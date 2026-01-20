@@ -1,4 +1,5 @@
-import { Package, Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import Logo from '../branding/Logo';
 
 export default function Footer() {
   const footerLinks = {
@@ -39,11 +40,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
-            <a href="/" className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white">Islakayd</span>
+            <a href="/" className="inline-block mb-6">
+              <Logo variant="light" size="md" />
             </a>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               The world's most advanced equipment rental marketplace. Rent anything, anywhere, powered by AI.

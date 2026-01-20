@@ -11,10 +11,10 @@ import {
   ChevronDown,
   LogOut,
   Settings,
-  Package,
   LayoutDashboard,
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
+import Logo from '../branding/Logo';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -76,17 +76,8 @@ export default function Header({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-12">
-            <button onClick={() => onNavigate('home')} className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                <Package className="w-6 h-6 text-white" />
-              </div>
-              <span
-                className={`text-2xl font-bold tracking-tight ${
-                  showTransparent ? 'text-white' : 'text-gray-900'
-                }`}
-              >
-                Islakayd
-              </span>
+            <button onClick={() => onNavigate('home')} className="flex items-center">
+              <Logo variant={showTransparent ? 'light' : 'color'} size="md" />
             </button>
 
             <nav className="hidden lg:flex items-center gap-8">
