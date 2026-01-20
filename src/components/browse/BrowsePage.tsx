@@ -5,15 +5,16 @@ import {
   SlidersHorizontal,
   Grid,
   List,
-  ChevronDown,
   X,
   Star,
   Heart,
   Shield,
   Clock,
   ArrowLeft,
+  Map,
 } from 'lucide-react';
 import type { Equipment, Category } from '../../types';
+import EquipmentMap from '../map/EquipmentMap';
 
 interface BrowsePageProps {
   equipment: Equipment[];
@@ -42,9 +43,10 @@ export default function BrowsePage({
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [condition, setCondition] = useState('');
   const [sortBy, setSortBy] = useState('featured');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [filteredEquipment, setFilteredEquipment] = useState<Equipment[]>(equipment);
+  const [selectedMapEquipment, setSelectedMapEquipment] = useState<string | undefined>();
 
   useEffect(() => {
     let filtered = [...equipment];
@@ -211,6 +213,7 @@ export default function BrowsePage({
                   className={`p-2 rounded-lg transition-colors ${
                     viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'
                   }`}
+                  title="Grid view"
                 >
                   <Grid className="w-4 h-4" />
                 </button>
@@ -219,8 +222,18 @@ export default function BrowsePage({
                   className={`p-2 rounded-lg transition-colors ${
                     viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'
                   }`}
+                  title="List view"
                 >
                   <List className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === 'map' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'
+                  }`}
+                  title="Map view"
+                >
+                  <Map className="w-4 h-4" />
                 </button>
               </div>
 
@@ -348,6 +361,65 @@ export default function BrowsePage({
             >
               Clear All Filters
             </button>
+          </div>
+        ) : viewMode === 'map' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="h-[600px] lg:h-[calc(100vh-280px)] lg:sticky lg:top-40">
+              <EquipmentMap
+                equipment={filteredEquipment}
+                onEquipmentClick={(item) => {
+                  setSelectedMapEquipment(item.id);
+                  onEquipmentClick(item);
+                }}
+                selectedId={selectedMapEquipment}
+                className="h-full"
+              />
+            </div>
+            <div className="space-y-4 max-h-[calc(100vh-280px)] overflow-y-auto">
+              {filteredEquipment.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setSelectedMapEquipment(item.id);
+                    onEquipmentClick(item);
+                  }}
+                  onMouseEnter={() => setSelectedMapEquipment(item.id)}
+                  onMouseLeave={() => setSelectedMapEquipment(undefined)}
+                  className={`w-full bg-white rounded-xl overflow-hidden border transition-all duration-200 flex text-left ${
+                    selectedMapEquipment === item.id
+                      ? 'border-teal-500 shadow-lg'
+                      : 'border-gray-100 hover:border-gray-200 hover:shadow-md'
+                  }`}
+                >
+                  <div className="w-32 h-28 flex-shrink-0 relative overflow-hidden">
+                    <img
+                      src={item.images[0]}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 p-4">
+                    <h3 className="font-semibold text-gray-900 line-clamp-1 mb-1">
+                      {item.title}
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span className="line-clamp-1">{item.location}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-lg font-bold text-gray-900">${item.daily_rate}</span>
+                        <span className="text-sm text-gray-500">/day</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                        <span className="text-sm font-medium text-gray-700">{item.rating}</span>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
