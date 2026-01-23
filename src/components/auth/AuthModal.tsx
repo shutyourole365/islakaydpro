@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, Package, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import SocialAuth from './SocialAuth';
+import BiometricAuth from './BiometricAuth';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -17,6 +19,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showAdvancedAuth, setShowAdvancedAuth] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -294,6 +297,40 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 )}
               </button>
             </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500">or continue with</span>
+              </div>
+            </div>
+
+            {/* Social Auth */}
+            <SocialAuth
+              onSuccess={() => {
+                onSuccess();
+                onClose();
+              }}
+              onError={(err) => setError(err)}
+              showMagicLink={true}
+            />
+
+            {/* Biometric Auth */}
+            {mode === 'signin' && (
+              <div className="mt-4">
+                <BiometricAuth
+                  onSuccess={() => {
+                    onSuccess();
+                    onClose();
+                  }}
+                  onError={(err) => setError(err)}
+                  mode="authenticate"
+                />
+              </div>
+            )}
 
             <div className="mt-8 text-center">
               {mode === 'signin' && (
