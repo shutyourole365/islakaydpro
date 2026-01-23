@@ -143,16 +143,20 @@ export function useAsync<T>(asyncFn: () => Promise<T>, deps: unknown[] = []) {
     error: null,
   });
 
+  const asyncFnRef = useRef(asyncFn);
+  asyncFnRef.current = asyncFn;
+
   const execute = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const data = await asyncFn();
+      const data = await asyncFnRef.current();
       setState({ data, loading: false, error: null });
       return data;
     } catch (error) {
       setState({ data: null, loading: false, error: error as Error });
       throw error;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   useEffect(() => {

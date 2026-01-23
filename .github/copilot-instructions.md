@@ -11,14 +11,14 @@ Islakayd is a React + TypeScript equipment rental marketplace built with Vite, T
 - **UI Icons**: lucide-react, custom verification badge
 - **Build Tools**: ESLint, PostCSS, TypeScript
 
-### Core Data Model ([src/types/index.ts](src/types/index.ts))
+### Core Data Model ([src/types/index.ts](../src/types/index.ts))
 - **Profile**: User profiles extended from Supabase auth with rating, verification status, two-factor
 - **Equipment**: Listings with dynamic pricing (daily/weekly/monthly rates), geo-location, images, features, specifications
 - **Booking**: Rental transactions with date ranges, payment status, cancellation support
 - **Category**: Equipment categories with lazy-loaded counts
 - Additional: Reviews, Favorites, Notifications, Conversations/Messages, Analytics, VerificationRequests
 
-### Service Architecture ([src/services/database.ts](src/services/database.ts))
+### Service Architecture ([src/services/database.ts](../src/services/database.ts))
 All Supabase queries go through the database service layer. Key patterns:
 - Queries return data + count for pagination (e.g., `getEquipment()` returns `{data: Equipment[], count: number}`)
 - Filters passed as optional params object with chainable query building
@@ -26,20 +26,20 @@ All Supabase queries go through the database service layer. Key patterns:
 - Real-time subscriptions for notifications and messages
 - Audit logging for compliance (via `logAuditEvent`)
 
-### Authentication & Context ([src/contexts/AuthContext.tsx](src/contexts/AuthContext.tsx))
+### Authentication & Context ([src/contexts/AuthContext.tsx](../src/contexts/AuthContext.tsx))
 - Wraps entire app; manages user session, profile, analytics, unread notification count
 - Single source of truth for auth state: `user`, `session`, `profile`, `analytics`, `isAuthenticated`, `isLoading`
 - Methods: `signIn`, `signUp`, `signOut`, `resetPassword`, `updatePassword`, `refreshProfile`, `refreshNotifications`
 - Auto-loads user data on auth state change; use `refreshProfile()` after profile updates
 
 ### Component Organization
-- **Layout**: [Header](src/components/layout/Header.tsx) (responsive, mobile menu, auth/profile dropdowns), [Footer](src/components/layout/Footer.tsx)
+- **Layout**: [Header](../src/components/layout/Header.tsx) (responsive, mobile menu, auth/profile dropdowns), [Footer](../src/components/layout/Footer.tsx)
 - **Home**: Hero, Categories, FeaturedListings, HowItWorks, Testimonials, CTA
-- **Booking**: [BookingCalendar](src/components/booking/BookingCalendar.tsx) (min/max rental days, unavailable dates handling)
-- **Search**: [SearchModal](src/components/search/SearchModal.tsx) (location, price range, category filters, trending searches)
-- **Equipment**: [EquipmentDetail](src/components/equipment/EquipmentDetail.tsx), EquipmentMap (Leaflet-based)
+- **Booking**: [BookingCalendar](../src/components/booking/BookingCalendar.tsx) (min/max rental days, unavailable dates handling)
+- **Search**: [SearchModal](../src/components/search/SearchModal.tsx) (location, price range, category filters, trending searches)
+- **Equipment**: [EquipmentDetail](../src/components/equipment/EquipmentDetail.tsx), EquipmentMap (Leaflet-based)
 - **User**: AuthModal, Dashboard, ReviewsSection, NotificationsDropdown
-- **AI**: [AIAssistant](src/components/ai/AIAssistant.tsx) (collapsible widget with message suggestions, simulated responses)
+- **AI**: [AIAssistant](../src/components/ai/AIAssistant.tsx) (collapsible widget with message suggestions, simulated responses)
 
 ## Developer Workflows
 
@@ -60,7 +60,7 @@ VITE_SUPABASE_ANON_KEY=<your-anon-key>
 ```
 
 ### Database Migrations
-Supabase migrations in [supabase/migrations/](supabase/migrations/) are timestamped SQL files. New migrations must:
+Supabase migrations in [supabase/migrations/](../supabase/migrations/) are timestamped SQL files. New migrations must:
 1. Have security policies (RLS) for all tables
 2. Include proper indexes for filtering/sorting
 3. Follow naming: `YYYYMMDDHHMMSS_description.sql`
@@ -72,7 +72,7 @@ Bookings flow through states: `pending` → `confirmed` → `active` → `comple
 - **Payment status** tracked separately: `pending` | `paid` | `refunded`
 - Renters can only update `pending` bookings; owners can update any booking they own
 
-### BookingCalendar Component ([src/components/booking/BookingCalendar.tsx](src/components/booking/BookingCalendar.tsx))
+### BookingCalendar Component ([src/components/booking/BookingCalendar.tsx](../src/components/booking/BookingCalendar.tsx))
 ```typescript
 // Key validation logic in handleDateClick:
 const daysDiff = Math.ceil((date.getTime() - selectedStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -91,13 +91,13 @@ const isAvailable = await checkAvailability(equipmentId, startDate, endDate);
 await blockDates(equipmentId, startDate, endDate, 'booked');
 ```
 
-### Booking Data Structure ([src/types/index.ts#L60](src/types/index.ts#L60))
+### Booking Data Structure ([src/types/index.ts](../src/types/index.ts))
 Includes: `subtotal`, `service_fee`, `deposit_amount`, `total_amount` for transparent pricing
 
 ## Security & Permissions Patterns
 
 ### Row-Level Security (RLS)
-All tables use Supabase RLS. Key patterns in [migrations](supabase/migrations/):
+All tables use Supabase RLS. Key patterns in [migrations](../supabase/migrations/):
 
 | Table | SELECT | INSERT | UPDATE | DELETE |
 |-------|--------|--------|--------|--------|
@@ -123,7 +123,7 @@ await logAuditEvent({ userId, action: 'sign_in', metadata: { method: 'email' } }
 // Actions: sign_in, sign_up, sign_out, password_changed
 ```
 
-### Input Sanitization ([src/utils/validation.ts](src/utils/validation.ts))
+### Input Sanitization ([src/utils/validation.ts](../src/utils/validation.ts))
 **Always sanitize user input** before storage:
 ```typescript
 sanitizeInput(input)  // Removes: <>, javascript:, on*= event handlers
@@ -161,7 +161,7 @@ optimizeDeps: { exclude: ['lucide-react'] }
 
 ## AI Assistant Integration
 
-### Current Architecture ([src/components/ai/AIAssistant.tsx](src/components/ai/AIAssistant.tsx))
+### Current Architecture ([src/components/ai/AIAssistant.tsx](../src/components/ai/AIAssistant.tsx))
 The AI Assistant ("Kayd") currently uses **simulated responses** for demo purposes:
 ```typescript
 const simulateResponse = async (userMessage: string) => {
@@ -228,13 +228,13 @@ interface Message {
 
 ## Integration Points & External Dependencies
 
-### Supabase Integration ([src/lib/supabase.ts](src/lib/supabase.ts))
+### Supabase Integration ([src/lib/supabase.ts](../src/lib/supabase.ts))
 - Single client instance initialized with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
 - All queries go through service layer; direct queries should be avoided
 - Auth state changes trigger profile/analytics reload
 
 ### Leaflet Maps
-- [EquipmentMap](src/components/equipment/EquipmentMap.tsx) uses react-leaflet
+- [EquipmentMap](../src/components/map/EquipmentMap.tsx) uses react-leaflet
 - Displays equipment pins with lat/long; click handlers show details
 - Required: Define map bounds, tile layer, and zoom defaults
 
@@ -245,14 +245,14 @@ interface Message {
 ## Common Workflows & Examples
 
 ### Adding a New Equipment Filter
-1. Extend `SearchFilters` type in [SearchModal](src/components/search/SearchModal.tsx)
+1. Extend `SearchFilters` type in [SearchModal](../src/components/search/SearchModal.tsx)
 2. Add filter state and input in JSX
 3. Update `getEquipment()` call in database service with new filter param
 4. Chain appropriate `.eq()`, `.gte()`, `.lte()` to query
 
 ### Creating a New Page
-1. Create component in appropriate subdirectory (e.g., [components/browse/](src/components/browse/))
-2. Import in [App.tsx](src/App.tsx)
+1. Create component in appropriate subdirectory (e.g., [components/browse/](../src/components/browse/))
+2. Import in [App.tsx](../src/App.tsx)
 3. Add route case to App's navigation logic
 4. Wire up Header navigation callback
 
@@ -262,8 +262,8 @@ interface Message {
 3. Components using `useAuth()` re-render automatically
 
 ## Useful File References
-- Sample data in [App.tsx](src/App.tsx#L22) shows Equipment type usage
-- Database schema definitions in [supabase/migrations/](supabase/migrations/)
-- Type definitions centralized in [src/types/index.ts](src/types/index.ts) (~330 lines)
-- Tailwind config: [tailwind.config.js](tailwind.config.js)
-- ESLint config: [eslint.config.js](eslint.config.js)
+- Sample data in [App.tsx](../src/App.tsx) shows Equipment type usage
+- Database schema definitions in [supabase/migrations/](../supabase/migrations/)
+- Type definitions centralized in [src/types/index.ts](../src/types/index.ts) (~330 lines)
+- Tailwind config: [tailwind.config.js](../tailwind.config.js)
+- ESLint config: [eslint.config.js](../eslint.config.js)
