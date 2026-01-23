@@ -75,7 +75,7 @@ export default function RealTimeChat({
   onSendMessage,
   className = '',
 }: RealTimeChatProps) {
-  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
+  const [conversations] = useState<Conversation[]>(initialConversations);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');

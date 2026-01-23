@@ -4,7 +4,6 @@ import {
   Star,
   Zap,
   Shield,
-  Award,
   Target,
   Flame,
   Crown,
@@ -19,9 +18,6 @@ import {
   CheckCircle2,
   Lock,
   Sparkles,
-  TrendingUp,
-  Clock,
-  ArrowRight,
 } from 'lucide-react';
 
 interface Achievement {

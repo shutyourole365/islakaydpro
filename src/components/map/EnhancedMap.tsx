@@ -8,17 +8,12 @@ import {
   Filter,
   X,
   Star,
-  Clock,
-  Truck,
   Search,
-  ChevronDown,
-  ChevronUp,
   Route,
   Target,
   Compass,
   Map as MapIcon,
   Satellite,
-  Thermometer,
   Wind,
   Droplets,
   Sun,
@@ -219,7 +214,7 @@ export default function EnhancedMap({
         iconAnchor: [40, 40],
       });
 
-      const marker = L.marker([item.latitude, item.longitude], { icon })
+      L.marker([item.latitude, item.longitude], { icon })
         .addTo(mapInstance)
         .on('click', () => onEquipmentClick(item))
         .on('mouseover', () => setHoveredEquipment(item))

@@ -10,7 +10,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Bitcoin,
-  ArrowRight,
+
   Globe,
   Zap,
   RefreshCw,

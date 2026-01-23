@@ -7,7 +7,6 @@ import {
   Heart,
   MessageSquare,
   Bell,
-  User,
   Settings,
   HelpCircle,
   Sparkles,
@@ -15,9 +14,7 @@ import {
   Mic,
   Map,
   Calendar,
-  Zap,
   Trophy,
-  Gift,
   BarChart3,
   Shield,
 } from 'lucide-react';
