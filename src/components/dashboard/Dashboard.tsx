@@ -21,12 +21,9 @@ import {
   Shield,
   Eye,
   Users,
-  BarChart3,
   Activity,
   Loader2,
   Search,
-  Filter,
-  MoreVertical,
   Edit,
   Trash2,
   Check,
@@ -35,12 +32,10 @@ import {
   Phone,
   Mail,
   BadgeCheck,
-  AlertTriangle,
   Lock,
   Smartphone,
   FileText,
   Building,
-  ChevronDown,
   RefreshCw,
 } from 'lucide-react';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
@@ -58,7 +53,6 @@ import {
   sendMessage,
   getUserAnalytics,
   updateProfile,
-  getVerificationRequests,
   updateBookingStatus,
 } from '../../services/database';
 

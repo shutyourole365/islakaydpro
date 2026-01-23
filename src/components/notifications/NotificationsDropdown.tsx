@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   Bell,
   X,
-  CheckCircle2,
   Calendar,
   MessageSquare,
   Star,

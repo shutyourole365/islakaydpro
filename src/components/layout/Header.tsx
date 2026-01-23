@@ -12,6 +12,7 @@ import {
   LogOut,
   Settings,
   LayoutDashboard,
+  Package,
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
 import Logo from '../branding/Logo';

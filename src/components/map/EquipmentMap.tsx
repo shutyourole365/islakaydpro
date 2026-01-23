@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, X, Navigation, Layers, Minus, Plus } from 'lucide-react';
+import { MapPin, Navigation, Minus, Plus } from 'lucide-react';
 import type { Equipment } from '../../types';
 
 interface EquipmentMapProps {
@@ -21,6 +21,7 @@ export default function EquipmentMap({
   className = '',
 }: EquipmentMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mapInstance, setMapInstance] = useState<any>(null);
   const [markers, setMarkers] = useState<MapMarker[]>([]);
   const [hoveredEquipment, setHoveredEquipment] = useState<Equipment | null>(null);
@@ -74,6 +75,7 @@ export default function EquipmentMap({
     markers.forEach(({ element }) => element.remove());
 
     const newMarkers: MapMarker[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const L = (window as any).L;
 
     equipment.forEach((item) => {

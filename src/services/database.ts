@@ -155,7 +155,11 @@ export async function deleteEquipment(id: string): Promise<void> {
 }
 
 async function incrementEquipmentViews(equipmentId: string): Promise<void> {
-  await supabase.rpc('increment_view_count', { equipment_id: equipmentId }).catch(() => {});
+  try {
+    await supabase.rpc('increment_view_count', { equipment_id: equipmentId });
+  } catch {
+    // Silently ignore view count errors
+  }
 }
 
 export async function getBookings(filters: {
@@ -431,7 +435,7 @@ export async function getConversations(userId: string): Promise<Conversation[]> 
 
   if (error) throw error;
 
-  return (data || []).map(d => d.conversation).filter(Boolean) as Conversation[];
+  return (data || []).map(d => d.conversation).filter(Boolean) as unknown as Conversation[];
 }
 
 export async function getMessages(conversationId: string): Promise<Message[]> {
@@ -587,16 +591,19 @@ export async function logAuditEvent(event: {
   entityId?: string;
   metadata?: Record<string, unknown>;
 }): Promise<void> {
-  await supabase
-    .from('audit_logs')
-    .insert({
-      user_id: event.userId,
-      action: event.action,
-      entity_type: event.entityType,
-      entity_id: event.entityId,
-      metadata: event.metadata || {},
-    })
-    .catch(() => {});
+  try {
+    await supabase
+      .from('audit_logs')
+      .insert({
+        user_id: event.userId,
+        action: event.action,
+        entity_type: event.entityType,
+        entity_id: event.entityId,
+        metadata: event.metadata || {},
+      });
+  } catch {
+    // Silently ignore audit log errors
+  }
 }
 
 export function subscribeToNotifications(userId: string, callback: (notification: Notification) => void) {
