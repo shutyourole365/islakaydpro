@@ -1,11 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   X,
   Send,
   Sparkles,
   Bot,
   User,
-  Loader2,
   Mic,
   Paperclip,
   ThumbsUp,
@@ -13,6 +12,14 @@ import {
   RefreshCw,
   Minimize2,
   Maximize2,
+  Search,
+  Calendar,
+  DollarSign,
+  HelpCircle,
+  Wrench,
+  Camera,
+  Truck,
+  PartyPopper,
 } from 'lucide-react';
 
 interface Message {
@@ -21,17 +28,36 @@ interface Message {
   content: string;
   timestamp: Date;
   suggestions?: string[];
+  metadata?: {
+    type?: 'search' | 'booking' | 'info' | 'recommendation';
+    equipmentIds?: string[];
+  };
 }
+
+interface QuickAction {
+  icon: React.ReactNode;
+  label: string;
+  query: string;
+}
+
+const quickActions: QuickAction[] = [
+  { icon: <Wrench className="w-4 h-4" />, label: 'Power Tools', query: 'Show me available power tools' },
+  { icon: <Camera className="w-4 h-4" />, label: 'Cameras', query: 'I need to rent a camera' },
+  { icon: <Truck className="w-4 h-4" />, label: 'Heavy Equipment', query: 'Find me an excavator or bulldozer' },
+  { icon: <PartyPopper className="w-4 h-4" />, label: 'Events', query: 'What equipment do I need for a wedding?' },
+];
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showQuickActions, setShowQuickActions] = useState(true);
+  const [feedbackGiven, setFeedbackGiven] = useState<Set<string>>(new Set());
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
       content:
-        "Hi! I'm Kayd, your AI equipment assistant. I can help you find the perfect equipment for your project, compare prices, check availability, and answer any questions. What are you looking to rent today?",
+        "👋 Hi! I'm **Kayd**, your AI equipment assistant. I can help you:\n\n• 🔍 Find the perfect equipment for your project\n• 💰 Compare prices and get the best deals\n• 📅 Check availability and make reservations\n• ❓ Answer any questions about rentals\n\nWhat are you looking to rent today?",
       timestamp: new Date(),
       suggestions: [
         'Find me an excavator',
@@ -44,77 +70,123 @@ export default function AIAssistant() {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  const getContextualResponses = useCallback((userMessage: string): { content: string; suggestions: string[]; type: string } => {
+    const lowerMessage = userMessage.toLowerCase();
+    
+    // Price/cost related
+    if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('how much') || lowerMessage.includes('expensive') || lowerMessage.includes('cheap') || lowerMessage.includes('budget')) {
+      return {
+        content: "💰 **Equipment Pricing Guide**\n\nPrices vary by equipment type and rental duration:\n\n**Power Tools**: $25-100/day\n**Photography Gear**: $50-250/day\n**Heavy Equipment**: $200-800/day\n**Event Supplies**: $100-500/day\n\n💡 **Pro tip**: Weekly and monthly rentals often include significant discounts (up to 30% off daily rates)!\n\nWhat's your budget range? I can find the best options for you.",
+        suggestions: ['Under $100/day', '$100-300/day', 'Show me weekly deals', 'Premium equipment'],
+        type: 'info'
+      };
+    }
+
+    // Availability related
+    if (lowerMessage.includes('available') || lowerMessage.includes('when') || lowerMessage.includes('book') || lowerMessage.includes('reserve')) {
+      return {
+        content: "📅 **Checking Availability**\n\nMost equipment on Islakayd can be booked with just 24-hour notice! Here's how it works:\n\n1. Select your dates\n2. Equipment owner confirms (usually within 2 hours)\n3. Pick up or get delivery\n\nTo check specific availability, tell me:\n• What equipment you need\n• Your preferred dates\n• Your location",
+        suggestions: ['Check excavator availability', 'Book for this weekend', 'Need equipment tomorrow', 'How does delivery work?'],
+        type: 'booking'
+      };
+    }
+
+    // Delivery related
+    if (lowerMessage.includes('delivery') || lowerMessage.includes('deliver') || lowerMessage.includes('pickup') || lowerMessage.includes('pick up')) {
+      return {
+        content: "🚚 **Delivery & Pickup Options**\n\nWe offer flexible options:\n\n**Owner Delivery** - Many owners offer delivery for a small fee\n**Self Pickup** - Meet at the owner's location\n**Courier Partners** - For smaller items\n\n📍 Delivery typically costs $25-150 depending on distance and equipment size.\n\nWould you like me to filter by equipment with free delivery?",
+        suggestions: ['Show free delivery options', 'Equipment near me', 'Self pickup only', 'How far will they deliver?'],
+        type: 'info'
+      };
+    }
+
+    // Construction/renovation
+    if (lowerMessage.includes('construct') || lowerMessage.includes('build') || lowerMessage.includes('renovation') || lowerMessage.includes('remodel') || lowerMessage.includes('home improvement')) {
+      return {
+        content: "🏗️ **Construction & Renovation Equipment**\n\nHere's what most projects need:\n\n**Demolition**\n• Hammer drills, jackhammers\n• Demolition saws\n\n**Building**\n• Concrete mixers, vibrators\n• Scaffolding, ladders\n\n**Finishing**\n• Sanders, planers\n• Paint sprayers\n\n**Safety**\n• PPE equipment\n\nWhat type of project are you working on?",
+        suggestions: ['Kitchen remodel', 'Bathroom renovation', 'Deck building', 'Full home renovation'],
+        type: 'recommendation'
+      };
+    }
+
+    // Tools/power tools
+    if (lowerMessage.includes('tool') || lowerMessage.includes('drill') || lowerMessage.includes('saw') || lowerMessage.includes('power')) {
+      return {
+        content: "🔧 **Power Tools Available**\n\nI found 50+ power tools near you! Here are the most popular:\n\n⭐ **DeWalt 20V Combo Kit** - $75/day (4.9 rating)\n⭐ **Milwaukee M18 Impact Driver** - $35/day (4.8 rating)\n⭐ **Makita Circular Saw** - $40/day (4.7 rating)\n⭐ **Bosch Rotary Hammer** - $55/day (4.9 rating)\n\nAll include batteries, chargers, and carrying cases. What specific tools do you need?",
+        suggestions: ['Drilling & driving', 'Cutting tools', 'Sanders & grinders', 'Full tool kit'],
+        type: 'search'
+      };
+    }
+
+    // Camera/photography
+    if (lowerMessage.includes('camera') || lowerMessage.includes('photo') || lowerMessage.includes('video') || lowerMessage.includes('film') || lowerMessage.includes('shoot')) {
+      return {
+        content: "📸 **Camera & Video Equipment**\n\nTop rentals for your shoot:\n\n**Mirrorless Cameras**\n• Sony A7IV Kit - $125/day\n• Canon R5 - $150/day\n• Fuji X-T5 - $85/day\n\n**Cinema Cameras**\n• RED Komodo - $350/day\n• Blackmagic 6K Pro - $175/day\n\n**Accessories**\n• Lenses, tripods, lighting\n• Gimbals and stabilizers\n\nWhat's the project? I'll recommend the perfect setup!",
+        suggestions: ['Wedding photography', 'Short film', 'Real estate', 'YouTube/content creation'],
+        type: 'search'
+      };
+    }
+
+    // Wedding/event
+    if (lowerMessage.includes('wedding') || lowerMessage.includes('party') || lowerMessage.includes('event') || lowerMessage.includes('celebration')) {
+      return {
+        content: "🎉 **Event Equipment Packages**\n\nEverything you need for an amazing event:\n\n**Tents & Structures**\n• 20x30 Party Tent - $300/day\n• Clear Top Marquee - $500/day\n\n**Furniture**\n• Tables (rounds, rectangles)\n• Chairs (chiavari, folding)\n\n**Atmosphere**\n• String lights, uplighting\n• Sound systems, DJ gear\n• Dance floors\n\nHow many guests are you expecting? I'll build a custom package!",
+        suggestions: ['50-100 guests', '100-200 guests', '200+ guests', 'Show me tent options'],
+        type: 'recommendation'
+      };
+    }
+
+    // Excavator/heavy equipment
+    if (lowerMessage.includes('excavator') || lowerMessage.includes('bulldozer') || lowerMessage.includes('backhoe') || lowerMessage.includes('heavy')) {
+      return {
+        content: "🚜 **Heavy Equipment Rentals**\n\nI found 24 excavators and heavy equipment nearby:\n\n**Excavators**\n• Mini (1-3 ton) - $250/day\n• Medium (6-10 ton) - $400/day\n• Large (20+ ton) - $650/day\n\n**Also Available**\n• Backhoe loaders\n• Skid steers\n• Bulldozers\n\n✅ All come with operator manuals\n✅ Delivery available\n\nWhat size do you need for your project?",
+        suggestions: ['Mini excavator for landscaping', 'Medium for foundations', 'Need an operator too', 'Compare all options'],
+        type: 'search'
+      };
+    }
+
+    // Help/how to
+    if (lowerMessage.includes('help') || lowerMessage.includes('how') || lowerMessage.includes('work') || lowerMessage.includes('explain')) {
+      return {
+        content: "📚 **How Islakayd Works**\n\n**For Renters:**\n1. 🔍 Search for equipment\n2. 📅 Select your dates\n3. 📱 Book instantly or request\n4. 🚗 Pick up or get delivery\n5. ⭐ Return & leave a review\n\n**Protection Included:**\n• Verified owners\n• Damage protection options\n• 24/7 support\n• Secure payments\n\nWhat would you like to know more about?",
+        suggestions: ['How to book equipment', 'What if something breaks?', 'Cancellation policy', 'How to list my equipment'],
+        type: 'info'
+      };
+    }
+
+    // Default response
+    return {
+      content: "I'd love to help you find the perfect equipment! 🎯\n\nTo give you personalized recommendations, tell me:\n\n• **What** - Type of equipment or project\n• **When** - Your rental dates\n• **Where** - Your location\n• **Budget** - Price range (optional)\n\nOr try one of the quick options below!",
+      suggestions: ['Browse all equipment', 'Construction tools', 'Photography gear', 'Event supplies'],
+      type: 'info'
+    };
+  }, []);
 
   const simulateResponse = async (userMessage: string) => {
     setIsTyping(true);
+    setShowQuickActions(false);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Simulate realistic typing delay
+    const responseDelay = 800 + Math.random() * 1200;
+    await new Promise((resolve) => setTimeout(resolve, responseDelay));
 
-    const responses: Record<string, { content: string; suggestions?: string[] }> = {
-      excavator: {
-        content:
-          "Great choice! I found 24 excavators available in your area. Based on your needs, I'd recommend the CAT 320 for general construction work - it's available starting at $350/day with excellent reviews (4.9 stars from 156 rentals). Would you like me to show you the top options or help narrow down based on specific requirements like dig depth or weight capacity?",
-        suggestions: [
-          'Show me the top 5 options',
-          'I need one for a specific dig depth',
-          'What about mini excavators?',
-          'Compare prices',
-        ],
-      },
-      wedding: {
-        content:
-          "Congratulations on the upcoming wedding! For a typical wedding setup, you might need:\n\n1. **Tents & Canopies** - Starting at $200/day\n2. **Tables & Chairs** - $50-150/day per set\n3. **Lighting & Decor** - $100-300/day\n4. **Sound System** - $150-400/day\n5. **Dance Floor** - $200-500/day\n\nI can create a complete package estimate based on your guest count. How many people are you expecting?",
-        suggestions: [
-          '100-150 guests',
-          'Show me tent options',
-          'I need sound equipment',
-          'What about photography gear?',
-        ],
-      },
-      camera: {
-        content:
-          "I'd love to help you find the perfect camera rental! Here's a quick price comparison for popular options:\n\n| Camera | Daily Rate | Rating |\n|--------|-----------|--------|\n| Sony A7IV | $75/day | 4.9 |\n| Canon R5 | $85/day | 4.8 |\n| RED Komodo | $250/day | 4.9 |\n| Blackmagic 6K | $125/day | 4.7 |\n\nWhat type of project is this for? I can recommend the best option based on your needs.",
-        suggestions: [
-          'For a short film',
-          'Real estate photography',
-          'I need video capability',
-          'Show me lens packages',
-        ],
-      },
-      default: {
-        content:
-          "I can definitely help you with that! To give you the best recommendations, could you tell me a bit more about your project? For example:\n\n- What type of work are you doing?\n- How long do you need the equipment?\n- Do you have a budget range in mind?\n\nThis will help me find exactly what you need.",
-        suggestions: [
-          'Construction project',
-          'Home renovation',
-          'Photography/Video',
-          'Event setup',
-        ],
-      },
-    };
-
-    const lowerMessage = userMessage.toLowerCase();
-    let response = responses.default;
-
-    if (lowerMessage.includes('excavator')) {
-      response = responses.excavator;
-    } else if (lowerMessage.includes('wedding') || lowerMessage.includes('event')) {
-      response = responses.wedding;
-    } else if (
-      lowerMessage.includes('camera') ||
-      lowerMessage.includes('photo') ||
-      lowerMessage.includes('video')
-    ) {
-      response = responses.camera;
-    }
+    const response = getContextualResponses(userMessage);
 
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -122,10 +194,17 @@ export default function AIAssistant() {
       content: response.content,
       timestamp: new Date(),
       suggestions: response.suggestions,
+      metadata: { type: response.type as 'search' | 'booking' | 'info' | 'recommendation' },
     };
 
     setMessages((prev) => [...prev, newMessage]);
     setIsTyping(false);
+  };
+
+  const handleFeedback = (messageId: string, isPositive: boolean) => {
+    setFeedbackGiven((prev) => new Set([...prev, messageId]));
+    // In production, this would send feedback to the server
+    console.log(`Feedback for message ${messageId}: ${isPositive ? 'positive' : 'negative'}`);
   };
 
   const handleSend = () => {
@@ -251,20 +330,43 @@ export default function AIAssistant() {
                         : 'bg-gray-100 text-gray-800 rounded-tl-sm'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-line">{message.content}</p>
+                    <div className="text-sm whitespace-pre-line prose prose-sm max-w-none">
+                      {message.content.split('\n').map((line, i) => {
+                        // Handle bold text
+                        const boldParsed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        return (
+                          <span key={i} dangerouslySetInnerHTML={{ __html: boldParsed }} className="block" />
+                        );
+                      })}
+                    </div>
                   </div>
-                  {message.role === 'assistant' && (
+                  {message.role === 'assistant' && !feedbackGiven.has(message.id) && (
                     <div className="flex items-center gap-2 mt-2 ml-1">
-                      <button className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                      <button 
+                        onClick={() => handleFeedback(message.id, true)}
+                        className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors"
+                        title="Helpful"
+                      >
                         <ThumbsUp className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                      <button 
+                        onClick={() => handleFeedback(message.id, false)}
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
+                        title="Not helpful"
+                      >
                         <ThumbsDown className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                      <button 
+                        onClick={() => simulateResponse(messages[messages.length - 2]?.content || '')}
+                        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Regenerate response"
+                      >
                         <RefreshCw className="w-4 h-4" />
                       </button>
                     </div>
+                  )}
+                  {message.role === 'assistant' && feedbackGiven.has(message.id) && (
+                    <p className="text-xs text-gray-400 mt-2 ml-1">Thanks for your feedback!</p>
                   )}
                   {message.suggestions && message.suggestions.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
@@ -289,10 +391,33 @@ export default function AIAssistant() {
                   <Bot className="w-5 h-5 text-white" />
                 </div>
                 <div className="px-4 py-3 bg-gray-100 rounded-2xl rounded-tl-sm">
-                  <div className="flex items-center gap-1">
-                    <Loader2 className="w-4 h-4 animate-spin text-teal-500" />
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 bg-teal-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
                     <span className="text-sm text-gray-500">Kayd is thinking...</span>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Actions for first-time users */}
+            {showQuickActions && messages.length === 1 && (
+              <div className="space-y-3">
+                <p className="text-xs text-gray-400 text-center">Quick Actions</p>
+                <div className="grid grid-cols-2 gap-2">
+                  {quickActions.map((action, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSuggestionClick(action.query)}
+                      className="flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-700 hover:border-teal-300 hover:bg-teal-50 transition-colors text-left"
+                    >
+                      <span className="text-teal-500">{action.icon}</span>
+                      {action.label}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -301,31 +426,57 @@ export default function AIAssistant() {
           </div>
 
           <div className="p-4 border-t border-gray-100">
+            {/* Context hints */}
+            <div className="flex items-center justify-center gap-4 mb-3 text-xs text-gray-400">
+              <span className="flex items-center gap-1">
+                <Search className="w-3 h-3" />
+                Search
+              </span>
+              <span className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                Book
+              </span>
+              <span className="flex items-center gap-1">
+                <DollarSign className="w-3 h-3" />
+                Prices
+              </span>
+              <span className="flex items-center gap-1">
+                <HelpCircle className="w-3 h-3" />
+                Help
+              </span>
+            </div>
             <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
-              <button className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+              <button 
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                title="Attach image"
+              >
                 <Paperclip className="w-5 h-5" />
               </button>
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                 placeholder="Ask Kayd anything about equipment..."
                 className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none text-sm"
               />
-              <button className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors">
+              <button 
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                title="Voice input"
+              >
                 <Mic className="w-5 h-5" />
               </button>
               <button
                 onClick={handleSend}
-                disabled={!input.trim()}
+                disabled={!input.trim() || isTyping}
                 className="p-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-all"
               >
                 <Send className="w-5 h-5" />
               </button>
             </div>
             <p className="text-xs text-center text-gray-400 mt-3">
-              Kayd AI can make mistakes. Verify important information.
+              Powered by AI • <span className="text-teal-500 cursor-pointer hover:underline">Privacy Policy</span>
             </p>
           </div>
         </div>
