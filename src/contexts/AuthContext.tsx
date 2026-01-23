@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
-import type { Profile, UserAnalytics, Notification } from '../types';
+import type { Profile, UserAnalytics } from '../types';
 import { getProfile, getUserAnalytics, getUnreadNotificationCount, subscribeToNotifications, logAuditEvent } from '../services/database';
 
 interface AuthState {
@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!state.user) return;
 
-    const channel = subscribeToNotifications(state.user.id, (_notification: Notification) => {
+    const channel = subscribeToNotifications(state.user.id, () => {
       setState(prev => ({
         ...prev,
         unreadNotifications: prev.unreadNotifications + 1,

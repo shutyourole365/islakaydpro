@@ -17,7 +17,7 @@ import AIAssistant from './components/ai/AIAssistant';
 import BrowsePage from './components/browse/BrowsePage';
 import Dashboard from './components/dashboard/Dashboard';
 import ListEquipmentForm from './components/listing/ListEquipmentForm';
-import { getEquipment, addFavorite, removeFavorite, isFavorite } from './services/database';
+import { addFavorite, removeFavorite } from './services/database';
 
 const sampleEquipment: Equipment[] = [
   {
@@ -546,7 +546,9 @@ function AppContent() {
     }
   };
 
-  const handleBook = (_equipment: Equipment, _dates: { start: string; end: string }) => {
+  const handleBook = (equipment: Equipment, dates: { start: string; end: string }) => {
+    // Equipment and dates will be used when booking is implemented
+    console.log('Booking:', equipment.id, dates);
     if (!isAuthenticated) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);
@@ -556,7 +558,9 @@ function AppContent() {
     setSelectedEquipment(null);
   };
 
-  const handleMessage = (_equipment: Equipment) => {
+  const handleMessage = (equipment: Equipment) => {
+    // Equipment will be used when messaging is implemented
+    console.log('Message about:', equipment.id);
     if (!isAuthenticated) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);

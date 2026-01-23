@@ -8,7 +8,6 @@ import {
   Shield,
   CheckCircle2,
   Calendar,
-  Clock,
   ChevronLeft,
   ChevronRight,
   MessageSquare,
