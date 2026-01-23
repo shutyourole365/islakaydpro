@@ -20,7 +20,16 @@ import ListEquipmentForm from './components/listing/ListEquipmentForm';
 import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
+import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import { addFavorite, removeFavorite } from './services/database';
+
+// Lazy load new feature components
+const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow'));
+const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
+const RealTimeChat = lazy(() => import('./components/chat/RealTimeChat'));
+const AchievementsSystem = lazy(() => import('./components/gamification/AchievementsSystem'));
+const ARPreview = lazy(() => import('./components/ar/ARPreview'));
+const PriceAlerts = lazy(() => import('./components/alerts/PriceAlerts'));
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -813,6 +822,15 @@ function AppContent() {
           <span className="text-lg">⚖️</span>
           <span className="font-medium">Compare ({comparisonItems.length})</span>
         </button>
+      )}
+
+      {/* Quick Actions Menu */}
+      {currentPage !== 'list-equipment' && isAuthenticated && (
+        <QuickActionsMenu
+          onNavigate={handleNavigate}
+          unreadMessages={3}
+          unreadNotifications={5}
+        />
       )}
 
       {/* Skip Link for Accessibility */}
