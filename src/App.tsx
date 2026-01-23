@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import type { Category, Equipment } from './types';
@@ -459,13 +459,29 @@ function AppContent() {
     window.scrollTo(0, 0);
   }, [currentPage]);
 
+  const loadFavorites = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('favorites')
+        .select('equipment_id')
+        .eq('user_id', user.id);
+
+      if (data) {
+        setFavorites(new Set(data.map(f => f.equipment_id)));
+      }
+    } catch (error) {
+      console.error('Failed to load favorites:', error);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (user) {
       loadFavorites();
     } else {
       setFavorites(new Set());
     }
-  }, [user]);
+  }, [user, loadFavorites]);
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -484,22 +500,6 @@ function AppContent() {
         equipment_count: [1250, 890, 456, 678, 345, 234, 123, 567, 890, 432, 765, 321][index] || 100,
       }));
       setCategories(categoriesWithCounts);
-    }
-  };
-
-  const loadFavorites = async () => {
-    if (!user) return;
-    try {
-      const { data } = await supabase
-        .from('favorites')
-        .select('equipment_id')
-        .eq('user_id', user.id);
-
-      if (data) {
-        setFavorites(new Set(data.map(f => f.equipment_id)));
-      }
-    } catch (error) {
-      console.error('Failed to load favorites:', error);
     }
   };
 

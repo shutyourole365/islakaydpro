@@ -67,11 +67,14 @@ export default function EquipmentMap({
         mapInstance.remove();
       }
     };
+    // mapInstance intentionally excluded - only runs on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (!mapInstance) return;
 
+    // Clean up old markers
     markers.forEach(({ element }) => element.remove());
 
     const newMarkers: MapMarker[] = [];
@@ -118,6 +121,7 @@ export default function EquipmentMap({
         mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapInstance, equipment, selectedId, onEquipmentClick]);
 
   const handleZoomIn = () => {
