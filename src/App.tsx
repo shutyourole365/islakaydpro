@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import type { Category, Equipment } from './types';
@@ -13,11 +13,31 @@ import CTASection from './components/home/CTASection';
 import SearchModal from './components/search/SearchModal';
 import EquipmentDetail from './components/equipment/EquipmentDetail';
 import AuthModal from './components/auth/AuthModal';
-import AIAssistant from './components/ai/AIAssistant';
+import AIAssistantEnhanced from './components/ai/AIAssistantEnhanced';
 import BrowsePage from './components/browse/BrowsePage';
 import Dashboard from './components/dashboard/Dashboard';
 import ListEquipmentForm from './components/listing/ListEquipmentForm';
+import BookingSystem from './components/booking/BookingSystem';
+import EquipmentComparison from './components/comparison/EquipmentComparison';
+import { SkipLink } from './components/ui/AccessibleComponents';
 import { addFavorite, removeFavorite } from './services/database';
+
+// Lazy load heavy components for better performance
+const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
+const AnalyticsDashboard = lazy(() => import('./components/dashboard/AnalyticsDashboard'));
+const AdminPanel = lazy(() => import('./components/admin/AdminPanel'));
+const NotificationCenter = lazy(() => import('./components/notifications/NotificationCenter'));
+const PaymentSettings = lazy(() => import('./components/payments/PaymentSettings'));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+      <p className="text-gray-600 font-medium">Loading...</p>
+    </div>
+  </div>
+);
 
 const sampleEquipment: Equipment[] = [
   {
@@ -438,10 +458,10 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments';
 
 function AppContent() {
-  const { isAuthenticated, user, signOut } = useAuth();
+  const { isAuthenticated, user, profile, signOut } = useAuth();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -450,6 +470,10 @@ function AppContent() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCategory, setSearchCategory] = useState('');
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [bookingEquipment, setBookingEquipment] = useState<Equipment | null>(null);
+  const [comparisonItems, setComparisonItems] = useState<Equipment[]>([]);
+  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -546,16 +570,42 @@ function AppContent() {
     }
   };
 
-  const handleBook = (equipment: Equipment, dates: { start: string; end: string }) => {
-    // Equipment and dates will be used when booking is implemented
-    console.log('Booking:', equipment.id, dates);
+  const handleBook = (equipment: Equipment, _dates: { start: string; end: string }) => {
     if (!isAuthenticated) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);
       return;
     }
-    alert('Booking confirmed! You will receive a confirmation email shortly.');
+    // Open the booking system modal
+    setBookingEquipment(equipment);
+    setIsBookingOpen(true);
     setSelectedEquipment(null);
+  };
+
+  const handleBookingComplete = (bookingData: unknown) => {
+    console.log('Booking completed:', bookingData);
+    setIsBookingOpen(false);
+    setBookingEquipment(null);
+    // Show success notification
+    alert('🎉 Booking confirmed! Check your email for confirmation details.');
+  };
+
+  /* TODO: Wire up to equipment cards for comparison feature
+  const handleAddToComparison = (equipment: Equipment) => {
+    if (comparisonItems.length >= 4) {
+      alert('You can compare up to 4 items at a time.');
+      return;
+    }
+    if (comparisonItems.find(item => item.id === equipment.id)) {
+      alert('This item is already in your comparison.');
+      return;
+    }
+    setComparisonItems(prev => [...prev, equipment]);
+  };
+  */
+
+  const handleRemoveFromComparison = (equipmentId: string) => {
+    setComparisonItems(prev => prev.filter(item => item.id !== equipmentId));
   };
 
   const handleMessage = (equipment: Equipment) => {
@@ -660,6 +710,41 @@ function AppContent() {
         </>
       )}
 
+      {currentPage === 'security' && (
+        <Suspense fallback={<PageLoader />}>
+          <SecurityCenter onBack={() => setCurrentPage('dashboard')} />
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'analytics' && (
+        <Suspense fallback={<PageLoader />}>
+          <AnalyticsDashboard onBack={() => setCurrentPage('dashboard')} />
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'admin' && profile?.is_admin && (
+        <Suspense fallback={<PageLoader />}>
+          <AdminPanel onBack={() => setCurrentPage('dashboard')} />
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'notifications' && (
+        <Suspense fallback={<PageLoader />}>
+          <NotificationCenter onBack={() => setCurrentPage('dashboard')} />
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'payments' && (
+        <Suspense fallback={<PageLoader />}>
+          <PaymentSettings onBack={() => setCurrentPage('dashboard')} />
+          <Footer />
+        </Suspense>
+      )}
+
       {currentPage === 'list-equipment' && (
         <ListEquipmentForm
           categories={categories}
@@ -668,7 +753,7 @@ function AppContent() {
         />
       )}
 
-      {currentPage !== 'list-equipment' && <AIAssistant />}
+      {currentPage !== 'list-equipment' && <AIAssistantEnhanced />}
 
       <SearchModal
         isOpen={isSearchOpen}
@@ -692,6 +777,46 @@ function AppContent() {
           onFavoriteToggle={() => handleFavoriteToggle(selectedEquipment.id)}
         />
       )}
+
+      {/* Advanced Booking System Modal */}
+      {isBookingOpen && bookingEquipment && (
+        <BookingSystem
+          equipment={bookingEquipment}
+          onClose={() => {
+            setIsBookingOpen(false);
+            setBookingEquipment(null);
+          }}
+          onComplete={handleBookingComplete}
+        />
+      )}
+
+      {/* Equipment Comparison Modal */}
+      {isComparisonOpen && comparisonItems.length > 0 && (
+        <EquipmentComparison
+          items={comparisonItems}
+          onClose={() => setIsComparisonOpen(false)}
+          onRemove={handleRemoveFromComparison}
+          onBook={(equipment) => {
+            setIsComparisonOpen(false);
+            setBookingEquipment(equipment);
+            setIsBookingOpen(true);
+          }}
+        />
+      )}
+
+      {/* Comparison Floating Button */}
+      {comparisonItems.length > 0 && !isComparisonOpen && (
+        <button
+          onClick={() => setIsComparisonOpen(true)}
+          className="fixed bottom-24 right-6 z-40 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+        >
+          <span className="text-lg">⚖️</span>
+          <span className="font-medium">Compare ({comparisonItems.length})</span>
+        </button>
+      )}
+
+      {/* Skip Link for Accessibility */}
+      <SkipLink />
     </div>
   );
 }
