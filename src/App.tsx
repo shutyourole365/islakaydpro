@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import type { Category, Equipment } from './types';
 import Header from './components/layout/Header';
@@ -16,6 +17,7 @@ import AIAssistant from './components/ai/AIAssistant';
 import BrowsePage from './components/browse/BrowsePage';
 import Dashboard from './components/dashboard/Dashboard';
 import ListEquipmentForm from './components/listing/ListEquipmentForm';
+import { getEquipment, addFavorite, removeFavorite, isFavorite } from './services/database';
 
 const sampleEquipment: Equipment[] = [
   {
@@ -58,6 +60,12 @@ const sampleEquipment: Equipment[] = [
       location: 'Los Angeles, CA',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.9,
       total_reviews: 234,
       created_at: new Date().toISOString(),
@@ -104,6 +112,12 @@ const sampleEquipment: Equipment[] = [
       location: 'San Francisco, CA',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.95,
       total_reviews: 189,
       created_at: new Date().toISOString(),
@@ -150,6 +164,12 @@ const sampleEquipment: Equipment[] = [
       location: 'Austin, TX',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.85,
       total_reviews: 156,
       created_at: new Date().toISOString(),
@@ -196,6 +216,12 @@ const sampleEquipment: Equipment[] = [
       location: 'Miami, FL',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.92,
       total_reviews: 312,
       created_at: new Date().toISOString(),
@@ -242,6 +268,12 @@ const sampleEquipment: Equipment[] = [
       location: 'Denver, CO',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.78,
       total_reviews: 98,
       created_at: new Date().toISOString(),
@@ -288,6 +320,12 @@ const sampleEquipment: Equipment[] = [
       location: 'Nashville, TN',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.97,
       total_reviews: 567,
       created_at: new Date().toISOString(),
@@ -334,6 +372,12 @@ const sampleEquipment: Equipment[] = [
       location: 'Seattle, WA',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.88,
       total_reviews: 178,
       created_at: new Date().toISOString(),
@@ -380,6 +424,12 @@ const sampleEquipment: Equipment[] = [
       location: 'Phoenix, AZ',
       phone: null,
       is_verified: true,
+      is_admin: false,
+      two_factor_enabled: false,
+      email_verified: true,
+      phone_verified: false,
+      last_login: null,
+      account_status: 'active',
       rating: 4.8,
       total_reviews: 245,
       created_at: new Date().toISOString(),
@@ -390,12 +440,12 @@ const sampleEquipment: Equipment[] = [
 
 type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment';
 
-function App() {
+function AppContent() {
+  const { isAuthenticated, user, signOut } = useAuth();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
@@ -403,12 +453,19 @@ function App() {
 
   useEffect(() => {
     fetchCategories();
-    checkAuth();
   }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [currentPage]);
+
+  useEffect(() => {
+    if (user) {
+      loadFavorites();
+    } else {
+      setFavorites(new Set());
+    }
+  }, [user]);
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -430,13 +487,20 @@ function App() {
     }
   };
 
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    setIsAuthenticated(!!session);
+  const loadFavorites = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('favorites')
+        .select('equipment_id')
+        .eq('user_id', user.id);
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
+      if (data) {
+        setFavorites(new Set(data.map(f => f.equipment_id)));
+      }
+    } catch (error) {
+      console.error('Failed to load favorites:', error);
+    }
   };
 
   const handleNavigate = (page: string) => {
@@ -458,20 +522,28 @@ function App() {
     setSelectedEquipment(equipment);
   };
 
-  const handleFavoriteToggle = (equipmentId: string) => {
-    if (!isAuthenticated) {
+  const handleFavoriteToggle = async (equipmentId: string) => {
+    if (!isAuthenticated || !user) {
       setIsAuthOpen(true);
       return;
     }
-    setFavorites((prev) => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(equipmentId)) {
-        newFavorites.delete(equipmentId);
+
+    try {
+      const isFav = favorites.has(equipmentId);
+      if (isFav) {
+        await removeFavorite(user.id, equipmentId);
+        setFavorites(prev => {
+          const newFavorites = new Set(prev);
+          newFavorites.delete(equipmentId);
+          return newFavorites;
+        });
       } else {
-        newFavorites.add(equipmentId);
+        await addFavorite(user.id, equipmentId);
+        setFavorites(prev => new Set(prev).add(equipmentId));
       }
-      return newFavorites;
-    });
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
   };
 
   const handleBook = (_equipment: Equipment, _dates: { start: string; end: string }) => {
@@ -502,8 +574,7 @@ function App() {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setIsAuthenticated(false);
+    await signOut();
     setCurrentPage('home');
   };
 
@@ -580,9 +651,6 @@ function App() {
             onBack={() => setCurrentPage('home')}
             onEquipmentClick={handleEquipmentClick}
             onListEquipment={handleListEquipment}
-            favorites={favorites}
-            equipment={sampleEquipment}
-            onRemoveFavorite={handleFavoriteToggle}
           />
           <Footer />
         </>
@@ -607,7 +675,7 @@ function App() {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onSuccess={() => setIsAuthenticated(true)}
+        onSuccess={() => setIsAuthOpen(false)}
       />
 
       {selectedEquipment && (
@@ -621,6 +689,14 @@ function App() {
         />
       )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
