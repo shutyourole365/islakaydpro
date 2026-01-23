@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Sparkles,
   TrendingUp,
   MapPin,
-  Clock,
   Star,
   Heart,
   ArrowRight,
@@ -35,7 +34,7 @@ interface RecommendationReason {
   color: string;
 }
 
-interface ScoredEquipment {
+export interface ScoredEquipment {
   equipment: Equipment;
   score: number;
   reasons: RecommendationReason[];

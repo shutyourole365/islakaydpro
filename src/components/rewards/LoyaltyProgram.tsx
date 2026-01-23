@@ -55,7 +55,7 @@ interface PointsActivity {
   date: string;
 }
 
-export default function LoyaltyProgram({ userId, onClose }: LoyaltyProgramProps) {
+export default function LoyaltyProgram(_props: LoyaltyProgramProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'rewards' | 'history' | 'challenges'>('overview');
   const [isAnimating, setIsAnimating] = useState(false);
 

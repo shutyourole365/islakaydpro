@@ -1,18 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Bell,
   BellOff,
   TrendingDown,
   DollarSign,
   Check,
-  X,
   Plus,
   Trash2,
   ChevronRight,
-  AlertCircle,
   Sparkles,
-  Target,
-  Clock,
   Zap,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
