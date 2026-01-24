@@ -2,18 +2,58 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    
+    <!-- Primary Meta Tags -->
     <title>Islakayd - AI-Powered Equipment Rental Marketplace</title>
+    <meta name="title" content="Islakayd - AI-Powered Equipment Rental Marketplace" />
     <meta name="description" content="Rent any equipment, anywhere, anytime. The world's most intelligent equipment rental marketplace powered by AI. From power tools to construction machinery." />
+    <meta name="keywords" content="equipment rental, tool rental, construction equipment, camera rental, power tools, heavy machinery, rental marketplace" />
+    <meta name="author" content="Islakayd" />
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#0d9488" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Islakayd" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="Islakayd" />
+    <meta name="msapplication-TileColor" content="#0d9488" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+    <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-152x152.png" />
+    
+    <!-- Splash Screens for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://islakayd.com/" />
     <meta property="og:title" content="Islakayd - AI-Powered Equipment Rental Marketplace" />
     <meta property="og:description" content="Rent any equipment, anywhere, anytime. The world's most intelligent equipment rental marketplace powered by AI." />
-    <meta property="og:image" content="https://bolt.new/static/og_default.png" />
+    <meta property="og:image" content="/icons/icon-512x512.png" />
+    <meta property="og:site_name" content="Islakayd" />
+    
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png" />
+    <meta name="twitter:url" content="https://islakayd.com/" />
+    <meta name="twitter:title" content="Islakayd - AI-Powered Equipment Rental Marketplace" />
+    <meta name="twitter:description" content="Rent any equipment, anywhere, anytime. The world's most intelligent equipment rental marketplace powered by AI." />
+    <meta name="twitter:image" content="/icons/icon-512x512.png" />
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/icons/icon.svg" as="image" type="image/svg+xml" />
   </head>
   <body>
     <div id="root"></div>

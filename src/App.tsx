@@ -21,6 +21,7 @@ import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
+import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { addFavorite, removeFavorite } from './services/database';
 
 // Lazy load new feature components
@@ -648,6 +649,10 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* PWA Components */}
+      <InstallPrompt />
+      <OfflineIndicator />
+
       {currentPage !== 'list-equipment' && (
         <Header
           onSearchClick={() => setIsSearchOpen(true)}
