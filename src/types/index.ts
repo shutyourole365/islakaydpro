@@ -330,3 +330,29 @@ export interface InsurancePlan {
   coverage: number;
   features: string[];
 }
+
+export interface EmailPreferences {
+  id: string;
+  user_id: string;
+  booking_confirmations: boolean;
+  booking_reminders: boolean;
+  new_messages: boolean;
+  new_reviews: boolean;
+  price_alerts: boolean;
+  marketing_emails: boolean;
+  weekly_digest: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EmailLog {
+  id: string;
+  recipient: string;
+  subject: string;
+  template: string;
+  status: 'pending' | 'sent' | 'failed';
+  error_message: string | null;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  sent_at: string | null;
+}
