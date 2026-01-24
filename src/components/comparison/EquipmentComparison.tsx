@@ -178,7 +178,7 @@ export default function EquipmentComparison({
         );
       }
       
-      case 'list':
+      case 'list': {
         if (Array.isArray(value)) {
           return (
             <div className="space-y-1">
@@ -192,6 +192,7 @@ export default function EquipmentComparison({
           );
         }
         return <span className="text-gray-500">None listed</span>;
+      }
       
       default:
         return <span className={isBest ? 'font-semibold text-green-600' : 'text-gray-700'}>{String(value)}</span>;

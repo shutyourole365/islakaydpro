@@ -88,7 +88,8 @@ export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps
       if (error) {
         onError(error.message);
       }
-    } catch {
+    } catch (error) {
+      console.error('Social auth error:', error);
       onError('Failed to connect. Please try again.');
     } finally {
       setLoadingProvider(null);
