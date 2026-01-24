@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Fingerprint, Smartphone, ShieldCheck, AlertCircle } from 'lucide-react';
 
 interface BiometricAuthProps {
@@ -19,13 +19,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
   const [isRegistering, setIsRegistering] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
 
-  useEffect(() => {
-    checkBiometricCapabilities();
-    checkIfRegistered();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
-
-  const checkBiometricCapabilities = async () => {
+  const checkBiometricCapabilities = useCallback(async () => {
     if (!window.PublicKeyCredential) {
       setCapabilities({ available: false, type: 'unknown', platformAuthenticator: false });
       return;
@@ -56,13 +50,18 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
     } catch {
       setCapabilities({ available: false, type: 'unknown', platformAuthenticator: false });
     }
-  };
+  }, []);
 
-  const checkIfRegistered = () => {
+  const checkIfRegistered = useCallback(() => {
     // Check localStorage for registered credentials
     const stored = localStorage.getItem(`biometric_${userId}`);
     setIsRegistered(!!stored);
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    checkBiometricCapabilities();
+    checkIfRegistered();
+  }, [checkBiometricCapabilities, checkIfRegistered]);
 
   const registerBiometric = async () => {
     if (!capabilities?.available || !userId) return;
@@ -109,7 +108,8 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
         setIsRegistered(true);
         onSuccess();
       }
-    } catch {
+    } catch (error) {
+      console.error('Biometric registration error:', error);
       onError('Biometric registration failed. Please try again.');
     } finally {
       setIsRegistering(false);
@@ -154,7 +154,8 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
       if (assertion) {
         onSuccess();
       }
-    } catch {
+    } catch (error) {
+      console.error('Biometric authentication error:', error);
       onError('Biometric authentication failed. Please try again or use password.');
     } finally {
       setIsAuthenticating(false);
