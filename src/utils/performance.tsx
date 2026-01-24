@@ -81,13 +81,13 @@ function TableSkeleton({ rows = 5 }: { rows?: number }) {
 }
 
 // Lazy load wrapper with error boundary
-interface LazyComponentProps<T extends ComponentType<any>> {
+interface LazyComponentProps<T extends ComponentType<Record<string, unknown>>> {
   component: () => Promise<{ default: T }>;
   fallback?: ReactNode;
   props?: React.ComponentProps<T>;
 }
 
-function LazyLoad<T extends ComponentType<any>>({ 
+function LazyLoad<T extends ComponentType<Record<string, unknown>>>({ 
   component, 
   fallback = <LoadingSkeleton />,
   props = {} as React.ComponentProps<T>
@@ -223,6 +223,7 @@ interface LazyImageProps {
   placeholder?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function LazyImage({ src, alt, className = '', placeholder: _placeholder }: LazyImageProps) {
   const imgRef = useRef<HTMLImageElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -230,7 +231,7 @@ function LazyImage({ src, alt, className = '', placeholder: _placeholder }: Lazy
   const isVisible = useIntersectionObserver(imgRef as React.RefObject<Element>);
 
   return (
-    <div ref={imgRef as any} className={`relative overflow-hidden ${className}`}>
+    <div ref={imgRef as React.RefObject<HTMLDivElement>} className={`relative overflow-hidden ${className}`}>
       {/* Placeholder/Skeleton */}
       {!isLoaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
@@ -285,7 +286,7 @@ function runWhenIdle(callback: () => void): void {
 }
 
 // Memoization helper for expensive computations
-function memoize<T extends (...args: any[]) => any>(fn: T): T {
+function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
   const cache = new Map();
   
   return ((...args: Parameters<T>): ReturnType<T> => {

@@ -163,7 +163,7 @@ export default function EquipmentComparison({
           </span>
         );
       
-      case 'badge':
+      case 'badge': {
         const condition = String(value).toLowerCase();
         const badgeColors: Record<string, string> = {
           excellent: 'bg-green-100 text-green-700',
@@ -176,6 +176,7 @@ export default function EquipmentComparison({
             {String(value)}
           </span>
         );
+      }
       
       case 'list':
         if (Array.isArray(value)) {

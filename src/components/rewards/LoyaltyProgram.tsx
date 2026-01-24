@@ -55,6 +55,7 @@ interface PointsActivity {
   date: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function LoyaltyProgram(_props: LoyaltyProgramProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'rewards' | 'history' | 'challenges'>('overview');
   const [isAnimating, setIsAnimating] = useState(false);

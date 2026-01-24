@@ -69,6 +69,7 @@ export default function NotificationSettings() {
   useEffect(() => {
     checkSubscriptionStatus();
     loadPreferences();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkSubscriptionStatus = async () => {

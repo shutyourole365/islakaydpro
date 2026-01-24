@@ -77,12 +77,13 @@ export default function ARPreview({ equipment, onClose, className = '' }: ARPrev
   }, []);
 
   useEffect(() => {
+    const video = videoRef.current;
     initCamera();
 
     return () => {
       // Cleanup camera stream
-      if (videoRef.current?.srcObject) {
-        const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      if (video?.srcObject) {
+        const tracks = (video.srcObject as MediaStream).getTracks();
         tracks.forEach(track => track.stop());
       }
     };

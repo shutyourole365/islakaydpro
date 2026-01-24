@@ -91,6 +91,7 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
     if (user) {
       loadPreferences();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadPreferences = async () => {
