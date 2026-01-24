@@ -21,7 +21,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [success, setSuccess] = useState('');
   // Advanced auth state reserved for future biometric/social features
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_showAdvancedAuth, setShowAdvancedAuth] = useState(false);
+  const [_showAdvancedAuth] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -312,12 +312,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
             {/* Social Auth */}
             <SocialAuth
-              onSuccess={() => {
-                onSuccess();
-                onClose();
-              }}
               onError={(err) => setError(err)}
-              showMagicLink={true}
+              onLoading={(loading) => setLoading(loading)}
+              mode={mode === 'signup' ? 'signup' : 'signin'}
             />
 
             {/* Biometric Auth */}
@@ -329,7 +326,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     onClose();
                   }}
                   onError={(err) => setError(err)}
-                  mode="authenticate"
                 />
               </div>
             )}

@@ -1,4 +1,4 @@
-import { lazy, Suspense, ComponentType, ReactNode } from 'react';
+import React, { lazy, Suspense, ComponentType, ReactNode, useState, useEffect, useRef, useCallback } from 'react';
 
 // Loading skeleton component for lazy-loaded content
 function LoadingSkeleton({ 
@@ -96,7 +96,8 @@ function LazyLoad<T extends ComponentType<Record<string, unknown>>>({
   
   return (
     <Suspense fallback={fallback}>
-      <LazyComponent {...props} />
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <LazyComponent {...(props as any)} />
     </Suspense>
   );
 }
@@ -294,14 +295,11 @@ function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
     if (cache.has(key)) {
       return cache.get(key);
     }
-    const result = fn(...args);
+    const result = fn(...args) as ReturnType<T>;
     cache.set(key, result);
     return result;
   }) as T;
 }
-
-// Required imports for hooks
-import { useState, useEffect, useRef, useCallback } from 'react';
 
 // Export all utilities
 export {
