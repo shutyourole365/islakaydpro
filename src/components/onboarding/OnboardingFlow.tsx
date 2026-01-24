@@ -267,7 +267,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                 onClick={() => {
                   if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
-                      (_position) => {
+                      () => {
                         setPreferences(prev => ({ ...prev, location: 'Current Location' }));
                       },
                       () => {

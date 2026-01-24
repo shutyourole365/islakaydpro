@@ -22,6 +22,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
   useEffect(() => {
     checkBiometricCapabilities();
     checkIfRegistered();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const checkBiometricCapabilities = async () => {
@@ -108,7 +109,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
         setIsRegistered(true);
         onSuccess();
       }
-    } catch (err) {
+    } catch {
       onError('Biometric registration failed. Please try again.');
     } finally {
       setIsRegistering(false);
@@ -153,7 +154,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
       if (assertion) {
         onSuccess();
       }
-    } catch (err) {
+    } catch {
       onError('Biometric authentication failed. Please try again or use password.');
     } finally {
       setIsAuthenticating(false);

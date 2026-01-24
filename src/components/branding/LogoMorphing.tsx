@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
 interface LogoMorphingProps {
   variant?: 'cosmic' | 'ocean' | 'aurora' | 'fire' | 'crystal';
@@ -54,11 +54,11 @@ export default function LogoMorphing({
 
   const config = sizeConfig[size];
 
-  const speedMultiplier = {
+  const speedMultiplier = useMemo(() => ({
     slow: 0.5,
     medium: 1,
     fast: 2,
-  };
+  }), []);
 
   const colorSchemes = {
     cosmic: {

@@ -24,13 +24,13 @@ import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { addFavorite, removeFavorite } from './services/database';
 
-// Lazy load new feature components
-const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow'));
-const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
-const RealTimeChat = lazy(() => import('./components/chat/RealTimeChat'));
-const AchievementsSystem = lazy(() => import('./components/gamification/AchievementsSystem'));
-const ARPreview = lazy(() => import('./components/ar/ARPreview'));
-const PriceAlerts = lazy(() => import('./components/alerts/PriceAlerts'));
+// Lazy load new feature components (reserved for future use)
+// const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow'));
+// const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
+// const RealTimeChat = lazy(() => import('./components/chat/RealTimeChat'));
+// const AchievementsSystem = lazy(() => import('./components/gamification/AchievementsSystem'));
+// const ARPreview = lazy(() => import('./components/ar/ARPreview'));
+// const PriceAlerts = lazy(() => import('./components/alerts/PriceAlerts'));
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -580,7 +580,8 @@ function AppContent() {
     }
   };
 
-  const handleBook = (equipment: Equipment, _dates: { start: string; end: string }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleBook = (equipment: Equipment, _dates?: { start: string; end: string }) => {
     if (!isAuthenticated) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);

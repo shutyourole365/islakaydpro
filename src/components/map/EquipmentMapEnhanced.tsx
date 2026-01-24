@@ -38,14 +38,18 @@ type MapStyle = 'streets' | 'satellite' | 'terrain' | 'dark';
 
 export default function EquipmentMapEnhanced({
   equipment,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onEquipmentClick: _onEquipmentClick,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   selectedId: _selectedId,
   className = '',
   showSearch = true,
   showFilters = true,
   showLayerControl = true,
   enableClustering = true,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   enableRouting: _enableRouting = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   userLocation: _userLocation = null,
 }: EquipmentMapEnhancedProps) {
   const mapRef = useRef<HTMLDivElement>(null);

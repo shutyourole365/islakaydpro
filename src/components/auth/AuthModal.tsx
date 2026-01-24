@@ -19,7 +19,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [showAdvancedAuth, setShowAdvancedAuth] = useState(false);
+  // Advanced auth state reserved for future biometric/social features
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_showAdvancedAuth, setShowAdvancedAuth] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

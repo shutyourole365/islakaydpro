@@ -383,6 +383,7 @@ export default function AIAssistantEnhanced() {
     const messageToSend = input;
     setInput('');
     simulateResponse(messageToSend);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, uploadedImage, isListening, simulateResponse]);
 
   const handleSuggestionClick = useCallback((suggestion: string) => {
