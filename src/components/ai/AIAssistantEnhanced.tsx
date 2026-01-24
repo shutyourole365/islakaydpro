@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { sendMessage as sendAIMessage } from '../../services/ai';
 import {
   X,
   Send,
@@ -290,31 +291,72 @@ export default function AIAssistantEnhanced() {
     setShowQuickActions(false);
 
     const startTime = Date.now();
-    const responseDelay = 600 + Math.random() * 800;
-    await new Promise((resolve) => setTimeout(resolve, responseDelay));
 
-    const response = getContextualResponses(userMessage);
-    const processingTime = Date.now() - startTime;
+    try {
+      // Build conversation history for context
+      const conversationHistory = messages
+        .filter(m => m.id !== '1' && m.role !== 'system')
+        .slice(-6)
+        .map(m => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        }));
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: 'assistant',
-      content: response.content,
-      timestamp: new Date(),
-      suggestions: response.suggestions,
-      metadata: { 
-        type: response.type as 'search' | 'alert' | 'success' | 'booking' | 'info' | 'recommendation',
-        processingTime,
-      },
-    };
+      // Add current message
+      conversationHistory.push({
+        role: 'user' as const,
+        content: userMessage,
+      });
 
-    setMessages((prev) => [...prev, newMessage]);
-    setIsTyping(false);
+      // Call real AI service
+      const response = await sendAIMessage(conversationHistory);
+      const processingTime = Date.now() - startTime;
 
-    if (voiceEnabled) {
-      speakResponse(response.content);
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: response.content,
+        timestamp: new Date(),
+        suggestions: response.suggestions,
+        metadata: { 
+          type: 'recommendation',
+          processingTime,
+        },
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+
+      if (voiceEnabled) {
+        speakResponse(response.content);
+      }
+    } catch (error) {
+      console.error('AI service error:', error);
+      
+      // Fallback to local responses
+      const response = getContextualResponses(userMessage);
+      const processingTime = Date.now() - startTime;
+
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: response.content + "\n\n_(Using offline mode)_",
+        timestamp: new Date(),
+        suggestions: response.suggestions,
+        metadata: { 
+          type: response.type as 'search' | 'alert' | 'success' | 'booking' | 'info' | 'recommendation',
+          processingTime,
+        },
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+
+      if (voiceEnabled) {
+        speakResponse(response.content);
+      }
+    } finally {
+      setIsTyping(false);
     }
-  }, [getContextualResponses, voiceEnabled, speakResponse]);
+  }, [messages, getContextualResponses, voiceEnabled, speakResponse]);
 
   const handleFeedback = (messageId: string, isPositive: boolean) => {
     setFeedbackGiven((prev) => new Set([...prev, messageId]));
