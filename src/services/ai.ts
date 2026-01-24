@@ -288,7 +288,8 @@ export async function getPersonalizedRecommendations(
     .limit(5);
 
   const recentCategories = bookings
-    ?.map(b => b.equipment?.category?.name)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ?.map((b: any) => b.equipment?.category?.name)
     .filter(Boolean)
     .slice(0, 3);
 
