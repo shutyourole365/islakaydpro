@@ -78,7 +78,7 @@ export async function subscribeToPushNotifications(
   try {
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
     });
 
     console.log('Push subscription:', subscription);
@@ -121,6 +121,7 @@ export async function showLocalNotification(
     await registration.showNotification(title, {
       icon: '/icons/icon-192x192.png',
       badge: '/icons/badge-72x72.png',
+      // @ts-expect-error - vibrate is valid for notifications but not in TS types
       vibrate: [100, 50, 100],
       ...options,
     });
