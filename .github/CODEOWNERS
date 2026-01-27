@@ -1,0 +1,24 @@
+# Code Owners for Islakayd Platform
+# These owners will be automatically requested for review when PRs modify these files
+
+# Default owner for everything
+* @shutyourole365
+
+# Deployment configurations
+/vercel.json @shutyourole365
+/netlify.toml @shutyourole365
+/.github/workflows/ @shutyourole365
+
+# Security-sensitive files
+/supabase/migrations/ @shutyourole365
+/.env* @shutyourole365
+/SECURITY.md @shutyourole365
+
+# Database and backend
+/src/services/ @shutyourole365
+/src/lib/supabase.ts @shutyourole365
+
+# Build and configuration
+/vite.config.ts @shutyourole365
+/tsconfig*.json @shutyourole365
+/package.json @shutyourole365
