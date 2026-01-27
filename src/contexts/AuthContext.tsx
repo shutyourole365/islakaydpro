@@ -52,7 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         unreadNotifications: unreadCount,
       }));
     } catch (error) {
-      console.error('Failed to load user data:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to load user data:', error);
+      }
+      // Track error in analytics
+      if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+        const { analytics: analyticsService } = await import('../services/analytics');
+        analyticsService.trackError(error as Error, 'auth_data_load');
+      }
     }
   }, []);
 
@@ -133,6 +140,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         action: 'sign_in',
         metadata: { method: 'email' },
       });
+      
+      // Track sign in event
+      if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+        const { analytics } = await import('../services/analytics');
+        analytics.event('login', { method: 'email' });
+        analytics.setUserId(data.user.id);
+      }
     }
   };
 
@@ -159,6 +173,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         action: 'sign_up',
         metadata: { method: 'email' },
       });
+      
+      // Track signup event
+      if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+        const { analytics } = await import('../services/analytics');
+        analytics.trackSignup('email');
+        analytics.setUserId(data.user.id);
+      }
     }
   };
 
