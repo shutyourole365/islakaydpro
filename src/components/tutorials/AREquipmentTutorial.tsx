@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Play,
   Pause,
-  RotateCcw,
   Volume2,
   VolumeX,
   ChevronLeft,
@@ -10,10 +9,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   X,
-  Maximize2,
-  Settings,
   BookOpen,
-  Wrench,
   Shield,
   Zap,
   Clock,
@@ -66,8 +62,8 @@ export default function AREquipmentTutorial({
   const [showAR, setShowAR] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<{ [key: string]: number }>({});
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
+  // Video playback state - using currentTime for progress display
+  const [currentTime, _setCurrentTime] = useState(0);
   const [stepComplete, setStepComplete] = useState(false);
 
   useEffect(() => {

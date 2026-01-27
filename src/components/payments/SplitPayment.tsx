@@ -1,23 +1,16 @@
 import { useState } from 'react';
 import {
   Users,
-  Plus,
   Trash2,
-  Mail,
-  Phone,
-  DollarSign,
   CheckCircle2,
   Clock,
   AlertCircle,
   Send,
   Copy,
-  Link,
   Share2,
-  CreditCard,
   Loader2,
   XCircle,
   UserPlus,
-  Percent,
   RefreshCw,
 } from 'lucide-react';
 
@@ -391,7 +384,7 @@ export default function SplitPayment({
               <div className="bg-gray-50 rounded-xl p-4 mb-6">
                 <h4 className="font-medium text-gray-900 mb-3">Split Preview</h4>
                 <div className="h-4 bg-gray-200 rounded-full overflow-hidden flex">
-                  {currentSplits.map((split, index) => (
+                  {currentSplits.map((split) => (
                     <div
                       key={split.participantId}
                       className={`h-full bg-gradient-to-r ${split.participant.avatarColor}`}

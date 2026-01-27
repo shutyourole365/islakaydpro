@@ -1,22 +1,15 @@
 import { useState } from 'react';
 import {
   Users,
-  Plus,
   Trash2,
   Calendar,
   Clock,
-  MapPin,
   Package,
   DollarSign,
   UserPlus,
-  Mail,
-  Phone,
   CheckCircle2,
-  AlertCircle,
   ChevronRight,
-  Settings,
   Share2,
-  Copy,
   XCircle,
   Building2,
   Tag,
@@ -81,7 +74,7 @@ export default function GroupBooking({
   const [endDate, setEndDate] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState('');
-  const [shareLink, setShareLink] = useState('');
+  const [_shareLink, setShareLink] = useState(''); // Reserved for share feature
   const [submitting, setSubmitting] = useState(false);
 
   const addMember = () => {

@@ -18,7 +18,7 @@ Documentation: README, guides, security policy, monitoring docs
 Build: ✅ 1,601 modules - SUCCESS"
 
 # Push to GitHub
-git push origin main# Copilot Instructions for Islakayd Equipment Rental Platform
+git push origin maingit pull origin main --rebase && git push origin main# Copilot Instructions for Islakayd Equipment Rental Platform
 
 ## Project Overview
 Islakayd is a React + TypeScript equipment rental marketplace built with Vite, Tailwind CSS, and Supabase. Users can list equipment for rent or browse and book equipment from other owners. The platform features real-time booking, user verification, ratings/reviews, and an AI assistant.
@@ -75,8 +75,8 @@ npm run typecheck    # Type check without emitting (tsconfig.app.json)
 ### Environment Setup
 Create `.env.local` with Supabase credentials:
 ```
-VITE_SUPABASE_URL=<your-project-url>
-VITE_SUPABASE_ANON_KEY=<your-anon-key>
+VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhbHhseWt5c2JxeWllamVwemt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxNDY2ODgsImV4cCI6MjA4NDcyMjY4OH0.xVQYWWYZDc2YSsTEgTGhCjyArgwrhaXgGaCZAk1fqZs
 ```
 
 ### Database Migrations
@@ -97,7 +97,7 @@ Bookings flow through states: `pending` → `confirmed` → `active` → `comple
 // Key validation logic in handleDateClick:
 const daysDiff = Math.ceil((date.getTime() - selectedStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 if (daysDiff < minRentalDays || daysDiff > maxRentalDays) return; // Enforce limits
-// Check for unavailable dates in range before confirming selection
+// Check for unpx vercel --token PASTE_YOUR_TOKEN_HERE --prodnavailable dates in range before confirming selection
 ```
 - Uses `unavailableDates` array to block already-booked dates
 - Validates min/max rental days before accepting range selection

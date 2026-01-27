@@ -2,17 +2,11 @@ import { useState, useEffect } from 'react';
 import {
   Leaf,
   TrendingDown,
-  Award,
   Share2,
   Info,
-  ChevronRight,
   TreeDeciduous,
   Zap,
   Droplets,
-  Wind,
-  BarChart3,
-  Target,
-  Gift,
   XCircle,
   CheckCircle2,
 } from 'lucide-react';
@@ -54,10 +48,11 @@ interface Achievement {
 }
 
 export default function CarbonFootprintTracker({
-  userId,
+  userId: _userId,
   bookings,
   onClose,
 }: CarbonFootprintTrackerProps) {
+  // userId reserved for future API integration
   const [stats, setStats] = useState<CarbonStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'achievements'>('overview');

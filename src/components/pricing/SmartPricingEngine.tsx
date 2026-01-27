@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Sparkles, TrendingUp, DollarSign, Calendar, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Sparkles, TrendingUp, Calendar, CheckCircle, Loader2 } from 'lucide-react';
 import type { Equipment } from '../../types';
 
 interface SmartPricingProps {

@@ -3,14 +3,10 @@ import {
   Award,
   Star,
   Gift,
-  Trophy,
   Zap,
   Crown,
-  ChevronRight,
   Lock,
   CheckCircle2,
-  Sparkles,
-  Target,
   TrendingUp,
   Flame,
   Calendar,
@@ -62,7 +58,8 @@ interface PointsHistory {
   date: Date;
 }
 
-export default function LoyaltyProgram({ userId, onClose }: LoyaltyProgramProps) {
+export default function LoyaltyProgram({ userId, onClose: _onClose }: LoyaltyProgramProps) {
+  // onClose reserved for modal close functionality
   const [rewards, setRewards] = useState<UserRewards | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'rewards' | 'badges' | 'history'>('overview');
   const [loading, setLoading] = useState(true);

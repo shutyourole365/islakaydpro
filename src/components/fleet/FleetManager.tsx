@@ -1,16 +1,11 @@
 import { useState, useEffect } from 'react';
 import {
   Package,
-  Calendar,
   DollarSign,
-  TrendingUp,
   AlertTriangle,
-  CheckCircle2,
-  Clock,
   MapPin,
   Wrench,
   BarChart3,
-  Filter,
   Search,
   Plus,
   MoreVertical,
@@ -19,7 +14,6 @@ import {
   Trash2,
   PauseCircle,
   PlayCircle,
-  Settings,
   Download,
   RefreshCw,
 } from 'lucide-react';
@@ -70,13 +64,14 @@ interface FleetAlert {
   date: Date;
 }
 
-export default function FleetManager({ ownerId, onClose }: FleetManagerProps) {
+export default function FleetManager({ ownerId, onClose: _onClose }: FleetManagerProps) {
+  // onClose reserved for modal close functionality
   const [equipment, setEquipment] = useState<FleetEquipment[]>([]);
   const [stats, setStats] = useState<FleetStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'available' | 'rented' | 'maintenance'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedEquipment, setSelectedEquipment] = useState<FleetEquipment | null>(null);
+  const [_selectedEquipment, _setSelectedEquipment] = useState<FleetEquipment | null>(null); // Reserved for detail view
   const [showActions, setShowActions] = useState<string | null>(null);
 
   useEffect(() => {
