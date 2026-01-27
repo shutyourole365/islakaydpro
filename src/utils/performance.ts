@@ -1,4 +1,21 @@
 // Performance monitoring utilities
+
+// Type definitions for performance entries
+interface PerformanceEntryWithProcessing extends PerformanceEntry {
+  processingStart: number;
+}
+
+interface LayoutShiftEntry extends PerformanceEntry {
+  hadRecentInput: boolean;
+  value: number;
+}
+
+interface PerformanceMemory {
+  usedJSHeapSize: number;
+  totalJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
 export class PerformanceMonitor {
   private static instance: PerformanceMonitor;
   private marks: Map<string, number> = new Map();
@@ -47,8 +64,9 @@ export class PerformanceMonitor {
       // First Input Delay (FID)
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
-        entries.forEach((entry: any) => {
-          const fid = entry.processingStart - entry.startTime;
+        entries.forEach((entry) => {
+          const fidEntry = entry as PerformanceEntryWithProcessing;
+          const fid = fidEntry.processingStart - fidEntry.startTime;
           console.log('FID:', fid);
         });
       }).observe({ entryTypes: ['first-input'] });
@@ -57,9 +75,10 @@ export class PerformanceMonitor {
       let clsScore = 0;
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
-        entries.forEach((entry: any) => {
-          if (!entry.hadRecentInput) {
-            clsScore += entry.value;
+        entries.forEach((entry) => {
+          const clsEntry = entry as LayoutShiftEntry;
+          if (!clsEntry.hadRecentInput) {
+            clsScore += clsEntry.value;
           }
         });
         console.log('CLS:', clsScore);
@@ -91,7 +110,7 @@ export class PerformanceMonitor {
   // Memory usage (Chrome only)
   static getMemoryUsage() {
     if ('memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as unknown as { memory: PerformanceMemory }).memory;
       return {
         usedJSHeapSize: (memory.usedJSHeapSize / 1048576).toFixed(2) + ' MB',
         totalJSHeapSize: (memory.totalJSHeapSize / 1048576).toFixed(2) + ' MB',
