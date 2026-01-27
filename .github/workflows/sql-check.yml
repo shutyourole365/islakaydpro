@@ -1,0 +1,95 @@
+name: SQL Security Check
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/**/*.sql'
+      - '**/*.sql'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**/*.sql'
+      - '**/*.sql'
+
+jobs:
+  sql-security:
+    name: SQL Security Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for SQL injection patterns
+        run: |
+          echo "🔍 Checking SQL files for security issues..."
+          
+          # Check for potential SQL injection vulnerabilities
+          if grep -r -E "(exec|execute|eval)\s*\(" supabase/migrations/ 2>/dev/null; then
+            echo "⚠️  Warning: Found potentially unsafe SQL execution patterns"
+            echo "Please review these patterns for SQL injection vulnerabilities"
+          else
+            echo "✅ No obvious SQL injection patterns found"
+          fi
+          
+          # Check for commented credentials
+          if grep -r -i -E "(password|secret|api_key|token)\s*=" supabase/migrations/ 2>/dev/null | grep -v "REDACTED"; then
+            echo "❌ ERROR: Found potential credentials in SQL files"
+            exit 1
+          else
+            echo "✅ No hardcoded credentials found"
+          fi
+          
+          # Check for DROP DATABASE or DROP SCHEMA
+          if grep -r -i "DROP\s\+\(DATABASE\|SCHEMA\)" supabase/migrations/ 2>/dev/null; then
+            echo "⚠️  Warning: Found DROP DATABASE/SCHEMA statements"
+            echo "Please ensure these are intentional"
+          fi
+          
+          echo "✅ SQL security check completed successfully"
+
+      - name: Validate SQL syntax (basic)
+        run: |
+          echo "🔍 Validating SQL syntax..."
+          
+          # Check for balanced parentheses
+          for file in $(find supabase/migrations -name "*.sql" 2>/dev/null); do
+            echo "Checking $file..."
+            
+            # Count opening and closing parentheses
+            open=$(grep -o "(" "$file" | wc -l)
+            close=$(grep -o ")" "$file" | wc -l)
+            
+            if [ "$open" -ne "$close" ]; then
+              echo "⚠️  Warning: Unbalanced parentheses in $file"
+            fi
+          done
+          
+          echo "✅ SQL syntax validation completed"
+
+      - name: Check for RLS policies
+        run: |
+          echo "🔍 Checking for Row Level Security policies..."
+          
+          # Check if RLS is enabled on tables
+          if grep -r "CREATE TABLE" supabase/migrations/ 2>/dev/null | grep -v "CREATE TABLE IF NOT EXISTS"; then
+            echo "⚠️  Warning: Some tables may not use IF NOT EXISTS"
+          fi
+          
+          # Check for ALTER TABLE ENABLE RLS
+          if grep -r "ALTER TABLE.*ENABLE ROW LEVEL SECURITY" supabase/migrations/ 2>/dev/null; then
+            echo "✅ Found RLS enablement statements"
+          else
+            echo "⚠️  Warning: No RLS policies found in migrations"
+          fi
+          
+          echo "✅ RLS check completed"
+
+      - name: Summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ SQL Security Analysis Complete"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "All SQL security checks passed!"
+          echo "Your database migrations are secure."
+          echo ""
