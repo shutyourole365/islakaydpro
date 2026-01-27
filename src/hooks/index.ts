@@ -34,3 +34,6 @@ export {
   equipmentValidators,
   registrationValidators,
 } from './useForm';
+
+// Supabase hooks
+export { useSupabaseStatus } from './useSupabaseStatus';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Star, MapPin, Shield, Clock, Eye, Zap } from 'lucide-react';
+import { Heart, Star, MapPin, Shield, Clock, Eye, Zap, Plus } from 'lucide-react';
 import type { Equipment } from '../../types';
 import { RatingBadge, FeaturedBadge, VerifiedBadge, ConditionBadge } from '../ui/Badge';
 
@@ -10,6 +10,8 @@ interface EquipmentCardProps {
   isFavorite: boolean;
   variant?: 'default' | 'compact' | 'horizontal';
   showQuickBook?: boolean;
+  onAddToComparison?: (equipment: Equipment) => void;
+  showCompareButton?: boolean;
 }
 
 export default function EquipmentCard({
@@ -19,6 +21,8 @@ export default function EquipmentCard({
   isFavorite,
   variant = 'default',
   showQuickBook = false,
+  onAddToComparison,
+  showCompareButton = false,
 }: EquipmentCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -26,6 +30,11 @@ export default function EquipmentCard({
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onFavoriteClick(equipment.id);
+  };
+
+  const handleCompareClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToComparison?.(equipment);
   };
 
   if (variant === 'horizontal') {
@@ -154,17 +163,28 @@ export default function EquipmentCard({
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
-        {/* Favorite Button */}
-        <button
-          onClick={handleFavoriteClick}
-          className={`absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isFavorite
-              ? 'bg-red-500 text-white scale-110'
-              : 'bg-white/90 text-gray-600 hover:bg-white hover:text-red-500'
-          }`}
-        >
-          <Heart className={`w-5 h-5 ${isFavorite ? 'fill-white' : ''}`} />
-        </button>
+        {/* Action Buttons */}
+        <div className="absolute top-4 right-4 flex flex-col gap-2">
+          <button
+            onClick={handleFavoriteClick}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+              isFavorite
+                ? 'bg-red-500 text-white scale-110'
+                : 'bg-white/90 text-gray-600 hover:bg-white hover:text-red-500'
+            }`}
+          >
+            <Heart className={`w-5 h-5 ${isFavorite ? 'fill-white' : ''}`} />
+          </button>
+          {showCompareButton && onAddToComparison && (
+            <button
+              onClick={handleCompareClick}
+              className="w-10 h-10 rounded-full bg-white/90 text-gray-600 hover:bg-purple-500 hover:text-white flex items-center justify-center transition-all duration-300"
+              title="Add to comparison"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
+        </div>
 
         {/* Featured Badge */}
         {equipment.is_featured && (

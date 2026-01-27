@@ -31,6 +31,29 @@ const AdminPanel = lazy(() => import('./components/admin/AdminPanel'));
 const NotificationCenter = lazy(() => import('./components/notifications/NotificationCenter'));
 const PaymentSettings = lazy(() => import('./components/payments/PaymentSettings'));
 
+// Premium Features - Lazy loaded for performance
+const SubscriptionPlans = lazy(() => import('./components/subscription/SubscriptionPlans'));
+const CarbonFootprintTracker = lazy(() => import('./components/sustainability/CarbonFootprintTracker'));
+const AREquipmentTutorial = lazy(() => import('./components/tutorials/AREquipmentTutorial'));
+const GroupBooking = lazy(() => import('./components/booking/GroupBooking'));
+const DroneDeliveryTracking = lazy(() => import('./components/delivery/DroneDeliveryTracking'));
+const QRCheckInOut = lazy(() => import('./components/booking/QRCheckInOut'));
+const BlockchainContract = lazy(() => import('./components/contracts/BlockchainContract'));
+const AIDamageDetection = lazy(() => import('./components/inspection/AIDamageDetection'));
+const SplitPayment = lazy(() => import('./components/payments/SplitPayment'));
+const InstantInsuranceQuote = lazy(() => import('./components/insurance/InstantInsuranceQuote'));
+const SmartPricingEngine = lazy(() => import('./components/pricing/SmartPricingEngine'));
+const Equipment3DViewer = lazy(() => import('./components/equipment/Equipment3DViewer'));
+const VoiceSearch = lazy(() => import('./components/search/VoiceSearch'));
+const LiveLocationTracker = lazy(() => import('./components/booking/LiveLocationTracker'));
+const DamageReportWizard = lazy(() => import('./components/booking/DamageReportWizard'));
+
+// Additional Premium Features
+const SocialProof = lazy(() => import('./components/social/SocialProof'));
+const LoyaltyProgram = lazy(() => import('./components/gamification/LoyaltyProgram'));
+const WeatherAdvisor = lazy(() => import('./components/weather/WeatherAdvisor'));
+const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -460,7 +483,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
@@ -476,6 +499,23 @@ function AppContent() {
   const [bookingEquipment, setBookingEquipment] = useState<Equipment | null>(null);
   const [comparisonItems, setComparisonItems] = useState<Equipment[]>([]);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
+  // Premium feature states
+  const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
+  const [is3DViewerOpen, setIs3DViewerOpen] = useState(false);
+  const [viewerEquipment, setViewerEquipment] = useState<Equipment | null>(null);
+  const [isGroupBookingOpen, setIsGroupBookingOpen] = useState(false);
+  const [isSplitPaymentOpen, setIsSplitPaymentOpen] = useState(false);
+  const [isInsuranceQuoteOpen, setIsInsuranceQuoteOpen] = useState(false);
+  const [isDroneTrackingOpen, setIsDroneTrackingOpen] = useState(false);
+  const [isQRCheckInOpen, setIsQRCheckInOpen] = useState(false);
+  const [isDamageDetectionOpen, setIsDamageDetectionOpen] = useState(false);
+  const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
+  const [isBlockchainOpen, setIsBlockchainOpen] = useState(false);
+  const [isARTutorialOpen, setIsARTutorialOpen] = useState(false);
+  const [isSmartPricingOpen, setIsSmartPricingOpen] = useState(false);
+  const [isLiveTrackerOpen, setIsLiveTrackerOpen] = useState(false);
+  const [isDamageWizardOpen, setIsDamageWizardOpen] = useState(false);
+  const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -483,6 +523,13 @@ function AppContent() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Track page views in analytics
+    if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+      import('./services/analytics').then(({ analytics }) => {
+        analytics.pageView(`/${currentPage}`, `Islakayd - ${currentPage}`);
+      });
+    }
   }, [currentPage]);
 
   const loadFavorites = useCallback(async () => {
@@ -497,7 +544,9 @@ function AppContent() {
         setFavorites(new Set(data.map(f => f.equipment_id)));
       }
     } catch (error) {
-      console.error('Failed to load favorites:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to load favorites:', error);
+      }
     }
   }, [user]);
 
@@ -516,7 +565,9 @@ function AppContent() {
       .order('name');
 
     if (error) {
-      console.error('Error fetching categories:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching categories:', error);
+      }
       return;
     }
 
@@ -537,6 +588,13 @@ function AppContent() {
     setSearchQuery(query);
     setIsSearchOpen(false);
     setCurrentPage('browse');
+    
+    // Track search event
+    if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+      import('./services/analytics').then(({ analytics }) => {
+        analytics.trackSearch(query, { resultCount: sampleEquipment.length });
+      });
+    }
   };
 
   const handleCategoryClick = (category: Category) => {
@@ -546,6 +604,17 @@ function AppContent() {
 
   const handleEquipmentClick = (equipment: Equipment) => {
     setSelectedEquipment(equipment);
+    
+    // Track equipment view
+    if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+      import('./services/analytics').then(({ analytics }) => {
+        analytics.trackEquipmentView(
+          equipment.id,
+          equipment.title,
+          equipment.category?.name || 'Uncategorized'
+        );
+      });
+    }
   };
 
   const handleFavoriteToggle = async (equipmentId: string) => {
@@ -568,7 +637,11 @@ function AppContent() {
         setFavorites(prev => new Set(prev).add(equipmentId));
       }
     } catch (error) {
-      console.error('Failed to toggle favorite:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to toggle favorite:', error);
+      }
+      // Show user-friendly error
+      alert('Failed to update favorites. Please try again.');
     }
   };
 
@@ -585,14 +658,24 @@ function AppContent() {
   };
 
   const handleBookingComplete = (bookingData: unknown) => {
-    console.log('Booking completed:', bookingData);
+    if (import.meta.env.DEV) {
+      console.log('Booking completed:', bookingData);
+    }
+    
+    // Track booking completion
+    if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+      import('./services/analytics').then(({ analytics }) => {
+        const booking = bookingData as { id: string; total_amount: number };
+        analytics.trackBooking(booking.id, booking.total_amount, 'USD');
+      });
+    }
+    
     setIsBookingOpen(false);
     setBookingEquipment(null);
     // Show success notification
     alert('🎉 Booking confirmed! Check your email for confirmation details.');
   };
 
-  /* TODO: Wire up to equipment cards for comparison feature
   const handleAddToComparison = (equipment: Equipment) => {
     if (comparisonItems.length >= 4) {
       alert('You can compare up to 4 items at a time.');
@@ -603,8 +686,14 @@ function AppContent() {
       return;
     }
     setComparisonItems(prev => [...prev, equipment]);
+    // Show toast notification
+    setTimeout(() => {
+      if (comparisonItems.length + 1 >= 2) {
+        const shouldOpen = window.confirm(`${equipment.title} added to comparison! You now have ${comparisonItems.length + 1} items. View comparison now?`);
+        if (shouldOpen) setIsComparisonOpen(true);
+      }
+    }, 100);
   };
-  */
 
   const handleRemoveFromComparison = (equipmentId: string) => {
     setComparisonItems(prev => prev.filter(item => item.id !== equipmentId));
@@ -672,6 +761,7 @@ function AppContent() {
               onEquipmentClick={handleEquipmentClick}
               onFavoriteClick={handleFavoriteToggle}
               favorites={favorites}
+              onAddToComparison={handleAddToComparison}
             />
 
             <HowItWorks />
@@ -747,6 +837,73 @@ function AppContent() {
       {currentPage === 'payments' && (
         <Suspense fallback={<PageLoader />}>
           <PaymentSettings onBack={() => setCurrentPage('dashboard')} />
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'subscription' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-violet-50 to-purple-100">
+            <div className="max-w-7xl mx-auto px-4">
+              <SubscriptionPlans 
+                currentPlan="free" 
+                onClose={() => setCurrentPage('dashboard')}
+              />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'sustainability' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+            <div className="max-w-3xl mx-auto px-4">
+              <CarbonFootprintTracker
+                userId={user?.id || ''}
+                bookings={[
+                  { id: '1', equipmentTitle: 'CAT Excavator', category: 'Heavy Equipment', rentalDays: 5, date: new Date('2026-01-15'), carbonSaved: 45, treesEquivalent: 2 },
+                  { id: '2', equipmentTitle: 'Sony Camera Kit', category: 'Photography', rentalDays: 3, date: new Date('2026-01-10'), carbonSaved: 12, treesEquivalent: 1 },
+                  { id: '3', equipmentTitle: 'DeWalt Tool Kit', category: 'Power Tools', rentalDays: 7, date: new Date('2026-01-05'), carbonSaved: 28, treesEquivalent: 1 },
+                ]}
+                onClose={() => setCurrentPage('dashboard')}
+              />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'loyalty' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-amber-50 to-orange-100">
+            <div className="max-w-3xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <LoyaltyProgram userId={user?.id || ''} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'fleet' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-indigo-50 to-violet-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <FleetManager ownerId={user?.id || ''} />
+            </div>
+          </div>
           <Footer />
         </Suspense>
       )}
@@ -832,6 +989,284 @@ function AppContent() {
 
       {/* Skip Link for Accessibility */}
       <SkipLink />
+
+      {/* Voice Search Modal */}
+      {isVoiceSearchOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsVoiceSearchOpen(false)} />
+            <div className="relative z-10 w-full max-w-lg">
+              <VoiceSearch
+                onSearch={(query) => {
+                  setIsVoiceSearchOpen(false);
+                  handleSearch(query);
+                }}
+                onClose={() => setIsVoiceSearchOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* 3D Equipment Viewer Modal */}
+      {is3DViewerOpen && viewerEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIs3DViewerOpen(false)} />
+            <div className="relative z-10 w-full max-w-4xl">
+              <Equipment3DViewer
+                equipment={viewerEquipment}
+                onClose={() => {
+                  setIs3DViewerOpen(false);
+                  setViewerEquipment(null);
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Group Booking Modal */}
+      {isGroupBookingOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsGroupBookingOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <GroupBooking
+                equipment={bookingEquipment}
+                onClose={() => {
+                  setIsGroupBookingOpen(false);
+                  setBookingEquipment(null);
+                }}
+                onComplete={(data) => {
+                  console.log('Group booking:', data);
+                  setIsGroupBookingOpen(false);
+                  alert('Group booking confirmed!');
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Split Payment Modal */}
+      {isSplitPaymentOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsSplitPaymentOpen(false)} />
+            <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+              <SplitPayment
+                totalAmount={1250}
+                bookingId="demo-booking-123"
+                onClose={() => setIsSplitPaymentOpen(false)}
+                onComplete={(data) => {
+                  console.log('Split payment:', data);
+                  setIsSplitPaymentOpen(false);
+                  alert('Payment split configured!');
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Instant Insurance Quote Modal */}
+      {isInsuranceQuoteOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsInsuranceQuoteOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <InstantInsuranceQuote
+                equipment={bookingEquipment}
+                rentalDays={7}
+                onClose={() => setIsInsuranceQuoteOpen(false)}
+                onSelect={(plan) => {
+                  console.log('Insurance plan:', plan);
+                  setIsInsuranceQuoteOpen(false);
+                  alert(`${plan.name} insurance selected!`);
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Drone Delivery Tracking Modal */}
+      {isDroneTrackingOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsDroneTrackingOpen(false)} />
+            <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DroneDeliveryTracking
+                bookingId="demo-booking-123"
+                onClose={() => setIsDroneTrackingOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* QR Check-In/Out Modal */}
+      {isQRCheckInOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsQRCheckInOpen(false)} />
+            <div className="relative z-10 w-full max-w-md">
+              <QRCheckInOut
+                bookingId="demo-booking-123"
+                equipmentTitle="CAT 320 Excavator"
+                type="check-in"
+                onComplete={(result) => {
+                  console.log('QR check result:', result);
+                  setIsQRCheckInOpen(false);
+                  alert('Check-in successful!');
+                }}
+                onClose={() => setIsQRCheckInOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* AI Damage Detection Modal */}
+      {isDamageDetectionOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsDamageDetectionOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <AIDamageDetection
+                equipmentId={bookingEquipment.id}
+                equipmentTitle={bookingEquipment.title}
+                bookingId="demo-booking-123"
+                inspectionType="return"
+                onComplete={(report) => {
+                  console.log('Damage report:', report);
+                  setIsDamageDetectionOpen(false);
+                  alert('Inspection complete!');
+                }}
+                onClose={() => setIsDamageDetectionOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Blockchain Contract Modal */}
+      {isBlockchainOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsBlockchainOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <BlockchainContract
+                booking={{
+                  id: 'demo-booking-123',
+                  equipmentTitle: bookingEquipment.title,
+                  renterName: profile?.full_name || 'Demo User',
+                  ownerName: bookingEquipment.owner?.full_name || 'Equipment Owner',
+                  startDate: new Date(),
+                  endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                  totalAmount: bookingEquipment.daily_rate * 7,
+                  depositAmount: bookingEquipment.deposit_amount,
+                }}
+                onSign={(signature) => {
+                  console.log('Contract signed:', signature);
+                  setIsBlockchainOpen(false);
+                  alert('Smart contract signed!');
+                }}
+                onClose={() => setIsBlockchainOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* AR Equipment Tutorial Modal */}
+      {isARTutorialOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsARTutorialOpen(false)} />
+            <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+              <AREquipmentTutorial
+                equipmentId={bookingEquipment.id}
+                equipmentTitle={bookingEquipment.title}
+                category={bookingEquipment.category?.name || 'Equipment'}
+                onComplete={(results) => {
+                  console.log('Tutorial complete:', results);
+                  setIsARTutorialOpen(false);
+                  alert(`Tutorial completed with ${results.score}% score!`);
+                }}
+                onClose={() => setIsARTutorialOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Smart Pricing Engine Modal */}
+      {isSmartPricingOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsSmartPricingOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <SmartPricingEngine
+                equipment={bookingEquipment}
+                onApply={(pricing) => {
+                  console.log('Pricing applied:', pricing);
+                  setIsSmartPricingOpen(false);
+                  alert('Smart pricing applied!');
+                }}
+                onClose={() => setIsSmartPricingOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Live Location Tracker Modal */}
+      {isLiveTrackerOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsLiveTrackerOpen(false)} />
+            <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+              <LiveLocationTracker
+                bookingId="demo-booking-123"
+                pickupLocation={{
+                  address: '123 Equipment Way, Los Angeles, CA 90001',
+                  lat: 34.0522,
+                  lng: -118.2437,
+                }}
+                onArrival={() => {
+                  setIsLiveTrackerOpen(false);
+                  alert('You have arrived!');
+                }}
+                onClose={() => setIsLiveTrackerOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Damage Report Wizard Modal */}
+      {isDamageWizardOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsDamageWizardOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DamageReportWizard
+                bookingId="demo-booking-123"
+                equipmentId={bookingEquipment.id}
+                equipmentTitle={bookingEquipment.title}
+                onComplete={(report) => {
+                  console.log('Damage report:', report);
+                  setIsDamageWizardOpen(false);
+                  alert('Return inspection complete!');
+                }}
+                onClose={() => setIsDamageWizardOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
     </div>
   );
 }
