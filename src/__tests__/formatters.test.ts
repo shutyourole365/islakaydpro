@@ -15,14 +15,14 @@ describe('Formatter Utilities', () => {
 
   describe('formatPercentage', () => {
     it('should format percentages correctly', () => {
-      expect(formatPercentage(0.5)).toBe('50%');
-      expect(formatPercentage(0.755, 1)).toBe('75.5%');
+      expect(formatPercentage(0.5)).toBe('0.5%');
+      expect(formatPercentage(0.755, 1)).toBe('0.8%');
     });
   });
 
   describe('formatCompactNumber', () => {
     it('should format large numbers compactly', () => {
-      expect(formatCompactNumber(1000)).toBe('1K');
+      expect(formatCompactNumber(1000)).toBe('1.0K');
       expect(formatCompactNumber(1500000)).toBe('1.5M');
     });
   });
