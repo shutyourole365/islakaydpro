@@ -70,7 +70,8 @@ if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
 
 // Initialize performance monitoring in production
 if (import.meta.env.PROD) {
-  PerformanceMonitor.init();
+  PerformanceMonitor.getInstance();
+  PerformanceMonitor.getWebVitals();
 }
 
 // Register service worker for PWA

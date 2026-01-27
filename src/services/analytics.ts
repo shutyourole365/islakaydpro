@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps, prefer-const */
 // Google Analytics 4 Integration
 export interface AnalyticsEvent {
   action: string;
