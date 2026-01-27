@@ -7,15 +7,11 @@ import {
   Shield,
   Gift,
   Percent,
-  Clock,
   HeadphonesIcon,
   Truck,
   Award,
-  ChevronRight,
   Sparkles,
   XCircle,
-  CreditCard,
-  Calendar,
 } from 'lucide-react';
 
 interface SubscriptionPlansProps {
@@ -174,10 +170,6 @@ export default function SubscriptionPlans({
       },
     },
   ];
-
-  const getPrice = (plan: SubscriptionPlan) => {
-    return billingCycle === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice;
-  };
 
   const getMonthlyEquivalent = (plan: SubscriptionPlan) => {
     return billingCycle === 'yearly' ? plan.yearlyPrice / 12 : plan.monthlyPrice;

@@ -27,7 +27,8 @@ interface LiveActivity {
   message?: string;
 }
 
-export default function SocialProof({ equipmentId, className = '' }: SocialProofProps) {
+export default function SocialProof({ equipmentId: _equipmentId, className = '' }: SocialProofProps) {
+  // equipmentId reserved for filtering activities
   const [activities, setActivities] = useState<LiveActivity[]>([]);
   const [currentActivity, setCurrentActivity] = useState<LiveActivity | null>(null);
   const [stats, setStats] = useState({

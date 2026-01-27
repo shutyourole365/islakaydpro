@@ -66,8 +66,11 @@ export function validateEnvironment(): ValidationResult {
     errors.push('VITE_SUPABASE_ANON_KEY appears invalid - should be a long JWT token');
   }
 
-  if (env.VITE_STRIPE_PUBLIC_KEY && !env.VITE_STRIPE_PUBLIC_KEY.startsWith('pk_')) {
-    errors.push('VITE_STRIPE_PUBLIC_KEY appears invalid - should start with pk_');
+  // Stripe is optional - only warn, don't block
+  if (env.VITE_STRIPE_PUBLIC_KEY && 
+      !env.VITE_STRIPE_PUBLIC_KEY.startsWith('pk_') && 
+      !env.VITE_STRIPE_PUBLIC_KEY.includes('your_')) {
+    warnings.push('VITE_STRIPE_PUBLIC_KEY appears invalid - should start with pk_');
   }
 
   if (env.VITE_GA_MEASUREMENT_ID && !env.VITE_GA_MEASUREMENT_ID.match(/^G-[A-Z0-9]+$/)) {

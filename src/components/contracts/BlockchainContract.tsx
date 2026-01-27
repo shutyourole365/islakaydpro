@@ -5,7 +5,6 @@ import {
   Lock,
   CheckCircle2,
   Clock,
-  AlertTriangle,
   Link,
   Copy,
   ExternalLink,
@@ -59,11 +58,11 @@ interface ContractStatus {
 }
 
 export default function BlockchainContract({
-  bookingId,
+  bookingId: _bookingId,
   renterId,
-  ownerId,
-  equipmentId,
-  equipmentTitle,
+  ownerId: _ownerId,
+  equipmentId: _equipmentId,
+  equipmentTitle: _equipmentTitle,
   startDate,
   endDate,
   totalAmount,
@@ -72,6 +71,7 @@ export default function BlockchainContract({
   onSign,
   onClose,
 }: BlockchainContractProps) {
+  // bookingId, ownerId, equipmentId, equipmentTitle reserved for blockchain integration
   const [status, setStatus] = useState<ContractStatus>({
     created: true,
     renterSigned: false,

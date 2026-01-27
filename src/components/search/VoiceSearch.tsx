@@ -1,30 +1,37 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff, Search, Loader2, Volume2 } from 'lucide-react';
+import { Mic, MicOff, Search } from 'lucide-react';
 
 interface VoiceSearchProps {
   onSearch: (query: string) => void;
   placeholder?: string;
 }
 
+// Use any for browser Speech Recognition API compatibility
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SpeechRecognitionAPI = any;
+
 export default function VoiceSearch({ onSearch, placeholder = "Search equipment..." }: VoiceSearchProps) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [isSupported, setIsSupported] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionAPI>(null);
 
   useEffect(() => {
-    // Check for browser support
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    setIsSupported(!!SpeechRecognition);
+    // Check for browser support - use any for cross-browser compatibility
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognitionConstructor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setIsSupported(!!SpeechRecognitionConstructor);
 
-    if (SpeechRecognition) {
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = true;
-      recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
+    if (SpeechRecognitionConstructor) {
+      const recognition = new SpeechRecognitionConstructor();
+      recognitionRef.current = recognition;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
 
-      recognitionRef.current.onresult = (event) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognition.onresult = (event: any) => {
         let interim = '';
         let final = '';
         
@@ -42,12 +49,13 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
         }
       };
 
-      recognitionRef.current.onerror = (event) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognition.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
 
-      recognitionRef.current.onend = () => {
+      recognition.onend = () => {
         setIsListening(false);
       };
     }
@@ -156,12 +164,4 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
       )}
     </div>
   );
-}
-
-// Add TypeScript declarations for Web Speech API
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition;
-    webkitSpeechRecognition: typeof SpeechRecognition;
-  }
 }

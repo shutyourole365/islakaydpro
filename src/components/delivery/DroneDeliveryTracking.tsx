@@ -2,23 +2,16 @@ import { useState, useEffect } from 'react';
 import {
   Package,
   MapPin,
-  Clock,
   Plane,
   CheckCircle2,
   AlertCircle,
-  Truck,
-  RotateCw,
   Navigation,
   Camera,
   Phone,
-  MessageSquare,
   Share2,
   XCircle,
-  Loader2,
   Wind,
   Battery,
-  Signal,
-  Thermometer,
   Eye,
 } from 'lucide-react';
 
@@ -58,9 +51,10 @@ export default function DroneDeliveryTracking({
   equipmentTitle,
   pickupLocation,
   deliveryLocation,
-  estimatedDelivery,
+  estimatedDelivery: _estimatedDelivery,
   onClose,
 }: DroneDeliveryTrackingProps) {
+  // estimatedDelivery reserved for display
   const [status, setStatus] = useState<DroneStatus>({
     phase: 'preparing',
     latitude: pickupLocation.lat,
@@ -77,7 +71,7 @@ export default function DroneDeliveryTracking({
   });
   const [events, setEvents] = useState<TrackingEvent[]>([]);
   const [showLiveView, setShowLiveView] = useState(false);
-  const [isLive, setIsLive] = useState(true);
+  const [isLive, _setIsLive] = useState(true); // Reserved for live toggle
 
   useEffect(() => {
     // Initialize with first event

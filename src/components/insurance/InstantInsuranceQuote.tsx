@@ -2,19 +2,13 @@ import { useState, useEffect } from 'react';
 import {
   Shield,
   CheckCircle2,
-  AlertTriangle,
-  Info,
-  DollarSign,
-  FileText,
   ChevronRight,
-  Loader2,
   XCircle,
   Sparkles,
   Zap,
   Award,
   Clock,
   Wrench,
-  Truck,
   Heart,
   Star,
 } from 'lucide-react';
@@ -53,14 +47,15 @@ interface QuoteFactors {
 }
 
 export default function InstantInsuranceQuote({
-  equipmentId,
-  equipmentTitle,
+  equipmentId: _equipmentId,
+  equipmentTitle: _equipmentTitle,
   equipmentValue,
   rentalDays,
   dailyRate,
   onSelect,
   onClose,
 }: InstantInsuranceQuoteProps) {
+  // equipmentId and equipmentTitle reserved for future API integration
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<InsurancePlan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<InsurancePlan | null>(null);

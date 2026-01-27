@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Clock, DollarSign, AlertTriangle, CheckCircle, FileText, Camera, MessageSquare } from 'lucide-react';
+import { Shield, DollarSign, AlertTriangle, CheckCircle, FileText, Camera } from 'lucide-react';
 
 interface DamageReportWizardProps {
   bookingId: string;
@@ -33,11 +33,12 @@ interface ChecklistItem {
 export default function DamageReportWizard({
   bookingId,
   equipmentTitle,
-  equipmentImages,
+  equipmentImages: _equipmentImages,
   depositAmount,
   onComplete,
   onClose,
 }: DamageReportWizardProps) {
+  // equipmentImages reserved for comparison view
   const [step, setStep] = useState(1);
   const [checklist, setChecklist] = useState<ChecklistItem[]>([
     { id: '1', label: 'Physical Condition', description: 'Check for dents, scratches, or cracks', status: 'unchecked' },
@@ -54,7 +55,6 @@ export default function DamageReportWizard({
 
   const issueCount = checklist.filter((item) => item.status === 'issue').length;
   const checkedCount = checklist.filter((item) => item.status !== 'unchecked').length;
-  const progress = (checkedCount / checklist.length) * 100;
 
   // Auto-calculate severity based on issues
   useEffect(() => {

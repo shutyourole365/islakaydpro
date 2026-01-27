@@ -3,18 +3,15 @@ import {
   Camera,
   Upload,
   Scan,
-  AlertTriangle,
   CheckCircle2,
   XCircle,
   Eye,
   Loader2,
   Image as ImageIcon,
   Trash2,
-  ZoomIn,
   RefreshCw,
   Shield,
   FileText,
-  DollarSign,
   Info,
 } from 'lucide-react';
 
@@ -51,12 +48,13 @@ interface DamageReport {
 
 export default function AIDamageDetection({
   equipmentId,
-  equipmentTitle,
+  equipmentTitle: _equipmentTitle,
   type,
   previousPhotos = [],
   onComplete,
   onClose,
 }: AIDamageDetectionProps) {
+  // equipmentTitle reserved for display in future enhancement
   const [photos, setPhotos] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzed, setAnalyzed] = useState(false);
