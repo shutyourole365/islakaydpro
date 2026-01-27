@@ -49,9 +49,7 @@ const LiveLocationTracker = lazy(() => import('./components/booking/LiveLocation
 const DamageReportWizard = lazy(() => import('./components/booking/DamageReportWizard'));
 
 // Additional Premium Features
-const SocialProof = lazy(() => import('./components/social/SocialProof'));
 const LoyaltyProgram = lazy(() => import('./components/gamification/LoyaltyProgram'));
-const WeatherAdvisor = lazy(() => import('./components/weather/WeatherAdvisor'));
 const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
 
 // Loading fallback component
@@ -509,13 +507,11 @@ function AppContent() {
   const [isDroneTrackingOpen, setIsDroneTrackingOpen] = useState(false);
   const [isQRCheckInOpen, setIsQRCheckInOpen] = useState(false);
   const [isDamageDetectionOpen, setIsDamageDetectionOpen] = useState(false);
-  const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
   const [isBlockchainOpen, setIsBlockchainOpen] = useState(false);
   const [isARTutorialOpen, setIsARTutorialOpen] = useState(false);
   const [isSmartPricingOpen, setIsSmartPricingOpen] = useState(false);
   const [isLiveTrackerOpen, setIsLiveTrackerOpen] = useState(false);
   const [isDamageWizardOpen, setIsDamageWizardOpen] = useState(false);
-  const [activeBookingId, setActiveBookingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -1001,7 +997,6 @@ function AppContent() {
                   setIsVoiceSearchOpen(false);
                   handleSearch(query);
                 }}
-                onClose={() => setIsVoiceSearchOpen(false)}
               />
             </div>
           </div>
@@ -1015,7 +1010,8 @@ function AppContent() {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIs3DViewerOpen(false)} />
             <div className="relative z-10 w-full max-w-4xl">
               <Equipment3DViewer
-                equipment={viewerEquipment}
+                images={viewerEquipment.images}
+                title={viewerEquipment.title}
                 onClose={() => {
                   setIs3DViewerOpen(false);
                   setViewerEquipment(null);
@@ -1033,7 +1029,9 @@ function AppContent() {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsGroupBookingOpen(false)} />
             <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <GroupBooking
-                equipment={bookingEquipment}
+                equipmentId={bookingEquipment.id}
+                equipmentTitle={bookingEquipment.title}
+                dailyRate={bookingEquipment.daily_rate}
                 onClose={() => {
                   setIsGroupBookingOpen(false);
                   setBookingEquipment(null);
@@ -1058,6 +1056,7 @@ function AppContent() {
               <SplitPayment
                 totalAmount={1250}
                 bookingId="demo-booking-123"
+                equipmentTitle="CAT 320 Excavator"
                 onClose={() => setIsSplitPaymentOpen(false)}
                 onComplete={(data) => {
                   console.log('Split payment:', data);
@@ -1077,7 +1076,10 @@ function AppContent() {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsInsuranceQuoteOpen(false)} />
             <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <InstantInsuranceQuote
-                equipment={bookingEquipment}
+                equipmentId={bookingEquipment.id}
+                equipmentTitle={bookingEquipment.title}
+                equipmentValue={bookingEquipment.daily_rate * 30}
+                dailyRate={bookingEquipment.daily_rate}
                 rentalDays={7}
                 onClose={() => setIsInsuranceQuoteOpen(false)}
                 onSelect={(plan) => {
@@ -1099,6 +1101,10 @@ function AppContent() {
             <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
               <DroneDeliveryTracking
                 bookingId="demo-booking-123"
+                equipmentTitle="CAT 320 Excavator"
+                pickupLocation={{ address: '123 Equipment Way, LA', lat: 34.0522, lng: -118.2437 }}
+                deliveryLocation={{ address: '456 Construction Site, LA', lat: 34.0622, lng: -118.2537 }}
+                estimatedDelivery={new Date(Date.now() + 3600000)}
                 onClose={() => setIsDroneTrackingOpen(false)}
               />
             </div>
@@ -1114,8 +1120,9 @@ function AppContent() {
             <div className="relative z-10 w-full max-w-md">
               <QRCheckInOut
                 bookingId="demo-booking-123"
+                equipmentId={bookingEquipment?.id || 'demo-equipment'}
                 equipmentTitle="CAT 320 Excavator"
-                type="check-in"
+                mode="check-in"
                 onComplete={(result) => {
                   console.log('QR check result:', result);
                   setIsQRCheckInOpen(false);
@@ -1137,8 +1144,7 @@ function AppContent() {
               <AIDamageDetection
                 equipmentId={bookingEquipment.id}
                 equipmentTitle={bookingEquipment.title}
-                bookingId="demo-booking-123"
-                inspectionType="return"
+                type="post-rental"
                 onComplete={(report) => {
                   console.log('Damage report:', report);
                   setIsDamageDetectionOpen(false);
@@ -1158,15 +1164,21 @@ function AppContent() {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsBlockchainOpen(false)} />
             <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <BlockchainContract
-                booking={{
-                  id: 'demo-booking-123',
-                  equipmentTitle: bookingEquipment.title,
-                  renterName: profile?.full_name || 'Demo User',
-                  ownerName: bookingEquipment.owner?.full_name || 'Equipment Owner',
-                  startDate: new Date(),
-                  endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                  totalAmount: bookingEquipment.daily_rate * 7,
-                  depositAmount: bookingEquipment.deposit_amount,
+                bookingId="demo-booking-123"
+                renterId={user?.id || ''}
+                ownerId={bookingEquipment.owner_id}
+                equipmentId={bookingEquipment.id}
+                equipmentTitle={bookingEquipment.title}
+                startDate={new Date()}
+                endDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}
+                totalAmount={bookingEquipment.daily_rate * 7}
+                depositAmount={bookingEquipment.deposit_amount}
+                terms={{ 
+                  cancellationPolicy: '48 hours notice required for full refund', 
+                  damagePolicy: 'Renter responsible for damages beyond normal wear', 
+                  usageRules: ['Equipment must be operated by trained personnel', 'No use for illegal activities'], 
+                  insuranceCoverage: 'Comprehensive damage protection included', 
+                  disputeResolution: 'Mediation followed by arbitration if needed' 
                 }}
                 onSign={(signature) => {
                   console.log('Contract signed:', signature);
@@ -1189,11 +1201,10 @@ function AppContent() {
               <AREquipmentTutorial
                 equipmentId={bookingEquipment.id}
                 equipmentTitle={bookingEquipment.title}
-                category={bookingEquipment.category?.name || 'Equipment'}
-                onComplete={(results) => {
-                  console.log('Tutorial complete:', results);
+                equipmentType={bookingEquipment.category?.name || 'Equipment'}
+                onComplete={() => {
                   setIsARTutorialOpen(false);
-                  alert(`Tutorial completed with ${results.score}% score!`);
+                  alert('Tutorial completed!');
                 }}
                 onClose={() => setIsARTutorialOpen(false)}
               />
@@ -1208,14 +1219,15 @@ function AppContent() {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsSmartPricingOpen(false)} />
             <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <button
+                onClick={() => setIsSmartPricingOpen(false)}
+                className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100"
+              >
+                ✕
+              </button>
               <SmartPricingEngine
                 equipment={bookingEquipment}
-                onApply={(pricing) => {
-                  console.log('Pricing applied:', pricing);
-                  setIsSmartPricingOpen(false);
-                  alert('Smart pricing applied!');
-                }}
-                onClose={() => setIsSmartPricingOpen(false)}
+                onPriceChange={(prices) => console.log('New prices:', prices)}
               />
             </div>
           </div>
@@ -1228,18 +1240,19 @@ function AppContent() {
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsLiveTrackerOpen(false)} />
             <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+              <button
+                onClick={() => setIsLiveTrackerOpen(false)}
+                className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100"
+              >
+                ✕
+              </button>
               <LiveLocationTracker
-                bookingId="demo-booking-123"
-                pickupLocation={{
+                equipmentLocation={{
                   address: '123 Equipment Way, Los Angeles, CA 90001',
                   lat: 34.0522,
                   lng: -118.2437,
                 }}
-                onArrival={() => {
-                  setIsLiveTrackerOpen(false);
-                  alert('You have arrived!');
-                }}
-                onClose={() => setIsLiveTrackerOpen(false)}
+                pickupTime={new Date(Date.now() + 1800000)}
               />
             </div>
           </div>
@@ -1254,8 +1267,9 @@ function AppContent() {
             <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <DamageReportWizard
                 bookingId="demo-booking-123"
-                equipmentId={bookingEquipment.id}
                 equipmentTitle={bookingEquipment.title}
+                equipmentImages={bookingEquipment.images}
+                depositAmount={bookingEquipment.deposit_amount}
                 onComplete={(report) => {
                   console.log('Damage report:', report);
                   setIsDamageWizardOpen(false);

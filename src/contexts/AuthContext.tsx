@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Track error in analytics
       if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
         const { analytics: analyticsService } = await import('../services/analytics');
-        analyticsService.trackError(error as Error, 'auth_data_load');
+        analyticsService.trackError(`Auth data load failed: ${(error as Error).message}`, false);
       }
     }
   }, []);
@@ -177,7 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Track signup event
       if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
         const { analytics } = await import('../services/analytics');
-        analytics.trackSignup('email');
+        analytics.trackSignUp('email');
         analytics.setUserId(data.user.id);
       }
     }
