@@ -147,7 +147,16 @@ export default function LogoAnimated({
   const currentSize = sizes[size];
   const currentVariant = variants[variant];
   const glowBlur = glowSettings[glowIntensity];
-  const uid = `ik-${Math.random().toString(36).slice(2, 8)}`;
+  // Use crypto for secure random UID
+  function getRandomUID() {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      const arr = new Uint32Array(1);
+      window.crypto.getRandomValues(arr);
+      return 'ik-' + arr[0].toString(36).slice(0, 6);
+    }
+    return 'ik-' + Math.random().toString(36).slice(2, 8);
+  }
+  const uid = getRandomUID();
 
   const iconSize = currentSize.icon;
   const strokeW = currentSize.stroke;

@@ -332,8 +332,12 @@ export default function AIAssistant() {
                   >
                     <div className="text-sm whitespace-pre-line prose prose-sm max-w-none">
                       {message.content.split('\n').map((line, i) => {
-                        // Handle bold text
-                        const boldParsed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        // Handle bold text, escape HTML to prevent XSS
+                        const escapeHtml = (text: string) =>
+                          text.replace(/[&<>"']/g, (m) => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+                          }[m]));
+                        const boldParsed = escapeHtml(line).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         return (
                           <span key={i} dangerouslySetInnerHTML={{ __html: boldParsed }} className="block" />
                         );
