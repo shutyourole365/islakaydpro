@@ -11,6 +11,10 @@ on:
       - 'supabase/migrations/**/*.sql'
       - '**/*.sql'
 
+permissions:
+  contents: read
+  actions: read
+  security-events: write
 jobs:
   sql-security:
     name: SQL Security Analysis

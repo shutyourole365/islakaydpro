@@ -501,7 +501,13 @@ export default function AIAssistantEnhanced() {
                     <div className="text-sm whitespace-pre-line">
                       {message.content.split('\n').map((line, i) => {
                         const boldParsed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                        return <span key={i} dangerouslySetInnerHTML={{ __html: boldParsed }} className="block" />;
+                        // Escape HTML to prevent XSS
+                        const escapeHtml = (text: string) =>
+                          text.replace(/[&<>"']/g, (m) => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+                          }[m]));
+                        const safe = escapeHtml(line).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        return <span key={i} dangerouslySetInnerHTML={{ __html: safe }} className="block" />;
                       })}
                     </div>
                   </div>

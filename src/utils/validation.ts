@@ -1,8 +1,10 @@
 export function sanitizeInput(input: string): string {
+  // Remove script tags, event handlers, javascript: and encode < >
   return input
-    .replace(/[<>]/g, '')
+    .replace(/<script.*?>.*?<\/script>/gi, '')
+    .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
     .replace(/javascript:/gi, '')
-    .replace(/on\w+=/gi, '')
+    .replace(/[<>]/g, '')
     .trim();
 }
 
@@ -180,29 +182,24 @@ export function validateImageUrl(url: string): { valid: boolean; error?: string 
   if (!url) {
     return { valid: true };
   }
-
   try {
     const parsed = new URL(url);
-
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
+    // Only allow http/https, block all others (ftp, file, data, javascript, etc)
+    if (!/^https?:$/.test(parsed.protocol)) {
       return { valid: false, error: 'Invalid image URL protocol' };
     }
-
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
     const hasImageExtension = imageExtensions.some((ext) =>
       parsed.pathname.toLowerCase().endsWith(ext)
     );
-
     const isKnownImageHost = [
       'images.pexels.com',
       'images.unsplash.com',
       'cdn.pixabay.com',
     ].some((host) => parsed.hostname.includes(host));
-
     if (!hasImageExtension && !isKnownImageHost) {
       return { valid: false, error: 'URL does not appear to be an image' };
     }
-
     return { valid: true };
   } catch {
     return { valid: false, error: 'Invalid URL format' };

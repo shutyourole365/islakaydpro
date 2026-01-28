@@ -9,6 +9,10 @@ on:
 env:
   NODE_VERSION: '20'
 
+permissions:
+  contents: read
+  actions: read
+  security-events: write
 jobs:
   # Lint and Type Check
   quality:
