@@ -1,9 +1,19 @@
 export function sanitizeInput(input: string): string {
   // Remove script tags, event handlers, javascript: and encode < >
-  return input
-    .replace(/<script.*?>.*?<\/script>/gi, '')
-    .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
-    .replace(/javascript:/gi, '')
+  let sanitized = input;
+  let previous: string;
+
+  // Repeatedly apply multi-character pattern removals until no more changes occur
+  do {
+    previous = sanitized;
+    sanitized = sanitized
+      .replace(/<script.*?>.*?<\/script>/gi, '')
+      .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
+      .replace(/javascript:/gi, '');
+  } while (sanitized !== previous);
+
+  // Finally, remove all angle brackets and trim whitespace
+  return sanitized
     .replace(/[<>]/g, '')
     .trim();
 }
