@@ -7,7 +7,7 @@ export function sanitizeInput(input: string): string {
   do {
     previous = sanitized;
     sanitized = sanitized
-      .replace(/<script.*?>.*?<\/script>/gi, '')
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script(?:\s[^>]*)?>/gi, '')
       .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
       .replace(/javascript:/gi, '');
   } while (sanitized !== previous);
