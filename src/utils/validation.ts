@@ -9,7 +9,7 @@ export function sanitizeInput(input: string): string {
     sanitized = sanitized
       .replace(/<script\b[^>]*>[\s\S]*?<\/script(?:\s[^>]*)?>/gi, '')
       .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
-      .replace(/javascript:/gi, '');
+      .replace(/\b(?:javascript|data|vbscript):/gi, '');
   } while (sanitized !== previous);
 
   // Finally, remove all angle brackets and trim whitespace
