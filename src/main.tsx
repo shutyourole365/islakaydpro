@@ -5,9 +5,13 @@ import { ToastProvider } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { registerServiceWorker } from './lib/serviceWorker';
 import { analytics } from './services/analytics';
+import { errorMonitoring } from './services/errorMonitoring';
 import { PerformanceMonitor } from './utils/performance';
 import { validateEnvironment, logValidationResults } from './utils/envValidation';
 import './index.css';
+
+// Initialize error monitoring first
+errorMonitoring.initialize();
 
 // Validate environment variables on startup
 const envValidation = validateEnvironment();
