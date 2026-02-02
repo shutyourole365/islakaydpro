@@ -55,11 +55,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (import.meta.env.DEV) {
         console.error('Failed to load user data:', error);
       }
-      // Track error in analytics
+      // Track error in analytics and error monitoring
       if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
         const { analytics: analyticsService } = await import('../services/analytics');
         analyticsService.trackError(`Auth data load failed: ${(error as Error).message}`, false);
       }
+      // Send to Sentry if configured
+      const { errorMonitoring } = await import('../services/errorMonitoring');
+      errorMonitoring.captureException(error as Error, {
+        context: 'AuthContext.loadUserData',
+        userId,
+      });
     }
   }, []);
 
@@ -147,6 +153,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         analytics.event('login', { method: 'email' });
         analytics.setUserId(data.user.id);
       }
+      // Set user context in error monitoring
+      const { errorMonitoring } = await import('../services/errorMonitoring');
+      errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
     }
   };
 
@@ -180,6 +189,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         analytics.trackSignUp('email');
         analytics.setUserId(data.user.id);
       }
+      // Set user context in error monitoring
+      const { errorMonitoring } = await import('../services/errorMonitoring');
+      errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
     }
   };
 
@@ -190,6 +202,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         action: 'sign_out',
       });
     }
+
+    // Clear user context from error monitoring
+    const { errorMonitoring } = await import('../services/errorMonitoring');
+    errorMonitoring.clearUser();
 
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
