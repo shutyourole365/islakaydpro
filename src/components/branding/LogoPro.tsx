@@ -23,20 +23,28 @@ export default function LogoPro({
 
   const variants = {
     default: {
-      icon: '#0F766E', // Deeper teal - more professional
-      text: '#111827', // Gray-900 - strong contrast
+      icon: '#18181B', // Zinc-900 - modern tech feel
+      text: '#18181B',
+      gradient1: '#14B8A6', // Teal-500
+      gradient2: '#06B6D4', // Cyan-500
     },
     light: {
       icon: '#FFFFFF',
       text: '#FFFFFF',
+      gradient1: '#FFFFFF',
+      gradient2: '#FFFFFF',
     },
     dark: {
-      icon: '#111827',
-      text: '#111827',
+      icon: '#18181B',
+      text: '#18181B',
+      gradient1: '#14B8A6',
+      gradient2: '#06B6D4',
     },
     monochrome: {
-      icon: '#374151', // Gray-700 - corporate gray
-      text: '#1F2937', // Gray-800
+      icon: '#52525B', // Zinc-600
+      text: '#3F3F46',
+      gradient1: '#71717A',
+      gradient2: '#52525B',
     },
   };
 
@@ -45,7 +53,7 @@ export default function LogoPro({
 
   return (
     <div className={`flex items-center ${currentSize.spacing} ${className}`}>
-      {/* Clean, Corporate Mark - Industrial Sophistication */}
+      {/* Abstract Tech Mark - Stripe/Notion Style */}
       <div className="relative" style={{ width: currentSize.icon, height: currentSize.icon }}>
         <svg
           viewBox="0 0 100 100"
@@ -53,95 +61,70 @@ export default function LogoPro({
           xmlns="http://www.w3.org/2000/svg"
           className="w-full h-full"
         >
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor={currentVariant.gradient1} />
+              <stop offset="100%" stopColor={currentVariant.gradient2} />
+            </linearGradient>
+          </defs>
+          
           {minimal ? (
-            // Minimal square variant - bold and confident
+            // Ultra-minimal abstract shape
             <>
-              <rect
-                x="15"
-                y="15"
-                width="70"
-                height="70"
-                rx="8"
-                stroke={currentVariant.icon}
-                strokeWidth="5"
+              <path
+                d="M 30,50 Q 30,30 50,30 Q 70,30 70,50 Q 70,70 50,70 Q 30,70 30,50"
+                stroke="url(#logoGradient)"
+                strokeWidth="4"
                 fill="none"
               />
-              <rect
-                x="35"
-                y="35"
-                width="30"
-                height="30"
-                rx="3"
-                fill={currentVariant.icon}
-              />
+              <circle cx="50" cy="50" r="8" fill="url(#logoGradient)" />
             </>
           ) : (
-            // Professional industrial mark - represents equipment/machinery
+            // Sleek abstract symbol - modern tech aesthetic
             <>
-              {/* Bold geometric structure */}
-              <rect
-                x="20"
-                y="25"
-                width="28"
-                height="50"
-                rx="3"
+              {/* Main abstract shape - flowing curves */}
+              <path
+                d="M 25,35 L 50,20 L 75,35 L 75,65 L 50,80 L 25,65 Z"
+                fill="url(#logoGradient)"
+                opacity="0.15"
+              />
+              
+              {/* Bold primary element */}
+              <path
+                d="M 30,40 L 50,28 L 70,40 L 70,50 L 50,62 L 30,50 Z"
                 fill={currentVariant.icon}
               />
               
-              {/* Secondary element - creates depth */}
-              <rect
-                x="52"
-                y="35"
-                width="28"
-                height="30"
-                rx="3"
-                fill={currentVariant.icon}
-                opacity="0.7"
-              />
-              
-              {/* Connecting bar - professional detail */}
-              <rect
-                x="32"
-                y="45"
-                width="28"
-                height="8"
-                rx="2"
-                fill={currentVariant.icon}
-              />
-              
-              {/* Subtle accent line for sophistication */}
-              <line
-                x1="28"
-                y1="32"
-                x2="28"
-                y2="68"
+              {/* Accent line - creates depth */}
+              <path
+                d="M 40,44 L 50,38 L 60,44"
                 stroke="white"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
-                opacity="0.3"
+                strokeLinejoin="round"
+                opacity="0.4"
               />
               
-              {/* Subtle accent mark - premium detail */}
-              <circle
-                cx="74"
-                cy="40"
-                r="2.5"
+              {/* Bottom geometric accent */}
+              <path
+                d="M 35,55 L 50,63 L 65,55 L 65,68 L 50,76 L 35,68 Z"
                 fill={currentVariant.icon}
-                opacity="0.5"
+                opacity="0.6"
               />
             </>
           )}
         </svg>
       </div>
 
-      {/* Professional Wordmark - Corporate Typography */}
+      {/* Modern Wordmark - Tech Company Style */}
       {showText && (
         <span
-          className={`font-bold tracking-tight leading-none ${currentSize.text}`}
+          className={`font-semibold tracking-tight leading-none ${currentSize.text}`}
           style={{ 
             color: currentVariant.text,
             fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-            letterSpacing: '-0.03em'
+            letterSpacing: '-0.025em',
+            fontWeight: 600
           }}
         >
           Islakayd
