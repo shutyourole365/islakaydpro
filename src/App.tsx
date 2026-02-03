@@ -21,6 +21,7 @@ import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
+import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { addFavorite, removeFavorite } from './services/database';
 
@@ -51,6 +52,26 @@ const DamageReportWizard = lazy(() => import('./components/booking/DamageReportW
 // Additional Premium Features
 const LoyaltyProgram = lazy(() => import('./components/gamification/LoyaltyProgram'));
 const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
+const PriceNegotiator = lazy(() => import('./components/negotiation/PriceNegotiator'));
+const MaintenancePredictor = lazy(() => import('./components/predictive/MaintenancePredictor'));
+const ReferralProgram = lazy(() => import('./components/referral/ReferralProgram'));
+const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler'));
+
+// NEW Premium Features - Live Chat & Advanced Search
+const LiveChat = lazy(() => import('./components/chat/LiveChat'));
+const AdvancedFilters = lazy(() => import('./components/search/AdvancedFilters'));
+const DetailedComparison = lazy(() => import('./components/comparison/DetailedComparison'));
+const SavedSearches = lazy(() => import('./components/search/SavedSearches'));
+const EquipmentRecommendations = lazy(() => import('./components/recommendations/EquipmentRecommendations'));
+const QuickBook = lazy(() => import('./components/booking/QuickBook'));
+
+// Balanced Approach Features - NEW Components
+const AISearchEngine = lazy(() => import('./components/search/AISearchEngine'));
+const AnalyticsCharts = lazy(() => import('./components/dashboard/AnalyticsCharts'));
+const PhotoMessaging = lazy(() => import('./components/messaging/PhotoMessaging'));
+const EnhancedReviewSystem = lazy(() => import('./components/reviews/EnhancedReviewSystem'));
+const PWAEnhancedFeatures = lazy(() => import('./components/pwa/PWAEnhancedFeatures'));
+const MultiPaymentSystem = lazy(() => import('./components/payments/MultiPaymentSystem'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -481,7 +502,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
@@ -512,6 +533,30 @@ function AppContent() {
   const [isSmartPricingOpen, setIsSmartPricingOpen] = useState(false);
   const [isLiveTrackerOpen, setIsLiveTrackerOpen] = useState(false);
   const [isDamageWizardOpen, setIsDamageWizardOpen] = useState(false);
+  // New premium features
+  const [isPriceNegotiatorOpen, setIsPriceNegotiatorOpen] = useState(false);
+  const [isMaintenancePredictorOpen, setIsMaintenancePredictorOpen] = useState(false);
+  const [isSmartSchedulerOpen, setIsSmartSchedulerOpen] = useState(false);
+  const [isFeatureShowcaseOpen, setIsFeatureShowcaseOpen] = useState(false);
+  // New Balanced Approach modal states
+  const [isAISearchOpen, setIsAISearchOpen] = useState(false);
+  const [isPhotoMessagingOpen, setIsPhotoMessagingOpen] = useState(false);
+  const [isEnhancedReviewOpen, setIsEnhancedReviewOpen] = useState(false);
+  const [isPWAFeaturesOpen, setIsPWAFeaturesOpen] = useState(false);
+  const [isMultiPaymentOpen, setIsMultiPaymentOpen] = useState(false);
+  const [reviewEquipment, setReviewEquipment] = useState<Equipment | null>(null);
+  const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
+  const [messageConversationId, setMessageConversationId] = useState<string | null>(null);
+  // NEWEST Features - Communication & Discovery modal states
+  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
+  const [chatRecipient, setChatRecipient] = useState<{id: string; name: string; avatar?: string} | null>(null);
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
+  const [isDetailedComparisonOpen, setIsDetailedComparisonOpen] = useState(false);
+  const [comparisonEquipment, setComparisonEquipment] = useState<Equipment[]>([]);
+  const [isSavedSearchesOpen, setIsSavedSearchesOpen] = useState(false);
+  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
+  const [isQuickBookOpen, setIsQuickBookOpen] = useState(false);
+  const [quickBookEquipment, setQuickBookEquipment] = useState<Equipment | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -704,6 +749,88 @@ function AppContent() {
       return;
     }
     alert('Message sent to owner! They will respond shortly.');
+  };
+
+  const handleFeatureSelect = (featureId: string) => {
+    if (!isAuthenticated) {
+      setIsAuthOpen(true);
+      return;
+    }
+
+    // Select a random equipment for demo purposes
+    const demoEquipment = sampleEquipment[0];
+    setBookingEquipment(demoEquipment);
+
+    switch (featureId) {
+      case 'price-negotiator':
+        setIsPriceNegotiatorOpen(true);
+        break;
+      case 'smart-scheduler':
+        setIsSmartSchedulerOpen(true);
+        break;
+      case 'maintenance-predictor':
+        setIsMaintenancePredictorOpen(true);
+        break;
+      case 'referral-program':
+        setCurrentPage('referrals');
+        break;
+      case 'smart-pricing':
+        setIsSmartPricingOpen(true);
+        break;
+      case 'group-booking':
+        setIsGroupBookingOpen(true);
+        break;
+      case 'ai-search':
+        setIsAISearchOpen(true);
+        break;
+      case 'analytics':
+        setCurrentPage('analytics');
+        break;
+      case 'photo-messaging':
+        setIsPhotoMessagingOpen(true);
+        setMessageConversationId('demo-conversation-123');
+        break;
+      case 'enhanced-reviews':
+        setIsEnhancedReviewOpen(true);
+        setReviewEquipment(demoEquipment);
+        setReviewBookingId('demo-booking-123');
+        break;
+      case 'pwa-features':
+        setCurrentPage('pwa');
+        break;
+      case 'multi-payment':
+        setIsMultiPaymentOpen(true);
+        break;
+      case 'live-chat':
+        setChatRecipient({ 
+          id: demoEquipment.owner_id, 
+          name: demoEquipment.owner?.full_name || 'Equipment Owner',
+          avatar: demoEquipment.owner?.avatar_url || undefined
+        });
+        setIsLiveChatOpen(true);
+        break;
+      case 'advanced-filters':
+        setIsAdvancedFiltersOpen(true);
+        break;
+      case 'comparison':
+        // Add 3 demo equipment items to comparison
+        setComparisonEquipment([sampleEquipment[0], sampleEquipment[1], sampleEquipment[2]]);
+        setIsDetailedComparisonOpen(true);
+        break;
+      case 'saved-searches':
+        setIsSavedSearchesOpen(true);
+        break;
+      case 'recommendations':
+        setIsRecommendationsOpen(true);
+        break;
+      case 'quick-book':
+        setQuickBookEquipment(demoEquipment);
+        setIsQuickBookOpen(true);
+        break;
+      default:
+        alert(`${featureId} feature coming soon!`);
+    }
+    setIsFeatureShowcaseOpen(false);
   };
 
   const handleListEquipment = () => {
@@ -1279,6 +1406,364 @@ function AppContent() {
               />
             </div>
           </div>
+        </Suspense>
+      )}
+
+      {/* Referrals Page */}
+      {currentPage === 'referrals' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <ReferralProgram 
+                userId={user?.id || ''}
+                userName={user?.email || 'User'}
+                onClose={() => setCurrentPage('dashboard')}
+              />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {/* Price Negotiator Modal */}
+      {isPriceNegotiatorOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <PriceNegotiator
+            equipmentId={bookingEquipment.id}
+            equipmentTitle={bookingEquipment.title}
+            currentPrice={bookingEquipment.daily_rate * 7}
+            dailyRate={bookingEquipment.daily_rate}
+            weeklyRate={bookingEquipment.weekly_rate}
+            monthlyRate={bookingEquipment.monthly_rate}
+            rentalDays={7}
+            ownerId={bookingEquipment.owner_id}
+            ownerName={bookingEquipment.owner?.full_name || 'Owner'}
+            ownerResponseRate={85}
+            ownerAverageDiscount={12}
+            marketAveragePrice={bookingEquipment.daily_rate * 0.9}
+            demandLevel="medium"
+            onOfferSubmit={(offer) => {
+              console.log('Negotiation offer:', offer);
+              setIsPriceNegotiatorOpen(false);
+              alert(`Offer submitted: $${offer.offeredPrice.toFixed(2)} (${offer.discountPercentage}% off)`);
+            }}
+            onClose={() => setIsPriceNegotiatorOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Maintenance Predictor Modal */}
+      {isMaintenancePredictorOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <MaintenancePredictor
+            equipmentId={bookingEquipment.id}
+            equipmentTitle={bookingEquipment.title}
+            equipmentType={bookingEquipment.category?.name || 'Equipment'}
+            purchaseDate={new Date('2023-01-15')}
+            totalUsageHours={1850}
+            lastMaintenanceDate={new Date('2025-12-10')}
+            maintenanceHistory={[
+              {
+                date: new Date('2025-12-10'),
+                type: 'Oil Change',
+                cost: 150,
+                description: 'Routine oil and filter replacement',
+                partsReplaced: ['Oil Filter', 'Engine Oil'],
+              },
+              {
+                date: new Date('2025-09-05'),
+                type: 'Hydraulic Service',
+                cost: 380,
+                description: 'Hydraulic fluid replacement and seal inspection',
+                partsReplaced: ['Hydraulic Fluid', 'Seals'],
+              },
+            ]}
+            onScheduleMaintenance={(schedule) => {
+              console.log('Maintenance scheduled:', schedule);
+              setIsMaintenancePredictorOpen(false);
+              alert(`Maintenance scheduled! Estimated cost: $${schedule.estimatedCost}`);
+            }}
+            onClose={() => setIsMaintenancePredictorOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Smart Scheduler Modal */}
+      {isSmartSchedulerOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <SmartScheduler
+            equipmentId={bookingEquipment.id}
+            equipmentTitle={bookingEquipment.title}
+            equipmentLocation={{
+              lat: bookingEquipment.latitude || 34.0522,
+              lng: bookingEquipment.longitude || -118.2437,
+              address: bookingEquipment.location || 'Location',
+            }}
+            dailyRate={bookingEquipment.daily_rate}
+            unavailableDates={[]}
+            deliveryAvailable={true}
+            deliveryFee={50}
+            onSchedule={(schedule) => {
+              console.log('Smart schedule:', schedule);
+              setIsSmartSchedulerOpen(false);
+              alert(`Booking optimized! Total: $${schedule.totalCost.toFixed(2)}, Savings: $${schedule.savings.toFixed(2)}`);
+            }}
+            onClose={() => setIsSmartSchedulerOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Feature Showcase Modal */}
+      {isFeatureShowcaseOpen && (
+        <FeatureShowcase
+          onFeatureSelect={handleFeatureSelect}
+          onClose={() => setIsFeatureShowcaseOpen(false)}
+        />
+      )}
+
+      {/* Feature Showcase Floating Button */}
+      {currentPage !== 'list-equipment' && isAuthenticated && (
+        <button
+          onClick={() => setIsFeatureShowcaseOpen(true)}
+          className="fixed bottom-6 left-6 z-40 group"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+            <div className="relative w-14 h-14 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110">
+              <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center animate-pulse">
+              <span className="text-xs font-bold text-white">✨</span>
+            </div>
+          </div>
+          <div className="absolute bottom-full left-0 mb-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+            Premium Features
+            <div className="absolute top-full left-6 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900" />
+          </div>
+        </button>
+      )}
+
+      {/* AI Search Engine Modal */}
+      {isAISearchOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <AISearchEngine
+            onSearch={(query, filters) => {
+              setIsAISearchOpen(false);
+              setSearchQuery(query);
+              setSearchCategory(filters.category || '');
+              setCurrentPage('browse');
+            }}
+            onClose={() => setIsAISearchOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Photo Messaging Modal */}
+      {isPhotoMessagingOpen && messageConversationId && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsPhotoMessagingOpen(false)} />
+            <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+              <PhotoMessaging
+                conversationId={messageConversationId}
+                onSendMessage={(content, photos) => {
+                  console.log('Message sent:', { content, photos });
+                  setIsPhotoMessagingOpen(false);
+                  alert('Message with photos sent successfully!');
+                }}
+                onClose={() => {
+                  setIsPhotoMessagingOpen(false);
+                  setMessageConversationId(null);
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Enhanced Review System Modal */}
+      {isEnhancedReviewOpen && reviewEquipment && reviewBookingId && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsEnhancedReviewOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <EnhancedReviewSystem
+                equipmentId={reviewEquipment.id}
+                equipmentTitle={reviewEquipment.title}
+                bookingId={reviewBookingId}
+                onSubmit={(reviewData) => {
+                  console.log('Review submitted:', reviewData);
+                  setIsEnhancedReviewOpen(false);
+                  setReviewEquipment(null);
+                  setReviewBookingId(null);
+                  alert('Thank you for your detailed review!');
+                }}
+                onClose={() => {
+                  setIsEnhancedReviewOpen(false);
+                  setReviewEquipment(null);
+                  setReviewBookingId(null);
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Multi-Payment System Modal */}
+      {isMultiPaymentOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMultiPaymentOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <MultiPaymentSystem
+                bookingId="demo-booking-123"
+                totalAmount={bookingEquipment.daily_rate * 7}
+                depositAmount={bookingEquipment.deposit_amount}
+                onPaymentComplete={(paymentData) => {
+                  console.log('Payment completed:', paymentData);
+                  setIsMultiPaymentOpen(false);
+                  alert(`Payment successful! Method: ${paymentData.method}`);
+                }}
+                onClose={() => setIsMultiPaymentOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Live Chat Modal */}
+      {isLiveChatOpen && chatRecipient && (
+        <Suspense fallback={<PageLoader />}>
+          <LiveChat
+            recipientId={chatRecipient.id}
+            recipientName={chatRecipient.name}
+            recipientAvatar={chatRecipient.avatar}
+            equipmentId={selectedEquipment?.id}
+            onClose={() => {
+              setIsLiveChatOpen(false);
+              setChatRecipient(null);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Advanced Filters Modal */}
+      {isAdvancedFiltersOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <AdvancedFilters
+            onApply={(filters) => {
+              console.log('Applied filters:', filters);
+              setIsAdvancedFiltersOpen(false);
+              // TODO: Apply filters to equipment search
+            }}
+            onClose={() => setIsAdvancedFiltersOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Detailed Comparison Modal */}
+      {isDetailedComparisonOpen && comparisonEquipment.length > 0 && (
+        <Suspense fallback={<PageLoader />}>
+          <DetailedComparison
+            items={comparisonEquipment}
+            onClose={() => {
+              setIsDetailedComparisonOpen(false);
+              setComparisonEquipment([]);
+            }}
+            onRemove={(id) => setComparisonEquipment(items => items.filter(i => i.id !== id))}
+            onBook={(equipment) => {
+              setSelectedEquipment(equipment);
+              setIsBookingOpen(true);
+              setIsDetailedComparisonOpen(false);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Saved Searches Modal */}
+      {isSavedSearchesOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <SavedSearches
+            onClose={() => setIsSavedSearchesOpen(false)}
+            onSearchClick={(filters) => {
+              console.log('Apply saved search:', filters);
+              setIsSavedSearchesOpen(false);
+              // TODO: Apply filters and navigate to browse
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Equipment Recommendations Modal */}
+      {isRecommendationsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentRecommendations
+            currentEquipment={selectedEquipment || undefined}
+            userLocation={user?.user_metadata?.location}
+            onEquipmentClick={(equipment) => {
+              setSelectedEquipment(equipment);
+              setIsRecommendationsOpen(false);
+            }}
+            onFavoriteClick={(id) => {
+              if (favorites.has(id)) {
+                removeFavorite(user!.id, id);
+                setFavorites(prev => { const next = new Set(prev); next.delete(id); return next; });
+              } else {
+                addFavorite(user!.id, id);
+                setFavorites(prev => new Set(prev).add(id));
+              }
+            }}
+            favorites={favorites}
+          />
+        </Suspense>
+      )}
+
+      {/* Quick Book Modal */}
+      {isQuickBookOpen && quickBookEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <QuickBook
+            equipment={quickBookEquipment}
+            lastBookingDates={{
+              startDate: new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0],
+              endDate: new Date(Date.now() + 86400000 * 10).toISOString().split('T')[0],
+            }}
+            savedPaymentMethod={{ type: 'card', last4: '4242' }}
+            onConfirm={(bookingData) => {
+              console.log('Quick booking confirmed:', bookingData);
+              setIsQuickBookOpen(false);
+              alert('Booking confirmed! Check your email for details.');
+            }}
+            onClose={() => {
+              setIsQuickBookOpen(false);
+              setQuickBookEquipment(null);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* PWA Features Page */}
+      {currentPage === 'pwa' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <PWAEnhancedFeatures onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer />
         </Suspense>
       )}
     </div>

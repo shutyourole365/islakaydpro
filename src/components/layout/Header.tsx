@@ -15,7 +15,7 @@ import {
   Package,
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
-import LogoAnimated from '../branding/LogoAnimated';
+import LogoPro from '../branding/LogoPro';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -78,11 +78,10 @@ export default function Header({
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-12">
             <button onClick={() => onNavigate('home')} className="flex items-center">
-              <LogoAnimated 
-                variant={showTransparent ? 'light' : 'gradient'} 
+              <LogoPro 
+                variant={showTransparent ? 'light' : 'default'} 
                 size="md" 
-                glowIntensity={showTransparent ? 'low' : 'medium'}
-                animated={true}
+                showText={true}
               />
             </button>
 
