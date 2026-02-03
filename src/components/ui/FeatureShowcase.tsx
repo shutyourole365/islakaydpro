@@ -244,7 +244,7 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
             ].map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id as any)}
+                onClick={() => setSelectedCategory(cat.id as 'all' | 'booking' | 'pricing' | 'management' | 'ai')}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === cat.id
                     ? 'bg-white text-teal-600'

@@ -204,7 +204,7 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
             ].map((metric) => (
               <button
                 key={metric.id}
-                onClick={() => setActiveMetric(metric.id as any)}
+                onClick={() => setActiveMetric(metric.id as 'revenue' | 'bookings' | 'views')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                   activeMetric === metric.id
                     ? `bg-gradient-to-r ${metric.color} text-white shadow-lg`
