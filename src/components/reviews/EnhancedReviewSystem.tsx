@@ -361,10 +361,10 @@ export default function EnhancedReviewSystem({
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
           <button
             onClick={() => {
-              const steps = ['rating', 'aspects', 'details', 'photos'];
+              const steps = ['rating', 'aspects', 'details', 'photos'] as const;
               const currentIndex = steps.indexOf(step);
               if (currentIndex > 0) {
-                setStep(steps[currentIndex - 1] as any);
+                setStep(steps[currentIndex - 1] as 'rating' | 'aspects' | 'details' | 'photos');
               } else {
                 onClose();
               }
@@ -376,10 +376,10 @@ export default function EnhancedReviewSystem({
 
           <button
             onClick={() => {
-              const steps = ['rating', 'aspects', 'details', 'photos'];
+              const steps = ['rating', 'aspects', 'details', 'photos'] as const;
               const currentIndex = steps.indexOf(step);
               if (currentIndex < steps.length - 1) {
-                setStep(steps[currentIndex + 1] as any);
+                setStep(steps[currentIndex + 1] as 'rating' | 'aspects' | 'details' | 'photos');
               } else {
                 handleSubmit();
               }

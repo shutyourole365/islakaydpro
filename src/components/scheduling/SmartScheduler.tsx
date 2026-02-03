@@ -49,6 +49,7 @@ export default function SmartScheduler({
 
   useEffect(() => {
     loadSmartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth]);
 
   const loadSmartData = async () => {

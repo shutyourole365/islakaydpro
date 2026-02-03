@@ -67,7 +67,6 @@ const QuickBook = lazy(() => import('./components/booking/QuickBook'));
 
 // Balanced Approach Features - NEW Components
 const AISearchEngine = lazy(() => import('./components/search/AISearchEngine'));
-const AnalyticsCharts = lazy(() => import('./components/dashboard/AnalyticsCharts'));
 const PhotoMessaging = lazy(() => import('./components/messaging/PhotoMessaging'));
 const EnhancedReviewSystem = lazy(() => import('./components/reviews/EnhancedReviewSystem'));
 const PWAEnhancedFeatures = lazy(() => import('./components/pwa/PWAEnhancedFeatures'));
@@ -542,7 +541,6 @@ function AppContent() {
   const [isAISearchOpen, setIsAISearchOpen] = useState(false);
   const [isPhotoMessagingOpen, setIsPhotoMessagingOpen] = useState(false);
   const [isEnhancedReviewOpen, setIsEnhancedReviewOpen] = useState(false);
-  const [isPWAFeaturesOpen, setIsPWAFeaturesOpen] = useState(false);
   const [isMultiPaymentOpen, setIsMultiPaymentOpen] = useState(false);
   const [reviewEquipment, setReviewEquipment] = useState<Equipment | null>(null);
   const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);

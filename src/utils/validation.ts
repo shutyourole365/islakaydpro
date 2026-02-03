@@ -17,7 +17,8 @@ export function sanitizeInput(input: string): string {
   // Remove any remaining angle brackets
   sanitized = sanitized.replace(/[<>]/g, '');
   
-  // Remove null bytes and control characters
+  // Remove null bytes and control characters (using proper escaping)
+  // eslint-disable-next-line no-control-regex
   sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
   
   return sanitized.trim();
