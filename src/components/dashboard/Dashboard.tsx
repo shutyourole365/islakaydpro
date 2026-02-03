@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
 import {
   LayoutDashboard,
   Package,
@@ -55,6 +55,9 @@ import {
   updateProfile,
   updateBookingStatus,
 } from '../../services/database';
+
+// Lazy load AnalyticsCharts for better performance
+const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
 
 interface DashboardProps {
   onBack: () => void;
@@ -362,6 +365,18 @@ export default function Dashboard({
                     color="bg-teal-500"
                   />
                 </div>
+
+                {/* Enhanced Analytics Charts - NEW */}
+                <Suspense fallback={
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-center h-64">
+                    <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+                  </div>
+                }>
+                  <AnalyticsCharts
+                    userId={user?.id || ''}
+                    analytics={analytics || undefined}
+                  />
+                </Suspense>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

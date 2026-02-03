@@ -17,6 +17,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -195,6 +196,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+    
+    if (error) throw error;
+    
+    // Analytics will be tracked after redirect when auth state changes
+  };
+
   const signOut = async () => {
     if (state.user) {
       await logAuditEvent({
@@ -246,6 +264,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...state,
         signIn,
         signUp,
+        signInWithGoogle,
         signOut,
         resetPassword,
         updatePassword,

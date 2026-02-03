@@ -1,5 +1,5 @@
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
-import LogoAnimated from '../branding/LogoAnimated';
+import LogoPro from '../branding/LogoPro';
 
 export default function Footer() {
   const footerLinks = {
@@ -41,7 +41,7 @@ export default function Footer() {
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
             <a href="/" className="inline-block mb-6">
-              <LogoAnimated variant="light" size="md" glowIntensity="low" showTagline={true} />
+              <LogoPro variant="light" size="md" showText={true} />
             </a>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               The world's most advanced equipment rental marketplace. Rent anything, anywhere, powered by AI.
