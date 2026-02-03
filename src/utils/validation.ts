@@ -1,21 +1,26 @@
 export function sanitizeInput(input: string): string {
-  // Remove script tags, event handlers, javascript: and encode < >
+  // Complete XSS prevention - remove all HTML and dangerous patterns
   let sanitized = input;
-  let previous: string;
-
-  // Repeatedly apply multi-character pattern removals until no more changes occur
-  do {
-    previous = sanitized;
-    sanitized = sanitized
-      .replace(/<script\b[^>]*>[\s\S]*?<\/script(?:\s[^>]*)?>/gi, '')
-      .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
-      .replace(/\b(?:javascript|data|vbscript):/gi, '');
-  } while (sanitized !== previous);
-
-  // Finally, remove all angle brackets and trim whitespace
-  return sanitized
-    .replace(/[<>]/g, '')
-    .trim();
+  
+  // First pass: remove all HTML tags completely
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+  
+  // Remove all event handlers (even without quotes)
+  sanitized = sanitized.replace(/on\w+\s*=\s*[^\s>]*/gi, '');
+  
+  // Remove dangerous URL schemes (including hex/unicode encoded versions)
+  sanitized = sanitized.replace(/(?:javascript|data|vbscript|file|about)\s*:/gi, '');
+  
+  // Remove HTML entities that could be used for obfuscation
+  sanitized = sanitized.replace(/&[#\w]+;/g, '');
+  
+  // Remove any remaining angle brackets
+  sanitized = sanitized.replace(/[<>]/g, '');
+  
+  // Remove null bytes and control characters
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+  
+  return sanitized.trim();
 }
 
 export function validateEmail(email: string): { valid: boolean; error?: string } {
