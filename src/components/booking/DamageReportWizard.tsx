@@ -253,17 +253,23 @@ export default function DamageReportWizard({
               {/* Photo Grid */}
               {photos.length > 0 && (
                 <div className="grid grid-cols-3 gap-3">
-                  {photos.map((photo, index) => (
-                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
-                      <img src={photo} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
-                      <button
-                        onClick={() => setPhotos((prev) => prev.filter((_, i) => i !== index))}
-                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
+                  {photos.map((photo, index) => {
+                    // Sanitize photo URL to prevent javascript: or data: URLs
+                    const safePhotoUrl = photo.startsWith('http://') || photo.startsWith('https://') || photo.startsWith('blob:') || photo.startsWith('data:image/')
+                      ? photo
+                      : '';
+                    return (
+                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden">
+                        <img src={safePhotoUrl} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => setPhotos((prev) => prev.filter((_, i) => i !== index))}
+                          className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
@@ -331,9 +337,13 @@ export default function DamageReportWizard({
                   <ul className="text-sm text-red-600 space-y-1">
                     {checklist
                       .filter((item) => item.status === 'issue')
-                      .map((item) => (
-                        <li key={item.id}>• {item.label}: {item.notes || 'No details provided'}</li>
-                      ))}
+                      .map((item) => {
+                        const safeLabel = String(item.label).replace(/[<>&"']/g, '');
+                        const safeNotes = String(item.notes || 'No details provided').replace(/[<>&"']/g, '');
+                        return (
+                          <li key={item.id}>• {safeLabel}: {safeNotes}</li>
+                        );
+                      })}
                   </ul>
                 </div>
               )}
@@ -343,11 +353,17 @@ export default function DamageReportWizard({
                 <div>
                   <div className="text-sm font-medium text-gray-700 mb-2">{photos.length} Photo(s) Attached</div>
                   <div className="flex gap-2">
-                    {photos.slice(0, 4).map((photo, index) => (
-                      <div key={index} className="w-16 h-16 rounded-lg overflow-hidden">
-                        <img src={photo} alt="" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
+                    {photos.slice(0, 4).map((photo, index) => {
+                      // Sanitize photo URL to prevent javascript: or data: URLs
+                      const safePhotoUrl = photo.startsWith('http://') || photo.startsWith('https://') || photo.startsWith('blob:') || photo.startsWith('data:image/')
+                        ? photo
+                        : '';
+                      return (
+                        <div key={index} className="w-16 h-16 rounded-lg overflow-hidden">
+                          <img src={safePhotoUrl} alt="Equipment photo" className="w-full h-full object-cover" />
+                        </div>
+                      );
+                    })}
                     {photos.length > 4 && (
                       <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
                         +{photos.length - 4}
