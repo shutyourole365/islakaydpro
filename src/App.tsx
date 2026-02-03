@@ -1435,21 +1435,18 @@ function AppContent() {
           <PriceNegotiator
             equipmentId={bookingEquipment.id}
             equipmentTitle={bookingEquipment.title}
-            currentPrice={bookingEquipment.daily_rate * 7}
-            dailyRate={bookingEquipment.daily_rate}
-            weeklyRate={bookingEquipment.weekly_rate}
-            monthlyRate={bookingEquipment.monthly_rate}
+            originalDailyRate={bookingEquipment.daily_rate}
             rentalDays={7}
             ownerId={bookingEquipment.owner_id}
             ownerName={bookingEquipment.owner?.full_name || 'Owner'}
-            ownerResponseRate={85}
-            ownerAverageDiscount={12}
-            marketAveragePrice={bookingEquipment.daily_rate * 0.9}
-            demandLevel="medium"
-            onOfferSubmit={(offer) => {
-              console.log('Negotiation offer:', offer);
+            onAccepted={(finalPrice: number) => {
+              console.log('Negotiation accepted:', finalPrice);
               setIsPriceNegotiatorOpen(false);
-              alert(`Offer submitted: $${offer.offeredPrice.toFixed(2)} (${offer.discountPercentage}% off)`);
+              alert(`Offer accepted! Final price: $${finalPrice.toFixed(2)}`);
+            }}
+            onRejected={() => {
+              setIsPriceNegotiatorOpen(false);
+              alert('Negotiation ended');
             }}
             onClose={() => setIsPriceNegotiatorOpen(false)}
           />
@@ -1482,10 +1479,10 @@ function AppContent() {
                 partsReplaced: ['Hydraulic Fluid', 'Seals'],
               },
             ]}
-            onScheduleMaintenance={(schedule) => {
-              console.log('Maintenance scheduled:', schedule);
+            onScheduleMaintenance={(date: Date, type: string) => {
+              console.log('Maintenance scheduled:', date, type);
               setIsMaintenancePredictorOpen(false);
-              alert(`Maintenance scheduled! Estimated cost: $${schedule.estimatedCost}`);
+              alert(`Maintenance scheduled: ${type} on ${date.toLocaleDateString()}`);
             }}
             onClose={() => setIsMaintenancePredictorOpen(false)}
           />
@@ -1498,19 +1495,13 @@ function AppContent() {
           <SmartScheduler
             equipmentId={bookingEquipment.id}
             equipmentTitle={bookingEquipment.title}
-            equipmentLocation={{
-              lat: bookingEquipment.latitude || 34.0522,
-              lng: bookingEquipment.longitude || -118.2437,
-              address: bookingEquipment.location || 'Location',
-            }}
             dailyRate={bookingEquipment.daily_rate}
-            unavailableDates={[]}
-            deliveryAvailable={true}
-            deliveryFee={50}
-            onSchedule={(schedule) => {
-              console.log('Smart schedule:', schedule);
+            onSelectDates={(start: Date, end: Date, discount: number) => {
+              console.log('Smart schedule:', start, end, discount);
               setIsSmartSchedulerOpen(false);
-              alert(`Booking optimized! Total: $${schedule.totalCost.toFixed(2)}, Savings: $${schedule.savings.toFixed(2)}`);
+              const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+              const total = bookingEquipment.daily_rate * days * (1 - discount / 100);
+              alert(`Booking optimized! ${days} days at ${discount}% off. Total: $${total.toFixed(2)}`);
             }}
             onClose={() => setIsSmartSchedulerOpen(false)}
           />
@@ -1572,7 +1563,7 @@ function AppContent() {
             <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto">
               <PhotoMessaging
                 conversationId={messageConversationId}
-                onSendMessage={(content, photos) => {
+                onSendMessage={async (content, photos) => {
                   console.log('Message sent:', { content, photos });
                   setIsPhotoMessagingOpen(false);
                   alert('Message with photos sent successfully!');
@@ -1597,7 +1588,7 @@ function AppContent() {
                 equipmentId={reviewEquipment.id}
                 equipmentTitle={reviewEquipment.title}
                 bookingId={reviewBookingId}
-                onSubmit={(reviewData) => {
+                onSubmit={async (reviewData) => {
                   console.log('Review submitted:', reviewData);
                   setIsEnhancedReviewOpen(false);
                   setReviewEquipment(null);
@@ -1625,7 +1616,7 @@ function AppContent() {
                 bookingId="demo-booking-123"
                 totalAmount={bookingEquipment.daily_rate * 7}
                 depositAmount={bookingEquipment.deposit_amount}
-                onPaymentComplete={(paymentData) => {
+                onPaymentComplete={async (paymentData) => {
                   console.log('Payment completed:', paymentData);
                   setIsMultiPaymentOpen(false);
                   alert(`Payment successful! Method: ${paymentData.method}`);
