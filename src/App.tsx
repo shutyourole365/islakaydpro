@@ -1459,26 +1459,9 @@ function AppContent() {
           <MaintenancePredictor
             equipmentId={bookingEquipment.id}
             equipmentTitle={bookingEquipment.title}
-            equipmentType={bookingEquipment.category?.name || 'Equipment'}
-            purchaseDate={new Date('2023-01-15')}
-            totalUsageHours={1850}
+            category={bookingEquipment.category?.name || 'Equipment'}
+            hoursUsed={1850}
             lastMaintenanceDate={new Date('2025-12-10')}
-            maintenanceHistory={[
-              {
-                date: new Date('2025-12-10'),
-                type: 'Oil Change',
-                cost: 150,
-                description: 'Routine oil and filter replacement',
-                partsReplaced: ['Oil Filter', 'Engine Oil'],
-              },
-              {
-                date: new Date('2025-09-05'),
-                type: 'Hydraulic Service',
-                cost: 380,
-                description: 'Hydraulic fluid replacement and seal inspection',
-                partsReplaced: ['Hydraulic Fluid', 'Seals'],
-              },
-            ]}
             onScheduleMaintenance={(date: Date, type: string) => {
               console.log('Maintenance scheduled:', date, type);
               setIsMaintenancePredictorOpen(false);

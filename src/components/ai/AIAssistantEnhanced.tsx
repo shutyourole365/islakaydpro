@@ -501,10 +501,12 @@ export default function AIAssistantEnhanced() {
                     <div className="text-sm whitespace-pre-line">
                       {message.content.split('\n').map((line, i) => {
                         // Escape HTML to prevent XSS
-                        const escapeHtml = (text: string) =>
-                          text.replace(/[&<>"']/g, (m) => ({
+                        const escapeHtml = (text: string) => {
+                          const htmlMap: Record<string, string> = {
                             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
-                          }[m]));
+                          };
+                          return text.replace(/[&<>"']/g, (m) => htmlMap[m] || m);
+                        };
                         const safe = escapeHtml(line).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         return <span key={i} dangerouslySetInnerHTML={{ __html: safe }} className="block" />;
                       })}
