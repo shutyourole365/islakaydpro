@@ -333,10 +333,12 @@ export default function AIAssistant() {
                     <div className="text-sm whitespace-pre-line prose prose-sm max-w-none">
                       {message.content.split('\n').map((line, i) => {
                         // Handle bold text, escape HTML to prevent XSS
-                        const escapeHtml = (text: string) =>
-                          text.replace(/[&<>"']/g, (m) => ({
+                        const escapeHtml = (text: string) => {
+                          const htmlMap: Record<string, string> = {
                             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
-                          }[m]));
+                          };
+                          return text.replace(/[&<>"']/g, (m) => htmlMap[m] || m);
+                        };
                         const boldParsed = escapeHtml(line).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         return (
                           <span key={i} dangerouslySetInnerHTML={{ __html: boldParsed }} className="block" />
