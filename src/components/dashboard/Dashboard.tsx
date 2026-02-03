@@ -374,7 +374,7 @@ export default function Dashboard({
                 }>
                   <AnalyticsCharts
                     userId={user?.id || ''}
-                    analytics={analytics || undefined}
+                    analytics={undefined}
                   />
                 </Suspense>
 
