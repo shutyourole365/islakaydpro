@@ -29,7 +29,7 @@ async function retryWithBackoff<T>(
       
       // Don't retry on client errors (400-499)
       if (error && typeof error === 'object' && 'status' in error) {
-        const status = (error as any).status;
+        const status = (error as { status: number }).status;
         if (status >= 400 && status < 500) {
           throw error;
         }
@@ -115,7 +115,7 @@ export async function signInWithRetry(
 export async function signUpWithRetry(
   email: string,
   password: string,
-  metadata: Record<string, any> = {},
+  metadata: Record<string, unknown> = {},
   options: RetryOptions = {}
 ) {
   return retryWithBackoff(async () => {

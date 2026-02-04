@@ -132,10 +132,11 @@ async function createUser() {
     console.log('🚀 Next Step:');
     console.log('   npm run seed:equipment\n');
 
-  } catch (error: any) {
-    console.error('❌ Error:', error.message);
-    if (error.status) console.error('   Status:', error.status);
-    if (error.code) console.error('   Code:', error.code);
+  } catch (error: unknown) {
+    const err = error as { message?: string; status?: number; code?: string };
+    console.error('❌ Error:', err.message || 'Unknown error');
+    if (err.status) console.error('   Status:', err.status);
+    if (err.code) console.error('   Code:', err.code);
     process.exit(1);
   }
 }

@@ -82,8 +82,9 @@ async function createDemoAccount() {
 
       return authData.user.id;
     }
-  } catch (error: any) {
-    console.error('❌ Error creating demo account:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Error creating demo account:', errorMessage);
     process.exit(1);
   }
 }

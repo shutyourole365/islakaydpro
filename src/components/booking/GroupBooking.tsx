@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps, prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react';
 import {
   Users,
