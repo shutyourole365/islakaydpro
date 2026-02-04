@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, Package, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { signUpWithRetry, getAuthErrorMessage } from '../../services/authHelpers';
 import SocialAuth from './SocialAuth';
 import BiometricAuth from './BiometricAuth';
 
@@ -57,70 +58,34 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
     setSuccess('');
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
-    });
+    try {
+      const data = await signUpWithRetry(
+        email,
+        password,
+        { full_name: fullName },
+        { maxAttempts: 3, delayMs: 1000 }
+      );
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
+      if (data.user) {
+        // If Supabase requires email confirmation, there will be no session
+        if (!data.session) {
+          setSuccess('✅ Account created! Please check your email to confirm your account.');
+          setLoading(false);
+          return;
+        }
 
-    if (data.user) {
-      // Try to update the profile (trigger will have created it already)
-      // This updates the full_name field with user input
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(
-          {
-            id: data.user.id,
-            full_name: fullName,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            onConflict: 'id',
-            ignoreDuplicates: false,
-          }
-        );
-
-      if (profileError) {
-        console.error('Profile update error:', profileError);
-        // Don't block signup if profile update fails
-        // The trigger created a basic profile, which is sufficient
-      }
-
-      // Check if email confirmation is required
-      if (data.user.identities && data.user.identities.length === 0) {
-        // User already exists
-        setError('An account with this email already exists. Please sign in instead.');
+        // Auto-confirmed (session exists)
+        setSuccess('✅ Account created successfully! Welcome to Islakayd!');
         setLoading(false);
-        return;
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 800);
       }
-
-      if (!data.session) {
-        // Email confirmation required
-        setSuccess(
-          '✅ Account created! Please check your email and click the confirmation link to complete your registration.'
-        );
-        setLoading(false);
-        // Don't close modal or call onSuccess - let user read the message
-        return;
-      }
-
-      // Auto-confirmed (session exists)
-      setSuccess('✅ Account created successfully! Welcome to Islakayd!');
+    } catch (err) {
+      const message = getAuthErrorMessage(err as Error);
+      setError(message);
       setLoading(false);
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 1500);
     }
   };
 

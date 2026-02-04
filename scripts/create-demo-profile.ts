@@ -34,7 +34,7 @@ async function createDemoProfile() {
   };
 
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('profiles')
       .insert([demoProfile])
       .select()
@@ -50,8 +50,9 @@ async function createDemoProfile() {
     console.log(`   User ID: ${demoProfile.id}\n`);
 
     return demoProfile.id;
-  } catch (error: any) {
-    console.error('❌ Error creating demo profile:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('❌ Error creating demo profile:', errorMessage);
     console.error('   Details:', error);
     process.exit(1);
   }
