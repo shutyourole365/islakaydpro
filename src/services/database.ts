@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { sanitizeInput } from '../utils/validation';
 import type {
   Profile,
   Equipment,
@@ -73,7 +74,9 @@ export async function getEquipment(filters?: {
     query = query.eq('owner_id', filters.ownerId);
   }
   if (filters?.search) {
-    query = query.or(`title.ilike.%${filters.search}%,description.ilike.%${filters.search}%,brand.ilike.%${filters.search}%`);
+    // Sanitize search input to prevent SQL injection
+    const sanitizedSearch = sanitizeInput(filters.search);
+    query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%`);
   }
   if (filters?.minPrice !== undefined) {
     query = query.gte('daily_rate', filters.minPrice);
@@ -85,7 +88,9 @@ export async function getEquipment(filters?: {
     query = query.eq('condition', filters.condition);
   }
   if (filters?.location) {
-    query = query.ilike('location', `%${filters.location}%`);
+    // Sanitize location input to prevent SQL injection
+    const sanitizedLocation = sanitizeInput(filters.location);
+    query = query.ilike('location', `%${sanitizedLocation}%`);
   }
   if (filters?.featured) {
     query = query.eq('is_featured', true);
