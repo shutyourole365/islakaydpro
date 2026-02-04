@@ -23,7 +23,7 @@ import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
-import { addFavorite, removeFavorite } from './services/database';
+import { addFavorite, removeFavorite, getEquipment } from './services/database';
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -507,6 +507,9 @@ function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [featuredEquipment, setFeaturedEquipment] = useState<Equipment[]>([]);
+  const [isLoadingEquipment, setIsLoadingEquipment] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
@@ -556,9 +559,31 @@ function AppContent() {
   const [isQuickBookOpen, setIsQuickBookOpen] = useState(false);
   const [quickBookEquipment, setQuickBookEquipment] = useState<Equipment | null>(null);
 
+  // Fetch equipment from database on mount
+  const fetchEquipment = useCallback(async () => {
+    setIsLoadingEquipment(true);
+    try {
+      // Fetch featured equipment
+      const { data: featured } = await getEquipment({ featured: true, limit: 8 });
+      setFeaturedEquipment(featured.length > 0 ? featured : sampleEquipment);
+      
+      // Fetch all equipment
+      const { data: all } = await getEquipment({ limit: 50 });
+      setEquipment(all.length > 0 ? all : sampleEquipment);
+    } catch (error) {
+      console.error('Error fetching equipment:', error);
+      // Fall back to sample data if fetch fails
+      setFeaturedEquipment(sampleEquipment);
+      setEquipment(sampleEquipment);
+    } finally {
+      setIsLoadingEquipment(false);
+    }
+  }, []);
+
   useEffect(() => {
     fetchCategories();
-  }, []);
+    fetchEquipment();
+  }, [fetchEquipment]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -598,24 +623,52 @@ function AppContent() {
   }, [user, loadFavorites]);
 
   const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
 
-    if (error) {
+      if (error) {
+        if (import.meta.env.DEV) {
+          console.error('Error fetching categories:', error);
+        }
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Try to get real equipment counts for each category
+        const categoriesWithCounts = await Promise.all(
+          data.map(async (cat) => {
+            try {
+              const { count } = await supabase
+                .from('equipment')
+                .select('*', { count: 'exact', head: true })
+                .eq('category_id', cat.id)
+                .eq('is_active', true);
+              return { ...cat, equipment_count: count || 0 };
+            } catch {
+              return { ...cat, equipment_count: 0 };
+            }
+          })
+        );
+        setCategories(categoriesWithCounts);
+      } else {
+        // Fallback: use sample counts if no categories in database
+        const sampleCategories = [
+          { id: 'cat1', name: 'Construction', slug: 'construction', description: 'Heavy machinery and construction equipment', icon: '🏗️', image_url: 'https://images.pexels.com/photos/2058128/pexels-photo-2058128.jpeg', equipment_count: 1250, created_at: new Date().toISOString() },
+          { id: 'cat2', name: 'Photography', slug: 'photography', description: 'Cameras, lenses, and studio equipment', icon: '📷', image_url: 'https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg', equipment_count: 890, created_at: new Date().toISOString() },
+          { id: 'cat3', name: 'Power Tools', slug: 'power-tools', description: 'Drills, saws, and power equipment', icon: '🔧', image_url: 'https://images.pexels.com/photos/1249611/pexels-photo-1249611.jpeg', equipment_count: 456, created_at: new Date().toISOString() },
+          { id: 'cat4', name: 'Audio & Video', slug: 'audio-video', description: 'DJ gear, sound systems, and AV equipment', icon: '🎧', image_url: 'https://images.pexels.com/photos/164938/pexels-photo-164938.jpeg', equipment_count: 678, created_at: new Date().toISOString() },
+          { id: 'cat5', name: 'Landscaping', slug: 'landscaping', description: 'Tractors, mowers, and garden equipment', icon: '🌿', image_url: 'https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg', equipment_count: 345, created_at: new Date().toISOString() },
+          { id: 'cat6', name: 'Events', slug: 'events', description: 'Tents, tables, chairs, and party supplies', icon: '🎪', image_url: 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg', equipment_count: 234, created_at: new Date().toISOString() },
+        ];
+        setCategories(sampleCategories);
+      }
+    } catch (error) {
       if (import.meta.env.DEV) {
         console.error('Error fetching categories:', error);
       }
-      return;
-    }
-
-    if (data) {
-      const categoriesWithCounts = data.map((cat, index) => ({
-        ...cat,
-        equipment_count: [1250, 890, 456, 678, 345, 234, 123, 567, 890, 432, 765, 321][index] || 100,
-      }));
-      setCategories(categoriesWithCounts);
     }
   };
 
@@ -631,7 +684,7 @@ function AppContent() {
     // Track search event
     if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
       import('./services/analytics').then(({ analytics }) => {
-        analytics.trackSearch(query, { resultCount: sampleEquipment.length });
+        analytics.trackSearch(query, { resultCount: equipment.length || sampleEquipment.length });
       });
     }
   };
@@ -755,8 +808,8 @@ function AppContent() {
       return;
     }
 
-    // Select a random equipment for demo purposes
-    const demoEquipment = sampleEquipment[0];
+    // Select equipment for demo purposes (use fetched data or fallback to first item)
+    const demoEquipment = equipment[0] || featuredEquipment[0] || sampleEquipment[0];
     setBookingEquipment(demoEquipment);
 
     switch (featureId) {
@@ -810,11 +863,15 @@ function AppContent() {
       case 'advanced-filters':
         setIsAdvancedFiltersOpen(true);
         break;
-      case 'comparison':
+      case 'comparison': {
         // Add 3 demo equipment items to comparison
-        setComparisonEquipment([sampleEquipment[0], sampleEquipment[1], sampleEquipment[2]]);
+        const compareItems = equipment.length >= 3 
+          ? [equipment[0], equipment[1], equipment[2]] 
+          : sampleEquipment.slice(0, 3);
+        setComparisonEquipment(compareItems);
         setIsDetailedComparisonOpen(true);
         break;
+      }
       case 'saved-searches':
         setIsSavedSearchesOpen(true);
         break;
@@ -878,11 +935,12 @@ function AppContent() {
             />
 
             <FeaturedListings
-              equipment={sampleEquipment}
+              equipment={featuredEquipment}
               onEquipmentClick={handleEquipmentClick}
               onFavoriteClick={handleFavoriteToggle}
               favorites={favorites}
               onAddToComparison={handleAddToComparison}
+              isLoading={isLoadingEquipment}
             />
 
             <HowItWorks />
@@ -899,7 +957,7 @@ function AppContent() {
       {currentPage === 'browse' && (
         <>
           <BrowsePage
-            equipment={sampleEquipment}
+            equipment={equipment}
             categories={categories}
             initialQuery={searchQuery}
             initialCategory={searchCategory}
