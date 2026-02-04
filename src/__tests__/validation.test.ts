@@ -12,9 +12,9 @@ import {
 describe('Validation Utilities', () => {
   describe('sanitizeInput', () => {
     it('should remove dangerous characters', () => {
-      expect(sanitizeInput('<script>alert("xss")</script>')).toBe('scriptalert("xss")/script');
+      expect(sanitizeInput('<script>alert("xss")</script>')).toBe('alert("xss")');
       expect(sanitizeInput('javascript:void(0)')).toBe('void(0)');
-      expect(sanitizeInput('onclick=alert(1)')).toBe('alert(1)');
+      expect(sanitizeInput('onclick=alert(1)')).toBe('');  // Event handlers are completely removed
     });
 
     it('should trim whitespace', () => {

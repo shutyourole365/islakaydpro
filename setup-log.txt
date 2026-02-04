@@ -1,0 +1,32 @@
+🚀 ISLAKAYD COMPLETE SETUP
+================================
+
+Step 1: Creating demo user...
+❌ Error: Database error creating new user
+User creation step completed with warnings
+
+Step 2: Waiting for profile trigger...
+
+Step 3: Seeding equipment...
+
+> vite-react-typescript-starter@0.0.0 seed:equipment
+> tsx scripts/seed-equipment.ts
+
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error [TransformError]: Transform failed with 1 error:
+/workspaces/islakaydpro/scripts/seed-equipment.ts:386:8: ERROR: Expected "finally" but found "else"
+    at failureErrorWithLog (/workspaces/islakaydpro/node_modules/tsx/node_modules/esbuild/lib/main.js:1467:15)
+    at /workspaces/islakaydpro/node_modules/tsx/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/workspaces/islakaydpro/node_modules/tsx/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/workspaces/islakaydpro/node_modules/tsx/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/workspaces/islakaydpro/node_modules/tsx/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:508:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+
+Node.js v24.13.0
