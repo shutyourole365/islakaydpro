@@ -24,6 +24,7 @@ import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { addFavorite, removeFavorite, getEquipment } from './services/database';
+import type { SearchFilters } from './types';
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -558,6 +559,15 @@ function AppContent() {
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
   const [isQuickBookOpen, setIsQuickBookOpen] = useState(false);
   const [quickBookEquipment, setQuickBookEquipment] = useState<Equipment | null>(null);
+  // Search filter state (used by Advanced Filters and Saved Searches)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchFilters, _setSearchFilters] = useState<Partial<SearchFilters>>({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchMinPrice, setSearchMinPrice] = useState<number | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchMaxPrice, setSearchMaxPrice] = useState<number | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchCondition, setSearchCondition] = useState<string>('');
 
   // Fetch equipment from database on mount
   const fetchEquipment = useCallback(async () => {
@@ -791,15 +801,21 @@ function AppContent() {
     setComparisonItems(prev => prev.filter(item => item.id !== equipmentId));
   };
 
-  const handleMessage = (equipment: Equipment) => {
-    // Equipment will be used when messaging is implemented
-    console.log('Message about:', equipment.id);
-    if (!isAuthenticated) {
+  const handleMessage = async (equipment: Equipment) => {
+    if (!isAuthenticated || !user) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);
       return;
     }
-    alert('Message sent to owner! They will respond shortly.');
+    
+    // Open live chat with the equipment owner
+    setChatRecipient({
+      id: equipment.owner_id,
+      name: equipment.owner?.full_name || 'Equipment Owner',
+      avatar: equipment.owner?.avatar_url || undefined,
+    });
+    setSelectedEquipment(null);
+    setIsLiveChatOpen(true);
   };
 
   const handleFeatureSelect = (featureId: string) => {
@@ -1690,9 +1706,15 @@ function AppContent() {
         <Suspense fallback={<PageLoader />}>
           <AdvancedFilters
             onApply={(filters) => {
-              console.log('Applied filters:', filters);
+              // Apply filters and navigate to browse
+              setSearchMinPrice(filters.priceRange[0] > 0 ? filters.priceRange[0] : undefined);
+              setSearchMaxPrice(filters.priceRange[1] < 1000 ? filters.priceRange[1] : undefined);
+              setSearchCondition(filters.condition.length > 0 ? filters.condition[0] : '');
+              if (filters.location?.address) {
+                setSearchQuery(filters.location.address);
+              }
               setIsAdvancedFiltersOpen(false);
-              // TODO: Apply filters to equipment search
+              setCurrentPage('browse');
             }}
             onClose={() => setIsAdvancedFiltersOpen(false)}
           />
@@ -1724,9 +1746,15 @@ function AppContent() {
           <SavedSearches
             onClose={() => setIsSavedSearchesOpen(false)}
             onSearchClick={(filters) => {
-              console.log('Apply saved search:', filters);
+              // Apply saved search filters and navigate to browse
+              if (filters.query) setSearchQuery(filters.query);
+              if (filters.category) setSearchCategory(filters.category);
+              if (filters.priceRange) {
+                setSearchMinPrice(filters.priceRange[0] > 0 ? filters.priceRange[0] : undefined);
+                setSearchMaxPrice(filters.priceRange[1] < 10000 ? filters.priceRange[1] : undefined);
+              }
               setIsSavedSearchesOpen(false);
-              // TODO: Apply filters and navigate to browse
+              setCurrentPage('browse');
             }}
           />
         </Suspense>
