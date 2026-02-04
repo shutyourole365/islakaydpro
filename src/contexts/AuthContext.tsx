@@ -3,6 +3,12 @@ import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
 import { getProfile, getUserAnalytics, getUnreadNotificationCount, subscribeToNotifications, logAuditEvent } from '../services/database';
+import { 
+  signInWithRetry, 
+  signUpWithRetry,
+  getAuthErrorMessage,
+  isEmailConfirmationRequired,
+} from '../services/authHelpers';
 
 interface AuthState {
   user: User | null;
@@ -137,62 +143,84 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.user]);
 
   const signIn = async (email: string, password: string) => {
-    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    try {
+      const data = await signInWithRetry(email, password, { maxAttempts: 3, delayMs: 1000 });
 
-    if (data.user) {
-      await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', data.user.id);
-      await logAuditEvent({
-        userId: data.user.id,
-        action: 'sign_in',
-        metadata: { method: 'email' },
-      });
-      
-      // Track sign in event
-      if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
-        const { analytics } = await import('../services/analytics');
-        analytics.event('login', { method: 'email' });
-        analytics.setUserId(data.user.id);
+      if (data.user) {
+        await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', data.user.id);
+        await logAuditEvent({
+          userId: data.user.id,
+          action: 'sign_in',
+          metadata: { method: 'email' },
+        });
+        
+        // Track sign in event
+        if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+          const { analytics } = await import('../services/analytics');
+          analytics.event('login', { method: 'email' });
+          analytics.setUserId(data.user.id);
+        }
+        // Set user context in error monitoring
+        const { errorMonitoring } = await import('../services/errorMonitoring');
+        errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
       }
-      // Set user context in error monitoring
-      const { errorMonitoring } = await import('../services/errorMonitoring');
-      errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
+    } catch (error) {
+      const message = getAuthErrorMessage(error as Error);
+      throw new Error(message);
     }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error, data } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    });
-    if (error) throw error;
+    try {
+      const data = await signUpWithRetry(
+        email, 
+        password, 
+        { full_name: fullName },
+        { maxAttempts: 3, delayMs: 1000 }
+      );
 
-    if (data.user) {
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        full_name: fullName,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+      if (data.user) {
+        // Create profile (may fail if email confirmation required)
+        try {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            full_name: fullName,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        } catch (profileError) {
+          console.warn('Profile creation deferred until email confirmation:', profileError);
+        }
 
-      await logAuditEvent({
-        userId: data.user.id,
-        action: 'sign_up',
-        metadata: { method: 'email' },
-      });
-      
-      // Track signup event
-      if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
-        const { analytics } = await import('../services/analytics');
-        analytics.trackSignUp('email');
-        analytics.setUserId(data.user.id);
+        await logAuditEvent({
+          userId: data.user.id,
+          action: 'sign_up',
+          metadata: { method: 'email', email_confirmed: !!data.session },
+        });
+        
+        // Track signup event
+        if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+          const { analytics } = await import('../services/analytics');
+          analytics.trackSignUp('email');
+          analytics.setUserId(data.user.id);
+        }
+        // Set user context in error monitoring
+        const { errorMonitoring } = await import('../services/errorMonitoring');
+        errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
+
+        // Check if email confirmation is required
+        const needsConfirmation = await isEmailConfirmationRequired();
+        if (needsConfirmation && !data.session) {
+          throw new Error('EMAIL_CONFIRMATION_REQUIRED');
+        }
       }
-      // Set user context in error monitoring
-      const { errorMonitoring } = await import('../services/errorMonitoring');
-      errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
+    } catch (error) {
+      const errorMsg = (error as Error).message;
+      if (errorMsg === 'EMAIL_CONFIRMATION_REQUIRED') {
+        throw new Error('Please check your email to confirm your account before signing in.');
+      }
+      const message = getAuthErrorMessage(error as Error);
+      throw new Error(message);
     }
   };
 

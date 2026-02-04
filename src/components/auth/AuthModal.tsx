@@ -24,8 +24,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -33,10 +34,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setLoading(false);
 
     if (error) {
-      setError(error.message);
-    } else {
-      onSuccess();
-      onClose();
+      // Provide user-friendly error messages
+      if (error.message.includes('Invalid login credentials')) {
+        setError('Invalid email or password. Please try again.');
+      } else if (error.message.includes('Email not confirmed')) {
+        setError('Please verify your email address. Check your inbox for the confirmation link.');
+      } else {
+        setError(error.message);
+      }
+    } else if (data.session) {
+      setSuccess('✅ Successfully signed in! Redirecting...');
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 800);
     }
   };
 
@@ -44,6 +55,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -62,19 +74,54 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     }
 
     if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        full_name: fullName,
-      });
+      // Try to update the profile (trigger will have created it already)
+      // This updates the full_name field with user input
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: data.user.id,
+            full_name: fullName,
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onConflict: 'id',
+            ignoreDuplicates: false,
+          }
+        );
 
-      if (profileError && !profileError.message.includes('duplicate')) {
-        console.error('Profile creation error:', profileError);
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        // Don't block signup if profile update fails
+        // The trigger created a basic profile, which is sufficient
       }
-    }
 
-    setLoading(false);
-    onSuccess();
-    onClose();
+      // Check if email confirmation is required
+      if (data.user.identities && data.user.identities.length === 0) {
+        // User already exists
+        setError('An account with this email already exists. Please sign in instead.');
+        setLoading(false);
+        return;
+      }
+
+      if (!data.session) {
+        // Email confirmation required
+        setSuccess(
+          '✅ Account created! Please check your email and click the confirmation link to complete your registration.'
+        );
+        setLoading(false);
+        // Don't close modal or call onSuccess - let user read the message
+        return;
+      }
+
+      // Auto-confirmed (session exists)
+      setSuccess('✅ Account created successfully! Welcome to Islakayd!');
+      setLoading(false);
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 1500);
+    }
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
