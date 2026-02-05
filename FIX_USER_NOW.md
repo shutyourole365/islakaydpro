@@ -1,20 +1,22 @@
-# 🚨 QUICK FIX - Create Demo User (2 minutes)
+# QUICK FIX - Create Demo User (2 minutes)
 
 ## The Issue
+
 The automated user creation is hitting database errors. This is likely due to Supabase Auth configuration.
 
-## ✅ EASIEST SOLUTION - Use Supabase Dashboard (30 seconds)
+## EASIEST SOLUTION - Use Supabase Dashboard (30 seconds)
 
-### Step-by-Step:
+### Step-by-Step
 
 1. **Open Supabase Dashboard**
-   - Go to: https://supabase.com/dashboard/project/ialxlykysbqyiejepzkx/auth/users
+   - Go to: <https://supabase.com/dashboard/project/ialxlykysbqyiejepzkx/auth/users>
    - (You should already be logged in)
 
 2. **Click "Add User" button** (green button top right)
 
 3. **Fill in the form:**
-   ```
+
+   ```text
    Email: demo@islakayd.com
    Password: Demo123456!
    ✅ Auto Confirm User (CHECK THIS BOX!)
@@ -25,17 +27,18 @@ The automated user creation is hitting database errors. This is likely due to Su
 5. **Wait 5 seconds** (for profile trigger to complete)
 
 6. **Run the seed command:**
+
    ```bash
    npm run seed:equipment
    ```
 
-7. **Done!** Visit http://localhost:5173/browse
+7. **Done!** Visit <http://localhost:5173/browse>
 
 ---
 
-## Alternative: SQL Method (if you prefer)
+## Alternative - SQL Method (if you prefer)
 
-1. Open: https://supabase.com/dashboard/project/ialxlykysbqyiejepzkx/sql/new
+1. Open: <https://supabase.com/dashboard/project/ialxlykysbqyiejepzkx/sql/new>
 
 2. Copy the SQL from `CREATE_USER_MANUALLY.sql` and run it
 
@@ -52,12 +55,13 @@ Supabase Auth has strict RLS policies and requires specific configuration. The d
 ## After Creating User
 
 Once you have a user, run:
+
 ```bash
 npm run seed:equipment
 ```
 
 This will add 15 equipment listings to your database!
 
-Then visit: http://localhost:5173
+Then visit: <http://localhost:5173>
 
-🎉 You'll see your fully working marketplace!
+You'll see your fully working marketplace!

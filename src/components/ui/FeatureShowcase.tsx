@@ -14,6 +14,14 @@ import {
   Star,
   Smartphone,
   CreditCard,
+  Cloud,
+  Users,
+  Fingerprint,
+  Bell,
+  Trophy,
+  Package,
+  TrendingUp,
+  Shield,
 } from 'lucide-react';
 
 interface FeatureShowcaseProps {
@@ -32,7 +40,7 @@ interface Feature {
 }
 
 export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureShowcaseProps) {
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'booking' | 'pricing' | 'management' | 'ai'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'booking' | 'pricing' | 'management' | 'ai' | 'security'>('all');
 
   const features: Feature[] = [
     {
@@ -196,15 +204,126 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
       badge: '🔥 HOT',
       demo: true,
     },
+    // Trust, Alerts & Warranty Features
+    {
+      id: 'trust-score',
+      name: 'Renter Trust Score',
+      description: 'View detailed trust scores with verification history and rental stats',
+      icon: <Shield className="w-6 h-6" />,
+      color: 'from-green-500 to-emerald-500',
+      badge: '⭐ NEW',
+      demo: true,
+    },
+    {
+      id: 'smart-alerts',
+      name: 'Smart Alerts System',
+      description: 'Personalized notifications for price drops, availability, and deals',
+      icon: <Bell className="w-6 h-6" />,
+      color: 'from-blue-500 to-indigo-500',
+      badge: '⭐ NEW',
+      demo: true,
+    },
+    {
+      id: 'bundle-deals',
+      name: 'Equipment Bundles',
+      description: 'Save up to 30% with pre-configured equipment bundles',
+      icon: <Package className="w-6 h-6" />,
+      color: 'from-purple-500 to-pink-500',
+      badge: 'SAVE 30%',
+      demo: true,
+    },
+    {
+      id: 'warranty-tracker',
+      name: 'Warranty Tracker',
+      description: 'Track equipment warranties, service history, and maintenance schedules',
+      icon: <Wrench className="w-6 h-6" />,
+      color: 'from-amber-500 to-orange-500',
+      badge: '⭐ NEW',
+      demo: true,
+    },
+    {
+      id: 'bulk-booking',
+      name: 'Bulk Booking System',
+      description: 'Book multiple items at once with volume discounts and shared billing',
+      icon: <Users className="w-6 h-6" />,
+      color: 'from-teal-500 to-cyan-500',
+      badge: 'PRO',
+      demo: true,
+    },
+    {
+      id: 'market-insights',
+      name: 'Market Insights',
+      description: 'Real-time market analytics with demand trends and pricing recommendations',
+      icon: <TrendingUp className="w-6 h-6" />,
+      color: 'from-rose-500 to-red-500',
+      badge: 'BUSINESS',
+      demo: true,
+    },
+    // Weather, Social & Security Features  
+    {
+      id: 'weather-advisor',
+      name: 'Weather Advisor',
+      description: 'Get weather forecasts and rental recommendations based on conditions',
+      icon: <Cloud className="w-6 h-6" />,
+      color: 'from-sky-500 to-blue-500',
+      badge: '🌤️ NEW',
+      demo: true,
+    },
+    {
+      id: 'social-proof',
+      name: 'Social Proof',
+      description: 'See real-time booking activity, recent reviews, and trending equipment',
+      icon: <Users className="w-6 h-6" />,
+      color: 'from-violet-500 to-purple-500',
+      badge: 'POPULAR',
+      demo: true,
+    },
+    {
+      id: 'biometric-auth',
+      name: 'Biometric Security',
+      description: 'Secure your account with fingerprint or face recognition',
+      icon: <Fingerprint className="w-6 h-6" />,
+      color: 'from-emerald-500 to-teal-500',
+      badge: '🔒 SECURE',
+      demo: true,
+    },
+    {
+      id: 'price-alerts',
+      name: 'Price Alerts',
+      description: 'Set price alerts and get notified when equipment hits your target',
+      icon: <Bell className="w-6 h-6" />,
+      color: 'from-orange-500 to-amber-500',
+      badge: 'SMART',
+      demo: true,
+    },
+    {
+      id: 'smart-recommendations',
+      name: 'AI Recommendations',
+      description: 'Get personalized equipment suggestions based on your rental history',
+      icon: <Brain className="w-6 h-6" />,
+      color: 'from-pink-500 to-rose-500',
+      badge: 'AI',
+      demo: true,
+    },
+    {
+      id: 'achievements',
+      name: 'Achievements & Badges',
+      description: 'Earn badges and unlock rewards as you rent and review equipment',
+      icon: <Trophy className="w-6 h-6" />,
+      color: 'from-yellow-500 to-amber-500',
+      badge: '🏆 FUN',
+      demo: true,
+    },
   ];
 
   const filteredFeatures = selectedCategory === 'all' 
     ? features 
     : features.filter(f => {
-        if (selectedCategory === 'booking') return ['smart-scheduler', 'group-booking', 'quick-book'].includes(f.id);
-        if (selectedCategory === 'pricing') return ['price-negotiator', 'smart-pricing', 'multi-payment'].includes(f.id);
-        if (selectedCategory === 'management') return ['maintenance-predictor', 'referral-program', 'analytics', 'saved-searches', 'comparison'].includes(f.id);
-        if (selectedCategory === 'ai') return ['ai-search', 'price-negotiator', 'maintenance-predictor', 'analytics', 'recommendations', 'live-chat', 'advanced-filters'].includes(f.id);
+        if (selectedCategory === 'booking') return ['smart-scheduler', 'group-booking', 'quick-book', 'bulk-booking', 'bundle-deals'].includes(f.id);
+        if (selectedCategory === 'pricing') return ['price-negotiator', 'smart-pricing', 'multi-payment', 'price-alerts', 'market-insights'].includes(f.id);
+        if (selectedCategory === 'management') return ['maintenance-predictor', 'referral-program', 'analytics', 'saved-searches', 'comparison', 'warranty-tracker', 'achievements'].includes(f.id);
+        if (selectedCategory === 'ai') return ['ai-search', 'price-negotiator', 'maintenance-predictor', 'analytics', 'recommendations', 'live-chat', 'advanced-filters', 'smart-recommendations', 'smart-alerts'].includes(f.id);
+        if (selectedCategory === 'security') return ['trust-score', 'biometric-auth', 'social-proof'].includes(f.id);
         return true;
       });
 
@@ -234,17 +353,18 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
           </div>
 
           {/* Category Filter */}
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4 flex-wrap">
             {[
               { id: 'all', label: 'All Features' },
               { id: 'ai', label: 'AI Powered' },
               { id: 'booking', label: 'Booking' },
               { id: 'pricing', label: 'Pricing' },
               { id: 'management', label: 'Management' },
+              { id: 'security', label: 'Security' },
             ].map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setSelectedCategory(cat.id as 'all' | 'booking' | 'pricing' | 'management' | 'ai')}
+                onClick={() => setSelectedCategory(cat.id as 'all' | 'booking' | 'pricing' | 'management' | 'ai' | 'security')}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   selectedCategory === cat.id
                     ? 'bg-white text-teal-600'

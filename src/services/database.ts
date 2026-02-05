@@ -619,8 +619,8 @@ export function subscribeToNotifications(userId: string, callback: (notification
       schema: 'public',
       table: 'notifications',
       filter: `user_id=eq.${userId}`,
-    }, payload => {
-      callback(payload.new as Notification);
+    }, (payload) => {
+      callback(payload.new as unknown as Notification);
     })
     .subscribe();
 }
@@ -633,8 +633,392 @@ export function subscribeToMessages(conversationId: string, callback: (message: 
       schema: 'public',
       table: 'messages',
       filter: `conversation_id=eq.${conversationId}`,
-    }, payload => {
-      callback(payload.new as Message);
+    }, (payload) => {
+      callback(payload.new as unknown as Message);
     })
     .subscribe();
 }
+
+// ============================================
+// Trust Score Functions
+// ============================================
+
+export async function getUserTrustScore(userId: string): Promise<{
+  total: number;
+  breakdown: {
+    verification: number;
+    rating: number;
+    rentals: number;
+    reviews: number;
+    security: number;
+  };
+  level: string;
+}> {
+  const profile = await getProfile(userId);
+  if (!profile) {
+    return {
+      total: 0,
+      breakdown: { verification: 0, rating: 0, rentals: 0, reviews: 0, security: 0 },
+      level: 'new'
+    };
+  }
+
+  const breakdown = {
+    verification: profile.is_verified ? 20 : 0,
+    rating: Math.min(25, (profile.rating || 0) * 5),
+    rentals: Math.min(25, (profile.total_rentals || 0) * 0.3),
+    reviews: Math.min(15, (profile.total_reviews || 0) * 0.5),
+    security: profile.two_factor_enabled ? 15 : 5,
+  };
+
+  const total = Object.values(breakdown).reduce((sum, val) => sum + val, 0);
+
+  let level = 'new';
+  if (total >= 90) level = 'excellent';
+  else if (total >= 75) level = 'good';
+  else if (total >= 50) level = 'fair';
+  else if (total >= 25) level = 'building';
+
+  return { total, breakdown, level };
+}
+
+// ============================================
+// Smart Alerts Functions
+// ============================================
+
+export interface SmartAlert {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  message: string;
+  priority: 'high' | 'medium' | 'low';
+  status: 'unread' | 'read' | 'dismissed';
+  equipment_id?: string;
+  booking_id?: string;
+  data?: Record<string, unknown>;
+  created_at: string;
+  action_url?: string;
+}
+
+export async function getUserAlerts(userId: string, filters?: {
+  type?: string;
+  priority?: string;
+  status?: string;
+  limit?: number;
+}): Promise<SmartAlert[]> {
+  let query = supabase
+    .from('smart_alerts')
+    .select('*')
+    .eq('user_id', userId)
+    .neq('status', 'dismissed')
+    .order('created_at', { ascending: false });
+
+  if (filters?.type) {
+    query = query.eq('type', filters.type);
+  }
+  if (filters?.priority) {
+    query = query.eq('priority', filters.priority);
+  }
+  if (filters?.status) {
+    query = query.eq('status', filters.status);
+  }
+  if (filters?.limit) {
+    query = query.limit(filters.limit);
+  }
+
+  const { data, error } = await query;
+  if (error) return [];
+  return data || [];
+}
+
+export async function markAlertAsRead(alertId: string): Promise<void> {
+  await supabase
+    .from('smart_alerts')
+    .update({ status: 'read' })
+    .eq('id', alertId);
+}
+
+export async function dismissAlert(alertId: string): Promise<void> {
+  await supabase
+    .from('smart_alerts')
+    .update({ status: 'dismissed' })
+    .eq('id', alertId);
+}
+
+export async function createAlert(alert: Omit<SmartAlert, 'id' | 'created_at'>): Promise<SmartAlert | null> {
+  const { data, error } = await supabase
+    .from('smart_alerts')
+    .insert(alert)
+    .select()
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+// ============================================
+// Equipment Bundle Functions
+// ============================================
+
+export interface EquipmentBundle {
+  id: string;
+  owner_id: string;
+  name: string;
+  description: string;
+  equipment_ids: string[];
+  discount_percentage: number;
+  original_daily_rate: number;
+  discounted_daily_rate: number;
+  min_rental_days: number;
+  max_rental_days: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export async function getEquipmentBundles(filters?: {
+  ownerId?: string;
+  isActive?: boolean;
+  limit?: number;
+}): Promise<EquipmentBundle[]> {
+  let query = supabase
+    .from('equipment_bundles')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (filters?.ownerId) {
+    query = query.eq('owner_id', filters.ownerId);
+  }
+  if (filters?.isActive !== undefined) {
+    query = query.eq('is_active', filters.isActive);
+  }
+  if (filters?.limit) {
+    query = query.limit(filters.limit);
+  }
+
+  const { data, error } = await query;
+  if (error) return [];
+  return data || [];
+}
+
+export async function createEquipmentBundle(bundle: Omit<EquipmentBundle, 'id' | 'created_at'>): Promise<EquipmentBundle | null> {
+  const { data, error } = await supabase
+    .from('equipment_bundles')
+    .insert(bundle)
+    .select()
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+export async function updateEquipmentBundle(bundleId: string, updates: Partial<EquipmentBundle>): Promise<EquipmentBundle | null> {
+  const { data, error } = await supabase
+    .from('equipment_bundles')
+    .update(updates)
+    .eq('id', bundleId)
+    .select()
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+export async function deleteEquipmentBundle(bundleId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('equipment_bundles')
+    .delete()
+    .eq('id', bundleId);
+
+  return !error;
+}
+
+// ============================================
+// Warranty Functions
+// ============================================
+
+export interface EquipmentWarrantyRecord {
+  id: string;
+  equipment_id: string;
+  warranty_type: 'manufacturer' | 'extended' | 'third_party';
+  provider: string;
+  coverage_details: string;
+  start_date: string;
+  end_date: string;
+  claim_contact?: string;
+  claim_phone?: string;
+  documents?: string[];
+  status: 'active' | 'expired' | 'claimed';
+  created_at: string;
+}
+
+export async function getEquipmentWarranties(equipmentId?: string, ownerId?: string): Promise<EquipmentWarrantyRecord[]> {
+  let query = supabase
+    .from('equipment_warranties')
+    .select('*, equipment:equipment(*)')
+    .order('end_date', { ascending: true });
+
+  if (equipmentId) {
+    query = query.eq('equipment_id', equipmentId);
+  }
+  if (ownerId) {
+    query = query.eq('equipment.owner_id', ownerId);
+  }
+
+  const { data, error } = await query;
+  if (error) return [];
+  return data || [];
+}
+
+export async function createWarranty(warranty: Omit<EquipmentWarrantyRecord, 'id' | 'created_at'>): Promise<EquipmentWarrantyRecord | null> {
+  const { data, error } = await supabase
+    .from('equipment_warranties')
+    .insert(warranty)
+    .select()
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+export async function updateWarranty(warrantyId: string, updates: Partial<EquipmentWarrantyRecord>): Promise<EquipmentWarrantyRecord | null> {
+  const { data, error } = await supabase
+    .from('equipment_warranties')
+    .update(updates)
+    .eq('id', warrantyId)
+    .select()
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+// ============================================
+// Bulk Booking Functions
+// ============================================
+
+export interface BulkBookingRecord {
+  id: string;
+  renter_id: string;
+  items: Array<{
+    equipment_id: string;
+    start_date: string;
+    end_date: string;
+    quantity: number;
+    subtotal: number;
+  }>;
+  subtotal: number;
+  discount_amount: number;
+  service_fee: number;
+  total_deposit: number;
+  total_amount: number;
+  payment_status: 'pending' | 'paid' | 'refunded';
+  booking_status: 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
+  created_at: string;
+}
+
+export async function createBulkBooking(booking: Omit<BulkBookingRecord, 'id' | 'created_at'>): Promise<BulkBookingRecord | null> {
+  const { data, error } = await supabase
+    .from('bulk_bookings')
+    .insert(booking)
+    .select()
+    .single();
+
+  if (error) return null;
+  return data;
+}
+
+export async function getUserBulkBookings(userId: string): Promise<BulkBookingRecord[]> {
+  const { data, error } = await supabase
+    .from('bulk_bookings')
+    .select('*')
+    .eq('renter_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) return [];
+  return data || [];
+}
+
+// ============================================
+// Marketplace Insights Functions
+// ============================================
+
+export interface MarketplaceInsight {
+  totalListings: number;
+  totalRentals: number;
+  averageRating: number;
+  topCategories: Array<{ name: string; count: number }>;
+  priceRange: { min: number; max: number; avg: number };
+  trendings: Equipment[];
+}
+
+export async function getMarketplaceInsights(): Promise<MarketplaceInsight> {
+  // Get equipment count
+  const { count: totalListings } = await supabase
+    .from('equipment')
+    .select('*', { count: 'exact', head: true })
+    .eq('is_active', true);
+
+  // Get booking count
+  const { count: totalRentals } = await supabase
+    .from('bookings')
+    .select('*', { count: 'exact', head: true });
+
+  // Get categories with counts
+  const { data: categories } = await supabase
+    .from('categories')
+    .select('name, equipment_count')
+    .order('equipment_count', { ascending: false })
+    .limit(5);
+
+  // Get trending equipment
+  const { data: trending } = await supabase
+    .from('equipment')
+    .select('*')
+    .eq('is_active', true)
+    .order('total_bookings', { ascending: false })
+    .limit(5);
+
+  return {
+    totalListings: totalListings || 0,
+    totalRentals: totalRentals || 0,
+    averageRating: 4.5, // Calculate from actual data
+    topCategories: categories?.map(c => ({ name: c.name, count: c.equipment_count || 0 })) || [],
+    priceRange: { min: 50, max: 2000, avg: 350 }, // Calculate from actual data
+    trendings: trending || [],
+  };
+}
+
+// ============================================
+// Price Tracking Functions
+// ============================================
+
+export async function trackPriceChange(equipmentId: string, oldPrice: number, newPrice: number): Promise<void> {
+  // Get users who favorited this equipment
+  const { data: favorites } = await supabase
+    .from('favorites')
+    .select('user_id')
+    .eq('equipment_id', equipmentId);
+
+  if (!favorites || favorites.length === 0) return;
+
+  // Create price drop alerts for each user
+  if (newPrice < oldPrice) {
+    const discount = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
+    
+    for (const fav of favorites) {
+      await createAlert({
+        user_id: fav.user_id,
+        type: 'price_drop',
+        title: 'Price Drop Alert!',
+        message: `An item in your favorites is now ${discount}% cheaper!`,
+        priority: 'high',
+        status: 'unread',
+        equipment_id: equipmentId,
+        data: { oldPrice, newPrice, discount },
+        action_url: `/equipment/${equipmentId}`,
+      });
+    }
+  }
+}
+

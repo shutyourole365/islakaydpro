@@ -37,3 +37,19 @@ export {
 
 // Supabase hooks
 export { useSupabaseStatus } from './useSupabaseStatus';
+
+// Advanced hooks for equipment rental features
+export {
+  useEquipmentAvailability,
+  useDynamicPricing,
+  useFavorites,
+  useBookingCart,
+  useBookingStatus,
+  useTrustScore,
+  useEquipmentSearch,
+  useNotifications,
+  useInfiniteScroll,
+  useOptimisticUpdate,
+  useAnalytics,
+  useRentalDates,
+} from './useAdvanced';
