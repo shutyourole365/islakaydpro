@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
 import LogoPro from '../branding/LogoPro';
+import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -199,6 +200,7 @@ export default function Header({
                       onClose={() => setIsNotificationsOpen(false)}
                     />
                   </div>
+                  <ThemeToggle variant="dropdown" />
                 </div>
 
                 <div className="relative profile-menu">
@@ -219,10 +221,10 @@ export default function Header({
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 overflow-hidden">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="font-semibold text-gray-900">John Doe</p>
-                        <p className="text-sm text-gray-500">john@example.com</p>
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                        <p className="font-semibold text-gray-900 dark:text-white">John Doe</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">john@example.com</p>
                       </div>
                       <div className="py-2">
                         <button
@@ -230,7 +232,7 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <LayoutDashboard className="w-5 h-5 text-gray-400" />
                           Dashboard
@@ -240,7 +242,7 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Package className="w-5 h-5 text-gray-400" />
                           My Listings
@@ -250,7 +252,7 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Heart className="w-5 h-5 text-gray-400" />
                           Favorites
@@ -260,19 +262,19 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Settings className="w-5 h-5 text-gray-400" />
                           Settings
                         </button>
                       </div>
-                      <div className="border-t border-gray-100 pt-2">
+                      <div className="border-t border-gray-100 dark:border-gray-700 pt-2">
                         <button
                           onClick={() => {
                             onSignOut();
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full"
                         >
                           <LogOut className="w-5 h-5" />
                           Sign Out
