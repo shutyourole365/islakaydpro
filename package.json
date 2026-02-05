@@ -13,6 +13,8 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "setup": "bash setup-complete.sh",
     "seed:equipment": "tsx scripts/seed-equipment.ts",
     "deploy": "./deploy-to-domain.sh",
@@ -32,6 +34,7 @@
   "devDependencies": {
     "@eslint/js": "^9.9.1",
     "@eslint/plugin-kit": "^0.5.1",
+    "@playwright/test": "^1.58.1",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.5.1",
