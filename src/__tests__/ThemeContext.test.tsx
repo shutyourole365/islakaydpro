@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 
@@ -43,14 +43,16 @@ describe('ThemeContext', () => {
     }));
   });
 
-  it('should default to system theme', () => {
+  it('should default to system theme', async () => {
     render(
       <ThemeProvider>
         <ThemeConsumer />
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('theme').textContent).toBe('system');
+    await waitFor(() => {
+      expect(screen.getByTestId('theme').textContent).toBe('system');
+    });
   });
 
   it('should set theme to dark when button clicked', async () => {
@@ -63,9 +65,11 @@ describe('ThemeContext', () => {
 
     await user.click(screen.getByTestId('set-dark'));
 
-    expect(screen.getByTestId('theme').textContent).toBe('dark');
-    expect(screen.getByTestId('resolved').textContent).toBe('dark');
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    await waitFor(() => {
+      expect(screen.getByTestId('theme').textContent).toBe('dark');
+      expect(screen.getByTestId('resolved').textContent).toBe('dark');
+      expect(document.documentElement.classList.contains('dark')).toBe(true);
+    });
   });
 
   it('should set theme to light when button clicked', async () => {
@@ -78,9 +82,11 @@ describe('ThemeContext', () => {
 
     await user.click(screen.getByTestId('set-light'));
 
-    expect(screen.getByTestId('theme').textContent).toBe('light');
-    expect(screen.getByTestId('resolved').textContent).toBe('light');
-    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    await waitFor(() => {
+      expect(screen.getByTestId('theme').textContent).toBe('light');
+      expect(screen.getByTestId('resolved').textContent).toBe('light');
+      expect(document.documentElement.classList.contains('dark')).toBe(false);
+    });
   });
 
   it('should toggle theme between light and dark', async () => {
@@ -93,15 +99,21 @@ describe('ThemeContext', () => {
 
     // Start with light
     await user.click(screen.getByTestId('set-light'));
-    expect(screen.getByTestId('resolved').textContent).toBe('light');
+    await waitFor(() => {
+      expect(screen.getByTestId('resolved').textContent).toBe('light');
+    });
 
     // Toggle to dark
     await user.click(screen.getByTestId('toggle'));
-    expect(screen.getByTestId('resolved').textContent).toBe('dark');
+    await waitFor(() => {
+      expect(screen.getByTestId('resolved').textContent).toBe('dark');
+    });
 
     // Toggle back to light
     await user.click(screen.getByTestId('toggle'));
-    expect(screen.getByTestId('resolved').textContent).toBe('light');
+    await waitFor(() => {
+      expect(screen.getByTestId('resolved').textContent).toBe('light');
+    });
   });
 
   it('should persist theme to localStorage', async () => {
@@ -114,10 +126,12 @@ describe('ThemeContext', () => {
 
     await user.click(screen.getByTestId('set-dark'));
 
-    expect(localStorage.getItem('islakayd-theme')).toBe('dark');
+    await waitFor(() => {
+      expect(localStorage.getItem('islakayd-theme')).toBe('dark');
+    });
   });
 
-  it('should read theme from localStorage on mount', () => {
+  it('should read theme from localStorage on mount', async () => {
     localStorage.setItem('islakayd-theme', 'dark');
 
     render(
@@ -126,10 +140,12 @@ describe('ThemeContext', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('theme').textContent).toBe('dark');
+    await waitFor(() => {
+      expect(screen.getByTestId('theme').textContent).toBe('dark');
+    });
   });
 
-  it('should respect system preference when set to system', () => {
+  it('should respect system preference when set to system', async () => {
     // Mock system dark mode preference
     window.matchMedia = vi.fn().mockImplementation((query) => ({
       matches: query === '(prefers-color-scheme: dark)',
@@ -146,8 +162,10 @@ describe('ThemeContext', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('theme').textContent).toBe('system');
-    expect(screen.getByTestId('resolved').textContent).toBe('dark');
+    await waitFor(() => {
+      expect(screen.getByTestId('theme').textContent).toBe('system');
+      expect(screen.getByTestId('resolved').textContent).toBe('dark');
+    });
   });
 
   it('should throw error when useTheme is used outside provider', () => {
