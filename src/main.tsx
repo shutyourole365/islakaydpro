@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { ToastProvider } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { registerServiceWorker } from './lib/serviceWorker';
 import { analytics } from './services/analytics';
 import { errorMonitoring } from './services/errorMonitoring';
@@ -95,10 +96,12 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary>
-      <ToastProvider>
-        <App />
-      </ToastProvider>
-    </ErrorBoundary>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <ToastProvider>
+          <App />
+        </ToastProvider>
+      </ErrorBoundary>
+    </ThemeProvider>
   </StrictMode>
 );

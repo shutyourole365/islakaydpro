@@ -21,6 +21,7 @@ import {
   Truck,
   PartyPopper,
 } from 'lucide-react';
+import { sendMessage } from '../../services/ai';
 
 interface Message {
   id: string;
@@ -182,23 +183,44 @@ export default function AIAssistant() {
     setIsTyping(true);
     setShowQuickActions(false);
 
-    // Simulate realistic typing delay
-    const responseDelay = 800 + Math.random() * 1200;
-    await new Promise((resolve) => setTimeout(resolve, responseDelay));
+    try {
+      // Try to use the real AI service
+      const conversationMessages = messages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .map(m => ({ role: m.role, content: m.content }));
+      
+      // Add the new user message
+      conversationMessages.push({ role: 'user' as const, content: userMessage });
 
-    const response = getContextualResponses(userMessage);
+      const aiResponse = await sendMessage(conversationMessages);
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: 'assistant',
-      content: response.content,
-      timestamp: new Date(),
-      suggestions: response.suggestions,
-      metadata: { type: response.type as 'search' | 'booking' | 'info' | 'recommendation' },
-    };
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: aiResponse.content,
+        timestamp: new Date(),
+        suggestions: aiResponse.suggestions,
+        metadata: { type: 'info' },
+      };
 
-    setMessages((prev) => [...prev, newMessage]);
-    setIsTyping(false);
+      setMessages((prev) => [...prev, newMessage]);
+    } catch {
+      // Fallback to contextual responses if AI service fails
+      const response = getContextualResponses(userMessage);
+
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: response.content,
+        timestamp: new Date(),
+        suggestions: response.suggestions,
+        metadata: { type: response.type as 'search' | 'booking' | 'info' | 'recommendation' },
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleFeedback = (messageId: string, isPositive: boolean) => {
@@ -258,7 +280,7 @@ export default function AIAssistant() {
 
       {isOpen && (
         <div
-          className={`fixed z-50 bg-white shadow-2xl flex flex-col transition-all duration-300 ${
+          className={`fixed z-50 bg-white dark:bg-gray-900 shadow-2xl flex flex-col transition-all duration-300 ${
             isExpanded
               ? 'inset-4 rounded-3xl'
               : 'bottom-6 right-6 w-[420px] h-[640px] rounded-3xl'
