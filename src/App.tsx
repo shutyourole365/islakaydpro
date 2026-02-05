@@ -10,21 +10,23 @@ import FeaturedListings from './components/home/FeaturedListings';
 import HowItWorks from './components/home/HowItWorks';
 import Testimonials from './components/home/Testimonials';
 import CTASection from './components/home/CTASection';
-import SearchModal from './components/search/SearchModal';
-import EquipmentDetail from './components/equipment/EquipmentDetail';
-import AuthModal from './components/auth/AuthModal';
-import AIAssistantEnhanced from './components/ai/AIAssistantEnhanced';
-import BrowsePage from './components/browse/BrowsePage';
-import Dashboard from './components/dashboard/Dashboard';
-import ListEquipmentForm from './components/listing/ListEquipmentForm';
-import BookingSystem from './components/booking/BookingSystem';
-import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
-import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { addFavorite, removeFavorite, getEquipment } from './services/database';
 import type { SearchFilters } from './types';
+
+// Lazy load page-level components for better initial load
+const SearchModal = lazy(() => import('./components/search/SearchModal'));
+const EquipmentDetail = lazy(() => import('./components/equipment/EquipmentDetail'));
+const AuthModal = lazy(() => import('./components/auth/AuthModal'));
+const AIAssistantEnhanced = lazy(() => import('./components/ai/AIAssistantEnhanced'));
+const BrowsePage = lazy(() => import('./components/browse/BrowsePage'));
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
+const ListEquipmentForm = lazy(() => import('./components/listing/ListEquipmentForm'));
+const BookingSystem = lazy(() => import('./components/booking/BookingSystem'));
+const EquipmentComparison = lazy(() => import('./components/comparison/EquipmentComparison'));
+const FeatureShowcase = lazy(() => import('./components/ui/FeatureShowcase'));
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -1044,7 +1046,7 @@ function AppContent() {
       )}
 
       {currentPage === 'browse' && (
-        <>
+        <Suspense fallback={<PageLoader />}>
           <BrowsePage
             equipment={equipment}
             categories={categories}
@@ -1060,18 +1062,18 @@ function AppContent() {
             }}
           />
           <Footer />
-        </>
+        </Suspense>
       )}
 
       {currentPage === 'dashboard' && (
-        <>
+        <Suspense fallback={<PageLoader />}>
           <Dashboard
             onBack={() => setCurrentPage('home')}
             onEquipmentClick={handleEquipmentClick}
             onListEquipment={handleListEquipment}
           />
           <Footer />
-        </>
+        </Suspense>
       )}
 
       {currentPage === 'security' && (
@@ -1177,62 +1179,78 @@ function AppContent() {
       )}
 
       {currentPage === 'list-equipment' && (
-        <ListEquipmentForm
-          categories={categories}
-          onClose={() => setCurrentPage('home')}
-          onSubmit={handleListingSubmit}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <ListEquipmentForm
+            categories={categories}
+            onClose={() => setCurrentPage('home')}
+            onSubmit={handleListingSubmit}
+          />
+        </Suspense>
       )}
 
-      {currentPage !== 'list-equipment' && <AIAssistantEnhanced />}
+      {currentPage !== 'list-equipment' && (
+        <Suspense fallback={null}>
+          <AIAssistantEnhanced />
+        </Suspense>
+      )}
 
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSearch={handleSearch}
-      />
+      <Suspense fallback={null}>
+        <SearchModal
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+          onSearch={handleSearch}
+        />
+      </Suspense>
 
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onSuccess={() => setIsAuthOpen(false)}
-      />
+      <Suspense fallback={null}>
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+          onSuccess={() => setIsAuthOpen(false)}
+        />
+      </Suspense>
 
       {selectedEquipment && (
-        <EquipmentDetail
-          equipment={selectedEquipment}
-          onClose={() => setSelectedEquipment(null)}
-          onBook={handleBook}
-          onMessage={handleMessage}
-          isFavorite={favorites.has(selectedEquipment.id)}
-          onFavoriteToggle={() => handleFavoriteToggle(selectedEquipment.id)}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentDetail
+            equipment={selectedEquipment}
+            onClose={() => setSelectedEquipment(null)}
+            onBook={handleBook}
+            onMessage={handleMessage}
+            isFavorite={favorites.has(selectedEquipment.id)}
+            onFavoriteToggle={() => handleFavoriteToggle(selectedEquipment.id)}
+          />
+        </Suspense>
       )}
 
       {/* Advanced Booking System Modal */}
       {isBookingOpen && bookingEquipment && (
-        <BookingSystem
-          equipment={bookingEquipment}
-          onClose={() => {
-            setIsBookingOpen(false);
-            setBookingEquipment(null);
-          }}
-          onComplete={handleBookingComplete}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <BookingSystem
+            equipment={bookingEquipment}
+            onClose={() => {
+              setIsBookingOpen(false);
+              setBookingEquipment(null);
+            }}
+            onComplete={handleBookingComplete}
+          />
+        </Suspense>
       )}
 
       {/* Equipment Comparison Modal */}
       {isComparisonOpen && comparisonItems.length > 0 && (
-        <EquipmentComparison
-          items={comparisonItems}
-          onClose={() => setIsComparisonOpen(false)}
-          onRemove={handleRemoveFromComparison}
-          onBook={(equipment) => {
-            setIsComparisonOpen(false);
-            setBookingEquipment(equipment);
-            setIsBookingOpen(true);
-          }}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentComparison
+            items={comparisonItems}
+            onClose={() => setIsComparisonOpen(false)}
+            onRemove={handleRemoveFromComparison}
+            onBook={(equipment) => {
+              setIsComparisonOpen(false);
+              setBookingEquipment(equipment);
+              setIsBookingOpen(true);
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Comparison Floating Button */}
@@ -1640,10 +1658,12 @@ function AppContent() {
 
       {/* Feature Showcase Modal */}
       {isFeatureShowcaseOpen && (
-        <FeatureShowcase
-          onFeatureSelect={handleFeatureSelect}
-          onClose={() => setIsFeatureShowcaseOpen(false)}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <FeatureShowcase
+            onFeatureSelect={handleFeatureSelect}
+            onClose={() => setIsFeatureShowcaseOpen(false)}
+          />
+        </Suspense>
       )}
 
       {/* Feature Showcase Floating Button */}
