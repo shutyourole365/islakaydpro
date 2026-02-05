@@ -50,7 +50,7 @@ describe('ThemeContext', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('theme')).toHaveTextContent('system');
+    expect(screen.getByTestId('theme').textContent).toBe('system');
   });
 
   it('should set theme to dark when button clicked', async () => {
@@ -63,8 +63,8 @@ describe('ThemeContext', () => {
 
     await user.click(screen.getByTestId('set-dark'));
 
-    expect(screen.getByTestId('theme')).toHaveTextContent('dark');
-    expect(screen.getByTestId('resolved')).toHaveTextContent('dark');
+    expect(screen.getByTestId('theme').textContent).toBe('dark');
+    expect(screen.getByTestId('resolved').textContent).toBe('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 
@@ -78,8 +78,8 @@ describe('ThemeContext', () => {
 
     await user.click(screen.getByTestId('set-light'));
 
-    expect(screen.getByTestId('theme')).toHaveTextContent('light');
-    expect(screen.getByTestId('resolved')).toHaveTextContent('light');
+    expect(screen.getByTestId('theme').textContent).toBe('light');
+    expect(screen.getByTestId('resolved').textContent).toBe('light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
 
@@ -93,15 +93,15 @@ describe('ThemeContext', () => {
 
     // Start with light
     await user.click(screen.getByTestId('set-light'));
-    expect(screen.getByTestId('resolved')).toHaveTextContent('light');
+    expect(screen.getByTestId('resolved').textContent).toBe('light');
 
     // Toggle to dark
     await user.click(screen.getByTestId('toggle'));
-    expect(screen.getByTestId('resolved')).toHaveTextContent('dark');
+    expect(screen.getByTestId('resolved').textContent).toBe('dark');
 
     // Toggle back to light
     await user.click(screen.getByTestId('toggle'));
-    expect(screen.getByTestId('resolved')).toHaveTextContent('light');
+    expect(screen.getByTestId('resolved').textContent).toBe('light');
   });
 
   it('should persist theme to localStorage', async () => {
@@ -126,7 +126,7 @@ describe('ThemeContext', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('theme')).toHaveTextContent('dark');
+    expect(screen.getByTestId('theme').textContent).toBe('dark');
   });
 
   it('should respect system preference when set to system', () => {
@@ -146,8 +146,8 @@ describe('ThemeContext', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('theme')).toHaveTextContent('system');
-    expect(screen.getByTestId('resolved')).toHaveTextContent('dark');
+    expect(screen.getByTestId('theme').textContent).toBe('system');
+    expect(screen.getByTestId('resolved').textContent).toBe('dark');
   });
 
   it('should throw error when useTheme is used outside provider', () => {
