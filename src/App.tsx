@@ -73,6 +73,23 @@ const EnhancedReviewSystem = lazy(() => import('./components/reviews/EnhancedRev
 const PWAEnhancedFeatures = lazy(() => import('./components/pwa/PWAEnhancedFeatures'));
 const MultiPaymentSystem = lazy(() => import('./components/payments/MultiPaymentSystem'));
 
+// New Feature Components - Trust, Alerts, Bundles, Warranties, Insights
+const RenterTrustScore = lazy(() => import('./components/trust/RenterTrustScore'));
+const SmartAlertsSystem = lazy(() => import('./components/alerts/SmartAlertsSystem'));
+const EquipmentBundleDeals = lazy(() => import('./components/bundles/EquipmentBundleDeals'));
+const EquipmentWarrantyTracker = lazy(() => import('./components/warranty/EquipmentWarrantyTracker'));
+const BulkBookingSystem = lazy(() => import('./components/booking/BulkBookingSystem'));
+const MarketplaceInsights = lazy(() => import('./components/insights/MarketplaceInsights'));
+
+// Additional Feature Components - Weather, Social, Onboarding, Security
+const WeatherAdvisor = lazy(() => import('./components/weather/WeatherAdvisor'));
+const SocialProof = lazy(() => import('./components/social/SocialProof'));
+const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow'));
+const BiometricAuth = lazy(() => import('./components/security/BiometricAuth'));
+const PriceAlerts = lazy(() => import('./components/pricing/PriceAlerts'));
+const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
+const AchievementsSystem = lazy(() => import('./components/gamification/AchievementsSystem'));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -502,7 +519,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
@@ -549,6 +566,21 @@ function AppContent() {
   const [reviewEquipment, setReviewEquipment] = useState<Equipment | null>(null);
   const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
   const [messageConversationId, setMessageConversationId] = useState<string | null>(null);
+  // New Feature modal states - Trust, Alerts, Bundles, Warranties
+  const [isTrustScoreOpen, setIsTrustScoreOpen] = useState(false);
+  const [isSmartAlertsOpen, setIsSmartAlertsOpen] = useState(false);
+  const [isBundleDealsOpen, setIsBundleDealsOpen] = useState(false);
+  const [isWarrantyTrackerOpen, setIsWarrantyTrackerOpen] = useState(false);
+  const [isBulkBookingOpen, setIsBulkBookingOpen] = useState(false);
+  const [isMarketInsightsOpen, setIsMarketInsightsOpen] = useState(false);
+  // Additional Feature modal states - Weather, Social, Onboarding, Security
+  const [isWeatherAdvisorOpen, setIsWeatherAdvisorOpen] = useState(false);
+  const [isSocialProofOpen, setIsSocialProofOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isBiometricAuthOpen, setIsBiometricAuthOpen] = useState(false);
+  const [isPriceAlertsOpen, setIsPriceAlertsOpen] = useState(false);
+  const [isSmartRecommendationsOpen, setIsSmartRecommendationsOpen] = useState(false);
+  const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   // NEWEST Features - Communication & Discovery modal states
   const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
   const [chatRecipient, setChatRecipient] = useState<{id: string; name: string; avatar?: string} | null>(null);
@@ -897,6 +929,47 @@ function AppContent() {
       case 'quick-book':
         setQuickBookEquipment(demoEquipment);
         setIsQuickBookOpen(true);
+        break;
+      // New Feature Cases - Trust, Alerts, Bundles, Warranties, Insights
+      case 'trust-score':
+        setIsTrustScoreOpen(true);
+        break;
+      case 'smart-alerts':
+        setIsSmartAlertsOpen(true);
+        break;
+      case 'bundle-deals':
+        setIsBundleDealsOpen(true);
+        break;
+      case 'warranty-tracker':
+        setIsWarrantyTrackerOpen(true);
+        break;
+      case 'bulk-booking':
+        setIsBulkBookingOpen(true);
+        break;
+      case 'market-insights':
+        setIsMarketInsightsOpen(true);
+        break;
+      // Weather, Social, Onboarding, Security Features
+      case 'weather-advisor':
+        setIsWeatherAdvisorOpen(true);
+        break;
+      case 'social-proof':
+        setIsSocialProofOpen(true);
+        break;
+      case 'onboarding':
+        setIsOnboardingOpen(true);
+        break;
+      case 'biometric-auth':
+        setIsBiometricAuthOpen(true);
+        break;
+      case 'price-alerts':
+        setIsPriceAlertsOpen(true);
+        break;
+      case 'smart-recommendations':
+        setIsSmartRecommendationsOpen(true);
+        break;
+      case 'achievements':
+        setIsAchievementsOpen(true);
         break;
       default:
         alert(`${featureId} feature coming soon!`);
@@ -1822,6 +1895,251 @@ function AppContent() {
             </div>
           </div>
           <Footer />
+        </Suspense>
+      )}
+
+      {/* Trust Score Page */}
+      {currentPage === 'trust-score' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-teal-50 to-cyan-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <RenterTrustScore userId={user?.id || ''} onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {/* Smart Alerts Page */}
+      {currentPage === 'alerts' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-amber-50 to-orange-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <SmartAlertsSystem userId={user?.id} onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {/* Equipment Bundles Page */}
+      {currentPage === 'bundles' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('browse')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Browse
+              </button>
+              <EquipmentBundleDeals mode="browse" onClose={() => setCurrentPage('browse')} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {/* Warranty Tracker Page */}
+      {currentPage === 'warranties' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {/* Bulk Booking Page */}
+      {currentPage === 'bulk-booking' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('browse')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Browse
+              </button>
+              <BulkBookingSystem onClose={() => setCurrentPage('browse')} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {/* Marketplace Insights Page */}
+      {currentPage === 'insights' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <MarketplaceInsights onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {/* New Feature Modals */}
+      {isTrustScoreOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <RenterTrustScore userId={user?.id || ''} onClose={() => setIsTrustScoreOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isSmartAlertsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <SmartAlertsSystem userId={user?.id} onClose={() => setIsSmartAlertsOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isBundleDealsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <EquipmentBundleDeals mode="browse" onClose={() => setIsBundleDealsOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isWarrantyTrackerOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setIsWarrantyTrackerOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isBulkBookingOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <BulkBookingSystem onClose={() => setIsBulkBookingOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isMarketInsightsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <MarketplaceInsights onClose={() => setIsMarketInsightsOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {/* Additional Feature Modals - Weather, Social, Onboarding, Security */}
+      {isWeatherAdvisorOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <WeatherAdvisor
+              location={bookingEquipment?.location || 'San Francisco, CA'}
+              startDate={new Date().toISOString()}
+              endDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()}
+              onClose={() => setIsWeatherAdvisorOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isSocialProofOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <SocialProof
+              equipmentId={bookingEquipment?.id || 'demo'}
+              onClose={() => setIsSocialProofOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isOnboardingOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <OnboardingFlow
+              userType="renter"
+              onComplete={() => setIsOnboardingOpen(false)}
+              onSkip={() => setIsOnboardingOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isBiometricAuthOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <BiometricAuth
+              onSuccess={() => {
+                setIsBiometricAuthOpen(false);
+                alert('Biometric authentication successful!');
+              }}
+              onCancel={() => setIsBiometricAuthOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isPriceAlertsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <PriceAlerts
+              userId={user?.id || ''}
+              onClose={() => setIsPriceAlertsOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isSmartRecommendationsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <SmartRecommendations
+              userId={user?.id}
+              onEquipmentSelect={(eq) => {
+                setSelectedEquipment(eq);
+                setIsSmartRecommendationsOpen(false);
+              }}
+              onClose={() => setIsSmartRecommendationsOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isAchievementsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <AchievementsSystem
+              userId={user?.id || ''}
+              onClose={() => setIsAchievementsOpen(false)}
+            />
+          </div>
         </Suspense>
       )}
     </div>

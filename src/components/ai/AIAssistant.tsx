@@ -337,7 +337,7 @@ export default function AIAssistant() {
                           const htmlMap: Record<string, string> = {
                             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
                           };
-                          return text.replace(/[&<>"']/g, (m) => htmlMap[m] || m);
+                          return text.replace(/[&<>"']/g, (m) => htmlMap[m] ?? m);
                         };
                         const boldParsed = escapeHtml(line).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         return (
