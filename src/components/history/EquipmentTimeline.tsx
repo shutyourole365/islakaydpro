@@ -411,7 +411,7 @@ export default function EquipmentTimeline({
                                     {event.metadata.duration && (
                                       <div className="text-sm">
                                         <span className="text-gray-500 dark:text-gray-400">Duration:</span>{' '}
-                                        <span className="text-gray-900 dark:text-white">{event.metadata.duration} days</span>
+                                        <span className="text-gray-900 dark:text-white">{String(event.metadata.duration)} days</span>
                                       </div>
                                     )}
                                     {event.metadata.total && (
