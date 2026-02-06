@@ -17,11 +17,12 @@ import {
 } from 'lucide-react';
 
 interface WeatherAdvisorProps {
-  equipmentType: string;
-  location: string;
-  startDate: Date;
-  endDate: Date;
+  equipmentType?: string;
+  location?: string;
+  startDate?: Date | string;
+  endDate?: Date | string;
   className?: string;
+  onClose?: () => void;
 }
 
 interface WeatherForecast {
@@ -42,12 +43,20 @@ interface WeatherRecommendation {
 }
 
 export default function WeatherAdvisor({
-  equipmentType,
-  location,
-  startDate,
-  endDate,
+  equipmentType = 'General Equipment',
+  location = 'San Francisco, CA',
+  startDate: startDateProp,
+  endDate: endDateProp,
   className = '',
+  onClose: _onClose,
 }: WeatherAdvisorProps) {
+  // Reserved for future use
+  void _onClose;
+  
+  // Convert string dates to Date objects
+  const startDate = startDateProp instanceof Date ? startDateProp : new Date(startDateProp || Date.now());
+  const endDate = endDateProp instanceof Date ? endDateProp : new Date(endDateProp || Date.now() + 7 * 24 * 60 * 60 * 1000);
+  
   const [forecast, setForecast] = useState<WeatherForecast[]>([]);
   const [recommendation, setRecommendation] = useState<WeatherRecommendation | null>(null);
   const [loading, setLoading] = useState(true);

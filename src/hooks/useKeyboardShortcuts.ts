@@ -219,6 +219,14 @@ export const defaultAppShortcuts: ShortcutConfig[] = [
 ];
 
 /**
+ * Hook to register the keyboard shortcuts help modal
+ */
+export function useKeyboardShortcutsModal() {
+  const { isOpen, open, close } = useShortcutsHelp(defaultAppShortcuts);
+  return { isOpen, open, close };
+}
+
+/**
  * Hook to listen for custom shortcut events
  */
 export function useShortcutEvent(
