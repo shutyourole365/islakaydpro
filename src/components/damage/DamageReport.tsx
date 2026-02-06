@@ -9,15 +9,14 @@ import {
   ChevronRight,
   Trash2,
   MapPin,
-  Calendar,
   FileText,
   Send,
   Loader2,
   Image as ImageIcon,
-  Plus,
   ZoomIn,
-  RotateCcw,
 } from 'lucide-react';
+
+// Icons available: Camera, ChevronLeft, ChevronRight for future use
 
 interface DamagePhoto {
   id: string;

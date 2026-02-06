@@ -2,11 +2,8 @@ import { useState, useEffect } from 'react';
 import {
   Zap,
   CheckCircle,
-  Clock,
   Calendar,
-  CreditCard,
   Shield,
-  ChevronRight,
   Loader2,
   AlertCircle,
   X,
@@ -14,8 +11,9 @@ import {
   MapPin,
   Truck,
   ArrowRight,
-  Sparkles,
 } from 'lucide-react';
+
+// Suppress unused variable warnings for props that may be used in future
 
 interface Equipment {
   id: string;

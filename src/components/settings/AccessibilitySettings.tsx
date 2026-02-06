@@ -7,19 +7,16 @@ import {
   MousePointer,
   Contrast,
   ZoomIn,
-  ZoomOut,
   RotateCcw,
   Moon,
   Sun,
   Monitor,
   Check,
-  ChevronRight,
   Keyboard,
   Hand,
   Focus,
   Pause,
   Play,
-  VolumeX,
 } from 'lucide-react';
 
 interface AccessibilitySettings {
@@ -94,7 +91,7 @@ export default function AccessibilitySettingsComponent({
     ...initialSettings,
   });
   const [activeSection, setActiveSection] = useState<string>('vision');
-  const [previewText, setPreviewText] = useState(
+  const [previewText] = useState(
     'The quick brown fox jumps over the lazy dog. Equipment rental made easy.'
   );
 

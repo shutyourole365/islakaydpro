@@ -85,6 +85,7 @@ export default function WishlistCollections({
   onCreateCollection,
   onDeleteCollection,
   onUpdateCollection,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAddToCollection,
   onRemoveFromCollection,
   onEquipmentClick,
