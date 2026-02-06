@@ -17,13 +17,15 @@ import {
 import type { Equipment } from '../../types';
 
 interface SmartRecommendationsProps {
-  equipment: Equipment[];
+  equipment?: Equipment[];
   userId?: string;
   userLocation?: { lat: number; lng: number };
   recentViews?: string[];
   favorites?: Set<string>;
-  onEquipmentClick: (equipment: Equipment) => void;
-  onFavoriteClick: (equipmentId: string) => void;
+  onEquipmentClick?: (equipment: Equipment) => void;
+  onEquipmentSelect?: (equipment: Equipment) => void;
+  onFavoriteClick?: (equipmentId: string) => void;
+  onClose?: () => void;
   className?: string;
 }
 
@@ -41,14 +43,25 @@ export interface ScoredEquipment {
 }
 
 export default function SmartRecommendations({
-  equipment,
+  equipment = [],
+  userId: _userId,
   userLocation,
   recentViews = [],
-  favorites = new Set(),
+  favorites = new Set<string>(),
   onEquipmentClick,
+  onEquipmentSelect,
   onFavoriteClick,
+  onClose: _onClose,
   className = '',
 }: SmartRecommendationsProps) {
+  // Use onEquipmentSelect as fallback for onEquipmentClick
+  const handleEquipmentClick = onEquipmentClick || onEquipmentSelect || (() => {});
+  const handleFavoriteClick = onFavoriteClick || (() => {});
+  
+  // Reserved for future use
+  void _userId;
+  void _onClose;
+  
   const [activeTab, setActiveTab] = useState<'for-you' | 'trending' | 'nearby' | 'deals'>('for-you');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [feedbackGiven, setFeedbackGiven] = useState<Set<string>>(new Set());
@@ -295,7 +308,7 @@ export default function SmartRecommendations({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onFavoriteClick(eq.id);
+                      handleFavoriteClick(eq.id);
                     }}
                     className={`absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                       favorites.has(eq.id)
@@ -308,7 +321,7 @@ export default function SmartRecommendations({
 
                   {/* Quick view */}
                   <button
-                    onClick={() => onEquipmentClick(eq)}
+                    onClick={() => handleEquipmentClick(eq)}
                     className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-2 bg-white rounded-full text-gray-900 font-medium text-sm opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0"
                   >
                     Quick View

@@ -33,10 +33,14 @@ export {
   useEscapeKey,
   useEnterKey,
   useShortcutsHelp,
+  useKeyboardShortcutsModal,
   useShortcutEvent,
   useTypeaheadSearch,
   defaultAppShortcuts,
 } from './useKeyboardShortcuts';
+
+// Command Palette hook
+export { useCommandPalette } from './useCommandPalette';
 
 // Form hooks
 export {

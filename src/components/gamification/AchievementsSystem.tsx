@@ -45,12 +45,14 @@ interface Badge {
 }
 
 interface AchievementsSystemProps {
-  userLevel: number;
-  currentXP: number;
-  totalXP: number;
-  achievements: Achievement[];
-  badges: Badge[];
-  onBadgeEquip: (badgeId: string) => void;
+  userId?: string;
+  userLevel?: number;
+  currentXP?: number;
+  totalXP?: number;
+  achievements?: Achievement[];
+  badges?: Badge[];
+  onBadgeEquip?: (badgeId: string) => void;
+  onClose?: () => void;
   className?: string;
 }
 
@@ -245,6 +247,13 @@ export default function AchievementsSystem({
   onBadgeEquip,
   className = '',
 }: AchievementsSystemProps) {
+  // Safe handler for badge equip
+  const handleBadgeEquip = (badgeId: string) => {
+    if (onBadgeEquip) {
+      onBadgeEquip(badgeId);
+    }
+  };
+  
   const [activeTab, setActiveTab] = useState<'all' | 'unlocked' | 'in-progress'>('all');
   const [selectedCategory, setSelectedCategory] = useState<'all' | Achievement['category']>('all');
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
@@ -343,7 +352,7 @@ export default function AchievementsSystem({
             {badges.map(badge => (
               <button
                 key={badge.id}
-                onClick={() => onBadgeEquip(badge.id)}
+                onClick={() => handleBadgeEquip(badge.id)}
                 className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all ${
                   badge.isEquipped
                     ? 'border-violet-500 bg-violet-50'

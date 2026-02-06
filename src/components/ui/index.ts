@@ -70,10 +70,10 @@ export {
 export { default as VerificationBadge } from './VerificationBadge';
 
 // Command Palette
-export { default as CommandPalette, useCommandPalette } from './CommandPalette';
+export { default as CommandPalette } from './CommandPalette';
 
 // Keyboard Shortcuts Help
-export { default as KeyboardShortcutsHelp, useKeyboardShortcutsModal } from './KeyboardShortcutsHelp';
+export { default as KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 
 // Theme Toggle
 export { default as ThemeToggle } from './ThemeToggle';

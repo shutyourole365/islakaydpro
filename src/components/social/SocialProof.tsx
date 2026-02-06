@@ -16,6 +16,7 @@ import {
 interface SocialProofProps {
   equipmentId?: string;
   className?: string;
+  onClose?: () => void;
 }
 
 interface LiveActivity {

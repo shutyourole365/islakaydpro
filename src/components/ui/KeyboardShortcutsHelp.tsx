@@ -131,11 +131,3 @@ export default function KeyboardShortcutsHelp({ additionalShortcuts = [] }: Keyb
     </div>
   );
 }
-
-/**
- * Hook to register the keyboard shortcuts help modal
- */
-export function useKeyboardShortcutsModal() {
-  const { isOpen, open, close } = useShortcutsHelp(defaultAppShortcuts);
-  return { isOpen, open, close };
-}
