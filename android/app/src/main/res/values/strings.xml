@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Islakayd</string>
+    <string name="title_activity_main">Islakayd</string>
+    <string name="package_name">com.islakayd.app</string>
+    <string name="custom_url_scheme">com.islakayd.app</string>
+</resources>

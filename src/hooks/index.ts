@@ -26,6 +26,18 @@ export {
   useFocus,
 } from './useUtilities';
 
+// Keyboard shortcuts hooks
+export {
+  useKeyboardShortcuts,
+  useKeyboardShortcut as useShortcut,
+  useEscapeKey,
+  useEnterKey,
+  useShortcutsHelp,
+  useShortcutEvent,
+  useTypeaheadSearch,
+  defaultAppShortcuts,
+} from './useKeyboardShortcuts';
+
 // Form hooks
 export {
   useForm,
@@ -37,6 +49,9 @@ export {
 
 // Supabase hooks
 export { useSupabaseStatus } from './useSupabaseStatus';
+
+// Theme hook
+export { useTheme } from './useTheme';
 
 // Advanced hooks for equipment rental features
 export {
@@ -53,3 +68,4 @@ export {
   useAnalytics,
   useRentalDates,
 } from './useAdvanced';
+

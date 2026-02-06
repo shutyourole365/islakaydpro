@@ -68,3 +68,12 @@ export {
 
 // Verification Badge
 export { default as VerificationBadge } from './VerificationBadge';
+
+// Command Palette
+export { default as CommandPalette, useCommandPalette } from './CommandPalette';
+
+// Keyboard Shortcuts Help
+export { default as KeyboardShortcutsHelp, useKeyboardShortcutsModal } from './KeyboardShortcutsHelp';
+
+// Theme Toggle
+export { default as ThemeToggle } from './ThemeToggle';

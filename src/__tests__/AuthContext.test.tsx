@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 import userEvent from '@testing-library/user-event';
 
 // Must define mocks before vi.mock calls due to hoisting
@@ -81,13 +82,13 @@ function AuthConsumer() {
       <span data-testid="notifications">{auth.unreadNotifications}</span>
       <button 
         data-testid="sign-in" 
-        onClick={() => auth.signIn('test@example.com', 'password123')}
+        onClick={() => auth.signIn('test@example.com', 'password123').catch(() => {})}
       >
         Sign In
       </button>
       <button 
         data-testid="sign-up" 
-        onClick={() => auth.signUp('new@example.com', 'password123', 'New User')}
+        onClick={() => auth.signUp('new@example.com', 'password123', 'New User').catch(() => {})}
       >
         Sign Up
       </button>
@@ -96,7 +97,7 @@ function AuthConsumer() {
       </button>
       <button 
         data-testid="reset-password" 
-        onClick={() => auth.resetPassword('test@example.com')}
+        onClick={() => auth.resetPassword('test@example.com').catch(() => {})}
       >
         Reset Password
       </button>
@@ -105,30 +106,29 @@ function AuthConsumer() {
 }
 
 describe('AuthContext', () => {
-  let authStateCallback: ((event: string, session: unknown) => void) | null = null;
-  
-  // Get typed reference to mocked supabase
-  const mockSupabase = vi.mocked(supabase);
+  let authStateCallback: ((event: AuthChangeEvent, session: Session | null) => void) | null = null;
 
   beforeEach(() => {
     vi.clearAllMocks();
     
-    // Setup default mocks
-    mockSupabase.auth.getSession.mockResolvedValue({
+    // Setup default mocks with proper typing
+    (supabase.auth.getSession as Mock).mockResolvedValue({
       data: { session: null },
       error: null,
-    } as never);
-    
-    mockSupabase.auth.onAuthStateChange.mockImplementation((callback) => {
-      authStateCallback = callback as (event: string, session: unknown) => void;
-      return {
-        data: {
-          subscription: {
-            unsubscribe: vi.fn(),
-          },
-        },
-      } as never;
     });
+    
+    (supabase.auth.onAuthStateChange as Mock).mockImplementation(
+      (callback: (event: AuthChangeEvent, session: Session | null) => void) => {
+        authStateCallback = callback;
+        return {
+          data: {
+            subscription: {
+              unsubscribe: vi.fn(),
+            },
+          },
+        };
+      }
+    );
   });
 
   afterEach(() => {
@@ -170,10 +170,10 @@ describe('AuthContext', () => {
       access_token: 'token',
     };
 
-    mockSupabase.auth.getSession.mockResolvedValue({
+    (supabase.auth.getSession as Mock).mockResolvedValue({
       data: { session: mockSession },
       error: null,
-    } as never);
+    });
 
     render(
       <AuthProvider>
@@ -244,13 +244,10 @@ describe('AuthContext', () => {
       expect(screen.getByTestId('loading').textContent).toBe('ready');
     });
 
-    // Click will throw but we just verify signInWithRetry was called
-    try {
-      await user.click(screen.getByTestId('sign-in'));
-    } catch {
-      // Expected to throw
-    }
+    // Click and expect error - the click triggers an async function that will reject
+    await user.click(screen.getByTestId('sign-in'));
 
+    // Wait for signInWithRetry to have been called
     await waitFor(() => {
       expect(signInWithRetry).toHaveBeenCalledWith(
         'test@example.com',
@@ -299,11 +296,11 @@ describe('AuthContext', () => {
       access_token: 'token',
     };
 
-    mockSupabase.auth.getSession.mockResolvedValue({
+    (supabase.auth.getSession as Mock).mockResolvedValue({
       data: { session: mockSession },
       error: null,
-    } as never);
-    mockSupabase.auth.signOut.mockResolvedValue({ error: null } as never);
+    });
+    (supabase.auth.signOut as Mock).mockResolvedValue({ error: null });
 
     const user = userEvent.setup();
     
@@ -320,12 +317,12 @@ describe('AuthContext', () => {
     await user.click(screen.getByTestId('sign-out'));
 
     await waitFor(() => {
-      expect(mockSupabase.auth.signOut).toHaveBeenCalled();
+      expect(supabase.auth.signOut).toHaveBeenCalled();
     });
   });
 
   it('should handle password reset', async () => {
-    mockSupabase.auth.resetPasswordForEmail.mockResolvedValue({ error: null } as never);
+    (supabase.auth.resetPasswordForEmail as Mock).mockResolvedValue({ error: null });
 
     const user = userEvent.setup();
     
@@ -342,7 +339,7 @@ describe('AuthContext', () => {
     await user.click(screen.getByTestId('reset-password'));
 
     await waitFor(() => {
-      expect(mockSupabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(
+      expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(
         'test@example.com',
         expect.objectContaining({
           redirectTo: expect.stringContaining('/reset-password'),
@@ -366,11 +363,14 @@ describe('AuthContext', () => {
     const mockSession = {
       user: { id: 'test-user-id', email: 'test@example.com' },
       access_token: 'token',
-    };
+      refresh_token: 'refresh_token',
+      expires_in: 3600,
+      token_type: 'bearer',
+    } as Session;
 
     await act(async () => {
       if (authStateCallback) {
-        authStateCallback('SIGNED_IN', mockSession);
+        authStateCallback('SIGNED_IN' as AuthChangeEvent, mockSession);
       }
     });
 
@@ -396,10 +396,10 @@ describe('AuthContext', () => {
       access_token: 'token',
     };
 
-    mockSupabase.auth.getSession.mockResolvedValue({
+    (supabase.auth.getSession as Mock).mockResolvedValue({
       data: { session: mockSession },
       error: null,
-    } as never);
+    });
 
     render(
       <AuthProvider>
@@ -414,7 +414,7 @@ describe('AuthContext', () => {
     // Simulate sign out via auth state change
     await act(async () => {
       if (authStateCallback) {
-        authStateCallback('SIGNED_OUT', null);
+        authStateCallback('SIGNED_OUT' as AuthChangeEvent, null);
       }
     });
 
