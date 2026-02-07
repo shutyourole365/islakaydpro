@@ -63,7 +63,6 @@ const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler
 
 // NEW Premium Features - Live Chat & Advanced Search
 const LiveChat = lazy(() => import('./components/chat/LiveChat'));
-const RealTimeChat = lazy(() => import('./components/chat/RealTimeChat'));
 const AdvancedFilters = lazy(() => import('./components/search/AdvancedFilters'));
 const DetailedComparison = lazy(() => import('./components/comparison/DetailedComparison'));
 const SavedSearches = lazy(() => import('./components/search/SavedSearches'));
@@ -1826,7 +1825,7 @@ function AppContent() {
       {/* Real Time Chat Modal */}
       {isRealTimeChatOpen && chatRecipient && (
         <Suspense fallback={<PageLoader />}>
-          <RealTimeChat
+          <LiveChat
             recipientId={chatRecipient.id}
             recipientName={chatRecipient.name}
             equipmentId={selectedEquipment?.id}
@@ -1846,11 +1845,10 @@ function AppContent() {
             <div className="relative z-10 w-full max-w-6xl max-h-[90vh] overflow-hidden">
               <EquipmentMapEnhanced
                 equipment={equipment}
-                onEquipmentSelect={(eq) => {
+                onEquipmentClick={(eq: Equipment) => {
                   setSelectedEquipment(eq);
                   setIsEquipmentMapEnhancedOpen(false);
                 }}
-                onClose={() => setIsEquipmentMapEnhancedOpen(false)}
               />
             </div>
           </div>
@@ -2244,6 +2242,7 @@ function AppContent() {
         <Suspense fallback={<PageLoader />}>
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <QRCodeScanner
+              isOpen={isQRCodeScannerOpen}
               onScan={(data) => {
                 console.log('QR Code scanned:', data);
                 // Handle QR code data (could be equipment ID, booking code, etc.)
