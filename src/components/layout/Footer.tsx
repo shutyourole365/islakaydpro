@@ -1,7 +1,11 @@
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import LogoPro from '../branding/LogoPro';
 
-export default function Footer() {
+interface FooterProps {
+  onNavigate?: (page: string) => void;
+}
+
+export default function Footer({ onNavigate }: FooterProps) {
   const footerLinks = {
     'Rent Equipment': [
       'Browse All',
@@ -81,15 +85,30 @@ export default function Footer() {
         <div className="py-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-              <a href="#" className="text-gray-400 hover:text-teal-400 transition-colors">
+              <button
+                onClick={() => onNavigate?.('terms')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
                 Terms of Service
-              </a>
-              <a href="#" className="text-gray-400 hover:text-teal-400 transition-colors">
+              </button>
+              <button
+                onClick={() => onNavigate?.('privacy')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
                 Privacy Policy
-              </a>
-              <a href="#" className="text-gray-400 hover:text-teal-400 transition-colors">
+              </button>
+              <button
+                onClick={() => onNavigate?.('cookies')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
                 Cookie Policy
-              </a>
+              </button>
+              <button
+                onClick={() => onNavigate?.('refund')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
+                Refund Policy
+              </button>
               <a href="#" className="text-gray-400 hover:text-teal-400 transition-colors">
                 Accessibility
               </a>
