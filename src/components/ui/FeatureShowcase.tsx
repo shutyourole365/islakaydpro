@@ -22,6 +22,8 @@ import {
   Package,
   TrendingUp,
   Shield,
+  QrCode,
+  Eye,
 } from 'lucide-react';
 
 interface FeatureShowcaseProps {
@@ -123,6 +125,15 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
       demo: true,
     },
     {
+      id: '3d-viewer',
+      name: '3D Equipment Viewer',
+      description: 'Interactive 360° equipment preview with zoom and rotation controls',
+      icon: <Eye className="w-6 h-6" />,
+      color: 'from-purple-500 to-indigo-500',
+      badge: '3D',
+      demo: true,
+    },
+    {
       id: 'enhanced-reviews',
       name: 'Enhanced Reviews',
       description: '4-step review wizard with aspect ratings and photo uploads',
@@ -157,6 +168,24 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
       icon: <Camera className="w-6 h-6" />,
       color: 'from-blue-500 to-cyan-500',
       badge: '🔥 HOT',
+      demo: true,
+    },
+    {
+      id: 'real-time-chat',
+      name: 'Real-Time Chat',
+      description: 'Advanced chat with WebSocket connections, message threads, and file sharing',
+      icon: <Camera className="w-6 h-6" />,
+      color: 'from-cyan-500 to-teal-500',
+      badge: 'ADVANCED',
+      demo: true,
+    },
+    {
+      id: 'enhanced-map',
+      name: 'Enhanced Equipment Map',
+      description: 'Interactive map with clustering, filters, and real-time equipment availability',
+      icon: <TrendingUp className="w-6 h-6" />,
+      color: 'from-green-500 to-emerald-500',
+      badge: 'MAP',
       demo: true,
     },
     {
@@ -288,6 +317,15 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
       demo: true,
     },
     {
+      id: 'qr-code-scanner',
+      name: 'QR Code Scanner',
+      description: 'Scan QR codes for quick equipment identification and booking',
+      icon: <QrCode className="w-6 h-6" />,
+      color: 'from-cyan-500 to-blue-500',
+      badge: 'QUICK',
+      demo: true,
+    },
+    {
       id: 'price-alerts',
       name: 'Price Alerts',
       description: 'Set price alerts and get notified when equipment hits your target',
@@ -322,8 +360,8 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
         if (selectedCategory === 'booking') return ['smart-scheduler', 'group-booking', 'quick-book', 'bulk-booking', 'bundle-deals'].includes(f.id);
         if (selectedCategory === 'pricing') return ['price-negotiator', 'smart-pricing', 'multi-payment', 'price-alerts', 'market-insights'].includes(f.id);
         if (selectedCategory === 'management') return ['maintenance-predictor', 'referral-program', 'analytics', 'saved-searches', 'comparison', 'warranty-tracker', 'achievements'].includes(f.id);
-        if (selectedCategory === 'ai') return ['ai-search', 'price-negotiator', 'maintenance-predictor', 'analytics', 'recommendations', 'live-chat', 'advanced-filters', 'smart-recommendations', 'smart-alerts'].includes(f.id);
-        if (selectedCategory === 'security') return ['trust-score', 'biometric-auth', 'social-proof'].includes(f.id);
+        if (selectedCategory === 'ai') return ['ai-search', 'price-negotiator', 'maintenance-predictor', 'analytics', 'recommendations', 'live-chat', 'advanced-filters', 'smart-recommendations', 'smart-alerts', '3d-viewer'].includes(f.id);
+        if (selectedCategory === 'security') return ['trust-score', 'biometric-auth', 'social-proof', 'qr-code-scanner'].includes(f.id);
         return true;
       });
 

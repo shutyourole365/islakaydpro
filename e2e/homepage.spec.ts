@@ -16,14 +16,14 @@ test.describe('Homepage', () => {
     await page.goto('/');
     
     // Categories section should be visible
-    await expect(page.getByText(/browse by category/i)).toBeVisible();
+    await expect(page.getByText(/find equipment by category/i)).toBeVisible();
   });
 
   test('should display featured equipment', async ({ page }) => {
     await page.goto('/');
     
     // Featured listings section
-    await expect(page.getByText(/featured equipment/i)).toBeVisible();
+    await expect(page.getByText(/top-rated equipment near you/i)).toBeVisible();
   });
 
   test('should have working search button', async ({ page }) => {
@@ -34,7 +34,7 @@ test.describe('Homepage', () => {
     await searchButton.click();
     
     // Search modal should open
-    await expect(page.getByPlaceholder(/search equipment/i)).toBeVisible();
+    await expect(page.getByPlaceholder(/search for equipment/i)).toBeVisible();
   });
 });
 
