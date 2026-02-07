@@ -51,6 +51,7 @@ const Equipment3DViewer = lazy(() => import('./components/equipment/Equipment3DV
 const VoiceSearch = lazy(() => import('./components/search/VoiceSearch'));
 const LiveLocationTracker = lazy(() => import('./components/booking/LiveLocationTracker'));
 const DamageReportWizard = lazy(() => import('./components/booking/DamageReportWizard'));
+const EquipmentMapEnhanced = lazy(() => import('./components/map/EquipmentMapEnhanced'));
 
 // Additional Premium Features
 const LoyaltyProgram = lazy(() => import('./components/gamification/LoyaltyProgram'));
@@ -62,10 +63,12 @@ const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler
 
 // NEW Premium Features - Live Chat & Advanced Search
 const LiveChat = lazy(() => import('./components/chat/LiveChat'));
+const RealTimeChat = lazy(() => import('./components/chat/RealTimeChat'));
 const AdvancedFilters = lazy(() => import('./components/search/AdvancedFilters'));
 const DetailedComparison = lazy(() => import('./components/comparison/DetailedComparison'));
 const SavedSearches = lazy(() => import('./components/search/SavedSearches'));
 const EquipmentRecommendations = lazy(() => import('./components/recommendations/EquipmentRecommendations'));
+const QRCodeScanner = lazy(() => import('./components/scanner/QRCodeScanner'));
 const QuickBook = lazy(() => import('./components/booking/QuickBook'));
 
 // Balanced Approach Features - NEW Components
@@ -583,9 +586,10 @@ function AppContent() {
   const [isPriceAlertsOpen, setIsPriceAlertsOpen] = useState(false);
   const [isSmartRecommendationsOpen, setIsSmartRecommendationsOpen] = useState(false);
   const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
-  // NEWEST Features - Communication & Discovery modal states
   const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
   const [chatRecipient, setChatRecipient] = useState<{id: string; name: string; avatar?: string} | null>(null);
+  const [isRealTimeChatOpen, setIsRealTimeChatOpen] = useState(false);
+  const [isEquipmentMapEnhancedOpen, setIsEquipmentMapEnhancedOpen] = useState(false);
   const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
   const [isDetailedComparisonOpen, setIsDetailedComparisonOpen] = useState(false);
   const [comparisonEquipment, setComparisonEquipment] = useState<Equipment[]>([]);
@@ -593,6 +597,7 @@ function AppContent() {
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
   const [isQuickBookOpen, setIsQuickBookOpen] = useState(false);
   const [quickBookEquipment, setQuickBookEquipment] = useState<Equipment | null>(null);
+  const [isQRCodeScannerOpen, setIsQRCodeScannerOpen] = useState(false);
   // Search filter state (used by Advanced Filters and Saved Searches)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_searchFilters, _setSearchFilters] = useState<Partial<SearchFilters>>({});
@@ -910,6 +915,17 @@ function AppContent() {
         });
         setIsLiveChatOpen(true);
         break;
+      case 'real-time-chat':
+        setChatRecipient({ 
+          id: demoEquipment.owner_id, 
+          name: demoEquipment.owner?.full_name || 'Equipment Owner',
+          avatar: demoEquipment.owner?.avatar_url || undefined
+        });
+        setIsRealTimeChatOpen(true);
+        break;
+      case 'enhanced-map':
+        setIsEquipmentMapEnhancedOpen(true);
+        break;
       case 'advanced-filters':
         setIsAdvancedFiltersOpen(true);
         break;
@@ -972,6 +988,13 @@ function AppContent() {
         break;
       case 'achievements':
         setIsAchievementsOpen(true);
+        break;
+      case 'qr-code-scanner':
+        setIsQRCodeScannerOpen(true);
+        break;
+      case '3d-viewer':
+        setViewerEquipment(demoEquipment);
+        setIs3DViewerOpen(true);
         break;
       default:
         alert(`${featureId} feature coming soon!`);
@@ -1794,6 +1817,40 @@ function AppContent() {
         </Suspense>
       )}
 
+      {/* Real Time Chat Modal */}
+      {isRealTimeChatOpen && chatRecipient && (
+        <Suspense fallback={<PageLoader />}>
+          <RealTimeChat
+            recipientId={chatRecipient.id}
+            recipientName={chatRecipient.name}
+            equipmentId={selectedEquipment?.id}
+            onClose={() => {
+              setIsRealTimeChatOpen(false);
+              setChatRecipient(null);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Enhanced Equipment Map Modal */}
+      {isEquipmentMapEnhancedOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsEquipmentMapEnhancedOpen(false)} />
+            <div className="relative z-10 w-full max-w-6xl max-h-[90vh] overflow-hidden">
+              <EquipmentMapEnhanced
+                equipment={equipment}
+                onEquipmentSelect={(eq) => {
+                  setSelectedEquipment(eq);
+                  setIsEquipmentMapEnhancedOpen(false);
+                }}
+                onClose={() => setIsEquipmentMapEnhancedOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
       {/* Advanced Filters Modal */}
       {isAdvancedFiltersOpen && (
         <Suspense fallback={<PageLoader />}>
@@ -2147,6 +2204,22 @@ function AppContent() {
                 setIsSmartRecommendationsOpen(false);
               }}
               onClose={() => setIsSmartRecommendationsOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isQRCodeScannerOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <QRCodeScanner
+              onScan={(data) => {
+                console.log('QR Code scanned:', data);
+                // Handle QR code data (could be equipment ID, booking code, etc.)
+                alert(`QR Code scanned: ${data}`);
+                setIsQRCodeScannerOpen(false);
+              }}
+              onClose={() => setIsQRCodeScannerOpen(false)}
             />
           </div>
         </Suspense>

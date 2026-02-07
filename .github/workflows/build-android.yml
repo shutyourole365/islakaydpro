@@ -60,10 +60,18 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Decode Keystore
-        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+      - name: Set ANDROID_KEYSTORE_BASE64 env
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
+          echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: Decode Keystore
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/keystore.jks
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       - name: Build Release AAB
         if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == '' }}
@@ -109,8 +117,14 @@ jobs:
           path: android/app/build/outputs/apk/release/*.apk
           retention-days: 30
 
+      - name: Set GOOGLE_PLAY_SERVICE_ACCOUNT_JSON env
+        run: |
+          echo "::add-mask::${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}"
+        env:
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+
       - name: Upload to Google Play (Internal Testing)
-        if: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        if: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
