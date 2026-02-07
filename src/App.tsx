@@ -95,6 +95,12 @@ const PriceAlerts = lazy(() => import('./components/pricing/PriceAlerts'));
 const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
 const AchievementsSystem = lazy(() => import('./components/gamification/AchievementsSystem'));
 
+// Legal Pages
+const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
+const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
+const CookiePolicy = lazy(() => import('./components/legal/CookiePolicy'));
+const RefundPolicy = lazy(() => import('./components/legal/RefundPolicy'));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -524,7 +530,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
@@ -1064,7 +1070,7 @@ function AppContent() {
             <CTASection onGetStarted={() => setIsAuthOpen(true)} />
           </main>
 
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </>
       )}
 
@@ -1084,7 +1090,7 @@ function AppContent() {
               setCurrentPage('home');
             }}
           />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1095,42 +1101,42 @@ function AppContent() {
             onEquipmentClick={handleEquipmentClick}
             onListEquipment={handleListEquipment}
           />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'security' && (
         <Suspense fallback={<PageLoader />}>
           <SecurityCenter onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'analytics' && (
         <Suspense fallback={<PageLoader />}>
           <AnalyticsDashboard onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'admin' && profile?.is_admin && (
         <Suspense fallback={<PageLoader />}>
           <AdminPanel onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'notifications' && (
         <Suspense fallback={<PageLoader />}>
           <NotificationCenter onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'payments' && (
         <Suspense fallback={<PageLoader />}>
           <PaymentSettings onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1144,7 +1150,7 @@ function AppContent() {
               />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1163,7 +1169,7 @@ function AppContent() {
               />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1180,7 +1186,7 @@ function AppContent() {
               <LoyaltyProgram userId={user?.id || ''} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1197,7 +1203,7 @@ function AppContent() {
               <FleetManager ownerId={user?.id || ''} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1613,7 +1619,7 @@ function AppContent() {
               />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1971,7 +1977,7 @@ function AppContent() {
               <PWAEnhancedFeatures onClose={() => setCurrentPage('dashboard')} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -1989,7 +1995,7 @@ function AppContent() {
               <RenterTrustScore userId={user?.id || ''} onClose={() => setCurrentPage('dashboard')} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -2007,7 +2013,7 @@ function AppContent() {
               <SmartAlertsSystem userId={user?.id} onClose={() => setCurrentPage('dashboard')} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -2025,7 +2031,7 @@ function AppContent() {
               <EquipmentBundleDeals mode="browse" onClose={() => setCurrentPage('browse')} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -2043,7 +2049,7 @@ function AppContent() {
               <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setCurrentPage('dashboard')} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -2061,7 +2067,7 @@ function AppContent() {
               <BulkBookingSystem onClose={() => setCurrentPage('browse')} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -2079,7 +2085,32 @@ function AppContent() {
               <MarketplaceInsights onClose={() => setCurrentPage('dashboard')} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Legal Pages */}
+      {currentPage === 'terms' && (
+        <Suspense fallback={<PageLoader />}>
+          <TermsOfService onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'privacy' && (
+        <Suspense fallback={<PageLoader />}>
+          <PrivacyPolicy onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'cookies' && (
+        <Suspense fallback={<PageLoader />}>
+          <CookiePolicy onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'refund' && (
+        <Suspense fallback={<PageLoader />}>
+          <RefundPolicy onBack={() => setCurrentPage('home')} />
         </Suspense>
       )}
 
