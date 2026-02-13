@@ -1,10 +1,10 @@
 export function sanitizeInput(input: string): string {
   // Remove script tags, event handlers, javascript: and encode < >
   return input
+    .replace(/[<>]/g, '')
     .replace(/<script.*?>.*?<\/script>/gi, '')
     .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
     .replace(/javascript:/gi, '')
-    .replace(/[<>]/g, '')
     .trim();
 }
 

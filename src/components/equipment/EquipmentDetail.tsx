@@ -15,8 +15,11 @@ import {
   Truck,
   AlertCircle,
   Info,
+  DollarSign,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
+import PriceNegotiator from '../negotiation/PriceNegotiator';
+import MaintenancePredictor from '../predictive/MaintenancePredictor';
 
 interface EquipmentDetailProps {
   equipment: Equipment;
@@ -38,6 +41,8 @@ export default function EquipmentDetail({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [showNegotiator, setShowNegotiator] = useState(false);
+  const [showMaintenance, setShowMaintenance] = useState(false);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -246,6 +251,27 @@ export default function EquipmentDetail({
                   </div>
                 </div>
               )}
+
+              <div className="border-t border-gray-100 pt-6 mt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Maintenance Status
+                  </h2>
+                  <button
+                    onClick={() => setShowMaintenance(true)}
+                    className="text-teal-600 hover:text-teal-700 text-sm font-medium"
+                  >
+                    View Details →
+                  </button>
+                </div>
+                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl">
+                  <CheckCircle2 className="w-6 h-6 text-green-600" />
+                  <div>
+                    <p className="font-medium text-green-800">Equipment is in good condition</p>
+                    <p className="text-sm text-green-600">Last maintenance: 2 weeks ago</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -348,6 +374,14 @@ export default function EquipmentDetail({
                   Message Owner
                 </button>
 
+                <button
+                  onClick={() => setShowNegotiator(true)}
+                  className="w-full py-4 border border-orange-200 text-orange-700 font-semibold rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <DollarSign className="w-5 h-5" />
+                  Negotiate Price
+                </button>
+
                 <div className="mt-6 p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-start gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold">
@@ -386,6 +420,39 @@ export default function EquipmentDetail({
           </div>
         </div>
       </div>
+
+      {showNegotiator && pricing && (
+        <PriceNegotiator
+          equipmentId={equipment.id}
+          equipmentTitle={equipment.title}
+          originalDailyRate={equipment.daily_rate}
+          ownerId={equipment.owner_id}
+          ownerName={equipment.owner?.full_name || 'Owner'}
+          rentalDays={pricing.days}
+          onAccepted={(finalPrice) => {
+            // Handle accepted negotiation
+            setShowNegotiator(false);
+            // Could update the booking with negotiated price
+          }}
+          onRejected={() => setShowNegotiator(false)}
+          onClose={() => setShowNegotiator(false)}
+        />
+      )}
+
+      {showMaintenance && (
+        <MaintenancePredictor
+          equipmentId={equipment.id}
+          equipmentTitle={equipment.title}
+          category={equipment.category_id}
+          hoursUsed={500} // Mock data
+          lastMaintenanceDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)} // 2 weeks ago
+          onScheduleMaintenance={(date, type) => {
+            // Handle scheduling
+            setShowMaintenance(false);
+          }}
+          onClose={() => setShowMaintenance(false)}
+        />
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, Package, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import SocialAuth from './SocialAuth';
@@ -19,6 +19,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Generate unique IDs for form accessibility
+  const emailId = useId();
+  const passwordId = useId();
+  const fullNameId = useId();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,12 +200,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             >
               {mode === 'signup' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={fullNameId} className="block text-sm font-medium text-gray-700 mb-1.5">
                     Full Name
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
+                      id={fullNameId}
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -213,12 +219,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id={emailId}
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -231,12 +238,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
               {mode !== 'forgot' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 mb-1.5">
                     Password
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
+                      id={passwordId}
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

@@ -10,18 +10,24 @@ import FeaturedListings from './components/home/FeaturedListings';
 import HowItWorks from './components/home/HowItWorks';
 import Testimonials from './components/home/Testimonials';
 import CTASection from './components/home/CTASection';
+import AboutPage from './components/home/AboutPage';
+import HelpCenter from './components/help/HelpCenter';
 import SearchModal from './components/search/SearchModal';
 import EquipmentDetail from './components/equipment/EquipmentDetail';
 import AuthModal from './components/auth/AuthModal';
 import AIAssistantEnhanced from './components/ai/AIAssistantEnhanced';
 import BrowsePage from './components/browse/BrowsePage';
 import Dashboard from './components/dashboard/Dashboard';
+import ErrorBoundary from './components/ui/ErrorBoundary';
 import ListEquipmentForm from './components/listing/ListEquipmentForm';
 import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
+import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
+import { useCookieConsent } from './hooks/useCookieConsent';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { addFavorite, removeFavorite } from './services/database';
 
 // Lazy load heavy components for better performance
@@ -51,6 +57,9 @@ const DamageReportWizard = lazy(() => import('./components/booking/DamageReportW
 // Additional Premium Features
 const LoyaltyProgram = lazy(() => import('./components/gamification/LoyaltyProgram'));
 const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
+const MaintenanceScheduler = lazy(() => import('./components/maintenance/MaintenanceScheduler'));
+const SchedulingOptimizer = lazy(() => import('./components/scheduling/SchedulingOptimizer'));
+const ReferralSystem = lazy(() => import('./components/referral/ReferralSystem'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -481,10 +490,20 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'about' | 'help' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'maintenance' | 'scheduler' | 'referrals';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
+  const {
+    showBanner,
+    showSettings,
+    settings,
+    setShowSettings,
+    setSettings,
+    acceptAll,
+    declineAll,
+    saveSettings,
+  } = useCookieConsent();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -771,6 +790,19 @@ function AppContent() {
         </>
       )}
 
+      {currentPage === 'about' && (
+        <>
+          <AboutPage />
+          <Footer />
+        </>
+      )}
+
+      {currentPage === 'help' && (
+        <>
+          <HelpCenter />
+        </>
+      )}
+
       {currentPage === 'browse' && (
         <>
           <BrowsePage
@@ -898,6 +930,57 @@ function AppContent() {
                 ← Back to Dashboard
               </button>
               <FleetManager ownerId={user?.id || ''} />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'maintenance' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <MaintenanceScheduler />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'scheduler' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <SchedulingOptimizer />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'referrals' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <ReferralSystem />
             </div>
           </div>
           <Footer />
@@ -1281,15 +1364,34 @@ function AppContent() {
           </div>
         </Suspense>
       )}
+
+      {/* Cookie Consent */}
+      {showBanner && (
+        <CookieConsentBanner
+          onAccept={acceptAll}
+          onDecline={declineAll}
+          onCustomize={() => setShowSettings(true)}
+        />
+      )}
+
+      <CookieSettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        settings={settings}
+        onSettingsChange={setSettings}
+        onSave={saveSettings}
+      />
     </div>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

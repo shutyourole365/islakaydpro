@@ -12,7 +12,13 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "deploy": "npm run build && vercel --prod",
+    "deploy:staging": "npm run build && vercel --staging",
+    "preview:build": "npm run build && npm run preview",
+    "analyze": "npm run build && npx vite-bundle-analyzer dist",
+    "clean": "rm -rf dist node_modules/.vite",
+    "postinstall": "npm run typecheck"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

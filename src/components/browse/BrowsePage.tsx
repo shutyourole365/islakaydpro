@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useDeferredValue, useMemo } from 'react';
 import {
   Search,
   MapPin,
@@ -45,14 +45,17 @@ export default function BrowsePage({
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(false);
-  const [filteredEquipment, setFilteredEquipment] = useState<Equipment[]>(equipment);
   const [selectedMapEquipment, setSelectedMapEquipment] = useState<string | undefined>();
 
-  useEffect(() => {
+  // Use deferred value for search to improve performance during typing
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+
+  // Memoize filtered equipment for better performance
+  const filteredEquipment = useMemo(() => {
     let filtered = [...equipment];
 
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    if (deferredSearchQuery) {
+      const query = deferredSearchQuery.toLowerCase();
       filtered = filtered.filter(
         (item) =>
           item.title.toLowerCase().includes(query) ||
@@ -101,8 +104,8 @@ export default function BrowsePage({
         filtered.sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0));
     }
 
-    setFilteredEquipment(filtered);
-  }, [searchQuery, selectedCategory, location, priceRange, condition, sortBy, equipment, categories]);
+    return filtered;
+  }, [deferredSearchQuery, selectedCategory, location, priceRange, condition, sortBy, equipment, categories]);
 
   const clearFilters = () => {
     setSearchQuery('');
