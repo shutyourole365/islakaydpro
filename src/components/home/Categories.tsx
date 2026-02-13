@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   HardHat,
   Drill,
@@ -30,6 +31,41 @@ const iconMap: Record<string, React.ReactNode> = {
   Sparkles: <Sparkles className="w-7 h-7" />,
 };
 
+interface CategoryItemProps {
+  category: Category;
+  onClick: (category: Category) => void;
+  index: number;
+}
+
+const CategoryItem = memo(function CategoryItem({ category, onClick, index }: CategoryItemProps) {
+  return (
+    <button
+      onClick={() => onClick(category)}
+      className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-teal-200 overflow-hidden"
+      style={{ animationDelay: `${index * 50}ms` }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative">
+        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center text-teal-600 group-hover:from-teal-500 group-hover:to-emerald-500 group-hover:text-white transition-all duration-300 mb-4">
+          {iconMap[category.icon || 'Sparkles']}
+        </div>
+
+        <h3 className="font-semibold text-gray-900 mb-1 text-left">
+          {category.name}
+        </h3>
+        <p className="text-sm text-gray-500 text-left">
+          {category.equipment_count.toLocaleString()} items
+        </p>
+      </div>
+
+      <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+        <ArrowRight className="w-4 h-4 text-gray-600" />
+      </div>
+    </button>
+  );
+});
+
 interface CategoriesProps {
   categories: Category[];
   onCategoryClick: (category: Category) => void;
@@ -55,31 +91,12 @@ export default function Categories({ categories, onCategoryClick }: CategoriesPr
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
           {categories.map((category, index) => (
-            <button
+            <CategoryItem
               key={category.id}
-              onClick={() => onCategoryClick(category)}
-              className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-teal-200 overflow-hidden"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-              <div className="relative">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center text-teal-600 group-hover:from-teal-500 group-hover:to-emerald-500 group-hover:text-white transition-all duration-300 mb-4">
-                  {iconMap[category.icon || 'Sparkles']}
-                </div>
-
-                <h3 className="font-semibold text-gray-900 mb-1 text-left">
-                  {category.name}
-                </h3>
-                <p className="text-sm text-gray-500 text-left">
-                  {category.equipment_count.toLocaleString()} items
-                </p>
-              </div>
-
-              <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">
-                <ArrowRight className="w-4 h-4 text-gray-600" />
-              </div>
-            </button>
+              category={category}
+              onClick={onCategoryClick}
+              index={index}
+            />
           ))}
         </div>
 
