@@ -536,7 +536,7 @@ const sampleEquipment: Equipment[] = [
 type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'cancellation' | 'support';
 
 function AppContent() {
-  const { isAuthenticated, user, profile, signOut } = useAuth();
+  const { isAuthenticated, user, profile, signOut, unreadNotifications } = useAuth();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -1022,7 +1022,7 @@ function AppContent() {
       <InstallPrompt />
       <OfflineIndicator />
 
-      {currentPage !== 'list-equipment' && (
+      {currentPage !== 'list-equipment' && !['terms', 'privacy', 'cookies', 'refund', 'cancellation', 'support'].includes(currentPage) && (
         <Header
           onSearchClick={() => setIsSearchOpen(true)}
           onAuthClick={() => setIsAuthOpen(true)}
@@ -1031,6 +1031,10 @@ function AppContent() {
           onListEquipment={handleListEquipment}
           onSignOut={handleSignOut}
           currentPage={currentPage}
+          userName={profile?.full_name || undefined}
+          userEmail={user?.email}
+          userAvatar={profile?.avatar_url}
+          unreadCount={unreadNotifications}
         />
       )}
 
@@ -2079,20 +2083,10 @@ function AppContent() {
         </Suspense>
       )}
 
-      {/* Legal Pages */}
+      {/* Legal & Support Pages */}
       {currentPage === 'terms' && (
         <Suspense fallback={<PageLoader />}>
-          <Header
-            isAuthenticated={isAuthenticated}
-            userEmail={user?.email}
-            userName={profile?.full_name || user?.email?.split('@')[0]}
-            userAvatar={profile?.avatar_url}
-            onSignIn={() => setIsAuthOpen(true)}
-            onSignOut={signOut}
-            onSearch={() => setIsSearchOpen(true)}
-            onNavigate={handleNavigate}
-            isAdmin={profile?.is_admin}
-          />
+          <Header onSearchClick={() => setIsSearchOpen(true)} onAuthClick={() => setIsAuthOpen(true)} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} onListEquipment={handleListEquipment} onSignOut={handleSignOut} currentPage={currentPage} userName={profile?.full_name || undefined} userEmail={user?.email} userAvatar={profile?.avatar_url} unreadCount={unreadNotifications} />
           <TermsOfService onBack={() => setCurrentPage('home')} />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
@@ -2100,17 +2094,7 @@ function AppContent() {
 
       {currentPage === 'privacy' && (
         <Suspense fallback={<PageLoader />}>
-          <Header
-            isAuthenticated={isAuthenticated}
-            userEmail={user?.email}
-            userName={profile?.full_name || user?.email?.split('@')[0]}
-            userAvatar={profile?.avatar_url}
-            onSignIn={() => setIsAuthOpen(true)}
-            onSignOut={signOut}
-            onSearch={() => setIsSearchOpen(true)}
-            onNavigate={handleNavigate}
-            isAdmin={profile?.is_admin}
-          />
+          <Header onSearchClick={() => setIsSearchOpen(true)} onAuthClick={() => setIsAuthOpen(true)} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} onListEquipment={handleListEquipment} onSignOut={handleSignOut} currentPage={currentPage} userName={profile?.full_name || undefined} userEmail={user?.email} userAvatar={profile?.avatar_url} unreadCount={unreadNotifications} />
           <PrivacyPolicy onBack={() => setCurrentPage('home')} />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
@@ -2118,17 +2102,7 @@ function AppContent() {
 
       {currentPage === 'cookies' && (
         <Suspense fallback={<PageLoader />}>
-          <Header
-            isAuthenticated={isAuthenticated}
-            userEmail={user?.email}
-            userName={profile?.full_name || user?.email?.split('@')[0]}
-            userAvatar={profile?.avatar_url}
-            onSignIn={() => setIsAuthOpen(true)}
-            onSignOut={signOut}
-            onSearch={() => setIsSearchOpen(true)}
-            onNavigate={handleNavigate}
-            isAdmin={profile?.is_admin}
-          />
+          <Header onSearchClick={() => setIsSearchOpen(true)} onAuthClick={() => setIsAuthOpen(true)} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} onListEquipment={handleListEquipment} onSignOut={handleSignOut} currentPage={currentPage} userName={profile?.full_name || undefined} userEmail={user?.email} userAvatar={profile?.avatar_url} unreadCount={unreadNotifications} />
           <CookiePolicy onBack={() => setCurrentPage('home')} />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
@@ -2136,17 +2110,7 @@ function AppContent() {
 
       {currentPage === 'refund' && (
         <Suspense fallback={<PageLoader />}>
-          <Header
-            isAuthenticated={isAuthenticated}
-            userEmail={user?.email}
-            userName={profile?.full_name || user?.email?.split('@')[0]}
-            userAvatar={profile?.avatar_url}
-            onSignIn={() => setIsAuthOpen(true)}
-            onSignOut={signOut}
-            onSearch={() => setIsSearchOpen(true)}
-            onNavigate={handleNavigate}
-            isAdmin={profile?.is_admin}
-          />
+          <Header onSearchClick={() => setIsSearchOpen(true)} onAuthClick={() => setIsAuthOpen(true)} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} onListEquipment={handleListEquipment} onSignOut={handleSignOut} currentPage={currentPage} userName={profile?.full_name || undefined} userEmail={user?.email} userAvatar={profile?.avatar_url} unreadCount={unreadNotifications} />
           <RefundPolicy onBack={() => setCurrentPage('home')} />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
@@ -2154,17 +2118,7 @@ function AppContent() {
 
       {currentPage === 'cancellation' && (
         <Suspense fallback={<PageLoader />}>
-          <Header
-            isAuthenticated={isAuthenticated}
-            userEmail={user?.email}
-            userName={profile?.full_name || user?.email?.split('@')[0]}
-            userAvatar={profile?.avatar_url}
-            onSignIn={() => setIsAuthOpen(true)}
-            onSignOut={signOut}
-            onSearch={() => setIsSearchOpen(true)}
-            onNavigate={handleNavigate}
-            isAdmin={profile?.is_admin}
-          />
+          <Header onSearchClick={() => setIsSearchOpen(true)} onAuthClick={() => setIsAuthOpen(true)} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} onListEquipment={handleListEquipment} onSignOut={handleSignOut} currentPage={currentPage} userName={profile?.full_name || undefined} userEmail={user?.email} userAvatar={profile?.avatar_url} unreadCount={unreadNotifications} />
           <CancellationPolicy onBack={() => setCurrentPage('home')} />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
@@ -2172,17 +2126,7 @@ function AppContent() {
 
       {currentPage === 'support' && (
         <Suspense fallback={<PageLoader />}>
-          <Header
-            isAuthenticated={isAuthenticated}
-            userEmail={user?.email}
-            userName={profile?.full_name || user?.email?.split('@')[0]}
-            userAvatar={profile?.avatar_url}
-            onSignIn={() => setIsAuthOpen(true)}
-            onSignOut={signOut}
-            onSearch={() => setIsSearchOpen(true)}
-            onNavigate={handleNavigate}
-            isAdmin={profile?.is_admin}
-          />
+          <Header onSearchClick={() => setIsSearchOpen(true)} onAuthClick={() => setIsAuthOpen(true)} isAuthenticated={isAuthenticated} onNavigate={handleNavigate} onListEquipment={handleListEquipment} onSignOut={handleSignOut} currentPage={currentPage} userName={profile?.full_name || undefined} userEmail={user?.email} userAvatar={profile?.avatar_url} unreadCount={unreadNotifications} />
           <SupportPage onBack={() => setCurrentPage('home')} onNavigate={handleNavigate} />
           <Footer onNavigate={handleNavigate} />
         </Suspense>

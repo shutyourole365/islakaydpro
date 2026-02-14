@@ -338,35 +338,58 @@ export default function Dashboard({
           <div className="flex-1 min-w-0">
             {activeTab === 'overview' && (
               <div className="space-y-6">
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        Welcome back, {profile?.full_name?.split(' ')[0] || 'there'}
+                      </h2>
+                      <p className="text-gray-500 text-sm mt-0.5">
+                        Here's what's happening with your account today.
+                      </p>
+                    </div>
+                    <button
+                      onClick={onListEquipment}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white font-medium rounded-xl hover:bg-teal-700 transition-colors text-sm shrink-0"
+                    >
+                      <Plus className="w-4 h-4" />
+                      List Equipment
+                    </button>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                   <StatCard
                     label="Total Earned"
                     value={`$${(analytics?.total_earned || 0).toLocaleString()}`}
                     icon={DollarSign}
-                    color="bg-green-500"
+                    color="bg-emerald-50"
+                    iconColor="text-emerald-600"
                     trend={12}
                   />
                   <StatCard
                     label="Total Spent"
                     value={`$${(analytics?.total_spent || 0).toLocaleString()}`}
                     icon={TrendingUp}
-                    color="bg-blue-500"
+                    color="bg-blue-50"
+                    iconColor="text-blue-600"
                   />
                   <StatCard
                     label="Active Listings"
                     value={myListings.length.toString()}
                     icon={Package}
-                    color="bg-amber-500"
+                    color="bg-amber-50"
+                    iconColor="text-amber-600"
                   />
                   <StatCard
                     label="Response Rate"
                     value={`${analytics?.response_rate || 0}%`}
                     icon={Activity}
-                    color="bg-teal-500"
+                    color="bg-teal-50"
+                    iconColor="text-teal-600"
                   />
                 </div>
 
-                {/* Enhanced Analytics Charts - NEW */}
                 <Suspense fallback={
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-center h-64">
                     <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
@@ -378,42 +401,59 @@ export default function Dashboard({
                   />
                 </Suspense>
 
+                {pendingOwnerBookings.length > 0 && (
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-amber-900 text-sm">
+                          {pendingOwnerBookings.length} Pending Request{pendingOwnerBookings.length > 1 ? 's' : ''}
+                        </h3>
+                        <p className="text-amber-700 text-sm">
+                          Booking{pendingOwnerBookings.length > 1 ? 's' : ''} waiting for your approval.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('listings')}
+                        className="px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors shrink-0"
+                      >
+                        Review
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-semibold text-gray-900">Performance Overview</h2>
-                      <select className="text-sm border-0 text-gray-500 focus:ring-0">
-                        <option>Last 30 days</option>
-                        <option>Last 90 days</option>
-                        <option>This year</option>
-                      </select>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <h2 className="text-base font-semibold text-gray-900 mb-5">Performance</h2>
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Eye className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Profile Views</span>
+                          <Eye className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs text-gray-500 font-medium">Profile Views</span>
                         </div>
                         <p className="text-2xl font-bold text-gray-900">{analytics?.profile_views || 0}</p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Users className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Total Rentals</span>
+                          <Users className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs text-gray-500 font-medium">Total Rentals</span>
                         </div>
                         <p className="text-2xl font-bold text-gray-900">{analytics?.total_rentals || 0}</p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Star className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Reviews Given</span>
+                          <Star className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs text-gray-500 font-medium">Reviews Given</span>
                         </div>
                         <p className="text-2xl font-bold text-gray-900">{analytics?.reviews_given || 0}</p>
                       </div>
                       <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Clock className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Avg Response</span>
+                          <Clock className="w-4 h-4 text-gray-400" />
+                          <span className="text-xs text-gray-500 font-medium">Avg Response</span>
                         </div>
                         <p className="text-2xl font-bold text-gray-900">{analytics?.avg_response_time_hours || 0}h</p>
                       </div>
@@ -421,35 +461,36 @@ export default function Dashboard({
                   </div>
 
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-semibold text-gray-900">Recent Bookings</h2>
+                    <div className="flex items-center justify-between mb-5">
+                      <h2 className="text-base font-semibold text-gray-900">Recent Bookings</h2>
                       <button
                         onClick={() => setActiveTab('bookings')}
-                        className="text-teal-600 text-sm font-medium hover:text-teal-700"
+                        className="text-teal-600 text-sm font-medium hover:text-teal-700 flex items-center gap-1"
                       >
                         View All
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     {bookings.length === 0 ? (
                       <div className="text-center py-8">
-                        <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">No bookings yet</p>
+                        <Calendar className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                        <p className="text-gray-400 text-sm">No bookings yet</p>
                       </div>
                     ) : (
-                      <div className="space-y-3">
-                        {bookings.slice(0, 3).map((booking) => (
+                      <div className="space-y-2.5">
+                        {bookings.slice(0, 4).map((booking) => (
                           <div
                             key={booking.id}
-                            className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl"
+                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition-colors"
                           >
                             <img
-                              src={booking.equipment?.images[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg'}
+                              src={booking.equipment?.images[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=100'}
                               alt=""
-                              className="w-12 h-12 rounded-lg object-cover"
+                              className="w-10 h-10 rounded-lg object-cover"
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 truncate">{booking.equipment?.title}</p>
-                              <p className="text-sm text-gray-500">{formatDate(booking.start_date)}</p>
+                              <p className="text-sm font-medium text-gray-900 truncate">{booking.equipment?.title}</p>
+                              <p className="text-xs text-gray-500">{formatDate(booking.start_date)}</p>
                             </div>
                             {getStatusBadge(booking.status)}
                           </div>
@@ -459,38 +500,18 @@ export default function Dashboard({
                   </div>
                 </div>
 
-                {pendingOwnerBookings.length > 0 && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <AlertCircle className="w-6 h-6 text-amber-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-amber-900 mb-1">Pending Booking Requests</h3>
-                        <p className="text-amber-700 text-sm mb-4">
-                          You have {pendingOwnerBookings.length} booking request{pendingOwnerBookings.length > 1 ? 's' : ''} waiting for your approval.
-                        </p>
-                        <button
-                          onClick={() => setActiveTab('listings')}
-                          className="px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition-colors"
-                        >
-                          Review Requests
-                        </button>
-                      </div>
-                    </div>
+                <div className="bg-gradient-to-r from-teal-600 to-emerald-600 rounded-2xl p-6 sm:p-8 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-bold mb-1">Start Earning Today</h2>
+                    <p className="text-white/70 text-sm">
+                      List your equipment and earn extra income when you're not using it.
+                    </p>
                   </div>
-                )}
-
-                <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white">
-                  <h2 className="text-xl font-bold mb-2">Start Earning Today</h2>
-                  <p className="text-white/80 mb-6">
-                    List your equipment and earn extra income when you're not using it.
-                  </p>
                   <button
                     onClick={onListEquipment}
-                    className="flex items-center gap-2 px-6 py-3 bg-white text-teal-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-white text-teal-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors text-sm shrink-0"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-4 h-4" />
                     List Equipment
                   </button>
                 </div>
@@ -1151,30 +1172,31 @@ export default function Dashboard({
   );
 }
 
-function StatCard({ label, value, icon: Icon, color, trend }: {
+function StatCard({ label, value, icon: Icon, color, iconColor, trend }: {
   label: string;
   value: string;
   icon: typeof DollarSign;
   color: string;
+  iconColor: string;
   trend?: number;
 }) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white mb-4`}>
-        <Icon className="w-6 h-6" />
-      </div>
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          <p className="text-sm text-gray-500">{label}</p>
+    <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+      <div className="flex items-center justify-between mb-3">
+        <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center`}>
+          <Icon className={`w-5 h-5 ${iconColor}`} />
         </div>
         {trend !== undefined && (
-          <div className={`flex items-center gap-1 text-sm ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {trend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+          <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
+            trend >= 0 ? 'text-green-700 bg-green-50' : 'text-red-700 bg-red-50'
+          }`}>
+            {trend >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {Math.abs(trend)}%
           </div>
         )}
       </div>
+      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <p className="text-xs text-gray-500 mt-0.5">{label}</p>
     </div>
   );
 }

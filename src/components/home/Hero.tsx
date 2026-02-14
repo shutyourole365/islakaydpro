@@ -1,16 +1,27 @@
 import { useState } from 'react';
-import { Search, MapPin, Calendar, Sparkles, ArrowRight, Play } from 'lucide-react';
+import { Search, MapPin, Calendar, Sparkles, ArrowRight, ChevronDown } from 'lucide-react';
 
 interface HeroProps {
-  onSearch: (query: string, location: string) => void;
+  onSearch: (query: string) => void;
 }
 
 export default function Hero({ onSearch }: HeroProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleSearch = () => {
-    onSearch(searchQuery, location);
+    onSearch(searchQuery);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSearch();
+  };
+
+  const handlePopularClick = (item: string) => {
+    setSearchQuery(item);
+    onSearch(item);
   };
 
   const stats = [
@@ -23,10 +34,15 @@ export default function Hero({ onSearch }: HeroProps) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900" />
+        )}
         <img
-          src="https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg"
-          alt="Equipment"
-          className="w-full h-full object-cover"
+          src="https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=1920"
+          alt="Equipment rental marketplace"
+          className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          onLoad={() => setImageLoaded(true)}
+          loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70" />
       </div>
@@ -50,7 +66,7 @@ export default function Hero({ onSearch }: HeroProps) {
 
         <p className="text-xl text-white/80 max-w-2xl mx-auto mb-12">
           The world's most intelligent equipment rental marketplace. From power tools to
-          construction machinery - find, compare, and rent with AI-powered precision.
+          construction machinery -- find, compare, and rent with AI-powered precision.
         </p>
 
         <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-2 mb-12">
@@ -62,6 +78,7 @@ export default function Hero({ onSearch }: HeroProps) {
                 placeholder="What do you need? (e.g., Excavator, Camera, Drill)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none"
               />
             </div>
@@ -73,6 +90,7 @@ export default function Hero({ onSearch }: HeroProps) {
                 placeholder="Location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none"
               />
             </div>
@@ -80,9 +98,12 @@ export default function Hero({ onSearch }: HeroProps) {
             <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl md:w-48">
               <Calendar className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <input
-                type="text"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
                 placeholder="When"
-                className="w-full bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none"
               />
             </div>
 
@@ -96,13 +117,13 @@ export default function Hero({ onSearch }: HeroProps) {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-4 mb-16">
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-16">
           <span className="text-white/60 text-sm">Popular:</span>
           {['Excavators', 'Power Drills', 'Cameras', 'DJ Equipment', 'Party Tents'].map(
             (item) => (
               <button
                 key={item}
-                onClick={() => setSearchQuery(item)}
+                onClick={() => handlePopularClick(item)}
                 className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/90 hover:bg-white/20 transition-colors border border-white/10"
               >
                 {item}
@@ -111,14 +132,14 @@ export default function Hero({ onSearch }: HeroProps) {
           )}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto mb-16">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-3xl mx-auto mb-16">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10"
+              className="bg-white/10 backdrop-blur-md rounded-2xl p-5 sm:p-6 border border-white/10 hover:bg-white/15 transition-colors"
             >
-              <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-sm text-white/60">{stat.label}</div>
+              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">{stat.value}</div>
+              <div className="text-xs sm:text-sm text-white/60">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -131,19 +152,11 @@ export default function Hero({ onSearch }: HeroProps) {
             Browse Categories
             <ArrowRight className="w-5 h-5" />
           </a>
-          <button className="flex items-center gap-2 px-6 py-3 text-white font-semibold hover:bg-white/10 rounded-full transition-colors">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <Play className="w-5 h-5 fill-white" />
-            </div>
-            Watch How It Works
-          </button>
         </div>
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-2 bg-white/60 rounded-full" />
-        </div>
+        <ChevronDown className="w-6 h-6 text-white/40" />
       </div>
     </section>
   );
