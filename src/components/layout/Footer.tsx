@@ -6,6 +6,32 @@ interface FooterProps {
 }
 
 export default function Footer({ onNavigate }: FooterProps) {
+  const handleLinkClick = (label: string) => {
+    switch (label) {
+      case 'Browse All':
+        onNavigate?.('browse');
+        break;
+      case 'Start Listing':
+        onNavigate?.('list-equipment');
+        break;
+      case 'Help Center':
+      case 'Contact Us':
+        onNavigate?.('support');
+        break;
+      case 'Trust & Verification':
+        onNavigate?.('trust-score');
+        break;
+      case 'Cancellation Policy':
+        onNavigate?.('cancellation');
+        break;
+      case 'Safety':
+        onNavigate?.('security');
+        break;
+      default:
+        break;
+    }
+  };
+
   const footerLinks = {
     'Rent Equipment': [
       'Browse All',
@@ -39,14 +65,19 @@ export default function Footer({ onNavigate }: FooterProps) {
     ],
   };
 
+  const navigableLinks = new Set([
+    'Browse All', 'Start Listing', 'Help Center', 'Contact Us',
+    'Trust & Verification', 'Cancellation Policy', 'Safety',
+  ]);
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
-            <a href="/" className="inline-block mb-6">
+            <button onClick={() => onNavigate?.('home')} className="inline-block mb-6">
               <LogoPro variant="light" size="md" showText={true} />
-            </a>
+            </button>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               The world's most advanced equipment rental marketplace. Rent anything, anywhere, powered by AI.
             </p>
@@ -69,12 +100,18 @@ export default function Footer({ onNavigate }: FooterProps) {
               <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-gray-400 hover:text-teal-400 transition-colors"
-                    >
-                      {link}
-                    </a>
+                    {navigableLinks.has(link) ? (
+                      <button
+                        onClick={() => handleLinkClick(link)}
+                        className="text-sm text-gray-400 hover:text-teal-400 transition-colors"
+                      >
+                        {link}
+                      </button>
+                    ) : (
+                      <span className="text-sm text-gray-400 hover:text-teal-400 transition-colors cursor-default">
+                        {link}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -85,33 +122,22 @@ export default function Footer({ onNavigate }: FooterProps) {
         <div className="py-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-              <button
-                onClick={() => onNavigate?.('terms')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Terms of Service
-              </button>
-              <button
-                onClick={() => onNavigate?.('privacy')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Privacy Policy
-              </button>
-              <button
-                onClick={() => onNavigate?.('cookies')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Cookie Policy
-              </button>
-              <button
-                onClick={() => onNavigate?.('refund')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Refund Policy
-              </button>
-              <a href="#" className="text-gray-400 hover:text-teal-400 transition-colors">
-                Accessibility
-              </a>
+              {[
+                { label: 'Terms of Service', page: 'terms' },
+                { label: 'Privacy Policy', page: 'privacy' },
+                { label: 'Cookie Policy', page: 'cookies' },
+                { label: 'Cancellation Policy', page: 'cancellation' },
+                { label: 'Refund Policy', page: 'refund' },
+                { label: 'Support', page: 'support' },
+              ].map((item) => (
+                <button
+                  key={item.page}
+                  onClick={() => onNavigate?.(item.page)}
+                  className="text-gray-400 hover:text-teal-400 transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
             <div className="flex items-center gap-4">
               <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
@@ -128,7 +154,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
           <p className="text-center text-gray-500 text-sm mt-6">
-            2024 Islakayd, Inc. All rights reserved.
+            2026 Islakayd, Inc. All rights reserved.
           </p>
         </div>
       </div>

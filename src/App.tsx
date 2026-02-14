@@ -14,7 +14,6 @@ import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { addFavorite, removeFavorite, getEquipment } from './services/database';
-import type { SearchFilters } from './types';
 
 // Lazy load page-level components for better initial load
 const SearchModal = lazy(() => import('./components/search/SearchModal'));
@@ -100,6 +99,10 @@ const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
 const CookiePolicy = lazy(() => import('./components/legal/CookiePolicy'));
 const RefundPolicy = lazy(() => import('./components/legal/RefundPolicy'));
+const CancellationPolicy = lazy(() => import('./components/legal/CancellationPolicy'));
+
+// Support
+const SupportPage = lazy(() => import('./components/support/SupportPage'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -530,7 +533,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'cancellation' | 'support';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
@@ -577,13 +580,6 @@ function AppContent() {
   const [reviewEquipment, setReviewEquipment] = useState<Equipment | null>(null);
   const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
   const [messageConversationId, setMessageConversationId] = useState<string | null>(null);
-  // New Feature modal states - Trust, Alerts, Bundles, Warranties
-  const [isTrustScoreOpen, setIsTrustScoreOpen] = useState(false);
-  const [isSmartAlertsOpen, setIsSmartAlertsOpen] = useState(false);
-  const [isBundleDealsOpen, setIsBundleDealsOpen] = useState(false);
-  const [isWarrantyTrackerOpen, setIsWarrantyTrackerOpen] = useState(false);
-  const [isBulkBookingOpen, setIsBulkBookingOpen] = useState(false);
-  const [isMarketInsightsOpen, setIsMarketInsightsOpen] = useState(false);
   // Additional Feature modal states - Weather, Social, Onboarding, Security
   const [isWeatherAdvisorOpen, setIsWeatherAdvisorOpen] = useState(false);
   const [isSocialProofOpen, setIsSocialProofOpen] = useState(false);
@@ -605,14 +601,9 @@ function AppContent() {
   const [quickBookEquipment, setQuickBookEquipment] = useState<Equipment | null>(null);
   const [isQRCodeScannerOpen, setIsQRCodeScannerOpen] = useState(false);
   // Search filter state (used by Advanced Filters and Saved Searches)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_searchFilters, _setSearchFilters] = useState<Partial<SearchFilters>>({});
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_searchMinPrice, setSearchMinPrice] = useState<number | undefined>(undefined);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_searchMaxPrice, setSearchMaxPrice] = useState<number | undefined>(undefined);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_searchCondition, setSearchCondition] = useState<string>('');
+  const [searchMinPrice, setSearchMinPrice] = useState<number | undefined>(undefined);
+  const [searchMaxPrice, setSearchMaxPrice] = useState<number | undefined>(undefined);
+  const [searchCondition, setSearchCondition] = useState<string>('');
 
   // Fetch equipment from database on mount
   const fetchEquipment = useCallback(async () => {
@@ -954,24 +945,23 @@ function AppContent() {
         setQuickBookEquipment(demoEquipment);
         setIsQuickBookOpen(true);
         break;
-      // New Feature Cases - Trust, Alerts, Bundles, Warranties, Insights
       case 'trust-score':
-        setIsTrustScoreOpen(true);
+        setCurrentPage('trust-score');
         break;
       case 'smart-alerts':
-        setIsSmartAlertsOpen(true);
+        setCurrentPage('alerts');
         break;
       case 'bundle-deals':
-        setIsBundleDealsOpen(true);
+        setCurrentPage('bundles');
         break;
       case 'warranty-tracker':
-        setIsWarrantyTrackerOpen(true);
+        setCurrentPage('warranties');
         break;
       case 'bulk-booking':
-        setIsBulkBookingOpen(true);
+        setCurrentPage('bulk-booking');
         break;
       case 'market-insights':
-        setIsMarketInsightsOpen(true);
+        setCurrentPage('insights');
         break;
       // Weather, Social, Onboarding, Security Features
       case 'weather-advisor':
@@ -2092,74 +2082,109 @@ function AppContent() {
       {/* Legal Pages */}
       {currentPage === 'terms' && (
         <Suspense fallback={<PageLoader />}>
+          <Header
+            isAuthenticated={isAuthenticated}
+            userEmail={user?.email}
+            userName={profile?.full_name || user?.email?.split('@')[0]}
+            userAvatar={profile?.avatar_url}
+            onSignIn={() => setIsAuthOpen(true)}
+            onSignOut={signOut}
+            onSearch={() => setIsSearchOpen(true)}
+            onNavigate={handleNavigate}
+            isAdmin={profile?.is_admin}
+          />
           <TermsOfService onBack={() => setCurrentPage('home')} />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'privacy' && (
         <Suspense fallback={<PageLoader />}>
+          <Header
+            isAuthenticated={isAuthenticated}
+            userEmail={user?.email}
+            userName={profile?.full_name || user?.email?.split('@')[0]}
+            userAvatar={profile?.avatar_url}
+            onSignIn={() => setIsAuthOpen(true)}
+            onSignOut={signOut}
+            onSearch={() => setIsSearchOpen(true)}
+            onNavigate={handleNavigate}
+            isAdmin={profile?.is_admin}
+          />
           <PrivacyPolicy onBack={() => setCurrentPage('home')} />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'cookies' && (
         <Suspense fallback={<PageLoader />}>
+          <Header
+            isAuthenticated={isAuthenticated}
+            userEmail={user?.email}
+            userName={profile?.full_name || user?.email?.split('@')[0]}
+            userAvatar={profile?.avatar_url}
+            onSignIn={() => setIsAuthOpen(true)}
+            onSignOut={signOut}
+            onSearch={() => setIsSearchOpen(true)}
+            onNavigate={handleNavigate}
+            isAdmin={profile?.is_admin}
+          />
           <CookiePolicy onBack={() => setCurrentPage('home')} />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'refund' && (
         <Suspense fallback={<PageLoader />}>
+          <Header
+            isAuthenticated={isAuthenticated}
+            userEmail={user?.email}
+            userName={profile?.full_name || user?.email?.split('@')[0]}
+            userAvatar={profile?.avatar_url}
+            onSignIn={() => setIsAuthOpen(true)}
+            onSignOut={signOut}
+            onSearch={() => setIsSearchOpen(true)}
+            onNavigate={handleNavigate}
+            isAdmin={profile?.is_admin}
+          />
           <RefundPolicy onBack={() => setCurrentPage('home')} />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
-      {/* New Feature Modals */}
-      {isTrustScoreOpen && (
+      {currentPage === 'cancellation' && (
         <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <RenterTrustScore userId={user?.id || ''} onClose={() => setIsTrustScoreOpen(false)} />
-          </div>
+          <Header
+            isAuthenticated={isAuthenticated}
+            userEmail={user?.email}
+            userName={profile?.full_name || user?.email?.split('@')[0]}
+            userAvatar={profile?.avatar_url}
+            onSignIn={() => setIsAuthOpen(true)}
+            onSignOut={signOut}
+            onSearch={() => setIsSearchOpen(true)}
+            onNavigate={handleNavigate}
+            isAdmin={profile?.is_admin}
+          />
+          <CancellationPolicy onBack={() => setCurrentPage('home')} />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
-      {isSmartAlertsOpen && (
+      {currentPage === 'support' && (
         <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <SmartAlertsSystem userId={user?.id} onClose={() => setIsSmartAlertsOpen(false)} />
-          </div>
-        </Suspense>
-      )}
-
-      {isBundleDealsOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <EquipmentBundleDeals mode="browse" onClose={() => setIsBundleDealsOpen(false)} />
-          </div>
-        </Suspense>
-      )}
-
-      {isWarrantyTrackerOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setIsWarrantyTrackerOpen(false)} />
-          </div>
-        </Suspense>
-      )}
-
-      {isBulkBookingOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <BulkBookingSystem onClose={() => setIsBulkBookingOpen(false)} />
-          </div>
-        </Suspense>
-      )}
-
-      {isMarketInsightsOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <MarketplaceInsights onClose={() => setIsMarketInsightsOpen(false)} />
-          </div>
+          <Header
+            isAuthenticated={isAuthenticated}
+            userEmail={user?.email}
+            userName={profile?.full_name || user?.email?.split('@')[0]}
+            userAvatar={profile?.avatar_url}
+            onSignIn={() => setIsAuthOpen(true)}
+            onSignOut={signOut}
+            onSearch={() => setIsSearchOpen(true)}
+            onNavigate={handleNavigate}
+            isAdmin={profile?.is_admin}
+          />
+          <SupportPage onBack={() => setCurrentPage('home')} onNavigate={handleNavigate} />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
