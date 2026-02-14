@@ -30,7 +30,7 @@ if (!envValidation.isValid) {
       min-height: 100vh;
       padding: 2rem;
       font-family: system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #0d9488 0%, #065f46 100%);
       color: white;
     ">
       <div style="
@@ -55,7 +55,7 @@ if (!envValidation.isValid) {
           <strong>To fix this:</strong>
         </p>
         <ol style="color: #4a5568; padding-left: 1.5rem;">
-          <li style="margin-bottom: 0.5rem;">Copy <code style="background: #edf2f7; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">.env.example</code> to <code style="background: #edf2f7; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">.env.local</code></li>
+          <li style="margin-bottom: 0.5rem;">Copy <code style="background: #edf2f7; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">.env.example</code> to <code style="background: #edf2f7; padding: 0.25rem 0.5rem; border-radius: 0.25rem;">.env</code></li>
           <li style="margin-bottom: 0.5rem;">Fill in your Supabase credentials</li>
           <li style="margin-bottom: 0.5rem;">Restart the development server</li>
         </ol>

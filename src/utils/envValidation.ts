@@ -103,8 +103,8 @@ export function logValidationResults(result: ValidationResult): void {
   if (!result.isValid) {
     console.error('❌ Environment Validation Failed:');
     result.errors.forEach(error => console.error(`  • ${error}`));
-    console.error('\n📝 Please check your .env.local file and ensure all required variables are set.');
-    console.error('📖 See SETUP_GUIDE.md for detailed configuration instructions.\n');
+    console.error('\nPlease check your .env file and ensure all required variables are set.');
+    console.error('See SETUP_GUIDE.md for detailed configuration instructions.\n');
   }
 
   if (result.warnings.length > 0) {
