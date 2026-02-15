@@ -20,7 +20,8 @@ import {
 } from 'lucide-react';
 
 interface OnboardingFlowProps {
-  onComplete: (preferences: UserPreferences) => void;
+  userType?: 'renter' | 'owner';
+  onComplete: ((preferences: UserPreferences) => void) | (() => void);
   onSkip: () => void;
 }
 

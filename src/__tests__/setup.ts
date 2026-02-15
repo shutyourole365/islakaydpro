@@ -1,10 +1,23 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, react-hooks/exhaustive-deps, prefer-const */
-import { expect, afterEach } from 'vitest';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
+// Mock environment variables for tests
+vi.stubEnv('VITE_SUPABASE_URL', 'https://test.supabase.co');
+vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-anon-key');
+
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
+
+// Suppress React act() warnings that are noisy when using testing-library's waitFor
+const originalError = console.error;
+console.error = (...args: any[]) => {
+  if (args[0]?.includes?.('not wrapped in act')) {
+    return;
+  }
+  originalError.call(console, ...args);
+};
 
 // Cleanup after each test
 afterEach(() => {

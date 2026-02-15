@@ -1,7 +1,11 @@
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
-import LogoAnimated from '../branding/LogoAnimated';
+import LogoPro from '../branding/LogoPro';
 
-export default function Footer() {
+interface FooterProps {
+  onNavigate?: (page: string) => void;
+}
+
+export default function Footer({ onNavigate }: FooterProps) {
   const footerLinks = {
     'Rent Equipment': [
       'Browse All',
@@ -41,7 +45,7 @@ export default function Footer() {
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
             <a href="/" className="inline-block mb-6">
-              <LogoAnimated variant="light" size="md" glowIntensity="low" showTagline={true} />
+              <LogoPro variant="light" size="md" showText={true} />
             </a>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               The world's most advanced equipment rental marketplace. Rent anything, anywhere, powered by AI.
@@ -81,6 +85,30 @@ export default function Footer() {
         <div className="py-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
+              <button
+                onClick={() => onNavigate?.('terms')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
+                Terms of Service
+              </button>
+              <button
+                onClick={() => onNavigate?.('privacy')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => onNavigate?.('cookies')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
+                Cookie Policy
+              </button>
+              <button
+                onClick={() => onNavigate?.('refund')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
+                Refund Policy
+              </button>
               <a href="/policies/TERMS_OF_SERVICE.md" className="text-gray-400 hover:text-teal-400 transition-colors">
                 Terms of Service
               </a>

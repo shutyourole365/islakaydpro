@@ -53,10 +53,55 @@ const Equipment3DViewer = lazy(() => import('./components/equipment/Equipment3DV
 const VoiceSearch = lazy(() => import('./components/search/VoiceSearch'));
 const LiveLocationTracker = lazy(() => import('./components/booking/LiveLocationTracker'));
 const DamageReportWizard = lazy(() => import('./components/booking/DamageReportWizard'));
+const EquipmentMapEnhanced = lazy(() => import('./components/map/EquipmentMapEnhanced'));
 
 // Additional Premium Features
 const LoyaltyProgram = lazy(() => import('./components/gamification/LoyaltyProgram'));
 const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
+const PriceNegotiator = lazy(() => import('./components/negotiation/PriceNegotiator'));
+const MaintenancePredictor = lazy(() => import('./components/predictive/MaintenancePredictor'));
+const ReferralProgram = lazy(() => import('./components/referral/ReferralProgram'));
+const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler'));
+
+// NEW Premium Features - Live Chat & Advanced Search
+const LiveChat = lazy(() => import('./components/chat/LiveChat'));
+const RealTimeChat = lazy(() => import('./components/chat/RealTimeChat'));
+const AdvancedFilters = lazy(() => import('./components/search/AdvancedFilters'));
+const DetailedComparison = lazy(() => import('./components/comparison/DetailedComparison'));
+const SavedSearches = lazy(() => import('./components/search/SavedSearches'));
+const EquipmentRecommendations = lazy(() => import('./components/recommendations/EquipmentRecommendations'));
+const QRCodeScanner = lazy(() => import('./components/scanner/QRCodeScanner'));
+const QuickBook = lazy(() => import('./components/booking/QuickBook'));
+
+// Balanced Approach Features - NEW Components
+const AISearchEngine = lazy(() => import('./components/search/AISearchEngine'));
+const PhotoMessaging = lazy(() => import('./components/messaging/PhotoMessaging'));
+const EnhancedReviewSystem = lazy(() => import('./components/reviews/EnhancedReviewSystem'));
+const PWAEnhancedFeatures = lazy(() => import('./components/pwa/PWAEnhancedFeatures'));
+const MultiPaymentSystem = lazy(() => import('./components/payments/MultiPaymentSystem'));
+
+// New Feature Components - Trust, Alerts, Bundles, Warranties, Insights
+const RenterTrustScore = lazy(() => import('./components/trust/RenterTrustScore'));
+const SmartAlertsSystem = lazy(() => import('./components/alerts/SmartAlertsSystem'));
+const EquipmentBundleDeals = lazy(() => import('./components/bundles/EquipmentBundleDeals'));
+const EquipmentWarrantyTracker = lazy(() => import('./components/warranty/EquipmentWarrantyTracker'));
+const BulkBookingSystem = lazy(() => import('./components/booking/BulkBookingSystem'));
+const MarketplaceInsights = lazy(() => import('./components/insights/MarketplaceInsights'));
+
+// Additional Feature Components - Weather, Social, Onboarding, Security
+const WeatherAdvisor = lazy(() => import('./components/weather/WeatherAdvisor'));
+const SocialProof = lazy(() => import('./components/social/SocialProof'));
+const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow'));
+const BiometricAuth = lazy(() => import('./components/security/BiometricAuth'));
+const PriceAlerts = lazy(() => import('./components/pricing/PriceAlerts'));
+const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
+const AchievementsSystem = lazy(() => import('./components/gamification/AchievementsSystem'));
+
+// Legal Pages
+const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
+const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
+const CookiePolicy = lazy(() => import('./components/legal/CookiePolicy'));
+const RefundPolicy = lazy(() => import('./components/legal/RefundPolicy'));
 const MaintenanceScheduler = lazy(() => import('./components/maintenance/MaintenanceScheduler'));
 const SchedulingOptimizer = lazy(() => import('./components/scheduling/SchedulingOptimizer'));
 const ReferralSystem = lazy(() => import('./components/referral/ReferralSystem'));
@@ -490,6 +535,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund';
 type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'about' | 'help' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'maintenance' | 'scheduler' | 'referrals';
 
 function AppContent() {
@@ -506,6 +552,9 @@ function AppContent() {
   } = useCookieConsent();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [featuredEquipment, setFeaturedEquipment] = useState<Equipment[]>([]);
+  const [isLoadingEquipment, setIsLoadingEquipment] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
@@ -531,10 +580,81 @@ function AppContent() {
   const [isSmartPricingOpen, setIsSmartPricingOpen] = useState(false);
   const [isLiveTrackerOpen, setIsLiveTrackerOpen] = useState(false);
   const [isDamageWizardOpen, setIsDamageWizardOpen] = useState(false);
+  // New premium features
+  const [isPriceNegotiatorOpen, setIsPriceNegotiatorOpen] = useState(false);
+  const [isMaintenancePredictorOpen, setIsMaintenancePredictorOpen] = useState(false);
+  const [isSmartSchedulerOpen, setIsSmartSchedulerOpen] = useState(false);
+  const [isFeatureShowcaseOpen, setIsFeatureShowcaseOpen] = useState(false);
+  // New Balanced Approach modal states
+  const [isAISearchOpen, setIsAISearchOpen] = useState(false);
+  const [isPhotoMessagingOpen, setIsPhotoMessagingOpen] = useState(false);
+  const [isEnhancedReviewOpen, setIsEnhancedReviewOpen] = useState(false);
+  const [isMultiPaymentOpen, setIsMultiPaymentOpen] = useState(false);
+  const [reviewEquipment, setReviewEquipment] = useState<Equipment | null>(null);
+  const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
+  const [messageConversationId, setMessageConversationId] = useState<string | null>(null);
+  // New Feature modal states - Trust, Alerts, Bundles, Warranties
+  const [isTrustScoreOpen, setIsTrustScoreOpen] = useState(false);
+  const [isSmartAlertsOpen, setIsSmartAlertsOpen] = useState(false);
+  const [isBundleDealsOpen, setIsBundleDealsOpen] = useState(false);
+  const [isWarrantyTrackerOpen, setIsWarrantyTrackerOpen] = useState(false);
+  const [isBulkBookingOpen, setIsBulkBookingOpen] = useState(false);
+  const [isMarketInsightsOpen, setIsMarketInsightsOpen] = useState(false);
+  // Additional Feature modal states - Weather, Social, Onboarding, Security
+  const [isWeatherAdvisorOpen, setIsWeatherAdvisorOpen] = useState(false);
+  const [isSocialProofOpen, setIsSocialProofOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [isBiometricAuthOpen, setIsBiometricAuthOpen] = useState(false);
+  const [isPriceAlertsOpen, setIsPriceAlertsOpen] = useState(false);
+  const [isSmartRecommendationsOpen, setIsSmartRecommendationsOpen] = useState(false);
+  const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
+  const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
+  const [chatRecipient, setChatRecipient] = useState<{id: string; name: string; avatar?: string} | null>(null);
+  const [isRealTimeChatOpen, setIsRealTimeChatOpen] = useState(false);
+  const [isEquipmentMapEnhancedOpen, setIsEquipmentMapEnhancedOpen] = useState(false);
+  const [isAdvancedFiltersOpen, setIsAdvancedFiltersOpen] = useState(false);
+  const [isDetailedComparisonOpen, setIsDetailedComparisonOpen] = useState(false);
+  const [comparisonEquipment, setComparisonEquipment] = useState<Equipment[]>([]);
+  const [isSavedSearchesOpen, setIsSavedSearchesOpen] = useState(false);
+  const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
+  const [isQuickBookOpen, setIsQuickBookOpen] = useState(false);
+  const [quickBookEquipment, setQuickBookEquipment] = useState<Equipment | null>(null);
+  const [isQRCodeScannerOpen, setIsQRCodeScannerOpen] = useState(false);
+  // Search filter state (used by Advanced Filters and Saved Searches)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchFilters, _setSearchFilters] = useState<Partial<SearchFilters>>({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchMinPrice, setSearchMinPrice] = useState<number | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchMaxPrice, setSearchMaxPrice] = useState<number | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_searchCondition, setSearchCondition] = useState<string>('');
+
+  // Fetch equipment from database on mount
+  const fetchEquipment = useCallback(async () => {
+    setIsLoadingEquipment(true);
+    try {
+      // Fetch featured equipment
+      const { data: featured } = await getEquipment({ featured: true, limit: 8 });
+      setFeaturedEquipment(featured.length > 0 ? featured : sampleEquipment);
+      
+      // Fetch all equipment
+      const { data: all } = await getEquipment({ limit: 50 });
+      setEquipment(all.length > 0 ? all : sampleEquipment);
+    } catch (error) {
+      console.error('Error fetching equipment:', error);
+      // Fall back to sample data if fetch fails
+      setFeaturedEquipment(sampleEquipment);
+      setEquipment(sampleEquipment);
+    } finally {
+      setIsLoadingEquipment(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+    fetchEquipment();
+  }, [fetchEquipment]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -574,24 +694,52 @@ function AppContent() {
   }, [user, loadFavorites]);
 
   const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .order('name');
 
-    if (error) {
+      if (error) {
+        if (import.meta.env.DEV) {
+          console.error('Error fetching categories:', error);
+        }
+        return;
+      }
+
+      if (data && data.length > 0) {
+        // Try to get real equipment counts for each category
+        const categoriesWithCounts = await Promise.all(
+          data.map(async (cat) => {
+            try {
+              const { count } = await supabase
+                .from('equipment')
+                .select('*', { count: 'exact', head: true })
+                .eq('category_id', cat.id)
+                .eq('is_active', true);
+              return { ...cat, equipment_count: count || 0 };
+            } catch {
+              return { ...cat, equipment_count: 0 };
+            }
+          })
+        );
+        setCategories(categoriesWithCounts);
+      } else {
+        // Fallback: use sample counts if no categories in database
+        const sampleCategories = [
+          { id: 'cat1', name: 'Construction', slug: 'construction', description: 'Heavy machinery and construction equipment', icon: '🏗️', image_url: 'https://images.pexels.com/photos/2058128/pexels-photo-2058128.jpeg', equipment_count: 1250, created_at: new Date().toISOString() },
+          { id: 'cat2', name: 'Photography', slug: 'photography', description: 'Cameras, lenses, and studio equipment', icon: '📷', image_url: 'https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg', equipment_count: 890, created_at: new Date().toISOString() },
+          { id: 'cat3', name: 'Power Tools', slug: 'power-tools', description: 'Drills, saws, and power equipment', icon: '🔧', image_url: 'https://images.pexels.com/photos/1249611/pexels-photo-1249611.jpeg', equipment_count: 456, created_at: new Date().toISOString() },
+          { id: 'cat4', name: 'Audio & Video', slug: 'audio-video', description: 'DJ gear, sound systems, and AV equipment', icon: '🎧', image_url: 'https://images.pexels.com/photos/164938/pexels-photo-164938.jpeg', equipment_count: 678, created_at: new Date().toISOString() },
+          { id: 'cat5', name: 'Landscaping', slug: 'landscaping', description: 'Tractors, mowers, and garden equipment', icon: '🌿', image_url: 'https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg', equipment_count: 345, created_at: new Date().toISOString() },
+          { id: 'cat6', name: 'Events', slug: 'events', description: 'Tents, tables, chairs, and party supplies', icon: '🎪', image_url: 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg', equipment_count: 234, created_at: new Date().toISOString() },
+        ];
+        setCategories(sampleCategories);
+      }
+    } catch (error) {
       if (import.meta.env.DEV) {
         console.error('Error fetching categories:', error);
       }
-      return;
-    }
-
-    if (data) {
-      const categoriesWithCounts = data.map((cat, index) => ({
-        ...cat,
-        equipment_count: [1250, 890, 456, 678, 345, 234, 123, 567, 890, 432, 765, 321][index] || 100,
-      }));
-      setCategories(categoriesWithCounts);
     }
   };
 
@@ -607,7 +755,7 @@ function AppContent() {
     // Track search event
     if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
       import('./services/analytics').then(({ analytics }) => {
-        analytics.trackSearch(query, { resultCount: sampleEquipment.length });
+        analytics.trackSearch(query, { resultCount: equipment.length || sampleEquipment.length });
       });
     }
   };
@@ -714,15 +862,166 @@ function AppContent() {
     setComparisonItems(prev => prev.filter(item => item.id !== equipmentId));
   };
 
-  const handleMessage = (equipment: Equipment) => {
-    // Equipment will be used when messaging is implemented
-    console.log('Message about:', equipment.id);
-    if (!isAuthenticated) {
+  const handleMessage = async (equipment: Equipment) => {
+    if (!isAuthenticated || !user) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);
       return;
     }
-    alert('Message sent to owner! They will respond shortly.');
+    
+    // Open live chat with the equipment owner
+    setChatRecipient({
+      id: equipment.owner_id,
+      name: equipment.owner?.full_name || 'Equipment Owner',
+      avatar: equipment.owner?.avatar_url || undefined,
+    });
+    setSelectedEquipment(null);
+    setIsLiveChatOpen(true);
+  };
+
+  const handleFeatureSelect = (featureId: string) => {
+    if (!isAuthenticated) {
+      setIsAuthOpen(true);
+      return;
+    }
+
+    // Select equipment for demo purposes (use fetched data or fallback to first item)
+    const demoEquipment = equipment[0] || featuredEquipment[0] || sampleEquipment[0];
+    setBookingEquipment(demoEquipment);
+
+    switch (featureId) {
+      case 'price-negotiator':
+        setIsPriceNegotiatorOpen(true);
+        break;
+      case 'smart-scheduler':
+        setIsSmartSchedulerOpen(true);
+        break;
+      case 'maintenance-predictor':
+        setIsMaintenancePredictorOpen(true);
+        break;
+      case 'referral-program':
+        setCurrentPage('referrals');
+        break;
+      case 'smart-pricing':
+        setIsSmartPricingOpen(true);
+        break;
+      case 'group-booking':
+        setIsGroupBookingOpen(true);
+        break;
+      case 'ai-search':
+        setIsAISearchOpen(true);
+        break;
+      case 'analytics':
+        setCurrentPage('analytics');
+        break;
+      case 'photo-messaging':
+        setIsPhotoMessagingOpen(true);
+        setMessageConversationId('demo-conversation-123');
+        break;
+      case 'enhanced-reviews':
+        setIsEnhancedReviewOpen(true);
+        setReviewEquipment(demoEquipment);
+        setReviewBookingId('demo-booking-123');
+        break;
+      case 'pwa-features':
+        setCurrentPage('pwa');
+        break;
+      case 'multi-payment':
+        setIsMultiPaymentOpen(true);
+        break;
+      case 'live-chat':
+        setChatRecipient({ 
+          id: demoEquipment.owner_id, 
+          name: demoEquipment.owner?.full_name || 'Equipment Owner',
+          avatar: demoEquipment.owner?.avatar_url || undefined
+        });
+        setIsLiveChatOpen(true);
+        break;
+      case 'real-time-chat':
+        setChatRecipient({ 
+          id: demoEquipment.owner_id, 
+          name: demoEquipment.owner?.full_name || 'Equipment Owner',
+          avatar: demoEquipment.owner?.avatar_url || undefined
+        });
+        setIsRealTimeChatOpen(true);
+        break;
+      case 'enhanced-map':
+        setIsEquipmentMapEnhancedOpen(true);
+        break;
+      case 'advanced-filters':
+        setIsAdvancedFiltersOpen(true);
+        break;
+      case 'comparison': {
+        // Add 3 demo equipment items to comparison
+        const compareItems = equipment.length >= 3 
+          ? [equipment[0], equipment[1], equipment[2]] 
+          : sampleEquipment.slice(0, 3);
+        setComparisonEquipment(compareItems);
+        setIsDetailedComparisonOpen(true);
+        break;
+      }
+      case 'saved-searches':
+        setIsSavedSearchesOpen(true);
+        break;
+      case 'recommendations':
+        setIsRecommendationsOpen(true);
+        break;
+      case 'quick-book':
+        setQuickBookEquipment(demoEquipment);
+        setIsQuickBookOpen(true);
+        break;
+      // New Feature Cases - Trust, Alerts, Bundles, Warranties, Insights
+      case 'trust-score':
+        setIsTrustScoreOpen(true);
+        break;
+      case 'smart-alerts':
+        setIsSmartAlertsOpen(true);
+        break;
+      case 'bundle-deals':
+        setIsBundleDealsOpen(true);
+        break;
+      case 'warranty-tracker':
+        setIsWarrantyTrackerOpen(true);
+        break;
+      case 'bulk-booking':
+        setIsBulkBookingOpen(true);
+        break;
+      case 'market-insights':
+        setIsMarketInsightsOpen(true);
+        break;
+      // Weather, Social, Onboarding, Security Features
+      case 'weather-advisor':
+        setIsWeatherAdvisorOpen(true);
+        break;
+      case 'social-proof':
+        setIsSocialProofOpen(true);
+        break;
+      case 'onboarding':
+        setIsOnboardingOpen(true);
+        break;
+      case 'biometric-auth':
+        setIsBiometricAuthOpen(true);
+        break;
+      case 'price-alerts':
+        setIsPriceAlertsOpen(true);
+        break;
+      case 'smart-recommendations':
+        setIsSmartRecommendationsOpen(true);
+        break;
+      case 'achievements':
+        setIsAchievementsOpen(true);
+        break;
+      case 'qr-code-scanner':
+        setIsQRCodeScannerOpen(true);
+        break;
+      case '3d-viewer':
+        setViewerEquipment(demoEquipment);
+        setIs3DViewerOpen(true);
+        break;
+      default:
+        alert(`${featureId} feature coming soon!`);
+    }
+    setIsFeatureShowcaseOpen(false);
   };
 
   const handleListEquipment = () => {
@@ -772,11 +1071,12 @@ function AppContent() {
             />
 
             <FeaturedListings
-              equipment={sampleEquipment}
+              equipment={featuredEquipment}
               onEquipmentClick={handleEquipmentClick}
               onFavoriteClick={handleFavoriteToggle}
               favorites={favorites}
               onAddToComparison={handleAddToComparison}
+              isLoading={isLoadingEquipment}
             />
 
             <HowItWorks />
@@ -786,7 +1086,7 @@ function AppContent() {
             <CTASection onGetStarted={() => setIsAuthOpen(true)} />
           </main>
 
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </>
       )}
 
@@ -804,9 +1104,9 @@ function AppContent() {
       )}
 
       {currentPage === 'browse' && (
-        <>
+        <Suspense fallback={<PageLoader />}>
           <BrowsePage
-            equipment={sampleEquipment}
+            equipment={equipment}
             categories={categories}
             initialQuery={searchQuery}
             initialCategory={searchCategory}
@@ -819,53 +1119,53 @@ function AppContent() {
               setCurrentPage('home');
             }}
           />
-          <Footer />
-        </>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
       )}
 
       {currentPage === 'dashboard' && (
-        <>
+        <Suspense fallback={<PageLoader />}>
           <Dashboard
             onBack={() => setCurrentPage('home')}
             onEquipmentClick={handleEquipmentClick}
             onListEquipment={handleListEquipment}
           />
-          <Footer />
-        </>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
       )}
 
       {currentPage === 'security' && (
         <Suspense fallback={<PageLoader />}>
           <SecurityCenter onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'analytics' && (
         <Suspense fallback={<PageLoader />}>
           <AnalyticsDashboard onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'admin' && profile?.is_admin && (
         <Suspense fallback={<PageLoader />}>
           <AdminPanel onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'notifications' && (
         <Suspense fallback={<PageLoader />}>
           <NotificationCenter onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
       {currentPage === 'payments' && (
         <Suspense fallback={<PageLoader />}>
           <PaymentSettings onBack={() => setCurrentPage('dashboard')} />
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -879,7 +1179,7 @@ function AppContent() {
               />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -898,7 +1198,7 @@ function AppContent() {
               />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -915,7 +1215,7 @@ function AppContent() {
               <LoyaltyProgram userId={user?.id || ''} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -932,7 +1232,7 @@ function AppContent() {
               <FleetManager ownerId={user?.id || ''} />
             </div>
           </div>
-          <Footer />
+          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
@@ -988,62 +1288,78 @@ function AppContent() {
       )}
 
       {currentPage === 'list-equipment' && (
-        <ListEquipmentForm
-          categories={categories}
-          onClose={() => setCurrentPage('home')}
-          onSubmit={handleListingSubmit}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <ListEquipmentForm
+            categories={categories}
+            onClose={() => setCurrentPage('home')}
+            onSubmit={handleListingSubmit}
+          />
+        </Suspense>
       )}
 
-      {currentPage !== 'list-equipment' && <AIAssistantEnhanced />}
+      {currentPage !== 'list-equipment' && (
+        <Suspense fallback={null}>
+          <AIAssistantEnhanced />
+        </Suspense>
+      )}
 
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSearch={handleSearch}
-      />
+      <Suspense fallback={null}>
+        <SearchModal
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+          onSearch={handleSearch}
+        />
+      </Suspense>
 
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onSuccess={() => setIsAuthOpen(false)}
-      />
+      <Suspense fallback={null}>
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+          onSuccess={() => setIsAuthOpen(false)}
+        />
+      </Suspense>
 
       {selectedEquipment && (
-        <EquipmentDetail
-          equipment={selectedEquipment}
-          onClose={() => setSelectedEquipment(null)}
-          onBook={handleBook}
-          onMessage={handleMessage}
-          isFavorite={favorites.has(selectedEquipment.id)}
-          onFavoriteToggle={() => handleFavoriteToggle(selectedEquipment.id)}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentDetail
+            equipment={selectedEquipment}
+            onClose={() => setSelectedEquipment(null)}
+            onBook={handleBook}
+            onMessage={handleMessage}
+            isFavorite={favorites.has(selectedEquipment.id)}
+            onFavoriteToggle={() => handleFavoriteToggle(selectedEquipment.id)}
+          />
+        </Suspense>
       )}
 
       {/* Advanced Booking System Modal */}
       {isBookingOpen && bookingEquipment && (
-        <BookingSystem
-          equipment={bookingEquipment}
-          onClose={() => {
-            setIsBookingOpen(false);
-            setBookingEquipment(null);
-          }}
-          onComplete={handleBookingComplete}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <BookingSystem
+            equipment={bookingEquipment}
+            onClose={() => {
+              setIsBookingOpen(false);
+              setBookingEquipment(null);
+            }}
+            onComplete={handleBookingComplete}
+          />
+        </Suspense>
       )}
 
       {/* Equipment Comparison Modal */}
       {isComparisonOpen && comparisonItems.length > 0 && (
-        <EquipmentComparison
-          items={comparisonItems}
-          onClose={() => setIsComparisonOpen(false)}
-          onRemove={handleRemoveFromComparison}
-          onBook={(equipment) => {
-            setIsComparisonOpen(false);
-            setBookingEquipment(equipment);
-            setIsBookingOpen(true);
-          }}
-        />
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentComparison
+            items={comparisonItems}
+            onClose={() => setIsComparisonOpen(false)}
+            onRemove={handleRemoveFromComparison}
+            onBook={(equipment) => {
+              setIsComparisonOpen(false);
+              setBookingEquipment(equipment);
+              setIsBookingOpen(true);
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Comparison Floating Button */}
@@ -1365,6 +1681,671 @@ function AppContent() {
         </Suspense>
       )}
 
+      {/* Referrals Page */}
+      {currentPage === 'referrals' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <ReferralProgram 
+                userId={user?.id || ''}
+                userName={user?.email || 'User'}
+                onClose={() => setCurrentPage('dashboard')}
+              />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Price Negotiator Modal */}
+      {isPriceNegotiatorOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <PriceNegotiator
+            equipmentId={bookingEquipment.id}
+            equipmentTitle={bookingEquipment.title}
+            originalDailyRate={bookingEquipment.daily_rate}
+            rentalDays={7}
+            ownerId={bookingEquipment.owner_id}
+            ownerName={bookingEquipment.owner?.full_name || 'Owner'}
+            onAccepted={(finalPrice: number) => {
+              console.log('Negotiation accepted:', finalPrice);
+              setIsPriceNegotiatorOpen(false);
+              alert(`Offer accepted! Final price: $${finalPrice.toFixed(2)}`);
+            }}
+            onRejected={() => {
+              setIsPriceNegotiatorOpen(false);
+              alert('Negotiation ended');
+            }}
+            onClose={() => setIsPriceNegotiatorOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Maintenance Predictor Modal */}
+      {isMaintenancePredictorOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <MaintenancePredictor
+            equipmentId={bookingEquipment.id}
+            equipmentTitle={bookingEquipment.title}
+            category={bookingEquipment.category?.name || 'Equipment'}
+            hoursUsed={1850}
+            lastMaintenanceDate={new Date('2025-12-10')}
+            onScheduleMaintenance={(date: Date, type: string) => {
+              console.log('Maintenance scheduled:', date, type);
+              setIsMaintenancePredictorOpen(false);
+              alert(`Maintenance scheduled: ${type} on ${date.toLocaleDateString()}`);
+            }}
+            onClose={() => setIsMaintenancePredictorOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Smart Scheduler Modal */}
+      {isSmartSchedulerOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <SmartScheduler
+            equipmentId={bookingEquipment.id}
+            equipmentTitle={bookingEquipment.title}
+            dailyRate={bookingEquipment.daily_rate}
+            onSelectDates={(start: Date, end: Date, discount: number) => {
+              console.log('Smart schedule:', start, end, discount);
+              setIsSmartSchedulerOpen(false);
+              const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+              const total = bookingEquipment.daily_rate * days * (1 - discount / 100);
+              alert(`Booking optimized! ${days} days at ${discount}% off. Total: $${total.toFixed(2)}`);
+            }}
+            onClose={() => setIsSmartSchedulerOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Feature Showcase Modal */}
+      {isFeatureShowcaseOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <FeatureShowcase
+            onFeatureSelect={handleFeatureSelect}
+            onClose={() => setIsFeatureShowcaseOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Feature Showcase Floating Button */}
+      {currentPage !== 'list-equipment' && isAuthenticated && (
+        <button
+          onClick={() => setIsFeatureShowcaseOpen(true)}
+          className="fixed bottom-6 left-6 z-40 group"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+            <div className="relative w-14 h-14 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110">
+              <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center animate-pulse">
+              <span className="text-xs font-bold text-white">✨</span>
+            </div>
+          </div>
+          <div className="absolute bottom-full left-0 mb-3 px-3 py-2 bg-gray-900 text-white text-sm rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+            Premium Features
+            <div className="absolute top-full left-6 transform -translate-y-1/2 rotate-45 w-2 h-2 bg-gray-900" />
+          </div>
+        </button>
+      )}
+
+      {/* AI Search Engine Modal */}
+      {isAISearchOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <AISearchEngine
+            onSearch={(query, filters) => {
+              setIsAISearchOpen(false);
+              setSearchQuery(query);
+              setSearchCategory(filters.category || '');
+              setCurrentPage('browse');
+            }}
+            onClose={() => setIsAISearchOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Photo Messaging Modal */}
+      {isPhotoMessagingOpen && messageConversationId && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsPhotoMessagingOpen(false)} />
+            <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+              <PhotoMessaging
+                conversationId={messageConversationId}
+                onSendMessage={async (content, photos) => {
+                  console.log('Message sent:', { content, photos });
+                  setIsPhotoMessagingOpen(false);
+                  alert('Message with photos sent successfully!');
+                }}
+                onClose={() => {
+                  setIsPhotoMessagingOpen(false);
+                  setMessageConversationId(null);
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Enhanced Review System Modal */}
+      {isEnhancedReviewOpen && reviewEquipment && reviewBookingId && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsEnhancedReviewOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <EnhancedReviewSystem
+                equipmentId={reviewEquipment.id}
+                equipmentTitle={reviewEquipment.title}
+                bookingId={reviewBookingId}
+                onSubmit={async (reviewData) => {
+                  console.log('Review submitted:', reviewData);
+                  setIsEnhancedReviewOpen(false);
+                  setReviewEquipment(null);
+                  setReviewBookingId(null);
+                  alert('Thank you for your detailed review!');
+                }}
+                onClose={() => {
+                  setIsEnhancedReviewOpen(false);
+                  setReviewEquipment(null);
+                  setReviewBookingId(null);
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Multi-Payment System Modal */}
+      {isMultiPaymentOpen && bookingEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMultiPaymentOpen(false)} />
+            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <MultiPaymentSystem
+                bookingId="demo-booking-123"
+                totalAmount={bookingEquipment.daily_rate * 7}
+                depositAmount={bookingEquipment.deposit_amount}
+                onPaymentComplete={async (paymentData) => {
+                  console.log('Payment completed:', paymentData);
+                  setIsMultiPaymentOpen(false);
+                  alert(`Payment successful! Method: ${paymentData.method}`);
+                }}
+                onClose={() => setIsMultiPaymentOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Live Chat Modal */}
+      {isLiveChatOpen && chatRecipient && (
+        <Suspense fallback={<PageLoader />}>
+          <LiveChat
+            recipientId={chatRecipient.id}
+            recipientName={chatRecipient.name}
+            recipientAvatar={chatRecipient.avatar}
+            equipmentId={selectedEquipment?.id}
+            onClose={() => {
+              setIsLiveChatOpen(false);
+              setChatRecipient(null);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Real Time Chat Modal */}
+      {isRealTimeChatOpen && chatRecipient && (
+        <Suspense fallback={<PageLoader />}>
+          <RealTimeChat
+            recipientId={chatRecipient.id}
+            recipientName={chatRecipient.name}
+            equipmentId={selectedEquipment?.id}
+            onClose={() => {
+              setIsRealTimeChatOpen(false);
+              setChatRecipient(null);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Enhanced Equipment Map Modal */}
+      {isEquipmentMapEnhancedOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsEquipmentMapEnhancedOpen(false)} />
+            <div className="relative z-10 w-full max-w-6xl max-h-[90vh] overflow-hidden">
+              <EquipmentMapEnhanced
+                equipment={equipment}
+                onEquipmentSelect={(eq) => {
+                  setSelectedEquipment(eq);
+                  setIsEquipmentMapEnhancedOpen(false);
+                }}
+                onClose={() => setIsEquipmentMapEnhancedOpen(false)}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
+
+      {/* Advanced Filters Modal */}
+      {isAdvancedFiltersOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <AdvancedFilters
+            onApply={(filters) => {
+              // Apply filters and navigate to browse
+              setSearchMinPrice(filters.priceRange[0] > 0 ? filters.priceRange[0] : undefined);
+              setSearchMaxPrice(filters.priceRange[1] < 1000 ? filters.priceRange[1] : undefined);
+              setSearchCondition(filters.condition.length > 0 ? filters.condition[0] : '');
+              if (filters.location?.address) {
+                setSearchQuery(filters.location.address);
+              }
+              setIsAdvancedFiltersOpen(false);
+              setCurrentPage('browse');
+            }}
+            onClose={() => setIsAdvancedFiltersOpen(false)}
+          />
+        </Suspense>
+      )}
+
+      {/* Detailed Comparison Modal */}
+      {isDetailedComparisonOpen && comparisonEquipment.length > 0 && (
+        <Suspense fallback={<PageLoader />}>
+          <DetailedComparison
+            items={comparisonEquipment}
+            onClose={() => {
+              setIsDetailedComparisonOpen(false);
+              setComparisonEquipment([]);
+            }}
+            onRemove={(id) => setComparisonEquipment(items => items.filter(i => i.id !== id))}
+            onBook={(equipment) => {
+              setSelectedEquipment(equipment);
+              setIsBookingOpen(true);
+              setIsDetailedComparisonOpen(false);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Saved Searches Modal */}
+      {isSavedSearchesOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <SavedSearches
+            onClose={() => setIsSavedSearchesOpen(false)}
+            onSearchClick={(filters) => {
+              // Apply saved search filters and navigate to browse
+              if (filters.query) setSearchQuery(filters.query);
+              if (filters.category) setSearchCategory(filters.category);
+              if (filters.priceRange) {
+                setSearchMinPrice(filters.priceRange[0] > 0 ? filters.priceRange[0] : undefined);
+                setSearchMaxPrice(filters.priceRange[1] < 10000 ? filters.priceRange[1] : undefined);
+              }
+              setIsSavedSearchesOpen(false);
+              setCurrentPage('browse');
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* Equipment Recommendations Modal */}
+      {isRecommendationsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentRecommendations
+            currentEquipment={selectedEquipment || undefined}
+            userLocation={user?.user_metadata?.location}
+            onEquipmentClick={(equipment) => {
+              setSelectedEquipment(equipment);
+              setIsRecommendationsOpen(false);
+            }}
+            onFavoriteClick={(id) => {
+              if (favorites.has(id)) {
+                removeFavorite(user!.id, id);
+                setFavorites(prev => { const next = new Set(prev); next.delete(id); return next; });
+              } else {
+                addFavorite(user!.id, id);
+                setFavorites(prev => new Set(prev).add(id));
+              }
+            }}
+            favorites={favorites}
+          />
+        </Suspense>
+      )}
+
+      {/* Quick Book Modal */}
+      {isQuickBookOpen && quickBookEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <QuickBook
+            equipment={quickBookEquipment}
+            lastBookingDates={{
+              startDate: new Date(Date.now() + 86400000 * 7).toISOString().split('T')[0],
+              endDate: new Date(Date.now() + 86400000 * 10).toISOString().split('T')[0],
+            }}
+            savedPaymentMethod={{ type: 'card', last4: '4242' }}
+            onConfirm={(bookingData) => {
+              console.log('Quick booking confirmed:', bookingData);
+              setIsQuickBookOpen(false);
+              alert('Booking confirmed! Check your email for details.');
+            }}
+            onClose={() => {
+              setIsQuickBookOpen(false);
+              setQuickBookEquipment(null);
+            }}
+          />
+        </Suspense>
+      )}
+
+      {/* PWA Features Page */}
+      {currentPage === 'pwa' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <PWAEnhancedFeatures onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Trust Score Page */}
+      {currentPage === 'trust-score' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-teal-50 to-cyan-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <RenterTrustScore userId={user?.id || ''} onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Smart Alerts Page */}
+      {currentPage === 'alerts' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-amber-50 to-orange-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <SmartAlertsSystem userId={user?.id} onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Equipment Bundles Page */}
+      {currentPage === 'bundles' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('browse')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Browse
+              </button>
+              <EquipmentBundleDeals mode="browse" onClose={() => setCurrentPage('browse')} />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Warranty Tracker Page */}
+      {currentPage === 'warranties' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Bulk Booking Page */}
+      {currentPage === 'bulk-booking' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('browse')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Browse
+              </button>
+              <BulkBookingSystem onClose={() => setCurrentPage('browse')} />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Marketplace Insights Page */}
+      {currentPage === 'insights' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <MarketplaceInsights onClose={() => setCurrentPage('dashboard')} />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {/* Legal Pages */}
+      {currentPage === 'terms' && (
+        <Suspense fallback={<PageLoader />}>
+          <TermsOfService onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'privacy' && (
+        <Suspense fallback={<PageLoader />}>
+          <PrivacyPolicy onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'cookies' && (
+        <Suspense fallback={<PageLoader />}>
+          <CookiePolicy onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'refund' && (
+        <Suspense fallback={<PageLoader />}>
+          <RefundPolicy onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {/* New Feature Modals */}
+      {isTrustScoreOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <RenterTrustScore userId={user?.id || ''} onClose={() => setIsTrustScoreOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isSmartAlertsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <SmartAlertsSystem userId={user?.id} onClose={() => setIsSmartAlertsOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isBundleDealsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <EquipmentBundleDeals mode="browse" onClose={() => setIsBundleDealsOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isWarrantyTrackerOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setIsWarrantyTrackerOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isBulkBookingOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <BulkBookingSystem onClose={() => setIsBulkBookingOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {isMarketInsightsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <MarketplaceInsights onClose={() => setIsMarketInsightsOpen(false)} />
+          </div>
+        </Suspense>
+      )}
+
+      {/* Additional Feature Modals - Weather, Social, Onboarding, Security */}
+      {isWeatherAdvisorOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <WeatherAdvisor
+              location={bookingEquipment?.location || 'San Francisco, CA'}
+              startDate={new Date().toISOString()}
+              endDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()}
+              onClose={() => setIsWeatherAdvisorOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isSocialProofOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <SocialProof
+              equipmentId={bookingEquipment?.id || 'demo'}
+              onClose={() => setIsSocialProofOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isOnboardingOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <OnboardingFlow
+              userType="renter"
+              onComplete={() => setIsOnboardingOpen(false)}
+              onSkip={() => setIsOnboardingOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isBiometricAuthOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <BiometricAuth
+              onSuccess={() => {
+                setIsBiometricAuthOpen(false);
+                alert('Biometric authentication successful!');
+              }}
+              onCancel={() => setIsBiometricAuthOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isPriceAlertsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <PriceAlerts
+              userId={user?.id || ''}
+              onClose={() => setIsPriceAlertsOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isSmartRecommendationsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <SmartRecommendations
+              userId={user?.id}
+              onEquipmentSelect={(eq) => {
+                setSelectedEquipment(eq);
+                setIsSmartRecommendationsOpen(false);
+              }}
+              onClose={() => setIsSmartRecommendationsOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isQRCodeScannerOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <QRCodeScanner
+              onScan={(data) => {
+                console.log('QR Code scanned:', data);
+                // Handle QR code data (could be equipment ID, booking code, etc.)
+                alert(`QR Code scanned: ${data}`);
+                setIsQRCodeScannerOpen(false);
+              }}
+              onClose={() => setIsQRCodeScannerOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
+
+      {isAchievementsOpen && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <AchievementsSystem
+              userId={user?.id || ''}
+              onClose={() => setIsAchievementsOpen(false)}
+            />
+          </div>
+        </Suspense>
+      )}
       {/* Cookie Consent */}
       {showBanner && (
         <CookieConsentBanner

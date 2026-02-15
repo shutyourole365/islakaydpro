@@ -2,12 +2,15 @@
   "name": "Islakayd - Equipment Rental Marketplace",
   "short_name": "Islakayd",
   "description": "Rent any equipment, anywhere. The world's most advanced equipment rental marketplace powered by AI.",
-  "start_url": "/",
+  "start_url": "https://islakayd.com/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d9488",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "scope": "/",
+  "id": "com.islakayd.app",
+  "dir": "ltr",
+  "lang": "en-US",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",

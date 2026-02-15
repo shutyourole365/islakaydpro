@@ -67,6 +67,7 @@ export default function PriceNegotiator({
 
     // Generate AI suggestions
     generateSuggestions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const generateSuggestions = () => {

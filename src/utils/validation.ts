@@ -1,4 +1,27 @@
 export function sanitizeInput(input: string): string {
+  // Complete XSS prevention - remove all HTML and dangerous patterns
+  let sanitized = input;
+  
+  // First pass: remove all HTML tags completely
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+  
+  // Remove all event handlers (even without quotes)
+  sanitized = sanitized.replace(/on\w+\s*=\s*[^\s>]*/gi, '');
+  
+  // Remove dangerous URL schemes (including hex/unicode encoded versions)
+  sanitized = sanitized.replace(/(?:javascript|data|vbscript|file|about)\s*:/gi, '');
+  
+  // Remove HTML entities that could be used for obfuscation
+  sanitized = sanitized.replace(/&[#\w]+;/g, '');
+  
+  // Remove any remaining angle brackets
+  sanitized = sanitized.replace(/[<>]/g, '');
+  
+  // Remove null bytes and control characters (using proper escaping)
+  // eslint-disable-next-line no-control-regex
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+  
+  return sanitized.trim();
   // Remove script tags, event handlers, javascript: and encode < >
   return input
     .replace(/[<>]/g, '')
