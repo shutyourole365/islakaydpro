@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
+import { useState, useEffect, useCallback, useTransition } from 'react';
 import {
   LayoutDashboard,
   Package,
@@ -37,6 +38,7 @@ import {
   FileText,
   Building,
   RefreshCw,
+  Users,
 } from 'lucide-react';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -55,6 +57,7 @@ import {
   updateProfile,
   updateBookingStatus,
 } from '../../services/database';
+import ReferralProgram from '../referral/ReferralProgram';
 
 // Lazy load components for better performance
 const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
@@ -66,7 +69,7 @@ interface DashboardProps {
   onListEquipment: () => void;
 }
 
-type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings';
+type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings' | 'referral';
 type BookingFilter = 'all' | 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
 
 export default function Dashboard({
@@ -83,6 +86,7 @@ export default function Dashboard({
   const [favorites, setFavorites] = useState<Equipment[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [showReferralProgram, setShowReferralProgram] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -96,6 +100,9 @@ export default function Dashboard({
   const [saving, setSaving] = useState(false);
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+
+  // Use transition for non-urgent updates
+  const [isPending, startTransition] = useTransition();
 
   const loadDashboardData = useCallback(async () => {
     if (!user) return;
@@ -112,19 +119,22 @@ export default function Dashboard({
         getConversations(user.id),
       ]);
 
-      setAnalytics(analyticsData);
-      setBookings(bookingsData);
-      setOwnerBookings(ownerBookingsData);
-      setMyListings(listingsData.data);
-      setFavorites(favoritesData.map(f => f.equipment!).filter(Boolean));
-      setNotifications(notificationsData);
-      setConversations(conversationsData);
+      // Use startTransition for non-urgent state updates
+      startTransition(() => {
+        setAnalytics(analyticsData);
+        setBookings(bookingsData);
+        setOwnerBookings(ownerBookingsData);
+        setMyListings(listingsData.data);
+        setFavorites(favoritesData.map(f => f.equipment!).filter(Boolean));
+        setNotifications(notificationsData);
+        setConversations(conversationsData);
+      });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, startTransition]);
 
   useEffect(() => {
     loadDashboardData();
@@ -216,6 +226,7 @@ export default function Dashboard({
     { id: 'notifications', label: 'Notifications', icon: Activity, badge: notifications.filter(n => !n.is_read).length },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'referral', label: 'Referrals', icon: Users },
   ];
 
   const getStatusBadge = (status: string) => {
@@ -1161,6 +1172,15 @@ export default function Dashboard({
                     Delete Account
                   </button>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'referral' && (
+              <div className="space-y-6">
+                <ReferralProgram
+                  userId={user?.id || ''}
+                  userName={profile?.full_name || user?.email || ''}
+                />
               </div>
             )}
           </div>

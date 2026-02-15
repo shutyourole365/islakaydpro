@@ -119,6 +119,27 @@ export default function Footer({ onNavigate }: FooterProps) {
               >
                 Accessibility
               </button>
+              <a href="/policies/TERMS_OF_SERVICE.md" className="text-gray-400 hover:text-teal-400 transition-colors">
+                Terms of Service
+              </a>
+              <a href="/policies/PRIVACY_POLICY.md" className="text-gray-400 hover:text-teal-400 transition-colors">
+                Privacy Policy
+              </a>
+              <a href="/policies/COOKIE_POLICY.md" className="text-gray-400 hover:text-teal-400 transition-colors">
+                Cookie Policy
+              </a>
+              <a href="/policies/ACCEPTABLE_USE_POLICY.md" className="text-gray-400 hover:text-teal-400 transition-colors">
+                Acceptable Use
+              </a>
+              <a href="/policies/DMCA_POLICY.md" className="text-gray-400 hover:text-teal-400 transition-colors">
+                DMCA Policy
+              </a>
+              <a href="/policies/DATA_RETENTION_POLICY.md" className="text-gray-400 hover:text-teal-400 transition-colors">
+                Data Retention
+              </a>
+              <a href="/policies/CANCELLATION_POLICY.md" className="text-gray-400 hover:text-teal-400 transition-colors">
+                Cancellation Policy
+              </a>
             </div>
             <div className="flex items-center gap-4">
               <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">

@@ -11,23 +11,25 @@ import EquipmentShowcase from './components/home/EquipmentShowcase';
 import HowItWorks from './components/home/HowItWorks';
 import Testimonials from './components/home/Testimonials';
 import CTASection from './components/home/CTASection';
+import AboutPage from './components/home/AboutPage';
+import HelpCenter from './components/help/HelpCenter';
+import SearchModal from './components/search/SearchModal';
+import EquipmentDetail from './components/equipment/EquipmentDetail';
+import AuthModal from './components/auth/AuthModal';
+import AIAssistantEnhanced from './components/ai/AIAssistantEnhanced';
+import BrowsePage from './components/browse/BrowsePage';
+import Dashboard from './components/dashboard/Dashboard';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import ListEquipmentForm from './components/listing/ListEquipmentForm';
+import BookingSystem from './components/booking/BookingSystem';
+import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
-import { addFavorite, removeFavorite, getEquipment } from './services/database';
-import type { SearchFilters } from './types';
-
-// Lazy load page-level components for better initial load
-const SearchModal = lazy(() => import('./components/search/SearchModal'));
-const EquipmentDetail = lazy(() => import('./components/equipment/EquipmentDetail'));
-const AuthModal = lazy(() => import('./components/auth/AuthModal'));
-const AIAssistantEnhanced = lazy(() => import('./components/ai/AIAssistantEnhanced'));
-const BrowsePage = lazy(() => import('./components/browse/BrowsePage'));
-const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
-const ListEquipmentForm = lazy(() => import('./components/listing/ListEquipmentForm'));
-const BookingSystem = lazy(() => import('./components/booking/BookingSystem'));
-const EquipmentComparison = lazy(() => import('./components/comparison/EquipmentComparison'));
-const FeatureShowcase = lazy(() => import('./components/ui/FeatureShowcase'));
+import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
+import { useCookieConsent } from './hooks/useCookieConsent';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { addFavorite, removeFavorite } from './services/database';
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -141,6 +143,9 @@ const PricingCalculator = lazy(() => import('./components/utility/PricingCalcula
 const InsuranceOptions = lazy(() => import('./components/utility/InsuranceOptions'));
 const HostResources = lazy(() => import('./components/utility/HostResources'));
 const HostCommunity = lazy(() => import('./components/utility/HostCommunity'));
+const MaintenanceScheduler = lazy(() => import('./components/maintenance/MaintenanceScheduler'));
+const SchedulingOptimizer = lazy(() => import('./components/scheduling/SchedulingOptimizer'));
+const ReferralSystem = lazy(() => import('./components/referral/ReferralSystem'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -571,10 +576,21 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations';
+<<<<<<< HEAD
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
+  const {
+    showBanner,
+    showSettings,
+    settings,
+    setShowSettings,
+    setSettings,
+    acceptAll,
+    declineAll,
+    saveSettings,
+  } = useCookieConsent();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -1182,6 +1198,19 @@ function AppContent() {
         </>
       )}
 
+      {currentPage === 'about' && (
+        <>
+          <AboutPage />
+          <Footer />
+        </>
+      )}
+
+      {currentPage === 'help' && (
+        <>
+          <HelpCenter />
+        </>
+      )}
+
       {currentPage === 'browse' && (
         <Suspense fallback={<PageLoader />}>
           <BrowsePage
@@ -1315,6 +1344,7 @@ function AppContent() {
         </Suspense>
       )}
 
+<<<<<<< HEAD
       {currentPage === 'ai-matching' && (
         <Suspense fallback={<PageLoader />}>
           <AIMatching onBack={() => setCurrentPage('dashboard')} />
@@ -1414,6 +1444,57 @@ function AppContent() {
       {currentPage === 'industry-integrations' && (
         <Suspense fallback={<PageLoader />}>
           <IndustryIntegrations onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'maintenance' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <MaintenanceScheduler />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'scheduler' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <SchedulingOptimizer />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'referrals' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <ReferralSystem />
+            </div>
+          </div>
+          <Footer />
         </Suspense>
       )}
 
@@ -2575,15 +2656,33 @@ function AppContent() {
           </div>
         </Suspense>
       )}
+      {/* Cookie Consent */}
+      {showBanner && (
+        <CookieConsentBanner
+          onAccept={acceptAll}
+          onDecline={declineAll}
+          onCustomize={() => setShowSettings(true)}
+        />
+      )}
+
+      <CookieSettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        settings={settings}
+        onSettingsChange={setSettings}
+        onSave={saveSettings}
+      />
     </div>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

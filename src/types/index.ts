@@ -24,6 +24,20 @@ export interface Profile {
   updated_at: string;
 }
 
+// Branded types for better type safety
+export type UserId = string & { readonly __brand: 'UserId' };
+export type EquipmentId = string & { readonly __brand: 'EquipmentId' };
+export type BookingId = string & { readonly __brand: 'BookingId' };
+export type Email = string & { readonly __brand: 'Email' };
+export type Phone = string & { readonly __brand: 'Phone' };
+
+// Type guards for branded types
+export const isUserId = (value: string): value is UserId => typeof value === 'string' && value.length > 0;
+export const isEquipmentId = (value: string): value is EquipmentId => typeof value === 'string' && value.length > 0;
+export const isBookingId = (value: string): value is BookingId => typeof value === 'string' && value.length > 0;
+export const isEmail = (value: string): value is Email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+export const isPhone = (value: string): value is Phone => /^\+?[\d\s\-\(\)]+$/.test(value);
+
 export interface Category {
   id: string;
   name: string;
@@ -36,8 +50,8 @@ export interface Category {
 }
 
 export interface Equipment {
-  id: string;
-  owner_id: string;
+  id: EquipmentId;
+  owner_id: UserId;
   category_id: string | null;
   title: string;
   description: string | null;
@@ -69,10 +83,10 @@ export interface Equipment {
 }
 
 export interface Booking {
-  id: string;
-  equipment_id: string;
-  renter_id: string;
-  owner_id: string;
+  id: BookingId;
+  equipment_id: EquipmentId;
+  renter_id: UserId;
+  owner_id: UserId;
   start_date: string;
   end_date: string;
   total_days: number;
