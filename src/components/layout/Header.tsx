@@ -41,6 +41,8 @@ export default function Header({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
+  const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,6 +60,12 @@ export default function Header({
       }
       if (!target.closest('.notifications-menu') && !target.closest('.notifications-button')) {
         setIsNotificationsOpen(false);
+      }
+      if (!target.closest('.company-menu') && !target.closest('.company-button')) {
+        setIsCompanyMenuOpen(false);
+      }
+      if (!target.closest('.support-menu') && !target.closest('.support-button')) {
+        setIsSupportMenuOpen(false);
       }
     };
     document.addEventListener('click', handleClickOutside);
@@ -108,22 +116,130 @@ export default function Header({
               >
                 How It Works
               </button>
-              <button
-                onClick={() => onNavigate('home')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
-                For Business
-              </button>
-              <button
-                onClick={() => onNavigate('home')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
-                Support
-              </button>
+              
+              {/* Company Dropdown */}
+              <div className="relative company-menu">
+                <button
+                  onClick={() => setIsCompanyMenuOpen(!isCompanyMenuOpen)}
+                  className={`company-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
+                    showTransparent ? 'text-white/90' : 'text-gray-700'
+                  }`}
+                >
+                  Company
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {isCompanyMenuOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <button
+                      onClick={() => {
+                        onNavigate('about');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      About Us
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('careers');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Careers
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('press');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Press
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('blog');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Blog
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('partnerships');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Partnerships
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('investors');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Investors
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Support Dropdown */}
+              <div className="relative support-menu">
+                <button
+                  onClick={() => setIsSupportMenuOpen(!isSupportMenuOpen)}
+                  className={`support-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
+                    showTransparent ? 'text-white/90' : 'text-gray-700'
+                  }`}
+                >
+                  Support
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {isSupportMenuOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <button
+                      onClick={() => {
+                        onNavigate('help');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Help Center
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('safety');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Safety
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('trust');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Trust & Verification
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('contact');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Contact Us
+                    </button>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
 
