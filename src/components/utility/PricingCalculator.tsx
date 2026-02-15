@@ -26,10 +26,10 @@ export default function PricingCalculator({ onBack }: PricingCalculatorProps) {
     const baseCost = dailyRate * rentalDays;
     const serviceFee = baseCost * 0.08; // 8% service fee
     const insuranceCost = insurance ? baseCost * 0.05 : 0; // 5% insurance
-    const deliveryCost = delivery ? Math.min(150, baseCost * 0.1) : 0; // $150 or 10% of rental
+    const deliveryCost = delivery ? Math.min(200, baseCost * 0.1) : 0; // $200 AUD or 10% of rental
     const subtotal = baseCost + serviceFee + insuranceCost + deliveryCost;
-    const tax = subtotal * 0.08; // 8% tax
-    const total = subtotal + tax;
+    const gst = subtotal * 0.10; // 10% GST (Australian Goods & Services Tax)
+    const total = subtotal + gst;
 
     return {
       baseCost,
@@ -37,7 +37,7 @@ export default function PricingCalculator({ onBack }: PricingCalculatorProps) {
       insuranceCost,
       deliveryCost,
       subtotal,
-      tax,
+      gst,
       total
     };
   };
@@ -213,8 +213,8 @@ export default function PricingCalculator({ onBack }: PricingCalculatorProps) {
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Tax (8%)</span>
-                      <span className="font-semibold">${pricing.tax.toFixed(2)}</span>
+                      <span className="text-gray-600">GST (10%)</span>
+                      <span className="font-semibold">${pricing.gst.toFixed(2)}</span>
                     </div>
 
                     <hr className="border-gray-300" />

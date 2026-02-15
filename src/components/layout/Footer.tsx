@@ -122,20 +122,23 @@ export default function Footer({ onNavigate }: FooterProps) {
             </div>
             <div className="flex items-center gap-4">
               <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
+                <option>English (AU)</option>
                 <option>English (US)</option>
                 <option>Spanish</option>
                 <option>French</option>
                 <option>German</option>
               </select>
               <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
+                <option>AUD $</option>
                 <option>USD $</option>
                 <option>EUR</option>
                 <option>GBP</option>
+                <option>NZD $</option>
               </select>
             </div>
           </div>
           <p className="text-center text-gray-500 text-sm mt-6">
-            2024 Islakayd, Inc. All rights reserved.
+            2024 Islakayd Pty Ltd. All rights reserved.
           </p>
         </div>
       </div>

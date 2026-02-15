@@ -10,17 +10,17 @@ export default function Careers({ onBack }: CareersProps) {
     {
       title: 'Senior Frontend Engineer',
       department: 'Engineering',
-      location: 'Remote / San Francisco',
+      location: 'Remote / Sydney',
       type: 'Full-time',
-      salary: '$120K - $160K',
+      salary: '$140K - $180K AUD',
       description: 'Build the next generation of our React-based marketplace platform. Work with TypeScript, modern tooling, and cutting-edge web technologies.'
     },
     {
       title: 'Product Manager',
       department: 'Product',
-      location: 'New York / Remote',
+      location: 'Melbourne / Remote',
       type: 'Full-time',
-      salary: '$110K - $140K',
+      salary: '$130K - $160K AUD',
       description: 'Drive product strategy for our equipment rental marketplace. Work closely with engineering, design, and business teams to deliver exceptional user experiences.'
     },
     {
@@ -28,23 +28,23 @@ export default function Careers({ onBack }: CareersProps) {
       department: 'Operations',
       location: 'Remote',
       type: 'Full-time',
-      salary: '$70K - $90K',
+      salary: '$80K - $100K AUD',
       description: 'Help our users succeed on the platform. Provide exceptional support, gather feedback, and ensure our community has the best possible experience.'
     },
     {
       title: 'Data Scientist',
       department: 'Engineering',
-      location: 'Remote / Austin',
+      location: 'Remote / Brisbane',
       type: 'Full-time',
-      salary: '$130K - $170K',
+      salary: '$150K - $190K AUD',
       description: 'Build machine learning models to improve our marketplace matching, pricing recommendations, and fraud detection systems.'
     },
     {
       title: 'Marketing Manager',
       department: 'Marketing',
-      location: 'Los Angeles / Remote',
+      location: 'Sydney / Remote',
       type: 'Full-time',
-      salary: '$85K - $110K',
+      salary: '$95K - $120K AUD',
       description: 'Grow our user base through innovative marketing campaigns, content creation, and community building initiatives.'
     },
     {
@@ -52,7 +52,7 @@ export default function Careers({ onBack }: CareersProps) {
       department: 'Operations',
       location: 'Remote',
       type: 'Full-time',
-      salary: '$65K - $85K',
+      salary: '$75K - $95K AUD',
       description: 'Analyze platform performance, optimize processes, and support our growing operations team with data-driven insights.'
     }
   ];
@@ -65,8 +65,8 @@ export default function Careers({ onBack }: CareersProps) {
     },
     {
       icon: <Heart className="w-6 h-6" />,
-      title: 'Health & Wellness',
-      description: 'Comprehensive health, dental, and vision insurance. Mental health support included.'
+      title: 'Health & Superannuation',
+      description: 'Private health insurance and superannuation contributions above the minimum requirement.'
     },
     {
       icon: <Clock className="w-6 h-6" />,
@@ -81,7 +81,7 @@ export default function Careers({ onBack }: CareersProps) {
     {
       icon: <Users className="w-6 h-6" />,
       title: 'Learning Budget',
-      description: '$2,000 annual budget for conferences, courses, and professional development.'
+      description: '$3,000 AUD annual budget for conferences, courses, and professional development.'
     },
     {
       icon: <Zap className="w-6 h-6" />,
