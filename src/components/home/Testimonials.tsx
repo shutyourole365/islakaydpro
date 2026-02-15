@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
-export default function Testimonials() {
+const Testimonials = memo(function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const testimonials = [
@@ -165,4 +165,6 @@ export default function Testimonials() {
       </div>
     </section>
   );
-}
+});
+
+export default Testimonials;
