@@ -14,6 +14,12 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   build: {
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Target modern browsers for smaller bundles
+    target: 'esnext',
+    // Minify with esbuild for better performance
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks: {
@@ -48,5 +54,12 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     // Enable source maps for production debugging (optional)
     sourcemap: false,
+  },
+  // Enable modern features
+  esbuild: {
+    // Target modern browsers
+    target: 'esnext',
+    // Remove console.log in production
+    drop: ['console', 'debugger'],
   },
 });

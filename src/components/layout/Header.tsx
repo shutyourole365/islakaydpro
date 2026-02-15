@@ -13,6 +13,9 @@ import {
   Settings,
   LayoutDashboard,
   Package,
+  Wrench,
+  Calendar,
+  Users,
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
 import LogoPro from '../branding/LogoPro';
@@ -94,6 +97,22 @@ export default function Header({
                 }`}
               >
                 Browse Equipment
+              </button>
+              <button
+                onClick={() => onNavigate('help')}
+                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
+                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                }`}
+              >
+                Help
+              </button>
+              <button
+                onClick={() => onNavigate('about')}
+                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
+                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                }`}
+              >
+                About
               </button>
               <button
                 onClick={() => {
@@ -267,6 +286,37 @@ export default function Header({
                           <Settings className="w-5 h-5 text-gray-400" />
                           Settings
                         </button>
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <button
+                          onClick={() => {
+                            onNavigate('maintenance');
+                            setIsProfileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                        >
+                          <Wrench className="w-5 h-5 text-gray-400" />
+                          Maintenance
+                        </button>
+                        <button
+                          onClick={() => {
+                            onNavigate('scheduler');
+                            setIsProfileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                        >
+                          <Calendar className="w-5 h-5 text-gray-400" />
+                          Smart Scheduler
+                        </button>
+                        <button
+                          onClick={() => {
+                            onNavigate('referrals');
+                            setIsProfileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                        >
+                          <Users className="w-5 h-5 text-gray-400" />
+                          Referrals
+                        </button>
                       </div>
                       <div className="border-t border-gray-100 dark:border-gray-700 pt-2">
                         <button
@@ -394,6 +444,38 @@ export default function Header({
                 >
                   Dashboard
                 </button>
+                <div className="pt-2 space-y-2">
+                  <button
+                    onClick={() => {
+                      onNavigate('maintenance');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Wrench className="w-4 h-4" />
+                    Maintenance
+                  </button>
+                  <button
+                    onClick={() => {
+                      onNavigate('scheduler');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Smart Scheduler
+                  </button>
+                  <button
+                    onClick={() => {
+                      onNavigate('referrals');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Users className="w-4 h-4" />
+                    Referrals
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="pt-4 border-t border-gray-100 space-y-3">

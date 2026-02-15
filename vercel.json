@@ -4,6 +4,7 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
+  "alias": ["islakayd.com", "www.islakayd.com"],
   "rewrites": [
     {
       "source": "/(.*)",

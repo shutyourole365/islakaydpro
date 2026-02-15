@@ -19,6 +19,7 @@ import {
   FileText,
 } from 'lucide-react';
 import type { Equipment, InsurancePlan } from '../../types';
+import SmartScheduler from '../scheduling/SmartScheduler';
 
 interface BookingSystemProps {
   equipment: Equipment;
@@ -77,6 +78,7 @@ export default function BookingSystem({
   insurancePlans = defaultInsurancePlans,
 }: BookingSystemProps) {
   const [currentStep, setCurrentStep] = useState<BookingStep>('dates');
+  const [showSmartScheduler, setShowSmartScheduler] = useState(false);
   const [selectedStart, setSelectedStart] = useState<Date | null>(null);
   const [selectedEnd, setSelectedEnd] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -484,6 +486,15 @@ export default function BookingSystem({
                       </div>
                     </div>
                   )}
+
+                  {/* Smart Scheduler */}
+                  <button
+                    onClick={() => setShowSmartScheduler(true)}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                  >
+                    <Calendar className="w-5 h-5" />
+                    Use Smart Scheduler
+                  </button>
                 </div>
               </div>
             </div>
@@ -842,6 +853,21 @@ export default function BookingSystem({
           )}
         </div>
       </div>
+
+      {showSmartScheduler && (
+        <SmartScheduler
+          equipmentId={equipment.id}
+          equipmentTitle={equipment.title}
+          dailyRate={equipment.daily_rate}
+          onSchedule={(startDate, endDate) => {
+            setSelectedStart(startDate);
+            setSelectedEnd(endDate);
+            setShowSmartScheduler(false);
+            setCurrentStep('options');
+          }}
+          onClose={() => setShowSmartScheduler(false)}
+        />
+      )}
     </div>
   );
 }

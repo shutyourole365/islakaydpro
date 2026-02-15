@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Heart, Star, MapPin, Shield, Clock, Eye, Zap, Plus } from 'lucide-react';
 import type { Equipment } from '../../types';
 import { RatingBadge, FeaturedBadge, VerifiedBadge, ConditionBadge } from '../ui/Badge';
@@ -14,7 +14,7 @@ interface EquipmentCardProps {
   showCompareButton?: boolean;
 }
 
-export default function EquipmentCard({
+const EquipmentCard = memo(function EquipmentCard({
   equipment,
   onEquipmentClick,
   onFavoriteClick,
@@ -258,4 +258,6 @@ export default function EquipmentCard({
       </div>
     </div>
   );
-}
+});
+
+export default EquipmentCard;
