@@ -188,11 +188,11 @@ const demoContract: RentalContract = {
     },
     {
       title: '7. Dispute Resolution',
-      content: 'Any disputes arising from this agreement shall first be attempted to be resolved through mediation. If mediation fails, disputes will be settled through binding arbitration in accordance with the rules of the American Arbitration Association.',
+      content: 'Any disputes arising from this agreement shall first be attempted to be resolved through mediation. If mediation fails, disputes will be settled through binding arbitration in accordance with the rules of the Australian Centre for International Commercial Arbitration (ACICA).',
     },
     {
       title: '8. Governing Law',
-      content: 'This agreement shall be governed by and construed in accordance with the laws of the State of New York, without regard to its conflict of law principles.',
+      content: 'This agreement shall be governed by and construed in accordance with the laws of New South Wales, Australia, without regard to its conflict of law principles.',
     },
   ],
   signatures: [

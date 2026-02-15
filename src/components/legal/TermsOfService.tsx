@@ -185,7 +185,7 @@ const TermsOfService: React.FC<TermsOfServiceProps> = ({ onBack }) => {
             </p>
             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
               <p className="text-gray-700"><strong>Email:</strong> legal@islakayd.com</p>
-              <p className="text-gray-700"><strong>Address:</strong> Islakayd Inc., Legal Department</p>
+              <p className="text-gray-700"><strong>Address:</strong> Islakayd Pty Ltd, Legal Department, Level 25, 123 Pitt Street, Sydney, NSW 2000, Australia</p>
             </div>
           </section>
         </div>

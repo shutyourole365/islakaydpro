@@ -19,7 +19,7 @@ export default function ContactUs({ onBack }: ContactUsProps) {
       icon: <Mail className="w-6 h-6" />,
       title: 'Email Support',
       description: 'Send us a detailed message about your issue',
-      availability: 'Mon-Fri, 9AM-6PM EST',
+      availability: 'Mon-Fri, 9AM-6PM AEST',
       action: 'Send Email',
       response: 'Within 24 hours'
     },
@@ -27,7 +27,7 @@ export default function ContactUs({ onBack }: ContactUsProps) {
       icon: <Phone className="w-6 h-6" />,
       title: 'Phone Support',
       description: 'Speak directly with a support specialist',
-      availability: 'Mon-Fri, 9AM-6PM EST',
+      availability: 'Mon-Fri, 9AM-6PM AEST',
       action: 'Call Now',
       response: 'Immediate'
     }
@@ -68,22 +68,22 @@ export default function ContactUs({ onBack }: ContactUsProps) {
 
   const offices = [
     {
-      city: 'San Francisco, CA',
-      address: '123 Tech Street, Suite 456\nSan Francisco, CA 94105',
-      phone: '+1 (415) 555-0123',
+      city: 'Sydney, NSW',
+      address: 'Level 25, 123 Pitt Street\nSydney, NSW 2000',
+      phone: '+61 2 1234 5678',
       type: 'Headquarters'
     },
     {
-      city: 'New York, NY',
-      address: '456 Business Ave, Floor 23\nNew York, NY 10001',
-      phone: '+1 (212) 555-0456',
-      type: 'East Coast Office'
+      city: 'Melbourne, VIC',
+      address: 'Level 15, 456 Collins Street\nMelbourne, VIC 3000',
+      phone: '+61 3 9876 5432',
+      type: 'Operations Center'
     },
     {
-      city: 'Austin, TX',
-      address: '789 Innovation Blvd, Suite 101\nAustin, TX 78701',
-      phone: '+1 (512) 555-0789',
-      type: 'Development Center'
+      city: 'Brisbane, QLD',
+      address: 'Level 10, 789 Queen Street\nBrisbane, QLD 4000',
+      phone: '+61 7 5555 1234',
+      type: 'Regional Office'
     }
   ];
 

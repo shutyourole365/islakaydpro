@@ -84,27 +84,27 @@ export default function HostResources({ onBack }: HostResourcesProps) {
   const successStories = [
     {
       name: 'Mike Johnson',
-      location: 'Austin, TX',
+      location: 'Brisbane, QLD',
       equipment: 'Construction Equipment',
-      earnings: '$45,000',
+      earnings: '$52,000 AUD',
       period: 'Last 12 months',
       quote: 'Islakayd turned my idle equipment into a steady income stream. The platform is incredibly easy to use.',
       rating: 5
     },
     {
       name: 'Sarah Chen',
-      location: 'Seattle, WA',
+      location: 'Sydney, NSW',
       equipment: 'Power Tools',
-      earnings: '$28,000',
+      earnings: '$32,000 AUD',
       period: 'Last 12 months',
       quote: 'The support team is amazing, and the renter verification gives me peace of mind.',
       rating: 5
     },
     {
       name: 'David Rodriguez',
-      location: 'Miami, FL',
+      location: 'Melbourne, VIC',
       equipment: 'Heavy Machinery',
-      earnings: '$67,000',
+      earnings: '$78,000 AUD',
       period: 'Last 12 months',
       quote: 'Started with one excavator, now have a fleet. Islakayd scales with your business.',
       rating: 5
