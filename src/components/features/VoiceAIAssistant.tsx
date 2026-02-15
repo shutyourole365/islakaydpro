@@ -1,6 +1,7 @@
 import { ArrowLeft, Mic, MicOff, Volume2, VolumeX, MessageCircle, Send, Bot, User, Settings, Zap } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import React from 'react';
 
 interface Message {
   id: string;
@@ -189,25 +190,34 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
     if (voiceEnabled) {
       speakText(aiResponse.response);
     }
-  }, [voiceEnabled]);
+  }, [voiceEnabled, speakText]);
 
   // Initialize speech recognition and synthesis
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as Window & { webkitSpeechRecognition?: any; SpeechRecognition?: any }).webkitSpeechRecognition || (window as Window & { webkitSpeechRecognition?: any; SpeechRecognition?: any }).SpeechRecognition;
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
+      const SpeechRecognition = (window as Window & {
+        webkitSpeechRecognition?: new () => SpeechRecognition;
+        SpeechRecognition?: new () => SpeechRecognition;
+      }).webkitSpeechRecognition || (window as Window & {
+        webkitSpeechRecognition?: new () => SpeechRecognition;
+        SpeechRecognition?: new () => SpeechRecognition;
+      }).SpeechRecognition;
 
-      recognition.onstart = () => setIsListening(true);
-      recognition.onend = () => setIsListening(false);
-      recognition.onresult = (event: Event & { results: SpeechRecognitionResultList }) => {
-        const transcript = event.results[0][0].transcript;
-        handleSendMessage(transcript);
-      };
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
 
-      setSpeechRecognition(recognition);
+        recognition.onstart = () => setIsListening(true);
+        recognition.onend = () => setIsListening(false);
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+          const transcript = event.results[0][0].transcript;
+          handleSendMessage(transcript);
+        };
+
+        setSpeechRecognition(recognition);
+      }
     }
 
     if ('speechSynthesis' in window) {

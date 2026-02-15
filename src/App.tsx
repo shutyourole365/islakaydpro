@@ -576,10 +576,8 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-<<<<<<< HEAD
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler';
-
 function AppContent() {
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler';
   const { isAuthenticated, user, profile, signOut } = useAuth();
   const {
     showBanner,
@@ -1344,7 +1342,6 @@ function AppContent() {
         </Suspense>
       )}
 
-<<<<<<< HEAD
       {currentPage === 'ai-matching' && (
         <Suspense fallback={<PageLoader />}>
           <AIMatching onBack={() => setCurrentPage('dashboard')} />

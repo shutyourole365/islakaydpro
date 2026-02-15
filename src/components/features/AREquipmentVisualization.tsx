@@ -26,9 +26,11 @@ export default function AREquipmentVisualization({ onBack, equipment }: AREquipm
     const checkARSupport = async () => {
       if ('xr' in navigator) {
         try {
-          const xr = (navigator as Navigator & { xr: any }).xr;
-          const supported = await xr.isSessionSupported('immersive-ar');
-          setIsARSupported(supported);
+          const xr = (navigator as Navigator & { xr?: XRSystem }).xr;
+          if (xr) {
+            const supported = await xr.isSessionSupported('immersive-ar');
+            setIsARSupported(supported);
+          }
         } catch (error) {
           console.log('AR not supported:', error);
         }
@@ -45,7 +47,10 @@ export default function AREquipmentVisualization({ onBack, equipment }: AREquipm
         return;
       }
 
-      await (navigator as Navigator & { xr: any }).xr.requestSession('immersive-ar', {
+      const xr = (navigator as Navigator & { xr?: XRSystem }).xr;
+      if (!xr) return;
+
+      await xr.requestSession('immersive-ar', {
         requiredFeatures: ['hit-test']
       });
 
