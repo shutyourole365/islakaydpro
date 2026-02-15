@@ -100,6 +100,28 @@ const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
 const CookiePolicy = lazy(() => import('./components/legal/CookiePolicy'));
 const RefundPolicy = lazy(() => import('./components/legal/RefundPolicy'));
+const Accessibility = lazy(() => import('./components/legal/Accessibility'));
+const CancellationPolicy = lazy(() => import('./components/legal/CancellationPolicy'));
+
+// Company Pages
+const AboutUs = lazy(() => import('./components/company/AboutUs'));
+const Careers = lazy(() => import('./components/company/Careers'));
+const Press = lazy(() => import('./components/company/Press'));
+const Blog = lazy(() => import('./components/company/Blog'));
+const Partnerships = lazy(() => import('./components/company/Partnerships'));
+const Investors = lazy(() => import('./components/company/Investors'));
+
+// Support Pages
+const HelpCenter = lazy(() => import('./components/support/HelpCenter'));
+const Safety = lazy(() => import('./components/support/Safety'));
+const TrustAndVerification = lazy(() => import('./components/support/TrustAndVerification'));
+const ContactUs = lazy(() => import('./components/support/ContactUs'));
+
+// Utility Pages
+const PricingCalculator = lazy(() => import('./components/utility/PricingCalculator'));
+const InsuranceOptions = lazy(() => import('./components/utility/InsuranceOptions'));
+const HostResources = lazy(() => import('./components/utility/HostResources'));
+const HostCommunity = lazy(() => import('./components/utility/HostCommunity'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -530,7 +552,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
@@ -2125,6 +2147,105 @@ function AppContent() {
       {currentPage === 'refund' && (
         <Suspense fallback={<PageLoader />}>
           <RefundPolicy onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'accessibility' && (
+        <Suspense fallback={<PageLoader />}>
+          <Accessibility onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'cancellation' && (
+        <Suspense fallback={<PageLoader />}>
+          <CancellationPolicy onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {/* Company Pages */}
+      {currentPage === 'about' && (
+        <Suspense fallback={<PageLoader />}>
+          <AboutUs onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'careers' && (
+        <Suspense fallback={<PageLoader />}>
+          <Careers onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'press' && (
+        <Suspense fallback={<PageLoader />}>
+          <Press onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'blog' && (
+        <Suspense fallback={<PageLoader />}>
+          <Blog onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'partnerships' && (
+        <Suspense fallback={<PageLoader />}>
+          <Partnerships onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'investors' && (
+        <Suspense fallback={<PageLoader />}>
+          <Investors onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {/* Support Pages */}
+      {currentPage === 'help' && (
+        <Suspense fallback={<PageLoader />}>
+          <HelpCenter onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'safety' && (
+        <Suspense fallback={<PageLoader />}>
+          <Safety onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'trust' && (
+        <Suspense fallback={<PageLoader />}>
+          <TrustAndVerification onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'contact' && (
+        <Suspense fallback={<PageLoader />}>
+          <ContactUs onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {/* Utility Pages */}
+      {currentPage === 'pricing-calculator' && (
+        <Suspense fallback={<PageLoader />}>
+          <PricingCalculator onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'insurance' && (
+        <Suspense fallback={<PageLoader />}>
+          <InsuranceOptions onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'host-resources' && (
+        <Suspense fallback={<PageLoader />}>
+          <HostResources onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'host-community' && (
+        <Suspense fallback={<PageLoader />}>
+          <HostCommunity onBack={() => setCurrentPage('home')} />
         </Suspense>
       )}
 

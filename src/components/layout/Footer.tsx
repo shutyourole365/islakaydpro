@@ -8,34 +8,34 @@ interface FooterProps {
 export default function Footer({ onNavigate }: FooterProps) {
   const footerLinks = {
     'Rent Equipment': [
-      'Browse All',
-      'Construction',
-      'Power Tools',
-      'Photography',
-      'Events',
-      'Vehicles',
+      { label: 'Browse All', page: 'browse' },
+      { label: 'Construction', page: 'browse', category: 'construction' },
+      { label: 'Power Tools', page: 'browse', category: 'power-tools' },
+      { label: 'Photography', page: 'browse', category: 'photography' },
+      { label: 'Events', page: 'browse', category: 'events' },
+      { label: 'Vehicles', page: 'browse', category: 'vehicles' },
     ],
     'List Equipment': [
-      'Start Listing',
-      'Pricing Calculator',
-      'Insurance Options',
-      'Host Resources',
-      'Host Community',
+      { label: 'Start Listing', page: 'list-equipment' },
+      { label: 'Pricing Calculator', page: 'pricing-calculator' },
+      { label: 'Insurance Options', page: 'insurance' },
+      { label: 'Host Resources', page: 'host-resources' },
+      { label: 'Host Community', page: 'host-community' },
     ],
     Company: [
-      'About Us',
-      'Careers',
-      'Press',
-      'Blog',
-      'Partnerships',
-      'Investors',
+      { label: 'About Us', page: 'about' },
+      { label: 'Careers', page: 'careers' },
+      { label: 'Press', page: 'press' },
+      { label: 'Blog', page: 'blog' },
+      { label: 'Partnerships', page: 'partnerships' },
+      { label: 'Investors', page: 'investors' },
     ],
     Support: [
-      'Help Center',
-      'Safety',
-      'Trust & Verification',
-      'Contact Us',
-      'Cancellation Policy',
+      { label: 'Help Center', page: 'help' },
+      { label: 'Safety', page: 'safety' },
+      { label: 'Trust & Verification', page: 'trust' },
+      { label: 'Contact Us', page: 'contact' },
+      { label: 'Cancellation Policy', page: 'cancellation' },
     ],
   };
 
@@ -68,13 +68,17 @@ export default function Footer({ onNavigate }: FooterProps) {
               <h3 className="text-white font-semibold mb-4">{category}</h3>
               <ul className="space-y-3">
                 {links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-gray-400 hover:text-teal-400 transition-colors"
+                  <li key={link.label}>
+                    <button
+                      onClick={() => {
+                        if (link.page) {
+                          onNavigate?.(link.page);
+                        }
+                      }}
+                      className="text-sm text-gray-400 hover:text-teal-400 transition-colors text-left"
                     >
-                      {link}
-                    </a>
+                      {link.label}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -109,9 +113,12 @@ export default function Footer({ onNavigate }: FooterProps) {
               >
                 Refund Policy
               </button>
-              <a href="#" className="text-gray-400 hover:text-teal-400 transition-colors">
+              <button
+                onClick={() => onNavigate?.('accessibility')}
+                className="text-gray-400 hover:text-teal-400 transition-colors"
+              >
                 Accessibility
-              </a>
+              </button>
             </div>
             <div className="flex items-center gap-4">
               <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
