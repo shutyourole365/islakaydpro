@@ -7,6 +7,7 @@ import Footer from './components/layout/Footer';
 import Hero from './components/home/Hero';
 import Categories from './components/home/Categories';
 import FeaturedListings from './components/home/FeaturedListings';
+import EquipmentShowcase from './components/home/EquipmentShowcase';
 import HowItWorks from './components/home/HowItWorks';
 import Testimonials from './components/home/Testimonials';
 import CTASection from './components/home/CTASection';
@@ -841,6 +842,11 @@ function AppContent() {
     }, 100);
   };
 
+  const handleQuickBook = (equipment: Equipment) => {
+    setQuickBookEquipment(equipment);
+    setIsQuickBookOpen(true);
+  };
+
   const handleRemoveFromComparison = (equipmentId: string) => {
     setComparisonItems(prev => prev.filter(item => item.id !== equipmentId));
   };
@@ -1047,6 +1053,16 @@ function AppContent() {
         <>
           <main>
             <Hero onSearch={handleSearch} />
+
+              <EquipmentShowcase
+                equipment={featuredEquipment.slice(0, 5)} // Show top 5 featured items
+                onEquipmentClick={handleEquipmentClick}
+                onFavoriteClick={handleFavoriteToggle}
+                favorites={favorites}
+                onAddToComparison={handleAddToComparison}
+                onQuickBook={handleQuickBook}
+                showDetailedPreview={true}
+              />
 
             <Categories
               categories={categories}
