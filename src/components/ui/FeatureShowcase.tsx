@@ -8,7 +8,6 @@ import {
   Zap,
   X,
   ChevronRight,
-  Brain,
   BarChart3,
   Camera,
   Star,
@@ -24,6 +23,13 @@ import {
   Shield,
   QrCode,
   Eye,
+  Activity,
+  Navigation,
+  Leaf,
+  Cpu,
+  Brain,
+  Plane,
+  Building
 } from 'lucide-react';
 
 interface FeatureShowcaseProps {
@@ -45,6 +51,15 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'booking' | 'pricing' | 'management' | 'ai' | 'security'>('all');
 
   const features: Feature[] = [
+    {
+      id: 'iot-telematics',
+      name: 'IoT Telematics Integration',
+      description: 'Monitor equipment in real-time, receive predictive maintenance alerts, and automate diagnostics',
+      icon: <Cpu className="w-6 h-6" />,
+      color: 'from-blue-600 to-green-500',
+      badge: '📡 IOT',
+      demo: true,
+    },
     {
       id: 'price-negotiator',
       name: 'AI Price Negotiator',
@@ -352,16 +367,171 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
       badge: '🏆 FUN',
       demo: true,
     },
+    // NEW Advanced Premium Features
+    {
+      id: 'ai-matching',
+      name: 'AI Equipment Matching',
+      description: '98% accuracy AI matching with smart recommendations and compatibility scoring',
+      icon: <Brain className="w-6 h-6" />,
+      color: 'from-blue-600 to-indigo-600',
+      badge: '🤖 AI',
+      demo: true,
+    },
+    {
+      id: 'smart-contracts',
+      name: 'Smart Contracts',
+      description: 'Blockchain-powered contracts with automated escrow and dispute resolution',
+      icon: <Shield className="w-6 h-6" />,
+      color: 'from-green-600 to-emerald-600',
+      badge: '🔐 BLOCKCHAIN',
+      demo: true,
+    },
+    {
+      id: 'ar-preview',
+      name: 'AR Equipment Preview',
+      description: 'Immersive AR/VR previews with 360° inspection and interactive controls',
+      icon: <Eye className="w-6 h-6" />,
+      color: 'from-purple-600 to-pink-600',
+      badge: '🕶️ AR/VR',
+      demo: true,
+    },
+    {
+      id: 'carbon-tracker',
+      name: 'Carbon Footprint Tracker',
+      description: 'Track environmental impact with carbon savings and sustainability metrics',
+      icon: <Cloud className="w-6 h-6" />,
+      color: 'from-green-500 to-teal-500',
+      badge: '🌱 ECO',
+      demo: true,
+    },
+    {
+      id: 'equipment-financing',
+      name: 'Equipment Financing',
+      description: 'Flexible financing options with competitive rates and quick approval',
+      icon: <CreditCard className="w-6 h-6" />,
+      color: 'from-blue-500 to-cyan-500',
+      badge: '💰 FINANCE',
+      demo: true,
+    },
+    {
+      id: 'iot-maintenance',
+      name: 'IoT Predictive Maintenance',
+      description: 'AI-powered equipment monitoring with predictive maintenance and real-time alerts',
+      icon: <Activity className="w-6 h-6" />,
+      color: 'from-orange-500 to-red-500',
+      badge: '⚡ IoT',
+      demo: true,
+    },
+    // NEWEST Advanced Features
+    {
+      id: 'ar-visualization',
+      name: 'AR Equipment Visualization',
+      description: 'See equipment in your actual work environment with augmented reality before renting',
+      icon: <Eye className="w-6 h-6" />,
+      color: 'from-cyan-500 to-blue-500',
+      badge: '🕶️ AR',
+      demo: true,
+    },
+    {
+      id: 'gps-tracking',
+      name: 'GPS Equipment Tracking',
+      description: 'Real-time GPS tracking with geofencing, speed monitoring, and theft prevention',
+      icon: <Navigation className="w-6 h-6" />,
+      color: 'from-green-500 to-emerald-500',
+      badge: '📍 GPS',
+      demo: true,
+    },
+    {
+      id: 'crypto-payments',
+      name: 'Cryptocurrency Payments',
+      description: 'Pay with Bitcoin, Ethereum, USDC, and other cryptocurrencies with instant confirmation',
+      icon: <CreditCard className="w-6 h-6" />,
+      color: 'from-orange-500 to-red-500',
+      badge: '₿ CRYPTO',
+      demo: true,
+    },
+    {
+      id: 'ai-insurance',
+      name: 'AI Dynamic Insurance',
+      description: 'Real-time risk assessment with personalized insurance quotes and instant coverage',
+      icon: <Shield className="w-6 h-6" />,
+      color: 'from-blue-500 to-indigo-500',
+      badge: '🤖 AI',
+      demo: true,
+    },
+    {
+      id: 'sustainability-dashboard',
+      name: 'Sustainability Dashboard',
+      description: 'Track your environmental impact with carbon savings, achievements, and eco-rewards',
+      icon: <Leaf className="w-6 h-6" />,
+      color: 'from-green-500 to-emerald-500',
+      badge: '🌱 ECO',
+      demo: true,
+    },
+    {
+      id: 'social-communities',
+      name: 'Social Communities',
+      description: 'Connect with fellow equipment users, share experiences, and join specialized groups',
+      icon: <Users className="w-6 h-6" />,
+      color: 'from-purple-500 to-pink-500',
+      badge: '👥 SOCIAL',
+      demo: true,
+    },
+    {
+      id: 'voice-ai-assistant',
+      name: 'Voice AI Assistant',
+      description: 'Speak naturally with Kayd, our intelligent voice assistant for equipment guidance and support',
+      icon: <Brain className="w-6 h-6" />,
+      color: 'from-blue-500 to-indigo-500',
+      badge: '🎤 VOICE',
+      demo: true,
+    },
+    {
+      id: 'blockchain-contracts',
+      name: 'Blockchain Contracts',
+      description: 'Secure, automated rental agreements with smart contracts and immutable blockchain records',
+      icon: <Shield className="w-6 h-6" />,
+      color: 'from-purple-600 to-blue-600',
+      badge: '⛓️ BLOCKCHAIN',
+      demo: true,
+    },
+    {
+      id: 'vr-training',
+      name: 'VR Training Simulator',
+      description: 'Immersive virtual reality training for equipment operation, safety, and maintenance procedures',
+      icon: <Eye className="w-6 h-6" />,
+      color: 'from-indigo-600 to-purple-600',
+      badge: '🥽 VR',
+      demo: true,
+    },
+    {
+      id: 'drone-delivery',
+      name: 'Drone Delivery System',
+      description: 'Autonomous drone fleet for rapid equipment delivery, real-time tracking, and weather-adaptive routing',
+      icon: <Plane className="w-6 h-6" />,
+      color: 'from-sky-600 to-blue-600',
+      badge: '🚁 DRONE',
+      demo: true,
+    },
+    {
+      id: 'industry-integrations',
+      name: 'Industry Software Connections',
+      description: 'Seamlessly integrate with BIM 360, Procore, and leading construction management platforms',
+      icon: <Building className="w-6 h-6" />,
+      color: 'from-blue-600 to-indigo-600',
+      badge: '🔗 INTEGRATIONS',
+      demo: true,
+    },
   ];
 
   const filteredFeatures = selectedCategory === 'all' 
     ? features 
     : features.filter(f => {
         if (selectedCategory === 'booking') return ['smart-scheduler', 'group-booking', 'quick-book', 'bulk-booking', 'bundle-deals'].includes(f.id);
-        if (selectedCategory === 'pricing') return ['price-negotiator', 'smart-pricing', 'multi-payment', 'price-alerts', 'market-insights'].includes(f.id);
-        if (selectedCategory === 'management') return ['maintenance-predictor', 'referral-program', 'analytics', 'saved-searches', 'comparison', 'warranty-tracker', 'achievements'].includes(f.id);
-        if (selectedCategory === 'ai') return ['ai-search', 'price-negotiator', 'maintenance-predictor', 'analytics', 'recommendations', 'live-chat', 'advanced-filters', 'smart-recommendations', 'smart-alerts', '3d-viewer'].includes(f.id);
-        if (selectedCategory === 'security') return ['trust-score', 'biometric-auth', 'social-proof', 'qr-code-scanner'].includes(f.id);
+        if (selectedCategory === 'pricing') return ['price-negotiator', 'smart-pricing', 'multi-payment', 'price-alerts', 'market-insights', 'equipment-financing', 'crypto-payments', 'ai-insurance'].includes(f.id);
+        if (selectedCategory === 'management') return ['maintenance-predictor', 'referral-program', 'analytics', 'saved-searches', 'comparison', 'warranty-tracker', 'achievements', 'iot-telematics', 'carbon-tracker', 'sustainability-dashboard', 'social-communities', 'drone-delivery', 'industry-integrations'].includes(f.id);
+        if (selectedCategory === 'ai') return ['ai-search', 'price-negotiator', 'maintenance-predictor', 'analytics', 'recommendations', 'live-chat', 'advanced-filters', 'smart-recommendations', 'smart-alerts', '3d-viewer', 'ai-matching', 'voice-ai-assistant', 'vr-training'].includes(f.id);
+        if (selectedCategory === 'security') return ['trust-score', 'biometric-auth', 'social-proof', 'qr-code-scanner', 'smart-contracts', 'blockchain-contracts'].includes(f.id);
         return true;
       });
 
