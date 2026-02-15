@@ -17,6 +17,7 @@ import {
   Info,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
+import ShareEquipment from './ShareEquipment';
 
 interface EquipmentDetailProps {
   equipment: Equipment;
@@ -38,6 +39,7 @@ export default function EquipmentDetail({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -91,7 +93,10 @@ export default function EquipmentDetail({
             >
               <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500' : ''}`} />
             </button>
-            <button className="p-2.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="p-2.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+            >
               <Share2 className="w-5 h-5" />
             </button>
             <button
@@ -386,6 +391,15 @@ export default function EquipmentDetail({
           </div>
         </div>
       </div>
+
+      {/* Share Equipment Modal */}
+      <ShareEquipment
+        equipmentId={equipment.id}
+        equipmentTitle={equipment.title}
+        equipmentImage={equipment.images[0]}
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+      />
     </div>
   );
 }
