@@ -3,6 +3,11 @@ import { Bell, BellOff, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
 
+// Extend ServiceWorkerRegistration to include pushManager
+interface ServiceWorkerRegistrationWithPush extends ServiceWorkerRegistration {
+  pushManager: PushManager;
+}
+
 interface PushNotificationsProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,10 +31,10 @@ export default function PushNotifications({ isOpen, onClose }: PushNotifications
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       try {
         const registration = await navigator.serviceWorker.ready;
-        const subscription = await registration.pushManager.getSubscription();
+        const subscription = await (registration as ServiceWorkerRegistrationWithPush).pushManager.getSubscription();
         setIsSubscribed(!!subscription);
-      } catch (error) {
-        console.error('Error checking subscription status:', error);
+      } catch (subscribeError) {
+        console.error('Error checking subscription status:', subscribeError);
       }
     }
   };
@@ -69,7 +74,7 @@ export default function PushNotifications({ isOpen, onClose }: PushNotifications
       // You'll need to replace this with your actual VAPID public key
       const vapidPublicKey = 'YOUR_VAPID_PUBLIC_KEY_HERE';
 
-      const subscription = await registration.pushManager.subscribe({
+      const subscription = await (registration as ServiceWorkerRegistrationWithPush).pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
       });
@@ -108,7 +113,7 @@ export default function PushNotifications({ isOpen, onClose }: PushNotifications
     setIsLoading(true);
     try {
       const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
+      const subscription = await (registration as ServiceWorkerRegistrationWithPush).pushManager.getSubscription();
 
       if (subscription) {
         await subscription.unsubscribe();
