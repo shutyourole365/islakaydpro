@@ -62,6 +62,25 @@ const MaintenancePredictor = lazy(() => import('./components/predictive/Maintena
 const ReferralProgram = lazy(() => import('./components/referral/ReferralProgram'));
 const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler'));
 
+// NEW Premium Features - AI Matching, Smart Contracts, AR Preview
+const AIMatching = lazy(() => import('./components/features/AIMatching'));
+const SmartContracts = lazy(() => import('./components/features/SmartContracts'));
+const ARPreview = lazy(() => import('./components/features/ARPreview'));
+const CarbonTracker = lazy(() => import('./components/features/CarbonTracker'));
+const EquipmentFinancing = lazy(() => import('./components/features/EquipmentFinancing'));
+const IoTTelematics = lazy(() => import('./components/features/IoTTelematics'));
+const AREquipmentVisualization = lazy(() => import('./components/features/AREquipmentVisualization'));
+const GPSTracking = lazy(() => import('./components/features/GPSTracking'));
+const CryptoPayments = lazy(() => import('./components/features/CryptoPayments'));
+const AIInsurance = lazy(() => import('./components/features/AIInsurance'));
+const SustainabilityDashboard = lazy(() => import('./components/features/SustainabilityDashboard'));
+const SocialCommunities = lazy(() => import('./components/features/SocialCommunities'));
+const VoiceAIAssistant = lazy(() => import('./components/features/VoiceAIAssistant'));
+const BlockchainContracts = lazy(() => import('./components/features/BlockchainContracts'));
+const VRTraining = lazy(() => import('./components/features/VRTraining'));
+const DroneDelivery = lazy(() => import('./components/features/DroneDelivery'));
+const IndustryIntegrations = lazy(() => import('./components/features/IndustryIntegrations'));
+
 // NEW Premium Features - Live Chat & Advanced Search
 const LiveChat = lazy(() => import('./components/chat/LiveChat'));
 const AdvancedFilters = lazy(() => import('./components/search/AdvancedFilters'));
@@ -552,7 +571,7 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations';
 
 function AppContent() {
   const { isAuthenticated, user, profile, signOut } = useAuth();
@@ -1029,6 +1048,58 @@ function AppContent() {
         setViewerEquipment(demoEquipment);
         setIs3DViewerOpen(true);
         break;
+      // NEW Advanced Premium Features
+      case 'ai-matching':
+        setCurrentPage('ai-matching');
+        break;
+      case 'smart-contracts':
+        setCurrentPage('smart-contracts');
+        break;
+      case 'ar-preview':
+        setCurrentPage('ar-preview');
+        break;
+      case 'carbon-tracker':
+        setCurrentPage('carbon-tracker');
+        break;
+      case 'equipment-financing':
+        setCurrentPage('equipment-financing');
+        break;
+      case 'iot-telematics':
+        setCurrentPage('iot-telematics');
+        break;
+      case 'ar-visualization':
+        setCurrentPage('ar-visualization');
+        break;
+      case 'gps-tracking':
+        setCurrentPage('gps-tracking');
+        break;
+      case 'crypto-payments':
+        setCurrentPage('crypto-payments');
+        break;
+      case 'ai-insurance':
+        setCurrentPage('ai-insurance');
+        break;
+      case 'sustainability-dashboard':
+        setCurrentPage('sustainability-dashboard');
+        break;
+      case 'social-communities':
+        setCurrentPage('social-communities');
+        break;
+      case 'voice-ai-assistant':
+        setCurrentPage('voice-ai-assistant');
+        break;
+      case 'blockchain-contracts':
+        setCurrentPage('blockchain-contracts');
+        break;
+      case 'vr-training':
+        setCurrentPage('vr-training');
+        break;
+      case 'drone-delivery':
+        setCurrentPage('drone-delivery');
+        break;
+      case 'industry-integrations':
+        setCurrentPage('industry-integrations');
+        break;
       default:
         alert(`${featureId} feature coming soon!`);
     }
@@ -1241,6 +1312,108 @@ function AppContent() {
             </div>
           </div>
           <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'ai-matching' && (
+        <Suspense fallback={<PageLoader />}>
+          <AIMatching onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'smart-contracts' && (
+        <Suspense fallback={<PageLoader />}>
+          <SmartContracts onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'ar-preview' && (
+        <Suspense fallback={<PageLoader />}>
+          <ARPreview onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'carbon-tracker' && (
+        <Suspense fallback={<PageLoader />}>
+          <CarbonTracker onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'equipment-financing' && (
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentFinancing onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'iot-telematics' && (
+        <Suspense fallback={<PageLoader />}>
+          <IoTTelematics onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'ar-visualization' && (
+        <Suspense fallback={<PageLoader />}>
+          <AREquipmentVisualization onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'gps-tracking' && (
+        <Suspense fallback={<PageLoader />}>
+          <GPSTracking onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'crypto-payments' && (
+        <Suspense fallback={<PageLoader />}>
+          <CryptoPayments onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'ai-insurance' && (
+        <Suspense fallback={<PageLoader />}>
+          <AIInsurance onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'sustainability-dashboard' && (
+        <Suspense fallback={<PageLoader />}>
+          <SustainabilityDashboard onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'social-communities' && (
+        <Suspense fallback={<PageLoader />}>
+          <SocialCommunities onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'voice-ai-assistant' && (
+        <Suspense fallback={<PageLoader />}>
+          <VoiceAIAssistant onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'blockchain-contracts' && (
+        <Suspense fallback={<PageLoader />}>
+          <BlockchainContracts onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'vr-training' && (
+        <Suspense fallback={<PageLoader />}>
+          <VRTraining onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'drone-delivery' && (
+        <Suspense fallback={<PageLoader />}>
+          <DroneDelivery onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'industry-integrations' && (
+        <Suspense fallback={<PageLoader />}>
+          <IndustryIntegrations onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
