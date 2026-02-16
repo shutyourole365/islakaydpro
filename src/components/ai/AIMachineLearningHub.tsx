@@ -44,8 +44,8 @@ export default function AIMachineLearningHub() {
         getBookings({ ownerId: user.id })
       ]);
 
-      const equipment = Array.isArray(equipmentData) ? equipmentData : (equipmentData as any).data || [];
-      const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || [];
+      const equipment = Array.isArray(equipmentData) ? equipmentData : ((equipmentData as { data?: Equipment[] })?.data ?? []);
+      const bookings = Array.isArray(bookingsData) ? bookingsData : ((bookingsData as { data?: Booking[] })?.data ?? []);
 
       // Simulate AI predictions (in real app, this would call ML service)
       const aiPredictions = equipment.map((eq: Equipment) => {
@@ -139,7 +139,7 @@ export default function AIMachineLearningHub() {
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as any)}
+            onClick={() => setActiveTab(id as 'predictions' | 'insights' | 'training')}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm ${
               activeTab === id
                 ? 'border-teal-500 text-teal-600'

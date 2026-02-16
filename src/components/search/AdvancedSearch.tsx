@@ -176,7 +176,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
   };
 
   const filteredEquipment = useMemo(() => {
-    let results = equipment.filter(eq => {
+    const results = equipment.filter(eq => {
       // Text search
       if (deferredQuery) {
         const searchTerm = deferredQuery.toLowerCase();

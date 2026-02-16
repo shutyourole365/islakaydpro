@@ -461,7 +461,7 @@ export default function EquipmentDetail({
           category={equipment.category_id ?? ''}
           hoursUsed={500} // Mock data
           lastMaintenanceDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)} // 2 weeks ago
-          onScheduleMaintenance={(_date, _type) => {
+          onScheduleMaintenance={() => {
             // Handle scheduling
             setShowMaintenance(false);
           }}

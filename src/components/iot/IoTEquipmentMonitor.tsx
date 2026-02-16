@@ -52,14 +52,14 @@ export default function IoTEquipmentMonitor() {
 
     try {
       const equipmentData = await getEquipment({ ownerId: user.id });
-      const equipment = Array.isArray(equipmentData) ? equipmentData : equipmentData.data || [];
+      const equipment = Array.isArray(equipmentData) ? equipmentData : ((equipmentData as { data?: import('../../types').Equipment[] })?.data ?? []);
 
       // Simulate IoT devices (in real app, this would come from IoT service)
       const mockDevices: IoTDevice[] = equipment.slice(0, 8).map((eq: Equipment, index: number) => ({
         id: `iot-${eq.id}`,
         equipmentId: eq.id,
-        deviceType: ['gps', 'sensor', 'lock', 'camera'][index % 4] as any,
-        status: Math.random() > 0.1 ? 'online' : ['offline', 'maintenance', 'error'][Math.floor(Math.random() * 3)] as any,
+        deviceType: (['gps', 'sensor', 'lock', 'camera'] as const)[index % 4],
+        status: Math.random() > 0.1 ? 'online' : (['offline', 'maintenance', 'error'] as const)[Math.floor(Math.random() * 3)],
         batteryLevel: Math.floor(Math.random() * 100),
         lastSeen: new Date(Date.now() - Math.random() * 3600000), // Within last hour
         location: Math.random() > 0.2 ? {
@@ -232,7 +232,7 @@ export default function IoTEquipmentMonitor() {
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as any)}
+            onClick={() => setActiveTab(id as 'overview' | 'devices' | 'alerts')}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm ${
               activeTab === id
                 ? 'border-teal-500 text-teal-600'

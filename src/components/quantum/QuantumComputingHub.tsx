@@ -10,14 +10,14 @@ interface QuantumOptimization {
   status: 'running' | 'completed' | 'failed';
   startTime: Date;
   endTime?: Date;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   results: QuantumResult;
   qubits: number;
   executionTime: number;
 }
 
 interface QuantumResult {
-  optimalSolution: any;
+  optimalSolution: Record<string, unknown> | null;
   confidence: number;
   improvement: number;
   constraints: string[];
@@ -33,7 +33,7 @@ interface QuantumSimulation {
   name: string;
   description: string;
   type: 'market' | 'demand' | 'supply' | 'pricing' | 'competition';
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   results: SimulationResult[];
   status: 'idle' | 'running' | 'completed';
   progress: number;
@@ -81,8 +81,8 @@ export default function QuantumComputingHub() {
         getBookings({ renterId: user.id })
       ]);
 
-      setEquipment(Array.isArray(equipmentData) ? equipmentData : (equipmentData as any).data || []);
-      setBookings(Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || []);
+setEquipment(Array.isArray(equipmentData) ? equipmentData : ((equipmentData as { data?: import('../../types').Equipment[] })?.data ?? []));
+      setBookings(Array.isArray(bookingsData) ? bookingsData : ((bookingsData as { data?: import('../../types').Booking[] })?.data ?? []));
 
       // Initialize mock quantum optimizations
       const mockOptimizations: QuantumOptimization[] = [
@@ -413,7 +413,7 @@ export default function QuantumComputingHub() {
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as any)}
+            onClick={() => setActiveTab(id as 'optimizations' | 'simulations' | 'analytics')}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm ${
               activeTab === id
                 ? 'border-purple-500 text-purple-600'
@@ -585,7 +585,7 @@ export default function QuantumComputingHub() {
                     {Object.entries(activeSimulation.parameters).map(([key, value]) => (
                       <div key={key} className="flex justify-between">
                         <span className="text-sm text-gray-600 capitalize">{key.replace('_', ' ')}</span>
-                        <span className="text-sm font-medium">{value}</span>
+                        <span className="text-sm font-medium">{String(value)}</span>
                       </div>
                     ))}
                   </div>

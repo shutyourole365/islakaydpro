@@ -69,15 +69,15 @@ export default function BlockchainIntegration() {
 
     try {
       const bookingsData = await getBookings({ ownerId: user.id });
-      const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || [];
+      const bookings = Array.isArray(bookingsData) ? bookingsData : ((bookingsData as { data?: Booking[] })?.data ?? []);
 
       // Simulate smart contracts (in real app, this would come from blockchain)
       const mockContracts: SmartContract[] = bookings.slice(0, 5).map((booking: Booking, index: number) => ({
         id: `contract-${booking.id}`,
         bookingId: booking.id,
-        status: ['pending', 'active', 'completed'][index % 3] as any,
+        status: (['pending', 'active', 'completed'] as const)[index % 3],
         contractAddress: `0x${Math.random().toString(16).substr(2, 40)}`,
-        network: ['ethereum', 'polygon', 'bnb'][index % 3] as any,
+        network: (['ethereum', 'polygon', 'bnb'] as const)[index % 3],
         value: booking.total_amount,
         deposit: booking.deposit_amount,
         startDate: new Date(booking.start_date),
@@ -246,7 +246,7 @@ export default function BlockchainIntegration() {
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as any)}
+            onClick={() => setActiveTab(id as 'contracts' | 'certificates' | 'transactions')}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm ${
               activeTab === id
                 ? 'border-teal-500 text-teal-600'

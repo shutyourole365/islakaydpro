@@ -859,7 +859,7 @@ export default function BookingSystem({
           equipmentId={equipment.id}
           equipmentTitle={equipment.title}
           dailyRate={equipment.daily_rate}
-          onSelectDates={(startDate: Date, endDate: Date, _discount?: number) => {
+          onSelectDates={(startDate: Date, endDate: Date) => {
             setSelectedStart(startDate);
             setSelectedEnd(endDate);
             setShowSmartScheduler(false);

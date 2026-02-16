@@ -18,7 +18,7 @@ interface ARVRInteraction {
   id: string;
   type: 'view' | 'rotate' | 'zoom' | 'inspect' | 'measure';
   timestamp: Date;
-  data: any;
+  data?: Record<string, unknown>;
 }
 
 interface VirtualTour {
@@ -143,12 +143,11 @@ export default function ARVRExperience() {
   const checkARVRSupport = () => {
     // Check for WebXR support
     if ('xr' in navigator) {
-      (navigator as any).xr.isSessionSupported('immersive-ar').then((supported: boolean) => {
-        setArSupported(supported);
-      });
-      (navigator as any).xr.isSessionSupported('immersive-vr').then((supported: boolean) => {
-        setVrSupported(supported);
-      });
+      const xr = (navigator as unknown as { xr?: { isSessionSupported: (mode: string) => Promise<boolean> } }).xr;
+      if (xr) {
+        xr.isSessionSupported('immersive-ar').then((supported: boolean) => setArSupported(supported));
+        xr.isSessionSupported('immersive-vr').then((supported: boolean) => setVrSupported(supported));
+      }
     }
   };
 
@@ -159,7 +158,9 @@ export default function ARVRExperience() {
     }
 
     try {
-      await (navigator as any).xr.requestSession('immersive-ar');
+      const xr = (navigator as unknown as { xr?: { requestSession?: (mode: string) => Promise<void> } }).xr;
+      if (!xr || !xr.requestSession) throw new Error('WebXR not available');
+      await xr.requestSession('immersive-ar');
       setSelectedEquipment(equipment);
       setActiveSession({
         id: `ar-${Date.now()}`,
@@ -182,7 +183,9 @@ export default function ARVRExperience() {
     }
 
     try {
-      await (navigator as any).xr.requestSession('immersive-vr');
+      const xr = (navigator as unknown as { xr?: { requestSession?: (mode: string) => Promise<void> } }).xr;
+      if (!xr || !xr.requestSession) throw new Error('WebXR not available');
+      await xr.requestSession('immersive-vr');
       setSelectedEquipment(equipment);
       setActiveSession({
         id: `vr-${Date.now()}`,
@@ -292,7 +295,7 @@ export default function ARVRExperience() {
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as any)}
+            onClick={() => setActiveTab(id as 'preview' | 'tours' | 'sessions')}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm ${
               activeTab === id
                 ? 'border-teal-500 text-teal-600'

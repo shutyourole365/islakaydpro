@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Monitor, Maximize, Minimize, RotateCcw, Settings, Volume2, VolumeX, Zap, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+
+declare global {
+  interface Window { webkitAudioContext?: typeof AudioContext; }
+}
 import { getEquipment, getBookings } from '../../services/database';
 import type { Equipment, Booking } from '../../types';
 
@@ -9,7 +13,7 @@ interface HologramProjection {
   type: 'equipment' | 'analytics' | 'simulation' | 'communication';
   title: string;
   description: string;
-  data: any;
+  data?: import('../../types').Equipment | Record<string, unknown>;
   position: { x: number; y: number; z: number };
   rotation: { x: number; y: number; z: number };
   scale: number;
@@ -67,8 +71,8 @@ export default function HolographicInterface() {
         getBookings({ renterId: user.id })
       ]);
 
-      setEquipment(Array.isArray(equipmentData) ? equipmentData : (equipmentData as any).data || []);
-      setBookings(Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || []);
+      setEquipment(Array.isArray(equipmentData) ? equipmentData : ((equipmentData as { data?: import('../../types').Equipment[] })?.data ?? []));
+      setBookings(Array.isArray(bookingsData) ? bookingsData : ((bookingsData as { data?: import('../../types').Booking[] })?.data ?? []));
 
       // Initialize holographic interfaces
       const mockInterfaces: HolographicInterface[] = [
@@ -182,8 +186,9 @@ export default function HolographicInterface() {
     // Initialize Web Audio API for spatial audio
     if (audioEnabled && !audioContextRef.current) {
       try {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      } catch (error) {
+        // webkitAudioContext is available on some older Safari versions
+        audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      } catch {
         console.warn('Web Audio API not supported');
       }
     }
@@ -341,7 +346,7 @@ export default function HolographicInterface() {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.font = '12px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(projection.data.value || projection.data.count || 'N/A', 0, 5);
+    ctx.fillText(String((projection.data as any)?.value ?? (projection.data as any)?.count ?? 'N/A'), 0, 5);
   };
 
   const renderCommunicationHologram = (ctx: CanvasRenderingContext2D, projection: HologramProjection) => {
@@ -356,7 +361,7 @@ export default function HolographicInterface() {
     ctx.stroke();
 
     // Participant indicators
-    const participants = projection.data.participants || 1;
+    const participants = typeof (projection.data as any)?.participants === 'number' ? (projection.data as any).participants : 1;
     for (let i = 0; i < participants; i++) {
       const angle = (i / participants) * Math.PI * 2;
       const x = Math.cos(angle) * (size/3);
@@ -480,7 +485,7 @@ export default function HolographicInterface() {
             <label className="text-sm font-medium">Mode:</label>
             <select
               value={projectionMode}
-              onChange={(e) => setProjectionMode(e.target.value as any)}
+              onChange={(e) => setProjectionMode(e.target.value as '3d' | '2d' | 'mixed')}
               className="px-3 py-1 border rounded"
             >
               <option value="3d">3D</option>
@@ -494,7 +499,7 @@ export default function HolographicInterface() {
             <label className="text-sm font-medium">Quality:</label>
             <select
               value={renderQuality}
-              onChange={(e) => setRenderQuality(e.target.value as any)}
+              onChange={(e) => setRenderQuality(e.target.value as 'low' | 'medium' | 'high' | 'ultra')}
               className="px-3 py-1 border rounded"
             >
               <option value="low">Low</option>

@@ -36,7 +36,7 @@ export const isUserId = (value: string): value is UserId => typeof value === 'st
 export const isEquipmentId = (value: string): value is EquipmentId => typeof value === 'string' && value.length > 0;
 export const isBookingId = (value: string): value is BookingId => typeof value === 'string' && value.length > 0;
 export const isEmail = (value: string): value is Email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-export const isPhone = (value: string): value is Phone => /^\+?[\d\s\-\(\)]+$/.test(value);
+export const isPhone = (value: string): value is Phone => /^\+?[\d\s\-()]+$/.test(value);
 
 export interface Category {
   id: string;
