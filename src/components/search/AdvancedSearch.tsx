@@ -1,16 +1,9 @@
 import { useState, useEffect, useMemo, useDeferredValue } from 'react';
 import {
   Search,
-  Filter,
   MapPin,
-  Calendar,
   DollarSign,
   Star,
-  TrendingUp,
-  Clock,
-  Users,
-  Zap,
-  Target,
   Sparkles,
   SlidersHorizontal,
 } from 'lucide-react';
@@ -49,7 +42,6 @@ interface AISuggestion {
 export default function AdvancedSearch({ onEquipmentSelect, className = '' }: AdvancedSearchProps) {
   const { user } = useAuth();
   const [equipment, setEquipment] = useState<Equipment[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<AISuggestion[]>([]);
@@ -76,7 +68,6 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
         ]);
 
         setEquipment(equipmentData.data);
-        setBookings(bookingsData);
 
         // Generate AI suggestions
         generateAISuggestions(equipmentData.data, bookingsData);
@@ -166,7 +157,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
       const personalizedEquipment = equipmentList
         .filter(eq =>
           userCategories.some(cat =>
-            eq.category?.name?.toLowerCase().includes(cat.toLowerCase())
+            !!cat && eq.category?.name?.toLowerCase().includes(cat.toLowerCase())
           )
         )
         .slice(0, 3);
@@ -190,10 +181,10 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
       if (deferredQuery) {
         const searchTerm = deferredQuery.toLowerCase();
         const matchesQuery =
-          eq.name.toLowerCase().includes(searchTerm) ||
-          eq.description.toLowerCase().includes(searchTerm) ||
-          eq.category?.name.toLowerCase().includes(searchTerm) ||
-          eq.location?.toLowerCase().includes(searchTerm) ||
+          eq.title.toLowerCase().includes(searchTerm) ||
+          (eq.description || '').toLowerCase().includes(searchTerm) ||
+          (eq.category?.name || '').toLowerCase().includes(searchTerm) ||
+          (eq.location || '').toLowerCase().includes(searchTerm) ||
           eq.features.some(feature => feature.toLowerCase().includes(searchTerm));
 
         if (!matchesQuery) return false;
@@ -526,7 +517,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
             <div className="relative mb-4">
               <img
                 src={eq.images[0] || '/placeholder-equipment.jpg'}
-                alt={eq.name}
+                alt={eq.title}
                 className="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform"
               />
               <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
@@ -540,7 +531,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
             <div className="space-y-3">
               <div>
                 <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                  {eq.name}
+                  {eq.title}
                 </h3>
                 <p className="text-sm text-gray-600">{eq.category?.name}</p>
               </div>

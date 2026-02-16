@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
-import type { Category, Equipment } from './types';
+import type { Category, Equipment, SearchFilters, EquipmentId, UserId } from './types';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Hero from './components/home/Hero';
@@ -12,7 +12,6 @@ import HowItWorks from './components/home/HowItWorks';
 import Testimonials from './components/home/Testimonials';
 import CTASection from './components/home/CTASection';
 import AboutPage from './components/home/AboutPage';
-import HelpCenter from './components/help/HelpCenter';
 import SearchModal from './components/search/SearchModal';
 import EquipmentDetail from './components/equipment/EquipmentDetail';
 import AuthModal from './components/auth/AuthModal';
@@ -25,11 +24,11 @@ import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
+import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
 import { useCookieConsent } from './hooks/useCookieConsent';
-import { ErrorBoundary } from './components/ui/ErrorBoundary';
-import { addFavorite, removeFavorite } from './services/database';
+import { addFavorite, removeFavorite, getEquipment } from './services/database';
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -159,8 +158,8 @@ const PageLoader = () => (
 
 const sampleEquipment: Equipment[] = [
   {
-    id: '1',
-    owner_id: 'owner1',
+    id: '1' as EquipmentId,
+    owner_id: 'owner1' as UserId,
     category_id: 'cat1',
     title: 'CAT 320 Excavator - 20 Ton',
     description: 'Professional-grade excavator perfect for construction, demolition, and earthmoving projects. Well-maintained with low hours. Includes operator manual and safety equipment.',
@@ -211,8 +210,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '2',
-    owner_id: 'owner2',
+    id: '2' as EquipmentId,
+    owner_id: 'owner2' as UserId,
     category_id: 'cat2',
     title: 'Sony A7IV Full Frame Camera Kit',
     description: 'Complete professional photography kit including Sony A7IV body, 24-70mm f/2.8 GM lens, 70-200mm f/2.8 GM lens, flash, and accessories. Perfect for weddings, events, and commercial shoots.',
@@ -263,8 +262,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '3',
-    owner_id: 'owner3',
+    id: '3' as EquipmentId,
+    owner_id: 'owner3' as UserId,
     category_id: 'cat3',
     title: 'DeWalt 20V MAX Power Tool Combo Kit',
     description: '15-piece professional power tool set including drill, impact driver, circular saw, reciprocating saw, oscillating tool, and more. Includes 4 batteries and fast charger.',
@@ -315,8 +314,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '4',
-    owner_id: 'owner4',
+    id: '4' as EquipmentId,
+    owner_id: 'owner4' as UserId,
     category_id: 'cat4',
     title: 'Premium DJ Equipment Package',
     description: 'Complete DJ setup including Pioneer DDJ-1000 controller, QSC K12.2 speakers, subwoofer, lighting package, and all necessary cables. Perfect for weddings, parties, and events.',
@@ -367,8 +366,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '5',
-    owner_id: 'owner5',
+    id: '5' as EquipmentId,
+    owner_id: 'owner5' as UserId,
     category_id: 'cat5',
     title: 'John Deere 1025R Compact Tractor',
     description: 'Versatile compact utility tractor with front loader, perfect for landscaping, property maintenance, and light construction. Easy to operate with hydrostatic transmission.',
@@ -419,8 +418,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '6',
-    owner_id: 'owner6',
+    id: '6' as EquipmentId,
+    owner_id: 'owner6' as UserId,
     category_id: 'cat6',
     title: '20x40 Premium Wedding Tent Package',
     description: 'Elegant frame tent package perfect for outdoor weddings and events. Includes tent, lighting, sidewalls, flooring, and professional setup. Accommodates up to 80 guests seated.',
@@ -471,8 +470,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '7',
-    owner_id: 'owner7',
+    id: '7' as EquipmentId,
+    owner_id: 'owner7' as UserId,
     category_id: 'cat7',
     title: 'DJI Mavic 3 Pro Drone Kit',
     description: 'Professional drone package with Hasselblad camera, 4/3 CMOS sensor, 46-min flight time. Includes extra batteries, ND filters, and hard case. FAA Part 107 compliant.',
@@ -523,8 +522,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '8',
-    owner_id: 'owner8',
+    id: '8' as EquipmentId,
+    owner_id: 'owner8' as UserId,
     category_id: 'cat8',
     title: 'Commercial Pressure Washer - 4000 PSI',
     description: 'Heavy-duty gas-powered pressure washer perfect for commercial cleaning, driveways, decks, and industrial applications. Includes surface cleaner attachment and multiple tips.',
@@ -1205,7 +1204,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
 
       {currentPage === 'help' && (
         <>
-          <HelpCenter />
+          <HelpCenter onBack={() => setCurrentPage('home')} />
         </>
       )}
 

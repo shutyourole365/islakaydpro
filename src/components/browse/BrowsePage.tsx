@@ -1,4 +1,4 @@
-import { useState, useEffect, useDeferredValue, useMemo } from 'react';
+import { useState, useDeferredValue, useMemo } from 'react';
 import {
   Search,
   MapPin,

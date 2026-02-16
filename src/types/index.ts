@@ -105,6 +105,29 @@ export interface Booking {
   owner?: Profile;
 }
 
+export interface InspectionReport {
+  id: string;
+  equipment_id: string;
+  inspector_id: string;
+  inspection_date: string;
+  status: 'pending' | 'pass' | 'fail';
+  categories: Array<{
+    id: string;
+    title: string;
+    status: 'pending' | 'pass' | 'fail';
+    items: Array<{
+      id: string;
+      title: string;
+      status: 'pending' | 'pass' | 'fail' | 'na';
+      notes?: string | null;
+      photos?: string[];
+    }>;
+  }>;
+  notes: string | null;
+  next_inspection_date: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
 export interface Review {
   id: string;
   booking_id: string | null;

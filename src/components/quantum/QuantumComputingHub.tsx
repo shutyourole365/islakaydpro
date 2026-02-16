@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Cpu, Zap, TrendingUp, BarChart3, Play, Pause, RotateCcw, Settings, Download } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Cpu, Zap, TrendingUp, BarChart3, Play, Download } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getEquipment, getBookings } from '../../services/database';
 import type { Equipment, Booking } from '../../types';
@@ -64,7 +64,6 @@ export default function QuantumComputingHub() {
   });
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
 
   useEffect(() => {
     if (user) {
@@ -82,8 +81,8 @@ export default function QuantumComputingHub() {
         getBookings({ renterId: user.id })
       ]);
 
-      setEquipment(Array.isArray(equipmentData) ? equipmentData : equipmentData.data || []);
-      setBookings(Array.isArray(bookingsData) ? bookingsData : bookingsData.data || []);
+      setEquipment(Array.isArray(equipmentData) ? equipmentData : (equipmentData as any).data || []);
+      setBookings(Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || []);
 
       // Initialize mock quantum optimizations
       const mockOptimizations: QuantumOptimization[] = [

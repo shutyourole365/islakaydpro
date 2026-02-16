@@ -344,7 +344,7 @@ export default function EquipmentInspection({
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Equipment Inspection</h2>
-            <p className="text-gray-600">{equipment.name} - Pre-rental Safety Check</p>
+            <p className="text-gray-600">{equipment.title} - Pre-rental Safety Check</p>
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold text-blue-600">{progress}%</div>

@@ -24,6 +24,15 @@ afterEach(() => {
   cleanup();
 });
 
+// Capture unexpected errors during test environment setup so we get stack traces
+process.on('uncaughtException', (err: any) => {
+  // eslint-disable-next-line no-console
+  console.error('UNCAUGHT_EXCEPTION_IN_TEST_SETUP:', err && err.stack ? err.stack : err);
+});
+process.on('unhandledRejection', (reason) => {
+  // eslint-disable-next-line no-console
+  console.error('UNHANDLED_REJECTION_IN_TEST_SETUP:', reason);
+});
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

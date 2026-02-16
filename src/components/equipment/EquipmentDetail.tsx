@@ -443,11 +443,12 @@ export default function EquipmentDetail({
           ownerId={equipment.owner_id}
           ownerName={equipment.owner?.full_name || 'Owner'}
           rentalDays={pricing.days}
-          onAccepted={(finalPrice) => {
+          onAccepted={() => {
             // Handle accepted negotiation
             setShowNegotiator(false);
             // Could update the booking with negotiated price
           }}
+
           onRejected={() => setShowNegotiator(false)}
           onClose={() => setShowNegotiator(false)}
         />
@@ -457,10 +458,10 @@ export default function EquipmentDetail({
         <MaintenancePredictor
           equipmentId={equipment.id}
           equipmentTitle={equipment.title}
-          category={equipment.category_id}
+          category={equipment.category_id ?? ''}
           hoursUsed={500} // Mock data
           lastMaintenanceDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)} // 2 weeks ago
-          onScheduleMaintenance={(date, type) => {
+          onScheduleMaintenance={(_date, _type) => {
             // Handle scheduling
             setShowMaintenance(false);
           }}

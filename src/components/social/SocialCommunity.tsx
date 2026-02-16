@@ -11,7 +11,7 @@ import {
   MessageSquare,
   Send,
 } from 'lucide-react';
-import type { Equipment, CommunityPost } from '../../types';
+import type { Equipment } from '../../types';
 
 interface SocialCommunityProps {
   equipment?: Equipment;
@@ -29,7 +29,13 @@ interface CommunityMember {
   badges: string[];
 }
 
-interface Post extends CommunityPost {
+interface Post {
+  id: string;
+  content: string;
+  equipment_id: string | null;
+  images?: string[];
+  type: 'equipment_share' | 'question' | 'tip' | 'general' | string;
+  created_at: string;
   author: CommunityMember;
   likes: number;
   comments: number;
@@ -89,7 +95,7 @@ export default function SocialCommunity({ equipment, className = '' }: SocialCom
             id: '1',
             author: mockMembers[0],
             content: 'Just added a brand new excavator to my fleet! Perfect condition, ready for heavy-duty projects. DM me for bookings! 🏗️',
-            equipment_id: equipment?.id,
+            equipment_id: equipment?.id ?? null,
             images: ['/excavator.jpg'],
             type: 'equipment_share',
             created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
@@ -285,7 +291,7 @@ export default function SocialCommunity({ equipment, className = '' }: SocialCom
                       className="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">General Post</option>
-                      {equipment && <option value={equipment.id}>{equipment.name}</option>}
+                      {equipment && <option value={equipment.id}>{equipment.title}</option>}
                     </select>
                   </div>
                   <button

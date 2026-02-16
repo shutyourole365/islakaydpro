@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Monitor, Maximize, Minimize, RotateCcw, Settings, Volume2, VolumeX, Zap, Eye, EyeOff } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Monitor, Maximize, Minimize, RotateCcw, Settings, Volume2, VolumeX, Zap, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getEquipment, getBookings } from '../../services/database';
 import type { Equipment, Booking } from '../../types';
@@ -28,11 +28,6 @@ interface HolographicInterface {
   gestureControls: boolean;
 }
 
-interface GestureControl {
-  type: 'pinch' | 'swipe' | 'rotate' | 'tap';
-  action: string;
-  sensitivity: number;
-}
 
 export default function HolographicInterface() {
   const { user } = useAuth();
@@ -72,8 +67,8 @@ export default function HolographicInterface() {
         getBookings({ renterId: user.id })
       ]);
 
-      setEquipment(Array.isArray(equipmentData) ? equipmentData : equipmentData.data || []);
-      setBookings(Array.isArray(bookingsData) ? bookingsData : bookingsData.data || []);
+      setEquipment(Array.isArray(equipmentData) ? equipmentData : (equipmentData as any).data || []);
+      setBookings(Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || []);
 
       // Initialize holographic interfaces
       const mockInterfaces: HolographicInterface[] = [
@@ -140,7 +135,7 @@ export default function HolographicInterface() {
               type: 'analytics',
               title: 'Equipment Status',
               description: 'Equipment availability and maintenance status',
-              data: { type: 'equipment', total: equipment.length, available: equipment.filter(e => e.is_available).length },
+              data: { type: 'equipment', total: equipment.length, available: equipment.filter(e => e.is_active).length },
               position: { x: 0, y: 3, z: 0 },
               rotation: { x: 0, y: 0, z: 0 },
               scale: 1,
@@ -586,6 +581,7 @@ export default function HolographicInterface() {
               if (rect) {
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                void x; void y;
                 // Find closest projection (simplified logic)
                 const closest = activeInterface.projections[0]; // Just select first for demo
                 handleProjectionInteraction(closest);

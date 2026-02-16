@@ -49,7 +49,7 @@ export default function PriceOptimization({ equipment, className = '' }: PriceOp
       try {
         // Get market data and booking history
         const [allEquipment, bookings] = await Promise.all([
-          getEquipment({ categoryId: equipment.category_id }),
+          getEquipment({ categoryId: equipment.category_id ?? undefined }),
           getBookings({ equipmentId: equipment.id }),
         ]);
 

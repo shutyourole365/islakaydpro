@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Brain, Cpu, Zap, TrendingUp, Target, Eye, BarChart3, Activity } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getEquipment, getBookings } from '../../services/database';
@@ -44,8 +44,8 @@ export default function AIMachineLearningHub() {
         getBookings({ ownerId: user.id })
       ]);
 
-      const equipment = Array.isArray(equipmentData) ? equipmentData : equipmentData.data || [];
-      const bookings = Array.isArray(bookingsData) ? bookingsData : bookingsData.data || [];
+      const equipment = Array.isArray(equipmentData) ? equipmentData : (equipmentData as any).data || [];
+      const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || [];
 
       // Simulate AI predictions (in real app, this would call ML service)
       const aiPredictions = equipment.map((eq: Equipment) => {

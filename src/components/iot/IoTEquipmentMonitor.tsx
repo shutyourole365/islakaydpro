@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Battery, Wifi, WifiOff, AlertTriangle, CheckCircle, Activity, Thermometer, Gauge } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getEquipment } from '../../services/database';
@@ -321,9 +321,10 @@ export default function IoTEquipmentMonitor() {
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  {React.createElement(getStatusIcon(device.status), {
-                    className: `w-5 h-5 ${getStatusColor(device.status)}`
-                  })}
+                  {(() => {
+                    const StatusIcon = getStatusIcon(device.status);
+                    return <StatusIcon className={`w-5 h-5 ${getStatusColor(device.status)}`} />;
+                  })()}
                   <span className="font-semibold text-gray-900 capitalize">
                     {device.deviceType}
                   </span>

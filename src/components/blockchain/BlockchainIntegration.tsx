@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Shield, Lock, FileText, Coins, CheckCircle, Clock, AlertCircle, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Shield, Lock, FileText, Coins, CheckCircle, Clock, ExternalLink } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getBookings } from '../../services/database';
 import type { Booking } from '../../types';
@@ -69,7 +69,7 @@ export default function BlockchainIntegration() {
 
     try {
       const bookingsData = await getBookings({ ownerId: user.id });
-      const bookings = Array.isArray(bookingsData) ? bookingsData : bookingsData.data || [];
+      const bookings = Array.isArray(bookingsData) ? bookingsData : (bookingsData as any).data || [];
 
       // Simulate smart contracts (in real app, this would come from blockchain)
       const mockContracts: SmartContract[] = bookings.slice(0, 5).map((booking: Booking, index: number) => ({

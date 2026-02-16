@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, Suspense, lazy } from 'react';
-import { useState, useEffect, useCallback, useTransition } from 'react';
+import { useState, useEffect, useCallback, Suspense, lazy, useTransition } from 'react';
 import {
   LayoutDashboard,
   Package,
@@ -21,7 +20,6 @@ import {
   AlertCircle,
   Shield,
   Eye,
-  Users,
   Activity,
   Loader2,
   Search,
@@ -86,7 +84,6 @@ export default function Dashboard({
   const [favorites, setFavorites] = useState<Equipment[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [showReferralProgram, setShowReferralProgram] = useState(false);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -102,7 +99,7 @@ export default function Dashboard({
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   // Use transition for non-urgent updates
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const loadDashboardData = useCallback(async () => {
     if (!user) return;

@@ -26,7 +26,8 @@ export default function AREquipmentVisualization({ onBack, equipment }: AREquipm
     const checkARSupport = async () => {
       if ('xr' in navigator) {
         try {
-          const xr = (navigator as Navigator & { xr?: XRSystem }).xr;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const xr = (navigator as Navigator & { xr?: any }).xr;
           if (xr) {
             const supported = await xr.isSessionSupported('immersive-ar');
             setIsARSupported(supported);
@@ -47,7 +48,8 @@ export default function AREquipmentVisualization({ onBack, equipment }: AREquipm
         return;
       }
 
-      const xr = (navigator as Navigator & { xr?: XRSystem }).xr;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const xr = (navigator as Navigator & { xr?: any }).xr;
       if (!xr) return;
 
       await xr.requestSession('immersive-ar', {

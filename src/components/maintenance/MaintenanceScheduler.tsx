@@ -50,6 +50,59 @@ export default function MaintenanceScheduler({ equipment: propEquipment, classNa
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'kanban'>('list');
+  const [, setShowTaskForm] = useState(false);
+  const [, setSelectedTask] = useState<MaintenanceTask | null>(null);
+
+  const generateMaintenanceTasks = useCallback((equipmentList: Equipment[]): MaintenanceTask[] => {
+    const tasks: MaintenanceTask[] = [];
+    const now = new Date();
+
+    equipmentList.forEach((eq) => {
+      // Basic maintenance schedule based on equipment type
+      const baseTasks = getBaseMaintenanceTasks(eq);
+
+      baseTasks.forEach((task, index) => {
+        const taskId = `${eq.id}-${task.type}-${index}`;
+        const scheduledDate = new Date(now);
+
+        // Schedule based on frequency
+        switch (task.frequency) {
+          case 'weekly':
+            scheduledDate.setDate(now.getDate() + 7);
+            break;
+          case 'monthly':
+            scheduledDate.setMonth(now.getMonth() + 1);
+            break;
+          case 'quarterly':
+            scheduledDate.setMonth(now.getMonth() + 3);
+            break;
+        }
+
+        // Check if task is overdue
+        const isOverdue = scheduledDate < now;
+
+        tasks.push({
+          id: taskId,
+          equipmentId: eq.id,
+          equipmentName: eq.title,
+          title: task.title,
+          description: task.description,
+          type: task.type,
+          priority: task.priority,
+          status: isOverdue ? 'overdue' : 'scheduled',
+          scheduledDate,
+          estimatedDuration: task.duration,
+          cost: task.cost,
+          recurring: {
+            frequency: task.frequency,
+            interval: 1,
+          },
+        });
+      });
+    });
+
+    return tasks.sort((a, b) => a.scheduledDate.getTime() - b.scheduledDate.getTime());
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {
@@ -71,62 +124,7 @@ export default function MaintenanceScheduler({ equipment: propEquipment, classNa
     loadData();
   }, [user, propEquipment, generateMaintenanceTasks]);
 
-  const generateMaintenanceTasks = useCallback((equipmentList: Equipment[]): MaintenanceTask[] => {
-    const tasks: MaintenanceTask[] = [];
-    const now = new Date();
 
-    equipmentList.forEach((eq) => {
-      // Basic maintenance schedule based on equipment type
-      const baseTasks = getBaseMaintenanceTasks(eq);
-
-      baseTasks.forEach((task, index) => {
-        const taskId = `${eq.id}-${task.type}-${index}`;
-        const scheduledDate = new Date(now);
-
-        // Schedule based on frequency
-        switch (task.frequency) {
-          case 'daily':
-            scheduledDate.setDate(now.getDate() + 1);
-            break;
-          case 'weekly':
-            scheduledDate.setDate(now.getDate() + 7);
-            break;
-          case 'monthly':
-            scheduledDate.setMonth(now.getMonth() + 1);
-            break;
-          case 'quarterly':
-            scheduledDate.setMonth(now.getMonth() + 3);
-            break;
-          case 'yearly':
-            scheduledDate.setFullYear(now.getFullYear() + 1);
-            break;
-        }
-
-        // Check if task is overdue
-        const isOverdue = scheduledDate < now && task.status !== 'completed';
-
-        tasks.push({
-          id: taskId,
-          equipmentId: eq.id,
-          equipmentName: eq.name,
-          title: task.title,
-          description: task.description,
-          type: task.type,
-          priority: task.priority,
-          status: isOverdue ? 'overdue' : 'scheduled',
-          scheduledDate,
-          estimatedDuration: task.duration,
-          cost: task.cost,
-          recurring: {
-            frequency: task.frequency,
-            interval: 1,
-          },
-        });
-      });
-    });
-
-    return tasks.sort((a, b) => a.scheduledDate.getTime() - b.scheduledDate.getTime());
-  }, []);
 
   const getBaseMaintenanceTasks = (eq: Equipment) => {
     const tasks = [];

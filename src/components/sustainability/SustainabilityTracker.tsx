@@ -76,7 +76,7 @@ export default function SustainabilityTracker({ className = '' }: Sustainability
 
           return {
             equipmentId: eq.id,
-            equipmentName: eq.name,
+            equipmentName: eq.title,
             emissions,
             bookings: equipmentBookings.length,
           };

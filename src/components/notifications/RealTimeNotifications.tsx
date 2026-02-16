@@ -10,9 +10,10 @@ import {
   DollarSign,
   Star,
   Settings,
+  AlertCircle,
 } from 'lucide-react';
 import type { Notification } from '../../types';
-import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../../services/database';
+import { getNotifications, markNotificationRead, markAllNotificationsRead } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface RealTimeNotificationsProps {
@@ -128,7 +129,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
 
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      await markNotificationAsRead(notificationId);
+      await markNotificationRead(notificationId);
       setNotifications(prev =>
         prev.map(n =>
           n.id === notificationId ? { ...n, is_read: true } : n
@@ -142,7 +143,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
 
   const handleMarkAllAsRead = async () => {
     try {
-      await markAllNotificationsAsRead(user!.id);
+      await markAllNotificationsRead(user!.id);
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
@@ -305,7 +306,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                             </div>
                           )}
 
-                          {notification.type === 'review_received' && (
+                          {notification.type === 'new_review' && (
                             <div className="mt-3">
                               <button className="px-3 py-1 text-xs bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors">
                                 View Review

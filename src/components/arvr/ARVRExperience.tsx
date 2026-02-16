@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Camera, RotateCcw, ZoomIn, ZoomOut, Eye, EyeOff, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Camera, RotateCcw, ZoomIn, ZoomOut, Eye, Play, Maximize } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getEquipment } from '../../services/database';
 import type { Equipment } from '../../types';
@@ -69,11 +69,9 @@ export default function ARVRExperience() {
 
   // AR/VR controls
   const [isFullscreen, setIsFullscreen] = useState(false);
+  void isFullscreen;
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [showHotspots, setShowHotspots] = useState(true);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -161,7 +159,7 @@ export default function ARVRExperience() {
     }
 
     try {
-      const session = await (navigator as any).xr.requestSession('immersive-ar');
+      await (navigator as any).xr.requestSession('immersive-ar');
       setSelectedEquipment(equipment);
       setActiveSession({
         id: `ar-${Date.now()}`,
@@ -184,7 +182,7 @@ export default function ARVRExperience() {
     }
 
     try {
-      const session = await (navigator as any).xr.requestSession('immersive-vr');
+      await (navigator as any).xr.requestSession('immersive-vr');
       setSelectedEquipment(equipment);
       setActiveSession({
         id: `vr-${Date.now()}`,

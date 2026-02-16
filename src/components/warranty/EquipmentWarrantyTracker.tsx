@@ -19,7 +19,7 @@ import {
   Bell,
   X,
 } from 'lucide-react';
-import type { EquipmentWarranty, Equipment } from '../../types';
+import type { EquipmentWarranty, Equipment, EquipmentId, UserId } from '../../types';
 
 interface WarrantyTrackerProps {
   equipmentId?: string;
@@ -54,8 +54,8 @@ const mockWarranties: (EquipmentWarranty & { equipment?: Equipment })[] = [
     created_at: '2025-01-15T10:00:00Z',
     updated_at: '2025-01-15T10:00:00Z',
     equipment: {
-      id: 'eq1',
-      owner_id: 'owner1',
+      id: 'eq1' as EquipmentId,
+      owner_id: 'owner1' as UserId,
       category_id: 'cat1',
       title: 'CAT 320 Excavator',
       description: null,
@@ -99,8 +99,8 @@ const mockWarranties: (EquipmentWarranty & { equipment?: Equipment })[] = [
     created_at: '2024-06-01T10:00:00Z',
     updated_at: '2024-06-01T10:00:00Z',
     equipment: {
-      id: 'eq2',
-      owner_id: 'owner1',
+      id: 'eq2' as EquipmentId,
+      owner_id: 'owner1' as UserId,
       category_id: 'cat2',
       title: 'John Deere Backhoe Loader',
       description: null,
