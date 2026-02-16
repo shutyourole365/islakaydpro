@@ -27,7 +27,7 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
       content: 'Hello! I\'m Kayd, your AI equipment assistant. I can help you find equipment, answer questions about rentals, and provide recommendations. What can I help you with today?',
       timestamp: new Date(),
       suggestions: [
-        'Find excavators near me',
+        'Show nearby equipment',
         'What\'s the best camera for weddings?',
         'How much does it cost to rent a generator?',
         'Show me equipment maintenance tips'
@@ -235,7 +235,7 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
       content: 'Hello! I\'m Kayd, your AI equipment assistant. I can help you find equipment, answer questions about rentals, and provide recommendations. What can I help you with today?',
       timestamp: new Date(),
       suggestions: [
-        'Find excavators near me',
+        'Show nearby equipment',
         'What\'s the best camera for weddings?',
         'How much does it cost to rent a generator?',
         'Show me equipment maintenance tips'
