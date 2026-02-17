@@ -18,7 +18,7 @@ import {
   Sparkles,
   Clock,
 } from 'lucide-react';
-import type { Equipment, EquipmentBundle } from '../../types';
+import type { Equipment, EquipmentBundle, EquipmentId, UserId } from '../../types';
 
 interface EquipmentBundleDealsProps {
   ownerId?: string;
@@ -30,8 +30,8 @@ interface EquipmentBundleDealsProps {
 // Mock equipment data
 const mockEquipment: Equipment[] = [
   {
-    id: 'eq1',
-    owner_id: 'owner1',
+    id: 'eq1' as EquipmentId,
+    owner_id: 'owner1' as UserId,
     category_id: 'cat1',
     title: 'CAT 320 Excavator - 20 Ton',
     description: 'Professional-grade excavator',
@@ -60,8 +60,8 @@ const mockEquipment: Equipment[] = [
     updated_at: '2025-01-15T00:00:00Z',
   },
   {
-    id: 'eq2',
-    owner_id: 'owner1',
+    id: 'eq2' as EquipmentId,
+    owner_id: 'owner1' as UserId,
     category_id: 'cat1',
     title: 'John Deere Backhoe Loader',
     description: 'Versatile backhoe loader',
@@ -90,8 +90,8 @@ const mockEquipment: Equipment[] = [
     updated_at: '2024-06-01T00:00:00Z',
   },
   {
-    id: 'eq3',
-    owner_id: 'owner1',
+    id: 'eq3' as EquipmentId,
+    owner_id: 'owner1' as UserId,
     category_id: 'cat2',
     title: 'Skid Steer Loader',
     description: 'Compact skid steer',

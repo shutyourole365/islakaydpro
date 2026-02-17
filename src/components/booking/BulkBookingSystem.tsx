@@ -17,7 +17,7 @@ import {
   Loader2,
   Tag,
 } from 'lucide-react';
-import type { Equipment, BulkBooking } from '../../types';
+import type { Equipment, BulkBooking, EquipmentId, UserId } from '../../types';
 
 interface BulkBookingSystemProps {
   initialEquipment?: Equipment[];
@@ -50,8 +50,8 @@ const bulkDiscounts: BulkDiscount[] = [
 // Mock available equipment for adding to cart
 const mockAvailableEquipment: Equipment[] = [
   {
-    id: 'eq1',
-    owner_id: 'owner1',
+    id: 'eq1' as EquipmentId,
+    owner_id: 'owner1' as UserId,
     category_id: 'cat1',
     title: 'CAT 320 Excavator - 20 Ton',
     description: 'Professional-grade excavator',
@@ -80,8 +80,8 @@ const mockAvailableEquipment: Equipment[] = [
     updated_at: '2025-01-15T00:00:00Z',
   },
   {
-    id: 'eq2',
-    owner_id: 'owner1',
+    id: 'eq2' as EquipmentId,
+    owner_id: 'owner1' as UserId,
     category_id: 'cat1',
     title: 'John Deere Backhoe Loader',
     description: 'Versatile backhoe loader',
@@ -110,8 +110,8 @@ const mockAvailableEquipment: Equipment[] = [
     updated_at: '2024-06-01T00:00:00Z',
   },
   {
-    id: 'eq3',
-    owner_id: 'owner2',
+    id: 'eq3' as EquipmentId,
+    owner_id: 'owner2' as UserId,
     category_id: 'cat2',
     title: 'Concrete Mixer Truck',
     description: 'Heavy duty concrete mixer',
@@ -140,8 +140,8 @@ const mockAvailableEquipment: Equipment[] = [
     updated_at: '2025-01-01T00:00:00Z',
   },
   {
-    id: 'eq4',
-    owner_id: 'owner2',
+    id: 'eq4' as EquipmentId,
+    owner_id: 'owner2' as UserId,
     category_id: 'cat3',
     title: 'Scaffolding Set - 50ft',
     description: 'Complete scaffolding set',

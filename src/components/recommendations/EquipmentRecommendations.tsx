@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, TrendingUp, MapPin, Star, Heart, Clock, Zap } from 'lucide-react';
-import type { Equipment } from '../../types';
+import type { Equipment, EquipmentId, UserId } from '../../types';
 
 interface RecommendationsProps {
   currentEquipment?: Equipment;
@@ -41,8 +41,8 @@ export default function EquipmentRecommendations({
     // Demo data - replace with actual API calls
     const demoEquipment: Equipment[] = [
       {
-        id: 'rec-1',
-        owner_id: 'owner1',
+        id: 'rec-1' as EquipmentId,
+        owner_id: 'owner1' as UserId,
         category_id: 'cat1',
         title: 'Kubota Mini Excavator - 3 Ton',
         description: 'Compact excavator perfect for tight spaces',
@@ -71,8 +71,8 @@ export default function EquipmentRecommendations({
         updated_at: new Date().toISOString(),
       },
       {
-        id: 'rec-2',
-        owner_id: 'owner2',
+        id: 'rec-2' as EquipmentId,
+        owner_id: 'owner2' as UserId,
         category_id: 'cat2',
         title: 'Canon R6 Mark II Camera Body',
         description: 'Latest mirrorless camera for professionals',

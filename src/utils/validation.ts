@@ -22,6 +22,13 @@ export function sanitizeInput(input: string): string {
   sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
   
   return sanitized.trim();
+  // Remove script tags, event handlers, javascript: and encode < >
+  return input
+    .replace(/[<>]/g, '')
+    .replace(/<script.*?>.*?<\/script>/gi, '')
+    .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
+    .replace(/javascript:/gi, '')
+    .trim();
 }
 
 export function validateEmail(email: string): { valid: boolean; error?: string } {

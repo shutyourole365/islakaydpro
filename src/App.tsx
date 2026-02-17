@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
-import type { Category, Equipment } from './types';
+import type { Category, Equipment, SearchFilters, EquipmentId, UserId } from './types';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Hero from './components/home/Hero';
@@ -11,23 +11,24 @@ import EquipmentShowcase from './components/home/EquipmentShowcase';
 import HowItWorks from './components/home/HowItWorks';
 import Testimonials from './components/home/Testimonials';
 import CTASection from './components/home/CTASection';
+import AboutPage from './components/home/AboutPage';
+import SearchModal from './components/search/SearchModal';
+import EquipmentDetail from './components/equipment/EquipmentDetail';
+import AuthModal from './components/auth/AuthModal';
+import AIAssistantEnhanced from './components/ai/AIAssistantEnhanced';
+import BrowsePage from './components/browse/BrowsePage';
+import Dashboard from './components/dashboard/Dashboard';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import ListEquipmentForm from './components/listing/ListEquipmentForm';
+import BookingSystem from './components/booking/BookingSystem';
+import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
+import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
+import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
+import { useCookieConsent } from './hooks/useCookieConsent';
 import { addFavorite, removeFavorite, getEquipment } from './services/database';
-import type { SearchFilters } from './types';
-
-// Lazy load page-level components for better initial load
-const SearchModal = lazy(() => import('./components/search/SearchModal'));
-const EquipmentDetail = lazy(() => import('./components/equipment/EquipmentDetail'));
-const AuthModal = lazy(() => import('./components/auth/AuthModal'));
-const AIAssistantEnhanced = lazy(() => import('./components/ai/AIAssistantEnhanced'));
-const BrowsePage = lazy(() => import('./components/browse/BrowsePage'));
-const Dashboard = lazy(() => import('./components/dashboard/Dashboard'));
-const ListEquipmentForm = lazy(() => import('./components/listing/ListEquipmentForm'));
-const BookingSystem = lazy(() => import('./components/booking/BookingSystem'));
-const EquipmentComparison = lazy(() => import('./components/comparison/EquipmentComparison'));
-const FeatureShowcase = lazy(() => import('./components/ui/FeatureShowcase'));
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -141,6 +142,9 @@ const PricingCalculator = lazy(() => import('./components/utility/PricingCalcula
 const InsuranceOptions = lazy(() => import('./components/utility/InsuranceOptions'));
 const HostResources = lazy(() => import('./components/utility/HostResources'));
 const HostCommunity = lazy(() => import('./components/utility/HostCommunity'));
+const MaintenanceScheduler = lazy(() => import('./components/maintenance/MaintenanceScheduler'));
+const SchedulingOptimizer = lazy(() => import('./components/scheduling/SchedulingOptimizer'));
+const ReferralSystem = lazy(() => import('./components/referral/ReferralSystem'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -154,8 +158,8 @@ const PageLoader = () => (
 
 const sampleEquipment: Equipment[] = [
   {
-    id: '1',
-    owner_id: 'owner1',
+    id: '1' as EquipmentId,
+    owner_id: 'owner1' as UserId,
     category_id: 'cat1',
     title: 'CAT 320 Excavator - 20 Ton',
     description: 'Professional-grade excavator perfect for construction, demolition, and earthmoving projects. Well-maintained with low hours. Includes operator manual and safety equipment.',
@@ -206,8 +210,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '2',
-    owner_id: 'owner2',
+    id: '2' as EquipmentId,
+    owner_id: 'owner2' as UserId,
     category_id: 'cat2',
     title: 'Sony A7IV Full Frame Camera Kit',
     description: 'Complete professional photography kit including Sony A7IV body, 24-70mm f/2.8 GM lens, 70-200mm f/2.8 GM lens, flash, and accessories. Perfect for weddings, events, and commercial shoots.',
@@ -258,8 +262,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '3',
-    owner_id: 'owner3',
+    id: '3' as EquipmentId,
+    owner_id: 'owner3' as UserId,
     category_id: 'cat3',
     title: 'DeWalt 20V MAX Power Tool Combo Kit',
     description: '15-piece professional power tool set including drill, impact driver, circular saw, reciprocating saw, oscillating tool, and more. Includes 4 batteries and fast charger.',
@@ -310,8 +314,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '4',
-    owner_id: 'owner4',
+    id: '4' as EquipmentId,
+    owner_id: 'owner4' as UserId,
     category_id: 'cat4',
     title: 'Premium DJ Equipment Package',
     description: 'Complete DJ setup including Pioneer DDJ-1000 controller, QSC K12.2 speakers, subwoofer, lighting package, and all necessary cables. Perfect for weddings, parties, and events.',
@@ -362,8 +366,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '5',
-    owner_id: 'owner5',
+    id: '5' as EquipmentId,
+    owner_id: 'owner5' as UserId,
     category_id: 'cat5',
     title: 'John Deere 1025R Compact Tractor',
     description: 'Versatile compact utility tractor with front loader, perfect for landscaping, property maintenance, and light construction. Easy to operate with hydrostatic transmission.',
@@ -414,8 +418,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '6',
-    owner_id: 'owner6',
+    id: '6' as EquipmentId,
+    owner_id: 'owner6' as UserId,
     category_id: 'cat6',
     title: '20x40 Premium Wedding Tent Package',
     description: 'Elegant frame tent package perfect for outdoor weddings and events. Includes tent, lighting, sidewalls, flooring, and professional setup. Accommodates up to 80 guests seated.',
@@ -466,8 +470,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '7',
-    owner_id: 'owner7',
+    id: '7' as EquipmentId,
+    owner_id: 'owner7' as UserId,
     category_id: 'cat7',
     title: 'DJI Mavic 3 Pro Drone Kit',
     description: 'Professional drone package with Hasselblad camera, 4/3 CMOS sensor, 46-min flight time. Includes extra batteries, ND filters, and hard case. FAA Part 107 compliant.',
@@ -518,8 +522,8 @@ const sampleEquipment: Equipment[] = [
     },
   },
   {
-    id: '8',
-    owner_id: 'owner8',
+    id: '8' as EquipmentId,
+    owner_id: 'owner8' as UserId,
     category_id: 'cat8',
     title: 'Commercial Pressure Washer - 4000 PSI',
     description: 'Heavy-duty gas-powered pressure washer perfect for commercial cleaning, driveways, decks, and industrial applications. Includes surface cleaner attachment and multiple tips.',
@@ -571,10 +575,19 @@ const sampleEquipment: Equipment[] = [
   },
 ];
 
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations';
-
 function AppContent() {
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler';
   const { isAuthenticated, user, profile, signOut } = useAuth();
+  const {
+    showBanner,
+    showSettings,
+    settings,
+    setShowSettings,
+    setSettings,
+    acceptAll,
+    declineAll,
+    saveSettings,
+  } = useCookieConsent();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [categories, setCategories] = useState<Category[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -1182,6 +1195,19 @@ function AppContent() {
         </>
       )}
 
+      {currentPage === 'about' && (
+        <>
+          <AboutPage />
+          <Footer />
+        </>
+      )}
+
+      {currentPage === 'help' && (
+        <>
+          <HelpCenter onBack={() => setCurrentPage('home')} />
+        </>
+      )}
+
       {currentPage === 'browse' && (
         <Suspense fallback={<PageLoader />}>
           <BrowsePage
@@ -1414,6 +1440,57 @@ function AppContent() {
       {currentPage === 'industry-integrations' && (
         <Suspense fallback={<PageLoader />}>
           <IndustryIntegrations onBack={() => setCurrentPage('dashboard')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'maintenance' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <MaintenanceScheduler />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'scheduler' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
+            <div className="max-w-6xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <SchedulingOptimizer />
+            </div>
+          </div>
+          <Footer />
+        </Suspense>
+      )}
+
+      {currentPage === 'referrals' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('dashboard')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+              <ReferralSystem />
+            </div>
+          </div>
+          <Footer />
         </Suspense>
       )}
 
@@ -2575,15 +2652,33 @@ function AppContent() {
           </div>
         </Suspense>
       )}
+      {/* Cookie Consent */}
+      {showBanner && (
+        <CookieConsentBanner
+          onAccept={acceptAll}
+          onDecline={declineAll}
+          onCustomize={() => setShowSettings(true)}
+        />
+      )}
+
+      <CookieSettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        settings={settings}
+        onSettingsChange={setSettings}
+        onSave={saveSettings}
+      />
     </div>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

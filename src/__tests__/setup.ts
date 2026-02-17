@@ -24,6 +24,13 @@ afterEach(() => {
   cleanup();
 });
 
+// Capture unexpected errors during test environment setup so we get stack traces
+process.on('uncaughtException', (err: any) => {
+  console.error('UNCAUGHT_EXCEPTION_IN_TEST_SETUP:', err && err.stack ? err.stack : err);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED_REJECTION_IN_TEST_SETUP:', reason);
+});
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

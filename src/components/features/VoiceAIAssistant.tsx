@@ -1,6 +1,8 @@
+
+
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Mic, MicOff, Volume2, VolumeX, MessageCircle, Send, Bot, User, Settings, Zap } from 'lucide-react';
 import { Button } from '../ui/Button';
-import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface Message {
   id: string;
@@ -25,7 +27,7 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
       content: 'Hello! I\'m Kayd, your AI equipment assistant. I can help you find equipment, answer questions about rentals, and provide recommendations. What can I help you with today?',
       timestamp: new Date(),
       suggestions: [
-        'Find excavators near me',
+        'Show nearby equipment',
         'What\'s the best camera for weddings?',
         'How much does it cost to rent a generator?',
         'Show me equipment maintenance tips'
@@ -35,6 +37,7 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
   const [currentInput, setCurrentInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [speechRecognition, setSpeechRecognition] = useState<any>(null);
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -141,18 +144,6 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
     }
   };
 
-  const speakText = (text: string) => {
-    if (speechSynthesis && voiceEnabled && !isSpeaking) {
-      setIsSpeaking(true);
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      utterance.volume = 0.8;
-
-      utterance.onend = () => setIsSpeaking(false);
-      speechSynthesis.speak(utterance);
-    }
-  };
 
   const handleSendMessage = useCallback(async (messageText: string) => {
     if (!messageText.trim()) return;
@@ -186,23 +177,33 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
     setIsTyping(false);
 
     // Speak the response if voice is enabled
-    if (voiceEnabled) {
-      speakText(aiResponse.response);
+    if (speechSynthesis && voiceEnabled && !isSpeaking) {
+      setIsSpeaking(true);
+      const utterance = new SpeechSynthesisUtterance(aiResponse.response);
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+      utterance.volume = 0.8;
+      utterance.onend = () => setIsSpeaking(false);
+      speechSynthesis.speak(utterance);
     }
-  }, [voiceEnabled]);
+  }, [voiceEnabled, speechSynthesis, isSpeaking]);
 
   // Initialize speech recognition and synthesis
   useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = (window as Window & { webkitSpeechRecognition?: any; SpeechRecognition?: any }).webkitSpeechRecognition || (window as Window & { webkitSpeechRecognition?: any; SpeechRecognition?: any }).SpeechRecognition;
-      const recognition = new SpeechRecognition();
+    // Prefer webkitSpeechRecognition if available, else SpeechRecognition
+    const SpeechRecognitionCtor = window.webkitSpeechRecognition || window.SpeechRecognition;
+    if (SpeechRecognitionCtor) {
+      const recognition = new SpeechRecognitionCtor();
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
 
-      recognition.onstart = () => setIsListening(true);
-      recognition.onend = () => setIsListening(false);
-      recognition.onresult = (event: Event & { results: SpeechRecognitionResultList }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (recognition as any).onstart = () => setIsListening(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (recognition as any).onend = () => setIsListening(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (recognition as any).onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         handleSendMessage(transcript);
       };
@@ -234,7 +235,7 @@ export default function VoiceAIAssistant({ onBack }: VoiceAIAssistantProps) {
       content: 'Hello! I\'m Kayd, your AI equipment assistant. I can help you find equipment, answer questions about rentals, and provide recommendations. What can I help you with today?',
       timestamp: new Date(),
       suggestions: [
-        'Find excavators near me',
+        'Show nearby equipment',
         'What\'s the best camera for weddings?',
         'How much does it cost to rent a generator?',
         'Show me equipment maintenance tips'
