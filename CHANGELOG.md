@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-02-17
+
 ### Added
 - Comprehensive README with full documentation
 - Equipment comparison feature with up to 4 items
