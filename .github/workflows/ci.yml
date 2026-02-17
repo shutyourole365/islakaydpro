@@ -44,6 +44,8 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    env:
+      TMPDIR: ${{ github.workspace }}/.vitest_tmp
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,8 +59,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create TMPDIR for tests
+        run: mkdir -p "$TMPDIR"
+
       - name: Run tests
-        run: npm test -- --run --reporter=verbose --coverage
+        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose --coverage
         env:
           CI: true
 
