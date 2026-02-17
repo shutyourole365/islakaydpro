@@ -29,6 +29,7 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+.playwright_tmp/
 
 # Vitest temporary folder (local)
 .vitest_tmp/
