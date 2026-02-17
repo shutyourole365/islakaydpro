@@ -1,7 +1,7 @@
 {
   "name": "islakayd",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +14,7 @@
     "test:coverage": "mkdir -p .vitest_tmp && TMPDIR=$PWD/.vitest_tmp vitest --coverage",
     "test:unit": "mkdir -p .vitest_tmp && TMPDIR=$PWD/.vitest_tmp vitest --run src/__tests__",
     "test:run": "mkdir -p .vitest_tmp && TMPDIR=$PWD/.vitest_tmp vitest run",
+    "test:e2e": "npx playwright test",
     "deploy": "npm run build && vercel --prod",
     "deploy:staging": "npm run build && vercel --staging",
     "preview:build": "npm run build && npm run preview",
