@@ -1,31 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { useTheme } from '../hooks/useTheme';
 
-// Helper component to test the hook
-function ThemeConsumer() {
-  const { theme, resolvedTheme, setTheme, toggleTheme } = useTheme();
-  return (
-    <div>
-      <span data-testid="theme">{theme}</span>
-      <span data-testid="resolved">{resolvedTheme}</span>
-      <button onClick={() => setTheme('dark')} data-testid="set-dark">
-        Set Dark
-      </button>
-      <button onClick={() => setTheme('light')} data-testid="set-light">
-        Set Light
-      </button>
-      <button onClick={() => setTheme('system')} data-testid="set-system">
-        Set System
-      </button>
-      <button onClick={toggleTheme} data-testid="toggle">
-        Toggle
-      </button>
-    </div>
-  );
-}
+
 
 describe('ThemeContext', () => {
   beforeEach(() => {
@@ -45,87 +23,63 @@ describe('ThemeContext', () => {
   });
 
   it('should default to system theme', async () => {
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('theme').textContent).toBe('system');
+      expect(result.current.theme).toBe('system');
     });
   });
 
-  it('should set theme to dark when button clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
+  it('should set theme to dark when called', async () => {
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
 
-    await user.click(screen.getByTestId('set-dark'));
+    act(() => result.current.setTheme('dark'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('theme').textContent).toBe('dark');
-      expect(screen.getByTestId('resolved').textContent).toBe('dark');
+      expect(result.current.theme).toBe('dark');
+      expect(result.current.resolvedTheme).toBe('dark');
       expect(document.documentElement.classList.contains('dark')).toBe(true);
     });
   });
 
-  it('should set theme to light when button clicked', async () => {
-    const user = userEvent.setup();
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
+  it('should set theme to light when called', async () => {
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
 
-    await user.click(screen.getByTestId('set-light'));
+    act(() => result.current.setTheme('light'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('theme').textContent).toBe('light');
-      expect(screen.getByTestId('resolved').textContent).toBe('light');
+      expect(result.current.theme).toBe('light');
+      expect(result.current.resolvedTheme).toBe('light');
       expect(document.documentElement.classList.contains('dark')).toBe(false);
     });
   });
 
   it('should toggle theme between light and dark', async () => {
-    const user = userEvent.setup();
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
 
     // Start with light
-    await user.click(screen.getByTestId('set-light'));
+    act(() => result.current.setTheme('light'));
     await waitFor(() => {
-      expect(screen.getByTestId('resolved').textContent).toBe('light');
+      expect(result.current.resolvedTheme).toBe('light');
     });
 
     // Toggle to dark
-    await user.click(screen.getByTestId('toggle'));
+    act(() => result.current.toggleTheme());
     await waitFor(() => {
-      expect(screen.getByTestId('resolved').textContent).toBe('dark');
+      expect(result.current.resolvedTheme).toBe('dark');
     });
 
     // Toggle back to light
-    await user.click(screen.getByTestId('toggle'));
+    act(() => result.current.toggleTheme());
     await waitFor(() => {
-      expect(screen.getByTestId('resolved').textContent).toBe('light');
+      expect(result.current.resolvedTheme).toBe('light');
     });
   });
 
   it('should persist theme to localStorage', async () => {
-    const user = userEvent.setup();
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
 
-    await user.click(screen.getByTestId('set-dark'));
+    act(() => result.current.setTheme('dark'));
 
     await waitFor(() => {
       expect(localStorage.getItem('islakayd-theme')).toBe('dark');
@@ -135,14 +89,10 @@ describe('ThemeContext', () => {
   it('should read theme from localStorage on mount', async () => {
     localStorage.setItem('islakayd-theme', 'dark');
 
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('theme').textContent).toBe('dark');
+      expect(result.current.theme).toBe('dark');
     });
   });
 
@@ -157,26 +107,25 @@ describe('ThemeContext', () => {
       dispatchEvent: vi.fn(),
     }));
 
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
+    const { result } = renderHook(() => useTheme(), { wrapper: ThemeProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('theme').textContent).toBe('system');
-      expect(screen.getByTestId('resolved').textContent).toBe('dark');
+      expect(result.current.theme).toBe('system');
+      expect(result.current.resolvedTheme).toBe('dark');
     });
   });
 
   it('should throw error when useTheme is used outside provider', () => {
-    // Suppress console.error for this test
+    // Prevent jsdom from reporting React's internal error event as an uncaught exception
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorListener = (e: Event) => e.preventDefault();
+    window.addEventListener('error', errorListener);
 
-    expect(() => {
-      render(<ThemeConsumer />);
-    }).toThrow('useTheme must be used within a ThemeProvider');
-
-    consoleSpy.mockRestore();
+    try {
+      expect(() => renderHook(() => useTheme())).toThrow('useTheme must be used within a ThemeProvider');
+    } finally {
+      window.removeEventListener('error', errorListener);
+      consoleSpy.mockRestore();
+    }
   });
 });
