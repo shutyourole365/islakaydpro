@@ -69,40 +69,7 @@ vi.mock('../services/errorMonitoring', () => ({
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
-// Test component
-function AuthConsumer() {
-  const auth = useAuth();
-  return (
-    <div>
-      <span data-testid="loading">{auth.isLoading ? 'loading' : 'ready'}</span>
-      <span data-testid="authenticated">{auth.isAuthenticated ? 'yes' : 'no'}</span>
-      <span data-testid="user">{auth.user?.email || 'none'}</span>
-      <span data-testid="profile">{auth.profile?.full_name || 'none'}</span>
-      <span data-testid="notifications">{auth.unreadNotifications}</span>
-      <button 
-        data-testid="sign-in" 
-        onClick={() => auth.signIn('test@example.com', 'password123').catch(() => {})}
-      >
-        Sign In
-      </button>
-      <button 
-        data-testid="sign-up" 
-        onClick={() => auth.signUp('new@example.com', 'password123', 'New User').catch(() => {})}
-      >
-        Sign Up
-      </button>
-      <button data-testid="sign-out" onClick={() => auth.signOut()}>
-        Sign Out
-      </button>
-      <button 
-        data-testid="reset-password" 
-        onClick={() => auth.resetPassword('test@example.com').catch(() => {})}
-      >
-        Reset Password
-      </button>
-    </div>
-  );
-}
+
 
 describe('AuthContext', () => {
   let authStateCallback: ((event: AuthChangeEvent, session: Session | null) => void) | null = null;
