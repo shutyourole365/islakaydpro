@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
-import userEvent from '@testing-library/user-event';
 
 // Must define mocks before vi.mock calls due to hoisting
 vi.mock('../lib/supabase', () => ({
@@ -136,28 +135,20 @@ describe('AuthContext', () => {
   });
 
   it('should start with loading state', async () => {
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
-    // Initially may be loading
+    // Initially may be loading; wait until ready
     await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('ready');
+      expect(result.current.isLoading).toBe(false);
     });
   });
 
   it('should show unauthenticated state when no session', async () => {
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('no');
-      expect(screen.getByTestId('user').textContent).toBe('none');
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBeNull();
     });
   });
 
@@ -175,20 +166,16 @@ describe('AuthContext', () => {
       error: null,
     });
 
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('yes');
-      expect(screen.getByTestId('user').textContent).toBe('test@example.com');
+      expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user?.email).toBe('test@example.com');
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('profile').textContent).toBe('Test User');
-      expect(screen.getByTestId('notifications').textContent).toBe('3');
+      expect(result.current.profile?.full_name).toBe('Test User');
+      expect(result.current.unreadNotifications).toBe(3);
     });
   });
 
@@ -201,19 +188,15 @@ describe('AuthContext', () => {
       session: { user: mockUser, access_token: 'token' },
     });
 
-    const user = userEvent.setup();
-    
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('ready');
+      expect(result.current.isLoading).toBe(false);
     });
 
-    await user.click(screen.getByTestId('sign-in'));
+    await act(async () => {
+      await result.current.signIn('test@example.com', 'password123');
+    });
 
     await waitFor(() => {
       expect(signInWithRetry).toHaveBeenCalledWith(
@@ -232,20 +215,16 @@ describe('AuthContext', () => {
     );
     (getAuthErrorMessage as ReturnType<typeof vi.fn>).mockReturnValue('Invalid email or password');
 
-    const user = userEvent.setup();
-    
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('ready');
+      expect(result.current.isLoading).toBe(false);
     });
 
-    // Click and expect error - the click triggers an async function that will reject
-    await user.click(screen.getByTestId('sign-in'));
+    // Call and expect the helper to be invoked
+    await act(async () => {
+      await result.current.signIn('test@example.com', 'password123').catch(() => {});
+    });
 
     // Wait for signInWithRetry to have been called
     await waitFor(() => {
@@ -266,19 +245,15 @@ describe('AuthContext', () => {
       session: { user: mockUser, access_token: 'token' },
     });
 
-    const user = userEvent.setup();
-    
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('ready');
+      expect(result.current.isLoading).toBe(false);
     });
 
-    await user.click(screen.getByTestId('sign-up'));
+    await act(async () => {
+      await result.current.signUp('new@example.com', 'password123', 'New User');
+    });
 
     await waitFor(() => {
       expect(signUpWithRetry).toHaveBeenCalledWith(
@@ -302,19 +277,15 @@ describe('AuthContext', () => {
     });
     (supabase.auth.signOut as Mock).mockResolvedValue({ error: null });
 
-    const user = userEvent.setup();
-    
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('yes');
+      expect(result.current.isAuthenticated).toBe(true);
     });
 
-    await user.click(screen.getByTestId('sign-out'));
+    await act(async () => {
+      await result.current.signOut();
+    });
 
     await waitFor(() => {
       expect(supabase.auth.signOut).toHaveBeenCalled();
@@ -324,19 +295,15 @@ describe('AuthContext', () => {
   it('should handle password reset', async () => {
     (supabase.auth.resetPasswordForEmail as Mock).mockResolvedValue({ error: null });
 
-    const user = userEvent.setup();
-    
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('ready');
+      expect(result.current.isLoading).toBe(false);
     });
 
-    await user.click(screen.getByTestId('reset-password'));
+    await act(async () => {
+      await result.current.resetPassword('test@example.com');
+    });
 
     await waitFor(() => {
       expect(supabase.auth.resetPasswordForEmail).toHaveBeenCalledWith(
@@ -349,14 +316,10 @@ describe('AuthContext', () => {
   });
 
   it('should respond to auth state changes', async () => {
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('no');
+      expect(result.current.isAuthenticated).toBe(false);
     });
 
     // Simulate auth state change (user signs in)
@@ -375,19 +338,23 @@ describe('AuthContext', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('yes');
-      expect(screen.getByTestId('user').textContent).toBe('test@example.com');
+      expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user?.email).toBe('test@example.com');
     });
   });
 
   it('should throw error when useAuth is used outside provider', () => {
+    // Prevent jsdom from reporting React's internal error event as an uncaught exception
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorListener = (e: Event) => e.preventDefault();
+    window.addEventListener('error', errorListener);
 
-    expect(() => {
-      render(<AuthConsumer />);
-    }).toThrow('useAuth must be used within an AuthProvider');
-
-    consoleSpy.mockRestore();
+    try {
+      expect(() => renderHook(() => useAuth())).toThrow('useAuth must be used within an AuthProvider');
+    } finally {
+      window.removeEventListener('error', errorListener);
+      consoleSpy.mockRestore();
+    }
   });
 
   it('should clear state on sign out via auth state change', async () => {
@@ -401,14 +368,10 @@ describe('AuthContext', () => {
       error: null,
     });
 
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
+    const { result } = renderHook(() => useAuth(), { wrapper: AuthProvider });
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('yes');
+      expect(result.current.isAuthenticated).toBe(true);
     });
 
     // Simulate sign out via auth state change
@@ -419,9 +382,9 @@ describe('AuthContext', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('authenticated').textContent).toBe('no');
-      expect(screen.getByTestId('user').textContent).toBe('none');
-      expect(screen.getByTestId('notifications').textContent).toBe('0');
+      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBeNull();
+      expect(result.current.unreadNotifications).toBe(0);
     });
   });
 });
