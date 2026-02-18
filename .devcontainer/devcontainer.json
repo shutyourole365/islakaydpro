@@ -1,0 +1,17 @@
+{
+  "name": "Islakayd Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "forwardPorts": [5173],
+  "postCreateCommand": "npm install",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ],
+  "remoteUser": "vscode"
+}
