@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { sendMessage as sendAIMessage } from '../../services/ai';
+import { useLocalStorage } from '../../hooks';
 import {
   X,
   Send,
@@ -29,6 +30,8 @@ import {
   TrendingUp,
   Star,
 } from 'lucide-react';
+
+const GLOBAL_AI_ENABLED = import.meta.env.VITE_ENABLE_AI === 'true';
 
 interface Message {
   id: string;
@@ -95,6 +98,10 @@ export default function AIAssistantEnhanced() {
   const [showSettings, setShowSettings] = useState(false);
   const [context, setContext] = useState<ConversationContext>({});
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+
+  // Persist user preference for AI assistant (local override of env flag)
+  const [aiEnabledByUser, setAiEnabledByUser] = useLocalStorage<boolean>('ai_assistant_enabled', true);
+  const aiIsEnabled = GLOBAL_AI_ENABLED && aiEnabledByUser;
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -292,6 +299,23 @@ export default function AIAssistantEnhanced() {
 
     const startTime = Date.now();
 
+    // If AI is disabled by environment or user preference, use local rule-based responses
+    if (!aiIsEnabled) {
+      await new Promise(resolve => setTimeout(resolve, 700 + Math.random() * 800));
+      const response = getContextualResponses(userMessage);
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: response.content + "\n\n_(AI disabled — using offline mode)_",
+        timestamp: new Date(),
+        suggestions: response.suggestions,
+        metadata: { type: response.type as 'search' | 'alert' | 'success' | 'booking' | 'info' | 'recommendation' },
+      };
+      setMessages((prev) => [...prev, newMessage]);
+      setIsTyping(false);
+      return;
+    }
+
     try {
       // Build conversation history for context
       const conversationHistory = messages
@@ -356,7 +380,7 @@ export default function AIAssistantEnhanced() {
     } finally {
       setIsTyping(false);
     }
-  }, [messages, getContextualResponses, voiceEnabled, speakResponse]);
+  }, [messages, getContextualResponses, voiceEnabled, speakResponse, aiIsEnabled]);
 
   const handleFeedback = (messageId: string, isPositive: boolean) => {
     setFeedbackGiven((prev) => new Set([...prev, messageId]));
@@ -467,7 +491,7 @@ export default function AIAssistantEnhanced() {
           </div>
 
           {showSettings && (
-            <div className="p-4 bg-gray-50 border-b border-gray-200">
+            <div className="p-4 bg-gray-50 border-b border-gray-200 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Volume2 className="w-5 h-5 text-gray-600" />
@@ -477,7 +501,31 @@ export default function AIAssistantEnhanced() {
                   <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${voiceEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                 </button>
               </div>
-              <button onClick={clearConversation} className="mt-3 w-full py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Bot className="w-5 h-5 text-gray-600" />
+                  <div>
+                    <div className="text-sm font-medium">Enable LLM (Kayd AI)</div>
+                    <div className="text-xs text-gray-400">Use the cloud LLM for richer assistant responses</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setAiEnabledByUser(prev => !prev)}
+                    disabled={!GLOBAL_AI_ENABLED}
+                    className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    aria-pressed={aiEnabledByUser}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${aiEnabledByUser ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                  </button>
+                  {!GLOBAL_AI_ENABLED && (
+                    <span className="text-xs text-gray-400">Disabled by server</span>
+                  )}
+                </div>
+              </div>
+
+              <button onClick={clearConversation} className="mt-1 w-full py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                 Clear Conversation
               </button>
             </div>

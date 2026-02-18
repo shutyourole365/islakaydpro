@@ -20,6 +20,7 @@ AI Assistant
 
 - The project includes an AI assistant widget (`AIAssistant` + `AIAssistantEnhanced`).
 - To enable the real LLM-backed assistant set `VITE_ENABLE_AI=true` and provide an `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`.
+- Users can toggle the LLM per‑device in **Settings → AI Assistant** (preference stored in localStorage).
 - The AI backend is implemented as a Supabase Edge Function at `supabase/functions/ai-chat` which proxies to OpenAI/Anthropic and falls back to rule-based responses when no API key is configured.
 
 Files to check:

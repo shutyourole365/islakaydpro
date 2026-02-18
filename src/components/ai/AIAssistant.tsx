@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useLocalStorage } from '../../hooks';
 import { sendMessage, streamMessage } from '../../services/ai';
 import {
   X,
@@ -22,6 +23,8 @@ import {
   Truck,
   PartyPopper,
 } from 'lucide-react';
+
+const AI_ENABLED = import.meta.env.VITE_ENABLE_AI === 'true';
 
 const AI_ENABLED = import.meta.env.VITE_ENABLE_AI === 'true';
 
@@ -70,7 +73,10 @@ export default function AIAssistant() {
       ],
     },
   ]);
-  const [input, setInput] = useState('');
+
+  // Respect user preference (localStorage) in addition to the env flag
+  const [aiEnabledByUser] = useLocalStorage<boolean>('ai_assistant_enabled', true);
+  const aiIsEnabled = AI_ENABLED && aiEnabledByUser;  const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -185,8 +191,8 @@ export default function AIAssistant() {
     setIsTyping(true);
     setShowQuickActions(false);
 
-    // If AI feature flag is enabled, stream a response from the backend AI service.
-    if (AI_ENABLED) {
+    // If AI is available (env + user preference), stream response from backend AI service.
+    if (aiIsEnabled) {
       try {
         const conversationHistory = messages
           .filter((m) => m.role !== 'system')
@@ -541,7 +547,7 @@ export default function AIAssistant() {
               </button>
             </div>
             <p className="text-xs text-center text-gray-400 mt-3">
-              Powered by AI • <span className="text-teal-500 cursor-pointer hover:underline">Privacy Policy</span>
+              Powered by AI • <span className="text-gray-400">{aiIsEnabled ? 'LLM: On' : 'LLM: Off (offline mode)'}</span> • <span className="text-teal-500 cursor-pointer hover:underline">Privacy Policy</span>
             </p>
           </div>
         </div>
