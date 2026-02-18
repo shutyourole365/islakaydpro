@@ -512,7 +512,27 @@ export default function AIAssistantEnhanced() {
                 </div>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => setAiEnabledByUser(prev => !prev)}
+                    onClick={async () => {
+                      const newVal = !aiEnabledByUser;
+                      setAiEnabledByUser(prev => !prev);
+
+                      // persist to server if signed in
+                      try {
+                        // dynamic require to avoid circular imports in module graph
+                        // eslint-disable-next-line @typescript-eslint/no-var-requires
+                        const { useAuth } = require('../../contexts/AuthContext');
+                        const auth = useAuth ? useAuth() : null;
+                        if (auth?.user?.id) {
+                          // eslint-disable-next-line @typescript-eslint/no-var-requires
+                          const db = require('../../services/database');
+                          await db.updateProfile(auth.user.id, { ai_assistant_enabled: newVal });
+                          await auth.refreshProfile();
+                        }
+                      } catch (err) {
+                        // ignore — preference still saved to localStorage
+                        console.error('Failed to persist AI preference:', err);
+                      }
+                    }}
                     disabled={!GLOBAL_AI_ENABLED}
                     className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
                     aria-pressed={aiEnabledByUser}

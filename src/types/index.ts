@@ -12,6 +12,7 @@ export interface Profile {
   phone_verified: boolean;
   last_login: string | null;
   account_status: 'active' | 'suspended' | 'banned';
+  ai_assistant_enabled?: boolean; // user preference persisted server-side
   rating: number;
   total_reviews: number;
   created_at: string;

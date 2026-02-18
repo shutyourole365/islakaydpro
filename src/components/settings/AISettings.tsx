@@ -6,6 +6,35 @@ const GLOBAL_AI_ENABLED = import.meta.env.VITE_ENABLE_AI === 'true';
 
 export default function AISettings({ className = '' }: { className?: string }) {
   const [aiEnabledByUser, setAiEnabledByUser] = useLocalStorage<boolean>('ai_assistant_enabled', true);
+  const { user, profile, refreshProfile } = (function tryUseAuth() {
+    try {
+      // dynamic import to avoid circular dependency errors in tests
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const ctx = require('../../contexts/AuthContext');
+      return ctx.useAuth();
+    } catch (e) {
+      return { user: null, profile: null, refreshProfile: async () => {} } as any;
+    }
+  })();
+
+  const persistPreference = async (value: boolean) => {
+    // update local preference
+    setAiEnabledByUser(value);
+
+    // persist to server when user is signed in
+    if (user?.id) {
+      try {
+        // lazy import to avoid circular imports
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const db = require('../../services/database');
+        await db.updateProfile(user.id, { ai_assistant_enabled: value });
+        // refresh cached profile in AuthContext
+        await refreshProfile();
+      } catch (err) {
+        console.error('Failed to persist AI preference:', err);
+      }
+    }
+  };
 
   return (
     <div className={`${className} bg-white rounded-2xl shadow-sm border border-gray-100`}>
@@ -26,7 +55,7 @@ export default function AISettings({ className = '' }: { className?: string }) {
 
           <div className="flex items-center gap-3">
             <button
-              onClick={() => setAiEnabledByUser(prev => !prev)}
+              onClick={() => persistPreference(!aiEnabledByUser)}
               disabled={!GLOBAL_AI_ENABLED}
               className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
@@ -38,7 +67,7 @@ export default function AISettings({ className = '' }: { className?: string }) {
           </div>
         </div>
 
-        <div className="text-sm text-gray-500">We respect your privacy — user preference is stored locally. To fully disable AI at the platform level, set <code>VITE_ENABLE_AI=false</code> in the environment.</div>
+        <div className="text-sm text-gray-500">We respect your privacy — user preference is stored locally and (when signed-in) in your profile. To fully disable AI at the platform level, set <code>VITE_ENABLE_AI=false</code> in the environment.</div>
       </div>
     </div>
   );

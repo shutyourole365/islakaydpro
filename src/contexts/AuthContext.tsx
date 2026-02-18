@@ -51,6 +51,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         analytics,
         unreadNotifications: unreadCount,
       }));
+
+      // sync server-side AI preference to local storage so UI toggles reflect user's saved preference
+      try {
+        if (profile?.ai_assistant_enabled !== undefined && typeof window !== 'undefined') {
+          window.localStorage.setItem('ai_assistant_enabled', JSON.stringify(!!profile.ai_assistant_enabled));
+        }
+      } catch (e) {
+        /* ignore localStorage errors */
+      }
     } catch (error) {
       console.error('Failed to load user data:', error);
     }
