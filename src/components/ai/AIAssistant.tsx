@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { sendMessage, streamMessage } from '../../services/ai';
 import {
   X,
   Send,
@@ -21,6 +22,8 @@ import {
   Truck,
   PartyPopper,
 } from 'lucide-react';
+
+const AI_ENABLED = import.meta.env.VITE_ENABLE_AI === 'true';
 
 interface Message {
   id: string;
@@ -182,7 +185,69 @@ export default function AIAssistant() {
     setIsTyping(true);
     setShowQuickActions(false);
 
-    // Simulate realistic typing delay
+    // If AI feature flag is enabled, stream a response from the backend AI service.
+    if (AI_ENABLED) {
+      try {
+        const conversationHistory = messages
+          .filter((m) => m.role !== 'system')
+          .slice(-8)
+          .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+
+        conversationHistory.push({ role: 'user', content: userMessage });
+
+        // Insert placeholder assistant message so streaming can update it in-place
+        const placeholderId = Date.now().toString();
+        const placeholderMsg: Message = {
+          id: placeholderId,
+          role: 'assistant',
+          content: '',
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, placeholderMsg]);
+
+        await streamMessage(
+          conversationHistory,
+          undefined,
+          (chunk: string) => {
+            // update placeholder message content with streamed chunk
+            setMessages((prev) =>
+              prev.map((m) => (m.id === placeholderId ? { ...m, content: chunk } : m))
+            );
+          },
+          (suggestions: string[]) => {
+            setMessages((prev) =>
+              prev.map((m) => (m.id === placeholderId ? { ...m, suggestions } : m))
+            );
+            setIsTyping(false);
+          },
+          (error: Error) => {
+            console.error('AI streaming error:', error);
+            // fallback to local rule-based response
+            const response = getContextualResponses(userMessage);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === placeholderId
+                  ? {
+                      ...m,
+                      content: response.content,
+                      suggestions: response.suggestions,
+                      metadata: { type: response.type as 'search' | 'booking' | 'info' | 'recommendation' },
+                    }
+                  : m
+              )
+            );
+            setIsTyping(false);
+          }
+        );
+
+        return;
+      } catch (err) {
+        console.error('AI request failed, falling back to local responses', err);
+        // continue to local fallback below
+      }
+    }
+
+    // Local rule-based fallback (existing behavior)
     const responseDelay = 800 + Math.random() * 1200;
     await new Promise((resolve) => setTimeout(resolve, responseDelay));
 

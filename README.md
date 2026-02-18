@@ -1,1 +1,34 @@
 islakaydpro
+
+Quick start
+
+1. Copy environment variables:
+
+   ```bash
+   cp .env.example .env.local
+   # fill in VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY and optional LLM keys
+   ```
+
+2. Run dev server:
+
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+AI Assistant
+
+- The project includes an AI assistant widget (`AIAssistant` + `AIAssistantEnhanced`).
+- To enable the real LLM-backed assistant set `VITE_ENABLE_AI=true` and provide an `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`.
+- The AI backend is implemented as a Supabase Edge Function at `supabase/functions/ai-chat` which proxies to OpenAI/Anthropic and falls back to rule-based responses when no API key is configured.
+
+Files to check:
+- `src/components/ai/AIAssistant.tsx` — lightweight assistant (now supports streaming from the Edge Function)
+- `src/components/ai/AIAssistantEnhanced.tsx` — advanced assistant (already wired to AI service)
+- `supabase/functions/ai-chat` — server-side AI proxy (reads OPENAI_API_KEY / ANTHROPIC_API_KEY)
+
+Security / notes
+
+- Do NOT commit API keys to Git. Use environment variables or your deployment provider secrets.
+- Edge Function requires `SUPABASE_SERVICE_ROLE_KEY` locally for some operations.
+
