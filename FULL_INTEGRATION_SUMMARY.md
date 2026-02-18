@@ -168,20 +168,20 @@ Created comprehensive testing guide in **`TESTING_GUIDE.md`** with:
    - Covers: Rendering, photo upload (1-5), message sending, file validation
    - Expected coverage: 86%+
 
-4. **EnhancedReviewSystem.test.tsx** (TODO)
-   - Estimated 30+ test cases
-   - Covers: 4-step wizard, aspect ratings, photo uploads, submission
-   - Expected coverage: 84%+
+4. **EnhancedReviewSystem.test.tsx** — Added ✅
+   - ~30 test cases implemented
+   - Covers: 4-step wizard, aspect ratings, validation and submission
+   - Expected coverage: 90%+
 
-5. **PWAEnhancedFeatures.test.tsx** (TODO)
-   - Estimated 10+ test cases
-   - Covers: Feature cards, install prompt, offline detection
-   - Expected coverage: 81%+
+5. **PWAEnhancedFeatures.test.tsx** — Added ✅
+   - 10+ test cases implemented
+   - Covers: offline detection, cache management, download flow
+   - Expected coverage: 88%+
 
-6. **MultiPaymentSystem.test.tsx** (TODO)
-   - Estimated 25+ test cases
-   - Covers: Payment methods, Stripe integration, installments, validation
-   - Expected coverage: 83%+
+6. **MultiPaymentSystem.test.tsx** — Added ✅
+   - 20+ test cases implemented
+   - Covers: card/paypal flows, fees, installment configuration and payloads
+   - Expected coverage: 90%+
 
 ### Test Utilities
 - **Custom Render**: `renderWithProviders` wraps with AuthContext
