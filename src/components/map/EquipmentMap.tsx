@@ -78,8 +78,8 @@ export default function EquipmentMap({
     markers.forEach(({ element }) => element.remove());
 
     const newMarkers: MapMarker[] = [];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const L = (window as any).L;
+    // Access Leaflet from window - dynamically imported
+    const L = (window as unknown as { L: typeof import('leaflet') }).L;
 
     equipment.forEach((item) => {
       if (!item.latitude || !item.longitude) return;

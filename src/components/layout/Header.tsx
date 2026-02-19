@@ -13,9 +13,13 @@ import {
   Settings,
   LayoutDashboard,
   Package,
+  Wrench,
+  Calendar,
+  Users,
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
-import LogoAnimated from '../branding/LogoAnimated';
+import LogoPro from '../branding/LogoPro';
+import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -40,6 +44,8 @@ export default function Header({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
+  const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,6 +63,12 @@ export default function Header({
       }
       if (!target.closest('.notifications-menu') && !target.closest('.notifications-button')) {
         setIsNotificationsOpen(false);
+      }
+      if (!target.closest('.company-menu') && !target.closest('.company-button')) {
+        setIsCompanyMenuOpen(false);
+      }
+      if (!target.closest('.support-menu') && !target.closest('.support-button')) {
+        setIsSupportMenuOpen(false);
       }
     };
     document.addEventListener('click', handleClickOutside);
@@ -78,11 +90,10 @@ export default function Header({
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-12">
             <button onClick={() => onNavigate('home')} className="flex items-center">
-              <LogoAnimated 
-                variant={showTransparent ? 'light' : 'gradient'} 
+              <LogoPro 
+                variant={showTransparent ? 'light' : 'default'} 
                 size="md" 
-                glowIntensity={showTransparent ? 'low' : 'medium'}
-                animated={true}
+                showText={true}
               />
             </button>
 
@@ -94,6 +105,22 @@ export default function Header({
                 }`}
               >
                 Browse Equipment
+              </button>
+              <button
+                onClick={() => onNavigate('help')}
+                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
+                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                }`}
+              >
+                Help
+              </button>
+              <button
+                onClick={() => onNavigate('about')}
+                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
+                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                }`}
+              >
+                About
               </button>
               <button
                 onClick={() => {
@@ -108,22 +135,130 @@ export default function Header({
               >
                 How It Works
               </button>
-              <button
-                onClick={() => onNavigate('home')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
-                For Business
-              </button>
-              <button
-                onClick={() => onNavigate('home')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
-                Support
-              </button>
+              
+              {/* Company Dropdown */}
+              <div className="relative company-menu">
+                <button
+                  onClick={() => setIsCompanyMenuOpen(!isCompanyMenuOpen)}
+                  className={`company-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
+                    showTransparent ? 'text-white/90' : 'text-gray-700'
+                  }`}
+                >
+                  Company
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {isCompanyMenuOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <button
+                      onClick={() => {
+                        onNavigate('about');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      About Us
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('careers');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Careers
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('press');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Press
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('blog');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Blog
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('partnerships');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Partnerships
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('investors');
+                        setIsCompanyMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Investors
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Support Dropdown */}
+              <div className="relative support-menu">
+                <button
+                  onClick={() => setIsSupportMenuOpen(!isSupportMenuOpen)}
+                  className={`support-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
+                    showTransparent ? 'text-white/90' : 'text-gray-700'
+                  }`}
+                >
+                  Support
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {isSupportMenuOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <button
+                      onClick={() => {
+                        onNavigate('help');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Help Center
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('safety');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Safety
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('trust');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Trust & Verification
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate('contact');
+                        setIsSupportMenuOpen(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      Contact Us
+                    </button>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
 
@@ -200,6 +335,7 @@ export default function Header({
                       onClose={() => setIsNotificationsOpen(false)}
                     />
                   </div>
+                  <ThemeToggle variant="dropdown" />
                 </div>
 
                 <div className="relative profile-menu">
@@ -220,10 +356,10 @@ export default function Header({
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 overflow-hidden">
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="font-semibold text-gray-900">John Doe</p>
-                        <p className="text-sm text-gray-500">john@example.com</p>
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden">
+                      <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                        <p className="font-semibold text-gray-900 dark:text-white">John Doe</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">john@example.com</p>
                       </div>
                       <div className="py-2">
                         <button
@@ -231,7 +367,7 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <LayoutDashboard className="w-5 h-5 text-gray-400" />
                           Dashboard
@@ -241,7 +377,7 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Package className="w-5 h-5 text-gray-400" />
                           My Listings
@@ -251,7 +387,7 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Heart className="w-5 h-5 text-gray-400" />
                           Favorites
@@ -261,19 +397,50 @@ export default function Header({
                             onNavigate('dashboard');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Settings className="w-5 h-5 text-gray-400" />
                           Settings
                         </button>
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <button
+                          onClick={() => {
+                            onNavigate('maintenance');
+                            setIsProfileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                        >
+                          <Wrench className="w-5 h-5 text-gray-400" />
+                          Maintenance
+                        </button>
+                        <button
+                          onClick={() => {
+                            onNavigate('scheduler');
+                            setIsProfileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                        >
+                          <Calendar className="w-5 h-5 text-gray-400" />
+                          Smart Scheduler
+                        </button>
+                        <button
+                          onClick={() => {
+                            onNavigate('referrals');
+                            setIsProfileMenuOpen(false);
+                          }}
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                        >
+                          <Users className="w-5 h-5 text-gray-400" />
+                          Referrals
+                        </button>
                       </div>
-                      <div className="border-t border-gray-100 pt-2">
+                      <div className="border-t border-gray-100 dark:border-gray-700 pt-2">
                         <button
                           onClick={() => {
                             onSignOut();
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full"
                         >
                           <LogOut className="w-5 h-5" />
                           Sign Out
@@ -393,6 +560,38 @@ export default function Header({
                 >
                   Dashboard
                 </button>
+                <div className="pt-2 space-y-2">
+                  <button
+                    onClick={() => {
+                      onNavigate('maintenance');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Wrench className="w-4 h-4" />
+                    Maintenance
+                  </button>
+                  <button
+                    onClick={() => {
+                      onNavigate('scheduler');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Smart Scheduler
+                  </button>
+                  <button
+                    onClick={() => {
+                      onNavigate('referrals');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Users className="w-4 h-4" />
+                    Referrals
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="pt-4 border-t border-gray-100 space-y-3">
