@@ -16,6 +16,9 @@ Quick start
    npm run dev
    ```
 
+Devcontainer check
+- The devcontainer now runs a post-create check for sandbox binaries (`ripgrep`, `bubblewrap`, `socat`). If any are missing the check will fail and print install + rebuild instructions so the Codespaces sandbox and Vitest can run locally.
+
 AI Assistant
 
 - The project includes an AI assistant widget (`AIAssistant` + `AIAssistantEnhanced`).
@@ -38,5 +41,3 @@ Security / notes
 
 - Do NOT commit API keys to Git. Use environment variables or your deployment provider secrets.
 - Edge Function requires `SUPABASE_SERVICE_ROLE_KEY` locally for some operations.
-
-<!-- ci: trigger -->
