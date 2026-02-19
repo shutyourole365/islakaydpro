@@ -537,7 +537,7 @@ export default function AIAssistantEnhanced() {
                     className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
                     aria-pressed={aiEnabledByUser}
                   >
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${aiEnabledByUser ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
                   {!GLOBAL_AI_ENABLED && (
                     <span className="text-xs text-gray-400">Disabled by server</span>
