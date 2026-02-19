@@ -1,18 +1,16 @@
+import sanitizeHtml from 'sanitize-html';
+
 export function sanitizeInput(input: string): string {
-  // Remove script tags, event handlers, javascript: and encode < >
-  let sanitized = input;
-  let previous: string;
+  // Use a robust HTML sanitizer to remove potentially dangerous content
+  const sanitized = sanitizeHtml(input, {
+    allowedTags: [],
+    allowedAttributes: {},
+    // Disallow all URL schemes that might be dangerous; default config
+    // already strips "javascript:" URLs from attributes and href/src values
+  });
 
-  // Repeatedly apply multi-character pattern removals until no more changes occur
-  do {
-    previous = sanitized;
-    sanitized = sanitized
-      .replace(/<script.*?>.*?<\/script>/gi, '')
-      .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
-      .replace(/javascript:/gi, '');
-  } while (sanitized !== previous);
-
-  // Finally, remove all angle brackets and trim whitespace
+  // Finally, remove all angle brackets and trim whitespace, preserving
+  // the original behavior expected by callers.
   return sanitized
     .replace(/[<>]/g, '')
     .trim();
