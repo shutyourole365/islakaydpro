@@ -1,7 +1,4 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
-  ignore = "if [[ $CACHED_COMMIT_REF != $COMMIT_REF ]]; then exit 1; else exit 0; fi"
-
-# Custom Domain: islakayd.com
-# Add this domain in Netlify dashboard under Site settings > Domain management
+command = "npx vite build"
+publish = "dist"
+ignore = "if [[ $CACHED_COMMIT_REF != $COMMIT_REF ]]; then exit 1; else exit 0; fi"
