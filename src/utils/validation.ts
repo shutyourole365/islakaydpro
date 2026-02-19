@@ -1,4 +1,20 @@
+import sanitizeHtml from 'sanitize-html';
+
 export function sanitizeInput(input: string): string {
+<<<<<<< alert-autofix-17
+  // Use a robust HTML sanitizer to remove potentially dangerous content
+  const sanitized = sanitizeHtml(input, {
+    allowedTags: [],
+    allowedAttributes: {},
+    // Disallow all URL schemes that might be dangerous; default config
+    // already strips "javascript:" URLs from attributes and href/src values
+  });
+
+  // Finally, remove all angle brackets and trim whitespace, preserving
+  // the original behavior expected by callers.
+  return sanitized
+    .replace(/[<>]/g, '')
+=======
   // Complete XSS prevention - remove all HTML and dangerous patterns
   let sanitized = input;
   
@@ -28,6 +44,7 @@ export function sanitizeInput(input: string): string {
     .replace(/<script.*?>.*?<\/script>/gi, '')
     .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
     .replace(/javascript:/gi, '')
+>>>>>>> main
     .trim();
 }
 
