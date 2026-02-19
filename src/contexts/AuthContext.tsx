@@ -1,8 +1,15 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
 import { getProfile, getUserAnalytics, getUnreadNotificationCount, subscribeToNotifications, logAuditEvent } from '../services/database';
+import { 
+  signInWithRetry, 
+  signUpWithRetry,
+  getAuthErrorMessage,
+  isEmailConfirmationRequired,
+} from '../services/authHelpers';
 
 interface AuthState {
   user: User | null;
@@ -17,6 +24,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -61,7 +69,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         /* ignore localStorage errors */
       }
     } catch (error) {
-      console.error('Failed to load user data:', error);
+      if (import.meta.env.DEV) {
+        console.error('Failed to load user data:', error);
+      }
+      // Track error in analytics and error monitoring
+      if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+        const { analytics: analyticsService } = await import('../services/analytics');
+        analyticsService.trackError(`Auth data load failed: ${(error as Error).message}`, false);
+      }
+      // Send to Sentry if configured
+      const { errorMonitoring } = await import('../services/errorMonitoring');
+      errorMonitoring.captureException(error as Error, {
+        context: 'AuthContext.loadUserData',
+        userId,
+      });
     }
   }, []);
 
@@ -132,43 +153,102 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.user]);
 
   const signIn = async (email: string, password: string) => {
-    const { error, data } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    try {
+      const data = await signInWithRetry(email, password, { maxAttempts: 3, delayMs: 1000 });
 
-    if (data.user) {
-      await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', data.user.id);
-      await logAuditEvent({
-        userId: data.user.id,
-        action: 'sign_in',
-        metadata: { method: 'email' },
-      });
+      if (data.user) {
+        await supabase.from('profiles').update({ last_login: new Date().toISOString() }).eq('id', data.user.id);
+        await logAuditEvent({
+          userId: data.user.id,
+          action: 'sign_in',
+          metadata: { method: 'email' },
+        });
+        
+        // Track sign in event
+        if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+          const { analytics } = await import('../services/analytics');
+          analytics.event('login', { method: 'email' });
+          analytics.setUserId(data.user.id);
+        }
+        // Set user context in error monitoring
+        const { errorMonitoring } = await import('../services/errorMonitoring');
+        errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
+      }
+    } catch (error) {
+      const message = getAuthErrorMessage(error as Error);
+      throw new Error(message);
     }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { error, data } = await supabase.auth.signUp({
-      email,
-      password,
+    try {
+      const data = await signUpWithRetry(
+        email, 
+        password, 
+        { full_name: fullName },
+        { maxAttempts: 3, delayMs: 1000 }
+      );
+
+      if (data.user) {
+        // Create profile (may fail if email confirmation required)
+        try {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            full_name: fullName,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        } catch (profileError) {
+          console.warn('Profile creation deferred until email confirmation:', profileError);
+        }
+
+        await logAuditEvent({
+          userId: data.user.id,
+          action: 'sign_up',
+          metadata: { method: 'email', email_confirmed: !!data.session },
+        });
+        
+        // Track signup event
+        if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+          const { analytics } = await import('../services/analytics');
+          analytics.trackSignUp('email');
+          analytics.setUserId(data.user.id);
+        }
+        // Set user context in error monitoring
+        const { errorMonitoring } = await import('../services/errorMonitoring');
+        errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
+
+        // Check if email confirmation is required
+        const needsConfirmation = await isEmailConfirmationRequired();
+        if (needsConfirmation && !data.session) {
+          throw new Error('EMAIL_CONFIRMATION_REQUIRED');
+        }
+      }
+    } catch (error) {
+      const errorMsg = (error as Error).message;
+      if (errorMsg === 'EMAIL_CONFIRMATION_REQUIRED') {
+        throw new Error('Please check your email to confirm your account before signing in.');
+      }
+      const message = getAuthErrorMessage(error as Error);
+      throw new Error(message);
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
       options: {
-        data: { full_name: fullName },
+        redirectTo: `${window.location.origin}/`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
       },
     });
+    
     if (error) throw error;
-
-    if (data.user) {
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        full_name: fullName,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-
-      await logAuditEvent({
-        userId: data.user.id,
-        action: 'sign_up',
-        metadata: { method: 'email' },
-      });
-    }
+    
+    // Analytics will be tracked after redirect when auth state changes
   };
 
   const signOut = async () => {
@@ -178,6 +258,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         action: 'sign_out',
       });
     }
+
+    // Clear user context from error monitoring
+    const { errorMonitoring } = await import('../services/errorMonitoring');
+    errorMonitoring.clearUser();
 
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
@@ -218,6 +302,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ...state,
         signIn,
         signUp,
+        signInWithGoogle,
         signOut,
         resetPassword,
         updatePassword,

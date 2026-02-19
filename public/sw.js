@@ -260,6 +260,94 @@ self.addEventListener('sync', (event) => {
   }
 });
 
+// Push notification event
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push received:', event);
+
+  let data = {};
+  if (event.data) {
+    data = event.data.json();
+  }
+
+  const options = {
+    body: data.body || 'You have a new notification from Islakayd',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-72x72.png',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: data.primaryKey || 1,
+      url: data.url || '/'
+    },
+    actions: [
+      {
+        action: 'view',
+        title: 'View',
+        icon: '/icons/icon-72x72.png'
+      },
+      {
+        action: 'dismiss',
+        title: 'Dismiss'
+      }
+    ],
+    requireInteraction: true,
+    silent: false
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Islakayd', options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification click received:', event);
+
+  event.notification.close();
+
+  if (event.action === 'dismiss') {
+    return;
+  }
+
+  const urlToOpen = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((windowClients) => {
+        // Check if there is already a window/tab open with the target URL
+        for (let client of windowClients) {
+          if (client.url === urlToOpen && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // If not, open a new window/tab with the target URL
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
+  );
+});
+
+// Push subscription change event
+self.addEventListener('pushsubscriptionchange', (event) => {
+  console.log('[SW] Push subscription change:', event);
+
+  // Re-subscribe to push notifications
+  event.waitUntil(
+    self.registration.pushManager.subscribe(event.oldSubscription.options)
+      .then((subscription) => {
+        // Send new subscription to server
+        return fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(subscription)
+        });
+      })
+  );
+});
+
 async function syncBookings() {
   // Sync pending bookings when back online
   console.log('[SW] Syncing bookings...');

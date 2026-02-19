@@ -1,8 +1,33 @@
 export function sanitizeInput(input: string): string {
+  // Complete XSS prevention - remove all HTML and dangerous patterns
+  let sanitized = input;
+  
+  // First pass: remove all HTML tags completely
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+  
+  // Remove all event handlers (even without quotes)
+  sanitized = sanitized.replace(/on\w+\s*=\s*[^\s>]*/gi, '');
+  
+  // Remove dangerous URL schemes (including hex/unicode encoded versions)
+  sanitized = sanitized.replace(/(?:javascript|data|vbscript|file|about)\s*:/gi, '');
+  
+  // Remove HTML entities that could be used for obfuscation
+  sanitized = sanitized.replace(/&[#\w]+;/g, '');
+  
+  // Remove any remaining angle brackets
+  sanitized = sanitized.replace(/[<>]/g, '');
+  
+  // Remove null bytes and control characters (using proper escaping)
+  // eslint-disable-next-line no-control-regex
+  sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
+  
+  return sanitized.trim();
+  // Remove script tags, event handlers, javascript: and encode < >
   return input
     .replace(/[<>]/g, '')
+    .replace(/<script.*?>.*?<\/script>/gi, '')
+    .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
     .replace(/javascript:/gi, '')
-    .replace(/on\w+=/gi, '')
     .trim();
 }
 
@@ -180,29 +205,24 @@ export function validateImageUrl(url: string): { valid: boolean; error?: string 
   if (!url) {
     return { valid: true };
   }
-
   try {
     const parsed = new URL(url);
-
-    if (!['http:', 'https:'].includes(parsed.protocol)) {
+    // Only allow http/https, block all others (ftp, file, data, javascript, etc)
+    if (!/^https?:$/.test(parsed.protocol)) {
       return { valid: false, error: 'Invalid image URL protocol' };
     }
-
     const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
     const hasImageExtension = imageExtensions.some((ext) =>
       parsed.pathname.toLowerCase().endsWith(ext)
     );
-
     const isKnownImageHost = [
       'images.pexels.com',
       'images.unsplash.com',
       'cdn.pixabay.com',
     ].some((host) => parsed.hostname.includes(host));
-
     if (!hasImageExtension && !isKnownImageHost) {
       return { valid: false, error: 'URL does not appear to be an image' };
     }
-
     return { valid: true };
   } catch {
     return { valid: false, error: 'Invalid URL format' };

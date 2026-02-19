@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense, ComponentType, ReactNode } from 'react';
 
 // Loading skeleton component for lazy-loaded content
@@ -96,6 +97,7 @@ function LazyLoad<T extends ComponentType<Record<string, unknown>>>({
   
   return (
     <Suspense fallback={fallback}>
+      {/* @ts-expect-error - Generic component props spreading */}
       <LazyComponent {...props} />
     </Suspense>
   );
@@ -292,9 +294,9 @@ function memoize<T extends (...args: unknown[]) => unknown>(fn: T): T {
   return ((...args: Parameters<T>): ReturnType<T> => {
     const key = JSON.stringify(args);
     if (cache.has(key)) {
-      return cache.get(key);
+      return cache.get(key) as ReturnType<T>;
     }
-    const result = fn(...args);
+    const result = fn(...args) as ReturnType<T>;
     cache.set(key, result);
     return result;
   }) as T;

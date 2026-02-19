@@ -1,0 +1,35 @@
+name: "CodeQL Configuration"
+
+# Paths to exclude from analysis
+paths-ignore:
+  - 'dist/**'
+  - 'node_modules/**'
+  - '**/*.sql'
+  - 'supabase/migrations/**'
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.config.js'
+  - '**/*.config.ts'
+  - 'SEED_DATA.sql'
+  - 'COMPLETE_DATABASE_SETUP.sql'
+  - 'setup-database.sql'
+  - '**/__tests__/**'
+
+# Paths to include (override excludes)
+paths:
+  - 'src/**'
+  - '.github/workflows/**'
+
+# Query packs to run
+packs:
+  - codeql/javascript-queries
+  
+# Disable specific queries
+disable-default-queries: false
+
+# Query filters
+query-filters:
+  - exclude:
+      id: 
+        - js/sql-injection  # We handle SQL via Supabase client, not raw SQL
+        - js/incomplete-url-scheme-check

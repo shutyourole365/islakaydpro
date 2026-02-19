@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, Package, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { signUpWithRetry, getAuthErrorMessage } from '../../services/authHelpers';
 import SocialAuth from './SocialAuth';
 import BiometricAuth from './BiometricAuth';
 
@@ -19,16 +20,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  // Advanced auth state reserved for future biometric/social features
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_showAdvancedAuth, setShowAdvancedAuth] = useState(false);
+
+  // Generate unique IDs for form accessibility
+  const emailId = useId();
+  const passwordId = useId();
+  const fullNameId = useId();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -36,10 +40,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setLoading(false);
 
     if (error) {
-      setError(error.message);
-    } else {
-      onSuccess();
-      onClose();
+      // Provide user-friendly error messages
+      if (error.message.includes('Invalid login credentials')) {
+        setError('Invalid email or password. Please try again.');
+      } else if (error.message.includes('Email not confirmed')) {
+        setError('Please verify your email address. Check your inbox for the confirmation link.');
+      } else {
+        setError(error.message);
+      }
+    } else if (data.session) {
+      setSuccess('✅ Successfully signed in! Redirecting...');
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+      }, 800);
     }
   };
 
@@ -47,37 +61,37 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
-      },
-    });
+    try {
+      const data = await signUpWithRetry(
+        email,
+        password,
+        { full_name: fullName },
+        { maxAttempts: 3, delayMs: 1000 }
+      );
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
+      if (data.user) {
+        // If Supabase requires email confirmation, there will be no session
+        if (!data.session) {
+          setSuccess('✅ Account created! Please check your email to confirm your account.');
+          setLoading(false);
+          return;
+        }
 
-    if (data.user) {
-      const { error: profileError } = await supabase.from('profiles').insert({
-        id: data.user.id,
-        full_name: fullName,
-      });
-
-      if (profileError && !profileError.message.includes('duplicate')) {
-        console.error('Profile creation error:', profileError);
+        // Auto-confirmed (session exists)
+        setSuccess('✅ Account created successfully! Welcome to Islakayd!');
+        setLoading(false);
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 800);
       }
+    } catch (err) {
+      const message = getAuthErrorMessage(err as Error);
+      setError(message);
+      setLoading(false);
     }
-
-    setLoading(false);
-    onSuccess();
-    onClose();
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -198,12 +212,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
             >
               {mode === 'signup' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={fullNameId} className="block text-sm font-medium text-gray-700 mb-1.5">
                     Full Name
                   </label>
                   <div className="relative">
                     <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
+                      id={fullNameId}
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
@@ -216,12 +231,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id={emailId}
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -234,12 +250,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
               {mode !== 'forgot' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 mb-1.5">
                     Password
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
+                      id={passwordId}
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -312,12 +329,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
             {/* Social Auth */}
             <SocialAuth
-              onSuccess={() => {
-                onSuccess();
-                onClose();
-              }}
               onError={(err) => setError(err)}
-              showMagicLink={true}
+              onLoading={(loading) => setLoading(loading)}
+              mode={mode === 'signin' ? 'signin' : 'signup'}
             />
 
             {/* Biometric Auth */}
@@ -329,7 +343,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     onClose();
                   }}
                   onError={(err) => setError(err)}
-                  mode="authenticate"
                 />
               </div>
             )}

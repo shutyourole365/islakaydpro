@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense, lazy, useTransition } from 'react';
 import {
   LayoutDashboard,
   Package,
@@ -20,7 +20,6 @@ import {
   AlertCircle,
   Shield,
   Eye,
-  Users,
   Activity,
   Loader2,
   Search,
@@ -37,6 +36,7 @@ import {
   FileText,
   Building,
   RefreshCw,
+  Users,
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
@@ -56,6 +56,11 @@ import {
   updateProfile,
   updateBookingStatus,
 } from '../../services/database';
+import ReferralProgram from '../referral/ReferralProgram';
+
+// Lazy load components for better performance
+const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
+const NotificationSettings = lazy(() => import('../settings/NotificationSettings'));
 
 interface DashboardProps {
   onBack: () => void;
@@ -63,7 +68,7 @@ interface DashboardProps {
   onListEquipment: () => void;
 }
 
-type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings';
+type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings' | 'referral';
 type BookingFilter = 'all' | 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
 
 export default function Dashboard({
@@ -92,6 +97,10 @@ export default function Dashboard({
   });
   const [saving, setSaving] = useState(false);
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+
+  // Use transition for non-urgent updates
+  const [, startTransition] = useTransition();
 
   const loadDashboardData = useCallback(async () => {
     if (!user) return;
@@ -108,19 +117,22 @@ export default function Dashboard({
         getConversations(user.id),
       ]);
 
-      setAnalytics(analyticsData);
-      setBookings(bookingsData);
-      setOwnerBookings(ownerBookingsData);
-      setMyListings(listingsData.data);
-      setFavorites(favoritesData.map(f => f.equipment!).filter(Boolean));
-      setNotifications(notificationsData);
-      setConversations(conversationsData);
+      // Use startTransition for non-urgent state updates
+      startTransition(() => {
+        setAnalytics(analyticsData);
+        setBookings(bookingsData);
+        setOwnerBookings(ownerBookingsData);
+        setMyListings(listingsData.data);
+        setFavorites(favoritesData.map(f => f.equipment!).filter(Boolean));
+        setNotifications(notificationsData);
+        setConversations(conversationsData);
+      });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, startTransition]);
 
   useEffect(() => {
     loadDashboardData();
@@ -212,6 +224,7 @@ export default function Dashboard({
     { id: 'notifications', label: 'Notifications', icon: Activity, badge: notifications.filter(n => !n.is_read).length },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'referral', label: 'Referrals', icon: Users },
   ];
 
   const getStatusBadge = (status: string) => {
@@ -363,6 +376,18 @@ export default function Dashboard({
                     color="bg-teal-500"
                   />
                 </div>
+
+                {/* Enhanced Analytics Charts - NEW */}
+                <Suspense fallback={
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-center h-64">
+                    <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+                  </div>
+                }>
+                  <AnalyticsCharts
+                    userId={user?.id || ''}
+                    analytics={undefined}
+                  />
+                </Suspense>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -852,56 +877,73 @@ export default function Dashboard({
                   <h2 className="text-lg font-semibold text-gray-900">
                     Notifications ({notifications.filter(n => !n.is_read).length} unread)
                   </h2>
-                  {notifications.some(n => !n.is_read) && (
+                  <div className="flex items-center gap-3">
                     <button
-                      onClick={handleMarkAllRead}
-                      className="text-teal-600 text-sm font-medium hover:text-teal-700"
+                      onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+                      className="text-teal-600 text-sm font-medium hover:text-teal-700 flex items-center gap-1"
                     >
-                      Mark all as read
+                      <Settings className="w-4 h-4" />
+                      Settings
                     </button>
-                  )}
+                    {notifications.some(n => !n.is_read) && (
+                      <button
+                        onClick={handleMarkAllRead}
+                        className="text-teal-600 text-sm font-medium hover:text-teal-700"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {notifications.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
-                    <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No notifications</h3>
-                    <p className="text-gray-600">You're all caught up!</p>
-                  </div>
+                {showNotificationSettings ? (
+                  <Suspense fallback={<div className="flex items-center justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-teal-600" /></div>}>
+                    <NotificationSettings />
+                  </Suspense>
                 ) : (
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`p-4 flex items-start gap-4 ${!notification.is_read ? 'bg-teal-50/50' : ''}`}
-                      >
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          notification.type.includes('booking') ? 'bg-blue-100 text-blue-600' :
-                          notification.type === 'new_message' ? 'bg-green-100 text-green-600' :
-                          notification.type.includes('payment') ? 'bg-amber-100 text-amber-600' :
-                          'bg-gray-100 text-gray-600'
-                        }`}>
-                          {notification.type.includes('booking') ? <Calendar className="w-5 h-5" /> :
-                           notification.type === 'new_message' ? <MessageSquare className="w-5 h-5" /> :
-                           notification.type.includes('payment') ? <DollarSign className="w-5 h-5" /> :
-                           <Activity className="w-5 h-5" />}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900">{notification.title}</p>
-                          <p className="text-sm text-gray-600">{notification.message}</p>
-                          <p className="text-xs text-gray-500 mt-1">{formatRelativeTime(notification.created_at)}</p>
-                        </div>
-                        {!notification.is_read && (
-                          <button
-                            onClick={() => handleMarkNotificationRead(notification.id)}
-                            className="p-1 text-teal-600 hover:bg-teal-100 rounded"
-                          >
-                            <Check className="w-4 h-4" />
-                          </button>
-                        )}
+                  <>
+                    {notifications.length === 0 ? (
+                      <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+                        <Activity className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No notifications</h3>
+                        <p className="text-gray-600">You're all caught up!</p>
                       </div>
-                    ))}
-                  </div>
+                    ) : (
+                      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
+                        {notifications.map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={`p-4 flex items-start gap-4 ${!notification.is_read ? 'bg-teal-50/50' : ''}`}
+                          >
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              notification.type.includes('booking') ? 'bg-blue-100 text-blue-600' :
+                              notification.type === 'new_message' ? 'bg-green-100 text-green-600' :
+                              notification.type.includes('payment') ? 'bg-amber-100 text-amber-600' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>
+                              {notification.type.includes('booking') ? <Calendar className="w-5 h-5" /> :
+                               notification.type === 'new_message' ? <MessageSquare className="w-5 h-5" /> :
+                               notification.type.includes('payment') ? <DollarSign className="w-5 h-5" /> :
+                               <Activity className="w-5 h-5" />}
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{notification.title}</p>
+                              <p className="text-sm text-gray-600">{notification.message}</p>
+                              <p className="text-xs text-gray-500 mt-1">{formatRelativeTime(notification.created_at)}</p>
+                            </div>
+                            {!notification.is_read && (
+                              <button
+                                onClick={() => handleMarkNotificationRead(notification.id)}
+                                className="p-1 text-teal-600 hover:bg-teal-100 rounded"
+                              >
+                                <Check className="w-4 h-4" />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -1130,6 +1172,15 @@ export default function Dashboard({
                     Delete Account
                   </button>
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'referral' && (
+              <div className="space-y-6">
+                <ReferralProgram
+                  userId={user?.id || ''}
+                  userName={profile?.full_name || user?.email || ''}
+                />
               </div>
             )}
           </div>

@@ -23,6 +23,7 @@ import {
   Truck,
   PartyPopper,
 } from 'lucide-react';
+import { sendMessage } from '../../services/ai';
 
 const AI_ENABLED = import.meta.env.VITE_ENABLE_AI === 'true';
 
@@ -258,18 +259,44 @@ export default function AIAssistant() {
     await new Promise((resolve) => setTimeout(resolve, responseDelay));
 
     const response = getContextualResponses(userMessage);
+    try {
+      // Try to use the real AI service
+      const conversationMessages = messages
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .map(m => ({ role: m.role, content: m.content }));
+      
+      // Add the new user message
+      conversationMessages.push({ role: 'user' as const, content: userMessage });
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: 'assistant',
-      content: response.content,
-      timestamp: new Date(),
-      suggestions: response.suggestions,
-      metadata: { type: response.type as 'search' | 'booking' | 'info' | 'recommendation' },
-    };
+      const aiResponse = await sendMessage(conversationMessages);
 
-    setMessages((prev) => [...prev, newMessage]);
-    setIsTyping(false);
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: aiResponse.content,
+        timestamp: new Date(),
+        suggestions: aiResponse.suggestions,
+        metadata: { type: 'info' },
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+    } catch {
+      // Fallback to contextual responses if AI service fails
+      const response = getContextualResponses(userMessage);
+
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: response.content,
+        timestamp: new Date(),
+        suggestions: response.suggestions,
+        metadata: { type: response.type as 'search' | 'booking' | 'info' | 'recommendation' },
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleFeedback = (messageId: string, isPositive: boolean) => {
@@ -329,7 +356,7 @@ export default function AIAssistant() {
 
       {isOpen && (
         <div
-          className={`fixed z-50 bg-white shadow-2xl flex flex-col transition-all duration-300 ${
+          className={`fixed z-50 bg-white dark:bg-gray-900 shadow-2xl flex flex-col transition-all duration-300 ${
             isExpanded
               ? 'inset-4 rounded-3xl'
               : 'bottom-6 right-6 w-[420px] h-[640px] rounded-3xl'
@@ -403,8 +430,14 @@ export default function AIAssistant() {
                   >
                     <div className="text-sm whitespace-pre-line prose prose-sm max-w-none">
                       {message.content.split('\n').map((line, i) => {
-                        // Handle bold text
-                        const boldParsed = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        // Handle bold text, escape HTML to prevent XSS
+                        const escapeHtml = (text: string) => {
+                          const htmlMap: Record<string, string> = {
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;',
+                          };
+                          return text.replace(/[&<>"']/g, (m) => htmlMap[m] ?? m);
+                        };
+                        const boldParsed = escapeHtml(line).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                         return (
                           <span key={i} dangerouslySetInnerHTML={{ __html: boldParsed }} className="block" />
                         );
