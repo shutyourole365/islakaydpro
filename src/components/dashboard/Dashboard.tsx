@@ -1142,7 +1142,7 @@ export default function Dashboard({
                     <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
                   </div>
                   <div className="p-6 space-y-4">
-                    [
+                    {[
                       { label: 'Email notifications for new messages', key: 'email_messages', checked: true },
                       { label: 'Email notifications for booking updates', key: 'email_bookings', checked: true },
                       { label: 'Marketing and promotional emails', key: 'email_marketing', checked: false },

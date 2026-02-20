@@ -1,52 +1,31 @@
 import sanitizeHtml from 'sanitize-html';
 
 export function sanitizeInput(input: string): string {
-<<<<<<< alert-autofix-17
-  // Use a robust HTML sanitizer to remove potentially dangerous content
-  const sanitized = sanitizeHtml(input, {
-    allowedTags: [],
-    allowedAttributes: {},
-    // Disallow all URL schemes that might be dangerous; default config
-    // already strips "javascript:" URLs from attributes and href/src values
-  });
-
-  // Finally, remove all angle brackets and trim whitespace, preserving
-  // the original behavior expected by callers.
-  return sanitized
-    .replace(/[<>]/g, '')
-=======
-  // Complete XSS prevention - remove all HTML and dangerous patterns
+  // Basic sanitization: strip HTML tags and dangerous patterns
   let sanitized = input;
-  
-  // First pass: remove all HTML tags completely
+
+  // remove any HTML tags
   sanitized = sanitized.replace(/<[^>]*>/g, '');
-  
-  // Remove all event handlers (even without quotes)
-  sanitized = sanitized.replace(/on\w+\s*=\s*[^\s>]*/gi, '');
-  
-  // Remove dangerous URL schemes (including hex/unicode encoded versions)
+
+  // strip event handlers like onclick= etc
+  sanitized = sanitized.replace(/on\w+\s*=\s*[^\s>]*?/gi, '');
+
+  // remove dangerous URI schemes
   sanitized = sanitized.replace(/(?:javascript|data|vbscript|file|about)\s*:/gi, '');
-  
-  // Remove HTML entities that could be used for obfuscation
+
+  // remove HTML entities
   sanitized = sanitized.replace(/&[#\w]+;/g, '');
-  
-  // Remove any remaining angle brackets
+
+  // remove angle brackets leftover
   sanitized = sanitized.replace(/[<>]/g, '');
-  
-  // Remove null bytes and control characters (using proper escaping)
+
+  // remove control characters
   // eslint-disable-next-line no-control-regex
   sanitized = sanitized.replace(/[\x00-\x1F\x7F]/g, '');
-  
+
   return sanitized.trim();
-  // Remove script tags, event handlers, javascript: and encode < >
-  return input
-    .replace(/[<>]/g, '')
-    .replace(/<script.*?>.*?<\/script>/gi, '')
-    .replace(/on\w+\s*=\s*(['"]).*?\1/gi, '')
-    .replace(/javascript:/gi, '')
->>>>>>> main
-    .trim();
 }
+
 
 export function validateEmail(email: string): { valid: boolean; error?: string } {
   const sanitized = sanitizeInput(email);
