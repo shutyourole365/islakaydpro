@@ -1,4 +1,4 @@
-import sanitizeHtml from 'sanitize-html';
+// note: sanitize_html types imported separately for compile
 
 export function sanitizeInput(input: string): string {
   // Basic sanitization: strip HTML tags and dangerous patterns
