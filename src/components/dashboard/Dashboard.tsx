@@ -38,6 +38,7 @@ import {
   RefreshCw,
   Users,
 } from 'lucide-react';
+import AISettings from '../settings/AISettings';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -1134,12 +1135,14 @@ export default function Dashboard({
                   </div>
                 </div>
 
+                <AISettings />
+
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
                   <div className="p-6 border-b border-gray-100">
                     <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
                   </div>
                   <div className="p-6 space-y-4">
-                    {[
+                    [
                       { label: 'Email notifications for new messages', key: 'email_messages', checked: true },
                       { label: 'Email notifications for booking updates', key: 'email_bookings', checked: true },
                       { label: 'Marketing and promotional emails', key: 'email_marketing', checked: false },

@@ -15,6 +15,7 @@ export interface Profile {
   verification_level?: 'none' | 'basic' | 'complete';
   last_login: string | null;
   account_status: 'active' | 'suspended' | 'banned';
+  ai_assistant_enabled?: boolean; // user preference persisted server-side
   rating: number;
   total_reviews: number;
   total_rentals?: number;
