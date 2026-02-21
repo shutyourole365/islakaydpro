@@ -1,3 +1,4 @@
+// React import removed (not needed since using JSX runtime)
 import { Bot, Lock } from 'lucide-react';
 import { useLocalStorage } from '../../hooks';
 
@@ -5,7 +6,7 @@ const GLOBAL_AI_ENABLED = import.meta.env.VITE_ENABLE_AI === 'true';
 
 export default function AISettings({ className = '' }: { className?: string }) {
   const [aiEnabledByUser, setAiEnabledByUser] = useLocalStorage<boolean>('ai_assistant_enabled', true);
-  const { user, refreshProfile } = (function tryUseAuth() {    try {
+  const { user, refreshProfile } = (function tryUseAuth() {    try { // note: profile intentionally omitted, unused
       // dynamic import to avoid circular dependency errors in tests
        
       // eslint-disable-next-line @typescript-eslint/no-require-imports
