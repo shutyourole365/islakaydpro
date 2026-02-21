@@ -308,6 +308,9 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
           <button
             onClick={() => setExpandedBundle(isExpanded ? null : bundle.id)}
             className="w-full mt-4 py-2 text-sm text-teal-600 hover:text-teal-700 flex items-center justify-center gap-1 border-t pt-3"
+            aria-expanded={isExpanded}
+            aria-controls={`bundle-details-${bundle.id}`}
+            aria-label={isExpanded ? 'Hide bundle details' : 'View bundle contents'}
           >
             {isExpanded ? (
               <>
@@ -322,7 +325,7 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
 
           {/* Expanded Content */}
           {isExpanded && (
-            <div className="mt-4 pt-4 border-t space-y-3">
+            <div id={`bundle-details-${bundle.id}`} className="mt-4 pt-4 border-t space-y-3">
               <h4 className="font-medium text-gray-900">Included Equipment:</h4>
               {bundleEquipment.map((eq) => (
                 <div key={eq.id} className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg">
@@ -368,8 +371,10 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
                 <button
                   onClick={() => handleDeleteBundle(bundle.id)}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                  aria-label="Delete bundle"
+                  title="Delete bundle"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
               </>
             )}
@@ -449,34 +454,46 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+              <label htmlFor="discount-percentage" className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
               <input
+                id="discount-percentage"
                 type="number"
                 min="1"
                 max="50"
+                placeholder="e.g., 10"
+                title="Discount percentage"
                 value={formData.discount_percentage}
                 onChange={(e) => setFormData({ ...formData, discount_percentage: parseInt(e.target.value) || 0 })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                aria-label="Discount percentage"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min Days</label>
+              <label htmlFor="min-days" className="block text-sm font-medium text-gray-700 mb-1">Min Days</label>
               <input
+                id="min-days"
                 type="number"
                 min="1"
+                placeholder="1"
+                title="Minimum rental days"
                 value={formData.min_rental_days}
                 onChange={(e) => setFormData({ ...formData, min_rental_days: parseInt(e.target.value) || 1 })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                aria-label="Minimum rental days"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Days</label>
+              <label htmlFor="max-days" className="block text-sm font-medium text-gray-700 mb-1">Max Days</label>
               <input
+                id="max-days"
                 type="number"
                 min="1"
+                placeholder="30"
+                title="Maximum rental days"
                 value={formData.max_rental_days}
                 onChange={(e) => setFormData({ ...formData, max_rental_days: parseInt(e.target.value) || 30 })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                aria-label="Maximum rental days"
               />
             </div>
           </div>

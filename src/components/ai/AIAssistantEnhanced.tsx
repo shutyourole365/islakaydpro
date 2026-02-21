@@ -528,7 +528,7 @@ export default function AIAssistantEnhanced() {
                   onClick={() => setVoiceEnabled(!voiceEnabled)}
                   className={`w-12 h-6 rounded-full transition-colors ${voiceEnabled ? 'bg-teal-500' : 'bg-gray-300'}`}
                   aria-label="Toggle voice responses"
-                  aria-pressed={voiceEnabled ? 'true' : 'false'}
+                  aria-pressed={voiceEnabled}
                 >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${voiceEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                 </button>
@@ -567,7 +567,7 @@ export default function AIAssistantEnhanced() {
                     }}
                     disabled={!GLOBAL_AI_ENABLED}
                     className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    aria-pressed={aiEnabledByUser ? 'true' : 'false'}
+                    aria-pressed={aiEnabledByUser}
                     aria-label="Toggle LLM (Kayd AI)"
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'translate-x-6' : 'translate-x-0.5'}`} />

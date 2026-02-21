@@ -238,7 +238,8 @@ export default function AIDamageDetection({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-             aria-label="Close damage detection">
+              aria-label="Close damage detection"
+            >
               <XCircle className="w-6 h-6" />
             </button>
           </div>
@@ -327,8 +328,10 @@ export default function AIDamageDetection({
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-orange-300 hover:text-orange-500 transition-colors"
+                      aria-label="Add photos"
+                      title="Add photos"
                     >
-                      <ImageIcon className="w-8 h-8" />
+                      <ImageIcon className="w-8 h-8" aria-hidden="true" />
                     </button>
                   </div>
                 )}
@@ -390,6 +393,8 @@ export default function AIDamageDetection({
                         className={`absolute border-2 rounded ${
                           selectedDamage?.id === damage.id ? 'border-red-500' : 'border-orange-400'
                         } animate-pulse cursor-pointer`}
+                        aria-label={`${damage.type} - ${Math.round(damage.confidence * 100)}% confidence`}
+                        title={`${damage.type} - ${Math.round(damage.confidence * 100)}% confidence`}
                         style={{
                           left: `${damage.boundingBox.x}%`,
                           top: `${damage.boundingBox.y}%`,
@@ -417,8 +422,10 @@ export default function AIDamageDetection({
                       <button
                         onClick={() => setShowComparison(!showComparison)}
                         className="absolute top-4 right-4 px-3 py-1.5 bg-white/90 rounded-full text-sm font-medium text-gray-700 shadow"
+                        aria-label={showComparison ? 'Hide comparison' : 'Show comparison'}
+                        title={showComparison ? 'Hide comparison' : 'Show comparison'}
                       >
-                        <Eye className="w-4 h-4 inline mr-1" />
+                        <Eye className="w-4 h-4 inline mr-1" aria-hidden="true" />
                         Compare
                       </button>
                     )}
@@ -426,15 +433,17 @@ export default function AIDamageDetection({
 
                   {/* Photo Thumbnails */}
                   <div className="flex gap-2 overflow-x-auto">
-                    {photos.map((photo, index) => (
+                      {photos.map((photo, index) => (
                       <button
                         key={index}
                         onClick={() => setActivePhoto(index)}
                         className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 ${
                           activePhoto === index ? 'border-orange-500' : 'border-transparent'
                         }`}
+                        aria-label={`View photo ${index + 1}`}
+                        title={`View photo ${index + 1}`}
                       >
-                        <img src={photo} alt="" className="w-full h-full object-cover" />
+                        <img src={photo} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>
@@ -497,6 +506,10 @@ export default function AIDamageDetection({
                           <div className="mt-2 h-1 bg-gray-100 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-orange-500"
+                              role="progressbar"
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              aria-valuenow={Math.round(damage.confidence * 100)}
                               style={{ width: `${damage.confidence * 100}%` }}
                             />
                           </div>

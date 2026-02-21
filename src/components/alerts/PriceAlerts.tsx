@@ -219,7 +219,7 @@ export default function PriceAlerts({
             {/* Target price slider */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700">Target Price</label>
+                <label htmlFor="target-price-range" className="text-sm font-medium text-gray-700">Target Price</label>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-orange-600">${newAlert.targetPrice}</span>
                   <span className="text-sm text-gray-500">/day</span>
@@ -229,12 +229,15 @@ export default function PriceAlerts({
                 </div>
               </div>
               <input
+                id="target-price-range"
                 type="range"
                 min={Math.floor(equipment.daily_rate * 0.5)}
                 max={equipment.daily_rate - 1}
                 value={newAlert.targetPrice}
                 onChange={(e) => setNewAlert(prev => ({ ...prev, targetPrice: Number(e.target.value) }))}
                 className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-orange-500"
+                aria-label="Target price slider"
+                title="Adjust target price"
               />
               <div className="flex justify-between text-xs text-gray-500 mt-1">
                 <span>50% off (${Math.floor(equipment.daily_rate * 0.5)})</span>

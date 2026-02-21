@@ -1080,20 +1080,27 @@ export default function Dashboard({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+                        <label htmlFor="settings-full-name" className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
                         <input
+                          id="settings-full-name"
                           type="text"
+                          placeholder="Your full name"
+                          title="Full name"
                           value={settingsForm.full_name}
                           onChange={(e) => setSettingsForm(prev => ({ ...prev, full_name: e.target.value }))}
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                          aria-label="Full name"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                        <label htmlFor="settings-email" className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
                         <input
+                          id="settings-email"
                           type="email"
                           value={user?.email || ''}
                           disabled
+                          title="Email address"
+                          aria-label="Email address"
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-500"
                         />
                       </div>
