@@ -291,7 +291,7 @@ export default function MaintenanceScheduler({ equipment: propEquipment, classNa
               <Plus className="w-4 h-4" />
               Add Task
             </button>
-            <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+            <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Icon button">
               <Download className="w-5 h-5" />
             </button>
             <button className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">

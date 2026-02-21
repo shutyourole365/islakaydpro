@@ -203,7 +203,7 @@ export default function SplitPayment({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-            >
+             aria-label="Icon button">
               <XCircle className="w-6 h-6" />
             </button>
           </div>
@@ -483,7 +483,7 @@ export default function SplitPayment({
                   <button
                     onClick={copyLink}
                     className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-                  >
+                   aria-label="Icon button">
                     <Copy className="w-5 h-5 text-gray-600" />
                   </button>
                   <button

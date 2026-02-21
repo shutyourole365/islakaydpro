@@ -280,6 +280,7 @@ export default function Dashboard({
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -290,6 +291,7 @@ export default function Dashboard({
           <button
             onClick={loadDashboardData}
             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Reload dashboard data"
           >
             <RefreshCw className="w-5 h-5" />
           </button>
@@ -393,7 +395,7 @@ export default function Dashboard({
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-lg font-semibold text-gray-900">Performance Overview</h2>
-                      <select className="text-sm border-0 text-gray-500 focus:ring-0">
+                      <select aria-label="Select time range" className="text-sm border-0 text-gray-500 focus:ring-0">
                         <option>Last 30 days</option>
                         <option>Last 90 days</option>
                         <option>This year</option>
@@ -514,6 +516,7 @@ export default function Dashboard({
                   <h2 className="text-lg font-semibold text-gray-900">My Bookings</h2>
                   <div className="flex items-center gap-2">
                     <select
+                      aria-label="Filter bookings"
                       value={bookingFilter}
                       onChange={(e) => setBookingFilter(e.target.value as BookingFilter)}
                       className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-500"
@@ -695,7 +698,7 @@ export default function Dashboard({
                             >
                               View
                             </button>
-                            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Icon button">
                               <Edit className="w-5 h-5" />
                             </button>
                             <button className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
@@ -852,7 +855,7 @@ export default function Dashboard({
                             <button
                               onClick={handleSendMessage}
                               className="p-2 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors"
-                            >
+                             aria-label="Icon button">
                               <Send className="w-5 h-5" />
                             </button>
                           </div>

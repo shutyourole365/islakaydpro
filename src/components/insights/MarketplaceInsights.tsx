@@ -631,7 +631,7 @@ export default function MarketplaceInsights({ categoryId, equipmentId, onClose }
               <option value="1y" className="text-gray-900">Last year</option>
             </select>
             {onClose && (
-              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors">
+              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors" aria-label="Icon button">
                 <X className="w-5 h-5" />
               </button>
             )}

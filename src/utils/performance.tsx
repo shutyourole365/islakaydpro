@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense, ComponentType, ReactNode } from 'react';
 
 // Loading skeleton component for lazy-loaded content

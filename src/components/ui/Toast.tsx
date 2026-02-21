@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { useState, useEffect, createContext, useContext, useCallback, type ReactNode } from 'react';
 import { CheckCircle2, XCircle, AlertCircle, Info, X } from 'lucide-react';
 
@@ -116,7 +115,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
         <p className="font-semibold text-sm">{toast.title}</p>
         {toast.message && <p className="text-sm opacity-80 mt-0.5">{toast.message}</p>}
       </div>
-      <button onClick={onClose} className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors">
+      <button onClick={onClose} className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors" aria-label="Icon button">
         <X className="w-4 h-4" />
       </button>
     </div>

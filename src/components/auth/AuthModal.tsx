@@ -172,7 +172,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
-          >
+           aria-label="Icon button">
             <X className="w-6 h-6 text-gray-500" />
           </button>
 

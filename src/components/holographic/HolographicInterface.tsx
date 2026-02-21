@@ -558,7 +558,7 @@ export default function HolographicInterface() {
               onClick={resetInterface}
               className="p-2 border rounded hover:bg-gray-50"
               title="Reset Interface"
-            >
+             aria-label="Icon button">
               <RotateCcw className="w-4 h-4" />
             </button>
 

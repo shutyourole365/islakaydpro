@@ -198,7 +198,6 @@ export default function EquipmentMapEnhanced({
         mapInstance.remove();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle user location
@@ -432,7 +431,7 @@ export default function EquipmentMapEnhanced({
         <button
           onClick={toggleFullscreen}
           className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-        >
+         aria-label="Icon button">
           <Maximize2 className="w-5 h-5 text-gray-700" />
         </button>
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -445,14 +444,14 @@ export default function EquipmentMapEnhanced({
           <button
             onClick={handleZoomOut}
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
+           aria-label="Icon button">
             <Minus className="w-5 h-5 text-gray-700" />
           </button>
         </div>
         <button
           onClick={handleLocate}
           className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-        >
+         aria-label="Icon button">
           <LocateFixed className="w-5 h-5 text-gray-700" />
         </button>
       </div>

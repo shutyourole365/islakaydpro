@@ -238,7 +238,7 @@ export default function AIDamageDetection({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-            >
+             aria-label="Icon button">
               <XCircle className="w-6 h-6" />
             </button>
           </div>
@@ -272,7 +272,7 @@ export default function AIDamageDetection({
                       <button
                         onClick={capturePhoto}
                         className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg"
-                      >
+                       aria-label="Icon button">
                         <div className="w-12 h-12 bg-red-500 rounded-full" />
                       </button>
                     </div>

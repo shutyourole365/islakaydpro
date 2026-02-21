@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps, prefer-const */
 import { useState, useEffect } from 'react';
 import {
   Cloud,

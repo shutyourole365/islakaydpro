@@ -149,7 +149,7 @@ export default function BookingCalendar({
             onClick={prevMonth}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={currentMonth <= new Date(today.getFullYear(), today.getMonth(), 1)}
-          >
+           aria-label="Icon button">
             <ChevronLeft className="w-5 h-5 text-gray-600" />
           </button>
           <h3 className="font-semibold text-gray-900">
@@ -241,7 +241,7 @@ export default function BookingCalendar({
             <button
               onClick={clearDates}
               className="p-1 rounded-full hover:bg-gray-200 transition-colors"
-            >
+             aria-label="Icon button">
               <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>

@@ -68,7 +68,6 @@ export default function EquipmentMap({
       }
     };
     // mapInstance intentionally excluded - only runs on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -214,7 +213,7 @@ export default function EquipmentMap({
         <button
           onClick={handleZoomIn}
           className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-        >
+         aria-label="Icon button">
           <Plus className="w-5 h-5 text-gray-700" />
         </button>
         <button
@@ -227,7 +226,7 @@ export default function EquipmentMap({
         <button
           onClick={handleLocate}
           className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-        >
+         aria-label="Icon button">
           <Navigation className="w-5 h-5 text-gray-700" />
         </button>
       </div>

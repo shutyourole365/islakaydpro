@@ -142,7 +142,6 @@ export default function QRCodeScanner({
     return () => {
       cancelAnimationFrame(animationId);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isScanning]);
 
   // Simulate QR detection (replace with actual QR library in production)
@@ -294,7 +293,7 @@ export default function QRCodeScanner({
           <button
             onClick={onClose}
             className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center text-white"
-          >
+           aria-label="Icon button">
             <X className="w-5 h-5" />
           </button>
 

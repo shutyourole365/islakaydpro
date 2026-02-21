@@ -407,7 +407,6 @@ export default function AIAssistantEnhanced() {
     const messageToSend = input;
     setInput('');
     simulateResponse(messageToSend);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, uploadedImage, isListening, simulateResponse]);
 
   const handleSuggestionClick = useCallback((suggestion: string) => {
@@ -478,13 +477,25 @@ export default function AIAssistantEnhanced() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setShowSettings(!showSettings)} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30"
+                aria-label="Open assistant settings"
+              >
                 <Settings className="w-5 h-5" />
               </button>
-              <button onClick={() => setIsExpanded(!isExpanded)} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30"
+                aria-label={isExpanded ? 'Minimize assistant' : 'Maximize assistant'}
+              >
                 {isExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
               </button>
-              <button onClick={() => setIsOpen(false)} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30"
+                aria-label="Close assistant"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -497,7 +508,12 @@ export default function AIAssistantEnhanced() {
                   <Volume2 className="w-5 h-5 text-gray-600" />
                   <span className="text-sm font-medium">Voice Responses</span>
                 </div>
-                <button onClick={() => setVoiceEnabled(!voiceEnabled)} className={`w-12 h-6 rounded-full transition-colors ${voiceEnabled ? 'bg-teal-500' : 'bg-gray-300'}`}>
+                <button
+                  onClick={() => setVoiceEnabled(!voiceEnabled)}
+                  className={`w-12 h-6 rounded-full transition-colors ${voiceEnabled ? 'bg-teal-500' : 'bg-gray-300'}`}
+                  aria-label="Toggle voice responses"
+                  aria-pressed={voiceEnabled}
+                >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${voiceEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                 </button>
               </div>
@@ -535,7 +551,8 @@ export default function AIAssistantEnhanced() {
                     }}
                     disabled={!GLOBAL_AI_ENABLED}
                     className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    aria-pressed={aiEnabledByUser}
+                    aria-pressed={!!aiEnabledByUser}
+                    aria-label="Toggle LLM (Kayd AI)"
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
@@ -585,12 +602,12 @@ export default function AIAssistantEnhanced() {
                     <div className="flex items-center gap-2 mt-2 ml-1">
                       {!feedbackGiven.has(message.id) ? (
                         <>
-                          <button onClick={() => handleFeedback(message.id, true)} className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600"><ThumbsUp className="w-4 h-4" /></button>
-                          <button onClick={() => handleFeedback(message.id, false)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600"><ThumbsDown className="w-4 h-4" /></button>
+                          <button aria-label="Give thumbs up feedback" onClick={() => handleFeedback(message.id, true)} className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600"><ThumbsUp className="w-4 h-4" /></button>
+                          <button aria-label="Give thumbs down feedback" onClick={() => handleFeedback(message.id, false)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600"><ThumbsDown className="w-4 h-4" /></button>
                           {isSpeaking ? (
-                            <button onClick={stopSpeaking} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><VolumeX className="w-4 h-4" /></button>
+                            <button aria-label="Stop speech" onClick={stopSpeaking} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><VolumeX className="w-4 h-4" /></button>
                           ) : (
-                            <button onClick={() => speakResponse(message.content)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><Volume2 className="w-4 h-4" /></button>
+                            <button aria-label="Play speech" onClick={() => speakResponse(message.content)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><Volume2 className="w-4 h-4" /></button>
                           )}
                         </>
                       ) : (
@@ -668,7 +685,7 @@ export default function AIAssistantEnhanced() {
             </div>
             <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
               <input type="file" ref={fileInputRef} accept="image/*" onChange={handleImageUpload} className="hidden" />
-              <button onClick={() => fileInputRef.current?.click()} className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+              <button aria-label="Upload an image" onClick={() => fileInputRef.current?.click()} className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100">
                 <Paperclip className="w-5 h-5" />
               </button>
               <input
@@ -683,7 +700,7 @@ export default function AIAssistantEnhanced() {
               <button onClick={toggleVoiceInput} className={`p-2 rounded-xl ${isListening ? 'bg-red-100 text-red-600 animate-pulse' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}>
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </button>
-              <button onClick={handleSend} disabled={(!input.trim() && !uploadedImage) || isTyping} className="p-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white disabled:opacity-50">
+              <button onClick={handleSend} disabled={(!input.trim() && !uploadedImage) || isTyping} className="p-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white disabled:opacity-50" aria-label="Icon button">
                 <Send className="w-5 h-5" />
               </button>
             </div>

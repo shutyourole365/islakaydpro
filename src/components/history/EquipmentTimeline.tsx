@@ -239,7 +239,7 @@ export default function EquipmentTimeline({
             <button
               onClick={exportTimeline}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
-            >
+             aria-label="Icon button">
               <Download className="w-5 h-5" />
             </button>
           </div>

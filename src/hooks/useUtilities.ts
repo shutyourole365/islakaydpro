@@ -156,7 +156,6 @@ export function useAsync<T>(asyncFn: () => Promise<T>, deps: unknown[] = []) {
       setState({ data: null, loading: false, error: error as Error });
       throw error;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
   useEffect(() => {

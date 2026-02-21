@@ -107,7 +107,7 @@ export default function EquipmentDetail({
             <button
               onClick={onClose}
               className="p-2.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-            >
+             aria-label="Icon button">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -126,7 +126,7 @@ export default function EquipmentDetail({
                   <button
                     onClick={prevImage}
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-gray-800 hover:bg-white transition-colors shadow-lg"
-                  >
+                   aria-label="Icon button">
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                   <button

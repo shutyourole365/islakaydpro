@@ -151,7 +151,6 @@ export default function EnhancedMap({
     return () => {
       if (mapInstance) mapInstance.remove();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update tile layer when style changes
@@ -427,14 +426,14 @@ export default function EnhancedMap({
 
       {/* Map Controls */}
       <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
-        <button onClick={handleZoomIn} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50">
+        <button onClick={handleZoomIn} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50" aria-label="Icon button">
           <Plus className="w-5 h-5 text-gray-700" />
         </button>
         <button onClick={handleZoomOut} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50">
           <Minus className="w-5 h-5 text-gray-700" />
         </button>
         <div className="w-10 h-px bg-gray-200 my-1" />
-        <button onClick={handleLocate} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50">
+        <button onClick={handleLocate} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50" aria-label="Icon button">
           <Navigation className="w-5 h-5 text-gray-700" />
         </button>
         <button onClick={() => setShowLayerPanel(!showLayerPanel)} className={`w-10 h-10 rounded-lg shadow-lg flex items-center justify-center ${showLayerPanel ? 'bg-teal-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>

@@ -146,7 +146,6 @@ export default function PWATestSuite({ onClose }: PWATestSuiteProps) {
   useEffect(() => {
     // Auto-run tests on mount
     runTests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const passedTests = tests.filter(t => t.status === 'passed').length;

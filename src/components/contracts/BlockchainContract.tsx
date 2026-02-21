@@ -168,7 +168,7 @@ export default function BlockchainContract({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-            >
+             aria-label="Icon button">
               <XCircle className="w-6 h-6" />
             </button>
           </div>
@@ -198,7 +198,7 @@ export default function BlockchainContract({
                 >
                   <Copy className="w-4 h-4 text-gray-400" />
                 </button>
-                <button className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors">
+                <button className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors" aria-label="Icon button">
                   <ExternalLink className="w-4 h-4 text-gray-400" />
                 </button>
               </div>

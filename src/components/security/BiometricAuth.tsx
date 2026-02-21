@@ -98,7 +98,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
           <button
             onClick={onCancel}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-          >
+           aria-label="Icon button">
             <X className="w-5 h-5" />
           </button>
         </div>

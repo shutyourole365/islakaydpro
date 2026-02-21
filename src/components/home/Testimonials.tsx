@@ -136,7 +136,7 @@ const Testimonials = memo(function Testimonials() {
             <button
               onClick={prevTestimonial}
               className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-            >
+             aria-label="Icon button">
               <ChevronLeft className="w-6 h-6" />
             </button>
 

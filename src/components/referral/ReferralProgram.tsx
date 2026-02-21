@@ -59,7 +59,6 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
 
   useEffect(() => {
     loadReferralData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   const loadReferralData = async () => {
