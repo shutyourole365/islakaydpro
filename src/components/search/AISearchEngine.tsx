@@ -191,7 +191,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
             <button
               onClick={onClose}
               className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
-             aria-label="Icon button">
+             aria-label="Close AI search">
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -219,7 +219,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
                     type="button"
                     className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                     title="Voice search"
-                   aria-label="Icon button">
+                   aria-label="Voice search">
                     <Mic className="w-5 h-5" />
                   </button>
                 )}

@@ -7,10 +7,12 @@ export default function AISettings({ className = '' }: { className?: string }) {
   const [aiEnabledByUser, setAiEnabledByUser] = useLocalStorage<boolean>('ai_assistant_enabled', true);
   const { user, refreshProfile } = (function tryUseAuth() {    try {
       // dynamic import to avoid circular dependency errors in tests
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+       
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const ctx = require('../../contexts/AuthContext');
       return ctx.useAuth();
-    } catch (e) {
+    } catch {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return { user: null, profile: null, refreshProfile: async () => {} } as any;
     }
   })();
@@ -22,14 +24,14 @@ export default function AISettings({ className = '' }: { className?: string }) {
     // persist to server when user is signed in
     if (user?.id) {
       try {
-        // lazy import to avoid circular imports
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const db = require('../../services/database');
+        // lazy dynamic import to avoid circular imports
+        // no lint: dynamic import below reduces bundle size
+        const db = await import('../../services/database');
         await db.updateProfile(user.id, { ai_assistant_enabled: value });
         // refresh cached profile in AuthContext
         await refreshProfile();
-      } catch (err) {
-        console.error('Failed to persist AI preference:', err);
+      } catch (_err) {
+        console.error('Failed to persist AI preference:', _err);
       }
     }
   };

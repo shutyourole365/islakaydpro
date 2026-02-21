@@ -257,7 +257,7 @@ export default function QuickActionsMenu({
           {/* Voice & Help */}
           <div className="p-3 border-t border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Voice command" aria-label="Icon button">
+              <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Voice command" aria-label="Voice command">
                 <Mic className="w-5 h-5" />
               </button>
               <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Camera search">

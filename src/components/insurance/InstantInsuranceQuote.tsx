@@ -47,14 +47,13 @@ interface QuoteFactors {
 }
 
 export default function InstantInsuranceQuote({
-  equipmentId: _equipmentId,
-  equipmentTitle: _equipmentTitle,
-  equipmentValue,
-  rentalDays,
-  dailyRate,
-  onSelect,
-  onClose,
-}: InstantInsuranceQuoteProps) {
+    equipmentValue,
+    rentalDays,
+    dailyRate,
+    onSelect,
+    onClose,
+  }: InstantInsuranceQuoteProps
+) {
   // equipmentId and equipmentTitle reserved for future API integration
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<InsurancePlan[]>([]);
@@ -226,7 +225,7 @@ export default function InstantInsuranceQuote({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-             aria-label="Icon button">
+             aria-label="Icon button (InstantInsuranceQuote.tsx)">
               <XCircle className="w-6 h-6" />
             </button>
           </div>

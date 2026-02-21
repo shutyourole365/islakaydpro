@@ -335,18 +335,23 @@ export default function EnhancedMap({
           <input
             type="text"
             placeholder="Search location or equipment..."
+            aria-label="Search location or equipment"
             className="flex-1 bg-transparent outline-none text-gray-800"
           />
-          <button onClick={() => setShowFilters(!showFilters)} className={`p-2 rounded-lg ${showFilters ? 'bg-teal-100 text-teal-600' : 'text-gray-400 hover:bg-gray-100'}`}>
-            <Filter className="w-5 h-5" />
-          </button>
+<button
+              aria-label="Toggle filters"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`p-2 rounded-lg ${showFilters ? 'bg-teal-100 text-teal-600' : 'text-gray-400 hover:bg-gray-100'}`}
+            >
+              <Filter className="w-5 h-5" />
+            </button>
         </div>
 
         {showFilters && (
           <div className="mt-2 p-4 bg-white rounded-xl shadow-lg max-w-md space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-semibold text-gray-900">Map Filters</h4>
-              <button onClick={() => setShowFilters(false)}><X className="w-5 h-5 text-gray-400" /></button>
+              <button aria-label="Close filter panel" onClick={() => setShowFilters(false)}><X className="w-5 h-5 text-gray-400" /></button>
             </div>
 
             <div>
@@ -407,7 +412,7 @@ export default function EnhancedMap({
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700">Search Radius</label>
+              <label htmlFor="search-radius" className="text-sm font-medium text-gray-700">Search Radius</label>
               <div className="flex items-center gap-3 mt-1">
                 <input
                   type="range"
@@ -426,20 +431,20 @@ export default function EnhancedMap({
 
       {/* Map Controls */}
       <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
-        <button onClick={handleZoomIn} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50" aria-label="Icon button">
+        <button onClick={handleZoomIn} aria-label="Zoom in" className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50">
           <Plus className="w-5 h-5 text-gray-700" />
         </button>
-        <button onClick={handleZoomOut} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50">
+        <button onClick={handleZoomOut} aria-label="Zoom out" className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50">
           <Minus className="w-5 h-5 text-gray-700" />
         </button>
         <div className="w-10 h-px bg-gray-200 my-1" />
-        <button onClick={handleLocate} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50" aria-label="Icon button">
+        <button onClick={handleLocate} className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50" aria-label="Locate me">
           <Navigation className="w-5 h-5 text-gray-700" />
         </button>
-        <button onClick={() => setShowLayerPanel(!showLayerPanel)} className={`w-10 h-10 rounded-lg shadow-lg flex items-center justify-center ${showLayerPanel ? 'bg-teal-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
+        <button aria-label="Toggle layer panel" onClick={() => setShowLayerPanel(!showLayerPanel)} className={`w-10 h-10 rounded-lg shadow-lg flex items-center justify-center ${showLayerPanel ? 'bg-teal-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
           <Layers className="w-5 h-5" />
         </button>
-        <button onClick={() => setRouteMode(!routeMode)} className={`w-10 h-10 rounded-lg shadow-lg flex items-center justify-center ${routeMode ? 'bg-teal-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
+        <button aria-label="Toggle route mode" onClick={() => setRouteMode(!routeMode)} className={`w-10 h-10 rounded-lg shadow-lg flex items-center justify-center ${routeMode ? 'bg-teal-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}>
           <Route className="w-5 h-5" />
         </button>
       </div>

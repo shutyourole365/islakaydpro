@@ -206,7 +206,7 @@ export default function SecurityCenter({
             <button
               onClick={onBack}
               className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-             aria-label="Icon button">
+             aria-label="Go back">
               <ChevronRight className="w-6 h-6 text-gray-600 rotate-180" />
             </button>
             <div>

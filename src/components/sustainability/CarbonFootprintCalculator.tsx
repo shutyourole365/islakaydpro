@@ -241,7 +241,7 @@ export default function CarbonFootprintCalculator({
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="p-2 bg-white/20 rounded-lg hover:bg-white/30" aria-label="Icon button">
+            <button className="p-2 bg-white/20 rounded-lg hover:bg-white/30" aria-label="Share carbon report">
               <Share2 className="w-5 h-5" />
             </button>
             <button className="p-2 bg-white/20 rounded-lg hover:bg-white/30">

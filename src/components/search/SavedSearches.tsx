@@ -119,7 +119,7 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
           <button
             onClick={onClose}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-           aria-label="Icon button">
+           aria-label="Close dialog">
             <X className="w-6 h-6 text-gray-500" />
           </button>
         </div>

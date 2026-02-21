@@ -237,7 +237,7 @@ export default function RealTimeChat({
             <button
               onClick={onClose}
               className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-             aria-label="Icon button">
+             aria-label="Icon button (RealTimeChat.tsx)">
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
@@ -385,13 +385,13 @@ export default function RealTimeChat({
             </div>
 
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Icon button">
+              <button className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Icon button (RealTimeChat.tsx)">
                 <Phone className="w-5 h-5 text-gray-600" />
               </button>
               <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
                 <Video className="w-5 h-5 text-gray-600" />
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Icon button">
+              <button className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Icon button (RealTimeChat.tsx)">
                 <MoreVertical className="w-5 h-5 text-gray-600" />
               </button>
             </div>
@@ -485,7 +485,7 @@ export default function RealTimeChat({
             )}
 
             <div className="flex items-end gap-2">
-              <button className="p-2.5 rounded-full hover:bg-gray-100 transition-colors" aria-label="Icon button">
+              <button className="p-2.5 rounded-full hover:bg-gray-100 transition-colors" aria-label="Icon button (RealTimeChat.tsx)">
                 <Paperclip className="w-5 h-5 text-gray-500" />
               </button>
               <button className="p-2.5 rounded-full hover:bg-gray-100 transition-colors">
@@ -516,7 +516,7 @@ export default function RealTimeChat({
                 <button
                   onClick={handleSendMessage}
                   className="p-2.5 rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:shadow-lg transition-all"
-                 aria-label="Icon button">
+                 aria-label="Icon button (RealTimeChat.tsx)">
                   <Send className="w-5 h-5" />
                 </button>
               ) : (

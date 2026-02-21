@@ -388,7 +388,7 @@ export default function ARVRExperience() {
                   onClick={toggleFullscreen}
                   className="p-2 border rounded hover:bg-gray-50"
                   title="Fullscreen"
-                 aria-label="Icon button">
+                 aria-label="Icon button (ARVRExperience.tsx)">
                   <Maximize className="w-4 h-4" />
                 </button>
               </div>

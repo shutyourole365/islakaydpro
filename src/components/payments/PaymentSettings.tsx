@@ -100,7 +100,7 @@ export default function PaymentSettings({ onBack }: PaymentSettingsProps) {
             <button
               onClick={onBack}
               className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-             aria-label="Icon button">
+             aria-label="Go back">
               <ArrowLeft className="w-6 h-6 text-gray-600" />
             </button>
             <div>
@@ -272,7 +272,7 @@ export default function PaymentSettings({ onBack }: PaymentSettingsProps) {
                           Set as default
                         </button>
                       )}
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Icon button">
+                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Edit payment method">
                         <Edit className="w-4 h-4 text-gray-600" />
                       </button>
                       <button className="p-2 hover:bg-red-50 rounded-lg transition-colors">

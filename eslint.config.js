@@ -16,6 +16,8 @@ export default tseslint.config(
     rules: {
       // Disable problematic rule that has compatibility issues with ESLint v9
       '@typescript-eslint/no-unused-expressions': 'off',
+      // we removed react-hooks plugin, turn off its rules to avoid undefined errors
+      'react-hooks/exhaustive-deps': 'off',
     },
   }
 );

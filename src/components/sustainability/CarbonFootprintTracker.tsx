@@ -149,7 +149,7 @@ export default function CarbonFootprintTracker({
           url: 'https://islakayd.com',
         });
       } catch (err) {
-        console.log('Share cancelled');
+        console.log('Share cancelled', err);
       }
     } else {
       navigator.clipboard.writeText(message);
@@ -193,7 +193,7 @@ export default function CarbonFootprintTracker({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-             aria-label="Icon button">
+             aria-label="Close tracker">
               <XCircle className="w-6 h-6" />
             </button>
           )}

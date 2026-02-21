@@ -268,10 +268,10 @@ export default function EquipmentConditionReport({
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" aria-label="Icon button">
+            <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" aria-label="Download report">
               <Download className="w-5 h-5" />
             </button>
-            <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+            <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" aria-label="Share report">
               <Share2 className="w-5 h-5" />
             </button>
           </div>

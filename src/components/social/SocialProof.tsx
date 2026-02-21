@@ -28,6 +28,7 @@ interface LiveActivity {
   message?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function SocialProof({ equipmentId: _equipmentId, className = '' }: SocialProofProps) {
   // equipmentId reserved for filtering activities
   const [activities, setActivities] = useState<LiveActivity[]>([]);

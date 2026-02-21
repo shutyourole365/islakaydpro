@@ -208,7 +208,7 @@ export default function DeliveryTracker({
             <button
               onClick={shareTracking}
               className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
-             aria-label="Icon button">
+             aria-label="Icon button (DeliveryTracker.tsx)">
               <Share2 className="w-5 h-5" />
             </button>
           </div>
@@ -324,7 +324,7 @@ export default function DeliveryTracker({
             <button
               onClick={onContactDriver}
               className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-xl hover:bg-blue-200 dark:hover:bg-blue-900/50"
-             aria-label="Icon button">
+             aria-label="Icon button (DeliveryTracker.tsx)">
               <MessageCircle className="w-5 h-5" />
             </button>
           </div>

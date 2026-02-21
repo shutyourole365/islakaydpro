@@ -216,7 +216,7 @@ export default function PriceNegotiator({
           <button
             onClick={onClose}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-           aria-label="Icon button">
+           aria-label="Close negotiator">
             <XCircle className="w-5 h-5" />
           </button>
         </div>

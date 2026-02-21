@@ -346,6 +346,7 @@ export default function HolographicInterface() {
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
     ctx.font = '12px monospace';
     ctx.textAlign = 'center';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ctx.fillText(String((projection.data as any)?.value ?? (projection.data as any)?.count ?? 'N/A'), 0, 5);
   };
 
@@ -361,6 +362,7 @@ export default function HolographicInterface() {
     ctx.stroke();
 
     // Participant indicators
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const participants = typeof (projection.data as any)?.participants === 'number' ? (projection.data as any).participants : 1;
     for (let i = 0; i < participants; i++) {
       const angle = (i / participants) * Math.PI * 2;
@@ -558,7 +560,7 @@ export default function HolographicInterface() {
               onClick={resetInterface}
               className="p-2 border rounded hover:bg-gray-50"
               title="Reset Interface"
-             aria-label="Icon button">
+             aria-label="Icon button (HolographicInterface.tsx)">
               <RotateCcw className="w-4 h-4" />
             </button>
 

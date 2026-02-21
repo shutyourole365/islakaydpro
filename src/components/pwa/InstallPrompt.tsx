@@ -115,7 +115,7 @@ export default function InstallPrompt() {
               <button
                 onClick={handleDismiss}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-               aria-label="Icon button">
+               aria-label="Dismiss install prompt">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -134,7 +134,7 @@ export default function InstallPrompt() {
               <button
                 onClick={handleDismiss}
                 className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
-               aria-label="Icon button">
+               aria-label="Icon button (InstallPrompt.tsx)">
                 <X className="w-5 h-5" />
               </button>
               

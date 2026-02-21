@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (profile?.ai_assistant_enabled !== undefined && typeof window !== 'undefined') {
           window.localStorage.setItem('ai_assistant_enabled', JSON.stringify(!!profile.ai_assistant_enabled));
         }
-      } catch (e) {
+      } catch {
         /* ignore localStorage errors */
       }
     } catch (error) {

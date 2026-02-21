@@ -115,7 +115,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
         <p className="font-semibold text-sm">{toast.title}</p>
         {toast.message && <p className="text-sm opacity-80 mt-0.5">{toast.message}</p>}
       </div>
-      <button onClick={onClose} className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors" aria-label="Icon button">
+      <button onClick={onClose} className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors" aria-label="Dismiss notification">
         <X className="w-4 h-4" />
       </button>
     </div>

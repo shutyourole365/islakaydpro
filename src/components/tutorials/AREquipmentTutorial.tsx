@@ -302,7 +302,7 @@ export default function AREquipmentTutorial({
                   <p className="text-sm text-white/80">Test what you've learned</p>
                 </div>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full" aria-label="Icon button">
+              <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full" aria-label="Close quiz">
                 <X className="w-6 h-6" />
               </button>
             </div>
@@ -415,7 +415,7 @@ export default function AREquipmentTutorial({
                 <p className="text-sm text-white/80">Interactive Tutorial</p>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full" aria-label="Icon button">
+            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-full" aria-label="Close tutorial">
               <X className="w-5 h-5" />
             </button>
           </div>

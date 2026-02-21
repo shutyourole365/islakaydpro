@@ -244,7 +244,7 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors" aria-label="Icon button">
+            <button className="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors" aria-label="Icon button (FleetManager.tsx)">
               <Download className="w-5 h-5" />
             </button>
             <button

@@ -272,7 +272,7 @@ export default function EquipmentShowcase({
                   Compare
                 </Button>
               )}
-              <button className="p-3 border border-white/30 rounded-lg text-white hover:bg-white/10 transition-all transform hover:scale-105" aria-label="Icon button">
+              <button className="p-3 border border-white/30 rounded-lg text-white hover:bg-white/10 transition-all transform hover:scale-105" aria-label="Icon button (EquipmentShowcase.tsx)">
                 <Share2 className="w-5 h-5" />
               </button>
             </div>
@@ -285,7 +285,7 @@ export default function EquipmentShowcase({
             <button
               onClick={goToPrevious}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center text-white transition-colors"
-             aria-label="Icon button">
+             aria-label="Icon button (EquipmentShowcase.tsx)">
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button

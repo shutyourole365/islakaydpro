@@ -169,7 +169,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
             <button
               onClick={onBack}
               className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-             aria-label="Icon button">
+             aria-label="Go back">
               <ArrowLeft className="w-6 h-6 text-gray-600" />
             </button>
             <div>
