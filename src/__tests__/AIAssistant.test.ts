@@ -109,16 +109,16 @@ describe('AI Assistant Integration', () => {
         }),
       });
 
-      const { streamMessage } = await import('../../services/ai');
+      const { streamMessage } = await import('../services/ai');
       const messages = [{ role: 'user' as const, content: 'Hi' }];
       const chunks: string[] = [];
       let doneSuggestions: string[] = [];
       let error: Error | null = null;
 
       await streamMessage(messages, undefined,
-        chunk => { chunks.push(chunk); },
-        suggestions => { doneSuggestions = suggestions; },
-        err => { error = err; }
+        (chunk: string) => { chunks.push(chunk); },
+        (suggestions: string[]) => { doneSuggestions = suggestions; },
+        (err: Error) => { error = err; }
       );
 
       expect(error).toBeNull();

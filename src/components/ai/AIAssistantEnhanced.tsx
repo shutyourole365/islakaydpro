@@ -372,17 +372,18 @@ export default function AIAssistantEnhanced() {
       setIsTyping(false);
     } catch (error) {
       console.error('AI service error:', error);
-      // Fallback to local responses
+      // Fallback to generic offline response
       const processingTime = Date.now() - startTime;
+      const fallbackContent = "I'm having trouble connecting right now. Please try again in a moment.";
 
       const newMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: response.content + "\n\n_(Using offline mode)_",
+        content: fallbackContent + "\n\n_(Using offline mode)_",
         timestamp: new Date(),
-        suggestions: response.suggestions,
+        suggestions: [],
         metadata: { 
-          type: response.type as 'search' | 'alert' | 'success' | 'booking' | 'info' | 'recommendation',
+          type: 'info',
           processingTime,
         },
       };
@@ -390,7 +391,7 @@ export default function AIAssistantEnhanced() {
       setMessages((prev) => [...prev, newMessage]);
 
       if (voiceEnabled) {
-        speakResponse(response.content);
+        speakResponse(fallbackContent);
       }
     } finally {
       setIsTyping(false);

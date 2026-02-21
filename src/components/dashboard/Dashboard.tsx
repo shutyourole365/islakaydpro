@@ -476,7 +476,7 @@ export default function Dashboard({
                   <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
                     <div className="flex items-start gap-4">
                       <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <AlertCircle className="w-6 h-6 text-amber-600" />
+                        <AlertCircle className="w-6 h-6 text-amber-600" aria-hidden="true" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-amber-900 mb-1">Pending Booking Requests</h3>
@@ -503,7 +503,7 @@ export default function Dashboard({
                     onClick={onListEquipment}
                     className="flex items-center gap-2 px-6 py-3 bg-white text-teal-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-5 h-5" aria-hidden="true" />
                     List Equipment
                   </button>
                 </div>
@@ -550,7 +550,7 @@ export default function Dashboard({
                         <div className="flex items-start gap-4">
                           <img
                             src={booking.equipment?.images[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg'}
-                            alt=""
+                            alt={booking.equipment?.title || 'Equipment image'}
                             className="w-24 h-24 rounded-xl object-cover flex-shrink-0"
                           />
                           <div className="flex-1 min-w-0">
@@ -558,7 +558,7 @@ export default function Dashboard({
                               <div>
                                 <h3 className="font-semibold text-gray-900">{booking.equipment?.title}</h3>
                                 <p className="text-sm text-gray-500 flex items-center gap-1.5">
-                                  <MapPin className="w-4 h-4" />
+                                  <MapPin className="w-4 h-4" aria-hidden="true" />
                                   {booking.equipment?.location}
                                 </p>
                               </div>
@@ -566,11 +566,11 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
                               <span className="flex items-center gap-1.5">
-                                <Calendar className="w-4 h-4" />
+                                <Calendar className="w-4 h-4" aria-hidden="true" />
                                 {formatDate(booking.start_date)} - {formatDate(booking.end_date)}
                               </span>
                               <span className="flex items-center gap-1.5">
-                                <Clock className="w-4 h-4" />
+                                <Clock className="w-4 h-4" aria-hidden="true" />
                                 {booking.total_days} days
                               </span>
                             </div>
@@ -581,7 +581,7 @@ export default function Dashboard({
                                 className="flex items-center gap-2 px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-xl transition-colors"
                               >
                                 View Details
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-4 h-4" aria-hidden="true" />
                               </button>
                             </div>
                           </div>
@@ -601,7 +601,7 @@ export default function Dashboard({
                     onClick={onListEquipment}
                     className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-5 h-5" aria-hidden="true" />
                     Add New
                   </button>
                 </div>
@@ -617,7 +617,7 @@ export default function Dashboard({
                           <div className="flex items-center gap-4">
                             <img
                               src={booking.equipment?.images[0] || ''}
-                              alt=""
+                              alt={booking.equipment?.title || 'Equipment image'}
                               className="w-16 h-16 rounded-lg object-cover"
                             />
                             <div className="flex-1">
@@ -631,14 +631,16 @@ export default function Dashboard({
                               <button
                                 onClick={() => handleBookingAction(booking.id, 'confirm')}
                                 className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
+                                aria-label="Approve request"
                               >
-                                <Check className="w-5 h-5" />
+                                <Check className="w-5 h-5" aria-hidden="true" />
                               </button>
                               <button
                                 onClick={() => handleBookingAction(booking.id, 'cancel')}
                                 className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                                aria-label="Reject request"
                               >
-                                <X className="w-5 h-5" />
+                                <X className="w-5 h-5" aria-hidden="true" />
                               </button>
                             </div>
                           </div>
@@ -650,7 +652,7 @@ export default function Dashboard({
 
                 {myListings.length === 0 ? (
                   <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
-                    <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" aria-hidden="true" />
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">No listings yet</h3>
                     <p className="text-gray-600 mb-6 max-w-md mx-auto">
                       Start earning money by listing your equipment. It's free to list and you set your own prices.

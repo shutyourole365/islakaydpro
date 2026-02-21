@@ -238,6 +238,9 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
   // Get equipment by ID
   const getEquipmentById = (id: string) => mockEquipment.find((eq) => eq.id === id);
 
+  // utility for z-index classes
+  const zClasses = ['z-4', 'z-3', 'z-2', 'z-1'];
+
   // Render bundle card
   const renderBundleCard = (bundle: EquipmentBundle) => {
     const bundleEquipment = bundle.equipment_ids.map(getEquipmentById).filter(Boolean) as Equipment[];
@@ -251,12 +254,12 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
             <div className="flex items-start justify-between">
               <div>
                 <span className="inline-flex items-center gap-1 px-2 py-1 bg-white/20 rounded-full text-white text-xs">
-                  <Package className="w-3 h-3" />
+                  <Package className="w-3 h-3" aria-hidden="true" />
                   {bundle.equipment_ids.length} Items
                 </span>
               </div>
               <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-500 rounded-full text-white text-sm font-bold">
-                <Percent className="w-4 h-4" />
+                <Percent className="w-4 h-4" aria-hidden="true" />
                 {bundle.discount_percentage}% OFF
               </span>
             </div>
@@ -267,8 +270,7 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
                 key={eq.id}
                 src={eq.images[0] || 'https://via.placeholder.com/48'}
                 alt={eq.title}
-                className="w-12 h-12 rounded-lg border-2 border-white object-cover"
-                style={{ zIndex: 4 - idx }}
+                className={`w-12 h-12 rounded-lg border-2 border-white object-cover ${zClasses[idx] || 'z-0'}`}
               />
             ))}
             {bundleEquipment.length > 4 && (
@@ -541,13 +543,13 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
                 onClick={() => setIsCreating(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50 transition-colors font-medium"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4" aria-hidden="true" />
                 Create Bundle
               </button>
             )}
             {onClose && (
               <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg transition-colors" aria-label="Close bundle deals">
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
             )}
           </div>
@@ -555,10 +557,11 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
 
         {/* Search */}
         <div className="mt-4 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-200" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-200" aria-hidden="true" />
           <input
             type="text"
             placeholder="Search bundles..."
+            aria-label="Search bundles"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-white/30"
@@ -573,7 +576,7 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
           <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-amber-100 rounded-lg">
-                <Gift className="w-6 h-6 text-amber-600" />
+                <Gift className="w-6 h-6 text-amber-600" aria-hidden="true" />
               </div>
               <div>
                 <h3 className="font-semibold text-amber-900">Bundle & Save!</h3>
@@ -593,7 +596,7 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
           <>
             {filteredBundles.length === 0 ? (
               <div className="text-center py-12">
-                <Package className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                <Package className="w-12 h-12 mx-auto text-gray-300 mb-3" aria-hidden="true" />
                 <p className="text-gray-500 mb-4">No bundles found</p>
                 {mode === 'manage' && (
                   <button
