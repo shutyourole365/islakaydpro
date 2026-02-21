@@ -49,7 +49,6 @@ export default function SmartScheduler({
 
   useEffect(() => {
     loadSmartData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth]);
 
   const loadSmartData = async () => {
@@ -259,7 +258,7 @@ export default function SmartScheduler({
             <button
               onClick={prevMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
+             aria-label="Previous month">
               <ChevronLeft className="w-5 h-5 text-gray-600" />
             </button>
             <h3 className="font-semibold text-gray-900">
@@ -268,7 +267,7 @@ export default function SmartScheduler({
             <button
               onClick={nextMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
+              aria-label="Next month">
               <ChevronRight className="w-5 h-5 text-gray-600" />
             </button>
           </div>

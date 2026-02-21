@@ -104,7 +104,7 @@ export default function AdvancedFilters({ onApply, onClose }: AdvancedFiltersPro
           <button
             onClick={onClose}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-          >
+           aria-label="Close filters">
             <X className="w-6 h-6 text-gray-500" />
           </button>
         </div>

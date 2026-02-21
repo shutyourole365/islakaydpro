@@ -93,7 +93,7 @@ export function CookieSettingsModal({
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600"
-            >
+             aria-label="Close cookie settings">
               <X className="w-6 h-6" />
             </button>
           </div>

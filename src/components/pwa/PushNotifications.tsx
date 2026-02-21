@@ -169,7 +169,7 @@ export default function PushNotifications({ isOpen, onClose }: PushNotifications
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
-          >
+           aria-label="Close notifications settings">
             <X className="h-6 w-6" />
           </button>
         </div>

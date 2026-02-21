@@ -397,7 +397,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
               )}
             </button>
             {onClose && (
-              <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
+              <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors" aria-label="Icon button (SmartAlertsSystem.tsx)">
                 <X className="w-5 h-5 text-white" />
               </button>
             )}
@@ -531,7 +531,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                             <button
                               className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
                               title="More options"
-                            >
+                             aria-label="Icon button (SmartAlertsSystem.tsx)">
                               <MoreVertical className="w-4 h-4" />
                             </button>
                           </div>

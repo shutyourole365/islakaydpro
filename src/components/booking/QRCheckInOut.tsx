@@ -236,7 +236,7 @@ export default function QRCheckInOut({
             <button
               onClick={onClose}
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
-            >
+             aria-label="Icon button (QRCheckInOut.tsx)">
               <XCircle className="w-6 h-6" />
             </button>
           </div>

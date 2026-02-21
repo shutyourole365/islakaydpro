@@ -230,7 +230,7 @@ export default function QuickRent({
               <button
                 onClick={onClose}
                 className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30"
-              >
+               aria-label="Close quick rent">
                 <X className="w-5 h-5" />
               </button>
               

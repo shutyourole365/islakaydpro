@@ -357,7 +357,7 @@ export default function ARPreview({ equipment, onClose, className = '' }: ARPrev
                 <button
                   onClick={handleDownload}
                   className="p-3 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-colors"
-                >
+                 aria-label="Icon button (ARPreview.tsx)">
                   <Download className="w-6 h-6" />
                 </button>
                 <button
@@ -384,7 +384,7 @@ export default function ARPreview({ equipment, onClose, className = '' }: ARPrev
             <button
               onClick={onClose}
               className="p-2.5 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-colors"
-            >
+             aria-label="Icon button (ARPreview.tsx)">
               <X className="w-6 h-6" />
             </button>
             
@@ -449,7 +449,7 @@ export default function ARPreview({ equipment, onClose, className = '' }: ARPrev
                 <button
                   onClick={handleZoomOut}
                   className="p-3 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-colors"
-                >
+                 aria-label="Icon button (ARPreview.tsx)">
                   <ZoomOut className="w-6 h-6" />
                 </button>
                 <button
@@ -461,7 +461,7 @@ export default function ARPreview({ equipment, onClose, className = '' }: ARPrev
                 <button
                   onClick={handleRotate}
                   className="p-3 bg-white/10 backdrop-blur-sm rounded-full text-white hover:bg-white/20 transition-colors"
-                >
+                 aria-label="Icon button (ARPreview.tsx)">
                   <RotateCcw className="w-6 h-6" />
                 </button>
               </div>
@@ -470,7 +470,7 @@ export default function ARPreview({ equipment, onClose, className = '' }: ARPrev
               <button
                 onClick={handleCapture}
                 className="w-20 h-20 rounded-full bg-white flex items-center justify-center hover:scale-105 transition-transform shadow-lg"
-              >
+               aria-label="Icon button (ARPreview.tsx)">
                 <div className="w-16 h-16 rounded-full border-4 border-gray-300" />
               </button>
 

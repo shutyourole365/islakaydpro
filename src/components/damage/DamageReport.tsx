@@ -234,7 +234,7 @@ export default function DamageReport({
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center justify-center"
-          >
+           aria-label="Icon button (DamageReport.tsx)">
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
@@ -316,7 +316,7 @@ export default function DamageReport({
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                      <button className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center">
+                      <button className="w-8 h-8 bg-white/90 rounded-full flex items-center justify-center" aria-label="Icon button (DamageReport.tsx)">
                         <ZoomIn className="w-4 h-4 text-gray-700" />
                       </button>
                       <button

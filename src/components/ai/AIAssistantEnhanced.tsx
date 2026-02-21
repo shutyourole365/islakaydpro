@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { sendMessage as sendAIMessage } from '../../services/ai';
+import { streamMessage } from '../../services/ai';
 import { useLocalStorage } from '../../hooks';
 import {
   X,
@@ -332,32 +332,47 @@ export default function AIAssistantEnhanced() {
         content: userMessage,
       });
 
-      // Call real AI service
-      const response = await sendAIMessage(conversationHistory);
-      const processingTime = Date.now() - startTime;
-
-      const newMessage: Message = {
-        id: Date.now().toString(),
+      // Insert placeholder assistant message so we can stream into it
+      const placeholderId = Date.now().toString();
+      setMessages(prev => [...prev, {
+        id: placeholderId,
         role: 'assistant',
-        content: response.content,
+        content: '',
         timestamp: new Date(),
-        suggestions: response.suggestions,
-        metadata: { 
-          type: 'recommendation',
-          processingTime,
-        },
-      };
+        suggestions: [],
+      }]);
 
-      setMessages((prev) => [...prev, newMessage]);
+      // track text locally so it's available after streaming completes
+      let streamedText = '';
+      await streamMessage(
+        conversationHistory,
+        {},
+        (chunk) => {
+          streamedText = chunk;
+          setMessages(prev => prev.map(m =>
+            m.id === placeholderId ? { ...m, content: chunk } : m
+          ));
+        },
+        (suggestions) => {
+          setMessages(prev => prev.map(m =>
+            m.id === placeholderId ? { ...m, suggestions } : m
+          ));
+        },
+        (err) => {
+          console.error('AI stream error:', err);
+        }
+      );
 
       if (voiceEnabled) {
-        speakResponse(response.content);
+        speakResponse(streamedText);
       }
+
+      // re-enable quick actions after a brief delay so the user sees them
+      setTimeout(() => setShowQuickActions(true), 200);
+      setIsTyping(false);
     } catch (error) {
       console.error('AI service error:', error);
-      
       // Fallback to local responses
-      const response = getContextualResponses(userMessage);
       const processingTime = Date.now() - startTime;
 
       const newMessage: Message = {
@@ -407,7 +422,6 @@ export default function AIAssistantEnhanced() {
     const messageToSend = input;
     setInput('');
     simulateResponse(messageToSend);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [input, uploadedImage, isListening, simulateResponse]);
 
   const handleSuggestionClick = useCallback((suggestion: string) => {
@@ -478,13 +492,25 @@ export default function AIAssistantEnhanced() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setShowSettings(!showSettings)} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30"
+                aria-label="Open assistant settings"
+              >
                 <Settings className="w-5 h-5" />
               </button>
-              <button onClick={() => setIsExpanded(!isExpanded)} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30">
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30"
+                aria-label={isExpanded ? 'Minimize assistant' : 'Maximize assistant'}
+              >
                 {isExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
               </button>
-              <button onClick={() => setIsOpen(false)} className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30"
+                aria-label="Close assistant"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -497,7 +523,12 @@ export default function AIAssistantEnhanced() {
                   <Volume2 className="w-5 h-5 text-gray-600" />
                   <span className="text-sm font-medium">Voice Responses</span>
                 </div>
-                <button onClick={() => setVoiceEnabled(!voiceEnabled)} className={`w-12 h-6 rounded-full transition-colors ${voiceEnabled ? 'bg-teal-500' : 'bg-gray-300'}`}>
+                <button
+                  onClick={() => setVoiceEnabled(!voiceEnabled)}
+                  className={`w-12 h-6 rounded-full transition-colors ${voiceEnabled ? 'bg-teal-500' : 'bg-gray-300'}`}
+                  aria-label="Toggle voice responses"
+                  aria-pressed={voiceEnabled ? 'true' : 'false'}
+                >
                   <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${voiceEnabled ? 'translate-x-6' : 'translate-x-0.5'}`} />
                 </button>
               </div>
@@ -519,12 +550,12 @@ export default function AIAssistantEnhanced() {
                       // persist to server if signed in
                       try {
                         // dynamic require to avoid circular imports in module graph
-                        // eslint-disable-next-line @typescript-eslint/no-var-requires
-                        const { useAuth } = require('../../contexts/AuthContext');
+                         
+                        const { useAuth } = await import('../../contexts/AuthContext');
                         const auth = useAuth ? useAuth() : null;
                         if (auth?.user?.id) {
-                          // eslint-disable-next-line @typescript-eslint/no-var-requires
-                          const db = require('../../services/database');
+                           
+                          const db = await import('../../services/database');
                           await db.updateProfile(auth.user.id, { ai_assistant_enabled: newVal });
                           await auth.refreshProfile();
                         }
@@ -535,7 +566,8 @@ export default function AIAssistantEnhanced() {
                     }}
                     disabled={!GLOBAL_AI_ENABLED}
                     className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    aria-pressed={aiEnabledByUser}
+                    aria-pressed={aiEnabledByUser ? 'true' : 'false'}
+                    aria-label="Toggle LLM (Kayd AI)"
                   >
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'translate-x-6' : 'translate-x-0.5'}`} />
                   </button>
@@ -552,6 +584,11 @@ export default function AIAssistantEnhanced() {
           )}
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {!aiIsEnabled && (
+              <div className="text-center text-xs text-gray-500 mb-2">
+                AI is currently disabled; using offline response rules.
+              </div>
+            )}
             {messages.map((message) => (
               <div key={message.id} className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${message.role === 'user' ? 'bg-gray-200' : 'bg-gradient-to-br from-teal-500 to-emerald-500'}`}>
@@ -585,12 +622,12 @@ export default function AIAssistantEnhanced() {
                     <div className="flex items-center gap-2 mt-2 ml-1">
                       {!feedbackGiven.has(message.id) ? (
                         <>
-                          <button onClick={() => handleFeedback(message.id, true)} className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600"><ThumbsUp className="w-4 h-4" /></button>
-                          <button onClick={() => handleFeedback(message.id, false)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600"><ThumbsDown className="w-4 h-4" /></button>
+                          <button aria-label="Give thumbs up feedback" onClick={() => handleFeedback(message.id, true)} className="p-1.5 rounded-lg hover:bg-green-50 text-gray-400 hover:text-green-600"><ThumbsUp className="w-4 h-4" /></button>
+                          <button aria-label="Give thumbs down feedback" onClick={() => handleFeedback(message.id, false)} className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600"><ThumbsDown className="w-4 h-4" /></button>
                           {isSpeaking ? (
-                            <button onClick={stopSpeaking} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><VolumeX className="w-4 h-4" /></button>
+                            <button aria-label="Stop speech" onClick={stopSpeaking} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><VolumeX className="w-4 h-4" /></button>
                           ) : (
-                            <button onClick={() => speakResponse(message.content)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><Volume2 className="w-4 h-4" /></button>
+                            <button aria-label="Play speech" onClick={() => speakResponse(message.content)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"><Volume2 className="w-4 h-4" /></button>
                           )}
                         </>
                       ) : (
@@ -652,7 +689,7 @@ export default function AIAssistantEnhanced() {
             <div className="px-4 pb-2">
               <div className="relative inline-block">
                 <img src={uploadedImage} alt="Upload preview" className="w-20 h-20 object-cover rounded-xl" />
-                <button onClick={() => setUploadedImage(null)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center">
+                <button aria-label="Remove uploaded image" onClick={() => setUploadedImage(null)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -667,8 +704,8 @@ export default function AIAssistantEnhanced() {
               <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Trending</span>
             </div>
             <div className="flex items-center gap-2 bg-gray-50 rounded-2xl p-2">
-              <input type="file" ref={fileInputRef} accept="image/*" onChange={handleImageUpload} className="hidden" />
-              <button onClick={() => fileInputRef.current?.click()} className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100">
+              <input aria-label="Upload an image" type="file" ref={fileInputRef} accept="image/*" onChange={handleImageUpload} className="hidden" />
+              <button aria-label="Upload an image" onClick={() => fileInputRef.current?.click()} className="p-2 rounded-xl text-gray-400 hover:text-gray-600 hover:bg-gray-100">
                 <Paperclip className="w-5 h-5" />
               </button>
               <input
@@ -677,13 +714,13 @@ export default function AIAssistantEnhanced() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                placeholder={isListening ? 'Listening...' : 'Ask Kayd anything...'}
+                placeholder={isListening ? 'Listening...' : aiIsEnabled ? 'Ask Kayd anything...' : 'AI disabled (offline mode)'}
                 className={`flex-1 bg-transparent text-gray-800 placeholder-gray-400 focus:outline-none text-sm ${isListening ? 'text-teal-600' : ''}`}
               />
-              <button onClick={toggleVoiceInput} className={`p-2 rounded-xl ${isListening ? 'bg-red-100 text-red-600 animate-pulse' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'}`}>
+              <button onClick={toggleVoiceInput} disabled={!aiIsEnabled} title={!aiIsEnabled ? 'Voice requires AI enabled' : undefined} aria-label={isListening ? 'Stop voice input' : 'Start voice input'} className={`p-2 rounded-xl ${isListening ? 'bg-red-100 text-red-600 animate-pulse' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} ${!aiIsEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </button>
-              <button onClick={handleSend} disabled={(!input.trim() && !uploadedImage) || isTyping} className="p-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white disabled:opacity-50">
+              <button onClick={handleSend} disabled={(!input.trim() && !uploadedImage) || isTyping} className="p-2 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 text-white disabled:opacity-50" aria-label="Send message">
                 <Send className="w-5 h-5" />
               </button>
             </div>

@@ -280,6 +280,7 @@ export default function Dashboard({
           <button
             onClick={onBack}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -290,6 +291,7 @@ export default function Dashboard({
           <button
             onClick={loadDashboardData}
             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Reload dashboard data"
           >
             <RefreshCw className="w-5 h-5" />
           </button>
@@ -393,7 +395,7 @@ export default function Dashboard({
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-lg font-semibold text-gray-900">Performance Overview</h2>
-                      <select className="text-sm border-0 text-gray-500 focus:ring-0">
+                      <select aria-label="Select time range" className="text-sm border-0 text-gray-500 focus:ring-0">
                         <option>Last 30 days</option>
                         <option>Last 90 days</option>
                         <option>This year</option>
@@ -514,6 +516,7 @@ export default function Dashboard({
                   <h2 className="text-lg font-semibold text-gray-900">My Bookings</h2>
                   <div className="flex items-center gap-2">
                     <select
+                      aria-label="Filter bookings"
                       value={bookingFilter}
                       onChange={(e) => setBookingFilter(e.target.value as BookingFilter)}
                       className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-500"
@@ -695,10 +698,10 @@ export default function Dashboard({
                             >
                               View
                             </button>
-                            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Edit booking">
                               <Edit className="w-5 h-5" />
                             </button>
-                            <button className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                            <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -767,6 +770,7 @@ export default function Dashboard({
                         <input
                           type="text"
                           placeholder="Search conversations..."
+                          aria-label="Search conversations"
                           className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-500"
                         />
                       </div>
@@ -847,12 +851,13 @@ export default function Dashboard({
                               onChange={(e) => setNewMessage(e.target.value)}
                               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                               placeholder="Type a message..."
+                              aria-label="Type a message"
                               className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-teal-500"
                             />
                             <button
                               onClick={handleSendMessage}
                               className="p-2 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors"
-                            >
+                             aria-label="Send message">
                               <Send className="w-5 h-5" />
                             </button>
                           </div>
@@ -935,6 +940,7 @@ export default function Dashboard({
                               <button
                                 onClick={() => handleMarkNotificationRead(notification.id)}
                                 className="p-1 text-teal-600 hover:bg-teal-100 rounded"
+                                aria-label="Mark notification as read"
                               >
                                 <Check className="w-4 h-4" />
                               </button>

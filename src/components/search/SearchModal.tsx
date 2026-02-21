@@ -118,7 +118,7 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
             <button
               onClick={onClose}
               className="p-3 rounded-xl hover:bg-gray-100 transition-colors"
-            >
+             aria-label="Close search modal">
               <X className="w-6 h-6 text-gray-500" />
             </button>
           </div>

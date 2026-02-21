@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
@@ -65,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (profile?.ai_assistant_enabled !== undefined && typeof window !== 'undefined') {
           window.localStorage.setItem('ai_assistant_enabled', JSON.stringify(!!profile.ai_assistant_enabled));
         }
-      } catch (e) {
+      } catch {
         /* ignore localStorage errors */
       }
     } catch (error) {

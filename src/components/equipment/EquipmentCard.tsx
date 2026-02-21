@@ -180,7 +180,7 @@ const EquipmentCard = memo(function EquipmentCard({
               onClick={handleCompareClick}
               className="w-10 h-10 rounded-full bg-white/90 text-gray-600 hover:bg-purple-500 hover:text-white flex items-center justify-center transition-all duration-300"
               title="Add to comparison"
-            >
+             aria-label="Icon button (EquipmentCard.tsx)">
               <Plus className="w-5 h-5" />
             </button>
           )}

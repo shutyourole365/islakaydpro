@@ -24,7 +24,8 @@ AI Assistant
 - The project includes an AI assistant widget (`AIAssistant` + `AIAssistantEnhanced`).
 - To enable the real LLM-backed assistant set `VITE_ENABLE_AI=true` and provide an `OPENAI_API_KEY` or `ANTHROPIC_API_KEY`.
 - Users can toggle the LLM per‑device in **Settings → AI Assistant** (preference stored in localStorage). When signed-in the preference is also saved to the user's profile (`ai_assistant_enabled`) so it follows the user across devices. Run the new DB migration in `supabase/migrations/20260218120000_add_ai_assistant_pref_to_profiles.sql` to add the column.
-- The AI backend is implemented as a Supabase Edge Function at `supabase/functions/ai-chat` which proxies to OpenAI/Anthropic and falls back to rule-based responses when no API key is configured.
+- The AI backend is implemented as a Supabase Edge Function at `supabase/functions/ai-chat` which proxies to OpenAI/Anthropic and falls back to rule-based responses when no API key is configured. Responses are streamed back to the client allowing the assistant widget to render text in real time, emulating a typing effect.
+- The frontend (`src/components/ai/AIAssistantEnhanced.tsx`) builds conversation history, sends it via the service layer, and displays incremental chunks as they arrive. Quick‑action buttons are hidden while Kayd is composing a reply and reappear once the message completes.
 
 Files to check:
 - `src/components/ai/AIAssistant.tsx` — lightweight assistant (now supports streaming from the Edge Function)

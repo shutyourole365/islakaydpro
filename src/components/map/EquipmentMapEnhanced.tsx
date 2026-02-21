@@ -198,7 +198,6 @@ export default function EquipmentMapEnhanced({
         mapInstance.remove();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle user location
@@ -332,10 +331,12 @@ export default function EquipmentMapEnhanced({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search equipment on map..."
+                aria-label="Search equipment on map"
                 className="w-full pl-10 pr-4 py-3 bg-white rounded-xl shadow-lg border-0 focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
               {searchQuery && (
                 <button
+                  aria-label="Clear search"
                   onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded-full"
                 >
@@ -376,8 +377,9 @@ export default function EquipmentMapEnhanced({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Min Price</label>
+                  <label htmlFor="min-price" className="text-sm text-gray-600 mb-1 block">Min Price</label>
                   <input
+                    id="min-price"
                     type="number"
                     value={filters.priceMin}
                     onChange={(e) => setFilters({ ...filters, priceMin: Number(e.target.value) })}
@@ -385,8 +387,9 @@ export default function EquipmentMapEnhanced({
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">Max Price</label>
+                  <label htmlFor="max-price" className="text-sm text-gray-600 mb-1 block">Max Price</label>
                   <input
+                    id="max-price"
                     type="number"
                     value={filters.priceMax}
                     onChange={(e) => setFilters({ ...filters, priceMax: Number(e.target.value) })}
@@ -432,27 +435,27 @@ export default function EquipmentMapEnhanced({
         <button
           onClick={toggleFullscreen}
           className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-        >
+          aria-label="Toggle fullscreen">
           <Maximize2 className="w-5 h-5 text-gray-700" />
         </button>
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <button
             onClick={handleZoomIn}
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors border-b border-gray-100"
-          >
+            aria-label="Zoom in">
             <Plus className="w-5 h-5 text-gray-700" />
           </button>
           <button
             onClick={handleZoomOut}
             className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
+            aria-label="Zoom out">
             <Minus className="w-5 h-5 text-gray-700" />
           </button>
         </div>
         <button
           onClick={handleLocate}
           className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-        >
+         aria-label="Locate me">
           <LocateFixed className="w-5 h-5 text-gray-700" />
         </button>
       </div>

@@ -99,6 +99,33 @@ describe('AI Assistant Integration', () => {
       }));
     });
 
+    it('should stream response chunks correctly', async () => {
+      // mock underlying fetch response for streamMessage
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({
+          content: 'streaming text',
+          suggestions: ['a','b'],
+        }),
+      });
+
+      const { streamMessage } = await import('../../services/ai');
+      const messages = [{ role: 'user' as const, content: 'Hi' }];
+      const chunks: string[] = [];
+      let doneSuggestions: string[] = [];
+      let error: Error | null = null;
+
+      await streamMessage(messages, undefined,
+        chunk => { chunks.push(chunk); },
+        suggestions => { doneSuggestions = suggestions; },
+        err => { error = err; }
+      );
+
+      expect(error).toBeNull();
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(doneSuggestions).toEqual(['a','b']);
+    });
+
     it('should handle API errors gracefully', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: false,

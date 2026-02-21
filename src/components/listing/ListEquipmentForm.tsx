@@ -316,7 +316,7 @@ export default function ListEquipmentForm({
                       type="button"
                       onClick={addFeature}
                       className="px-4 py-3 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors"
-                    >
+                     aria-label="Icon button (ListEquipmentForm.tsx)">
                       <Plus className="w-5 h-5" />
                     </button>
                   </div>

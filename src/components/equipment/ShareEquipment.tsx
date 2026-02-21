@@ -119,7 +119,7 @@ export default function ShareEquipment({
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
-          >
+           aria-label="Icon button (ShareEquipment.tsx)">
             <X className="h-6 w-6" />
           </button>
         </div>

@@ -91,7 +91,7 @@ export default function Equipment3DViewer({ images, title, onClose }: Equipment3
         <button
           onClick={onClose}
           className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
-        >
+         aria-label="Icon button (Equipment3DViewer.tsx)">
           <X className="w-6 h-6 text-gray-400" />
         </button>
       </div>
@@ -213,7 +213,7 @@ export default function Equipment3DViewer({ images, title, onClose }: Equipment3
             <button
               onClick={handleZoomOut}
               className="p-2 hover:bg-gray-700 rounded-l-lg transition-colors"
-            >
+             aria-label="Icon button (Equipment3DViewer.tsx)">
               <ZoomOut className="w-5 h-5 text-gray-300" />
             </button>
             <div className="w-px h-6 bg-gray-700" />

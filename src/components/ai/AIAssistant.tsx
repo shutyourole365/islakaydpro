@@ -3,4 +3,3 @@
 // It simply re-exports the modern component.
 
 export { default } from './AIAssistantEnhanced';
-

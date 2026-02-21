@@ -109,7 +109,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
             <button
               onClick={onBack}
               className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-            >
+             aria-label="Icon button (AdminPanel.tsx)">
               <ArrowLeft className="w-6 h-6 text-gray-600" />
             </button>
             <div>
@@ -286,13 +286,13 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                       <td className="px-6 py-4 text-gray-600">{user.bookings}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1">
-                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="View">
+                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="View" aria-label="View">
                             <Eye className="w-4 h-4 text-gray-600" />
                           </button>
                           <button className="p-2 hover:bg-gray-100 rounded-lg" title="Edit">
                             <Edit className="w-4 h-4 text-gray-600" />
                           </button>
-                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="Email">
+                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="Email" aria-label="Email">
                             <Mail className="w-4 h-4 text-gray-600" />
                           </button>
                           <button className="p-2 hover:bg-red-50 rounded-lg" title="Ban">
@@ -341,13 +341,13 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                       <td className="px-6 py-4 text-gray-600">{report.date}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1">
-                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="View">
+                          <button className="p-2 hover:bg-gray-100 rounded-lg" title="View" aria-label="View">
                             <Eye className="w-4 h-4 text-gray-600" />
                           </button>
                           <button className="p-2 hover:bg-green-50 rounded-lg" title="Resolve">
                             <CheckCircle2 className="w-4 h-4 text-green-600" />
                           </button>
-                          <button className="p-2 hover:bg-red-50 rounded-lg" title="Dismiss">
+                          <button className="p-2 hover:bg-red-50 rounded-lg" title="Dismiss" aria-label="Dismiss">
                             <XCircle className="w-4 h-4 text-red-600" />
                           </button>
                         </div>
