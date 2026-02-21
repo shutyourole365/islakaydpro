@@ -1,7 +1,6 @@
 import js from '@eslint/js';
 import globals from 'globals';
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
+// Lint plugins temporarily disabled until they support ESLint 10
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
@@ -13,16 +12,8 @@ export default tseslint.config(
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
+    // no plugins enabled until compatible versions are available
     rules: {
-      ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
       // Disable problematic rule that has compatibility issues with ESLint v9
       '@typescript-eslint/no-unused-expressions': 'off',
     },
