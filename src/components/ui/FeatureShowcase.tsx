@@ -613,7 +613,7 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
       color: 'from-blue-500 to-purple-600',
       badge: '🌐 i18n',
       demo: true,
-,
+    },
     // NEWEST Features (10-15) - Availability, Revenue, Certification, Agreements, Support
     {
       id: 'availability-calendar',
