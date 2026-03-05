@@ -34,10 +34,14 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Log to error tracking service (e.g., Sentry)
-    // if (window.Sentry) {
-    //   window.Sentry.captureException(error, { extra: errorInfo });
-    // }
+    // Report to Sentry error monitoring
+    import('../../services/errorMonitoring').then(({ errorMonitoring }) => {
+      errorMonitoring.captureException(error, {
+        componentStack: { stack: errorInfo.componentStack },
+      });
+    }).catch(() => {
+      // Sentry not available, already logged to console
+    });
   }
 
   handleReset = () => {

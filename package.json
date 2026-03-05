@@ -14,11 +14,16 @@
     "test:coverage": "mkdir -p .vitest_tmp && TMPDIR=$PWD/.vitest_tmp vitest --coverage",
     "test:unit": "mkdir -p .vitest_tmp && TMPDIR=$PWD/.vitest_tmp vitest --run src/__tests__",
     "test:run": "mkdir -p .vitest_tmp && TMPDIR=$PWD/.vitest_tmp vitest run",
+    "test:e2e": "npx playwright test",
+    "test:e2e:headed": "npx playwright test --headed",
+    "test:e2e:ui": "npx playwright test --ui",
     "deploy": "npm run build && vercel --prod",
     "deploy:staging": "npm run build && vercel --staging",
     "preview:build": "npm run build && npm run preview",
     "analyze": "npm run build && npx vite-bundle-analyzer dist",
     "clean": "rm -rf dist node_modules/.vite",
+    "perf:audit": "npx tsx scripts/perf-audit.ts",
+    "mobile:verify": "npx tsx scripts/verify-mobile-build.ts",
     "postinstall": "npm run typecheck"
   },
   "dependencies": {
