@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, FileText, Download, Send, Check, Lock, AlertCircle, Plus } from 'lucide-react';
+import { ArrowLeft, FileText, Download, Send, Check, Lock, Plus } from 'lucide-react';
 
 interface RentalAgreementGeneratorProps {
   onBack: () => void;

@@ -40,43 +40,6 @@ import {
   FileText,
   HelpCircle
 } from 'lucide-react';
-import {
-  Sparkles,
-  DollarSign,
-  Wrench,
-  Gift,
-  Calendar,
-  Zap,
-  X,
-  ChevronRight,
-  BarChart3,
-  Camera,
-  Star,
-  Smartphone,
-  CreditCard,
-  Cloud,
-  Users,
-  Fingerprint,
-  Bell,
-  Trophy,
-  Package,
-  TrendingUp,
-  Shield,
-  QrCode,
-  Eye,
-  Activity,
-  Navigation,
-  Leaf,
-  Cpu,
-  Brain,
-  Plane,
-  Building,
-  HeartPulse,
-  Calculator,
-  Tag,
-  Clock,
-  Globe
-} from 'lucide-react';
 
 interface FeatureShowcaseProps {
   onFeatureSelect: (feature: string) => void;
