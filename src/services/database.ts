@@ -686,7 +686,7 @@ export async function getUserTrustScore(userId: string): Promise<{
 // Smart Alerts Functions
 // ============================================
 
-export interface SmartAlert {
+export interface SmartAlertRecord {
   id: string;
   user_id: string;
   type: string;
@@ -706,7 +706,7 @@ export async function getUserAlerts(userId: string, filters?: {
   priority?: string;
   status?: string;
   limit?: number;
-}): Promise<SmartAlert[]> {
+}): Promise<SmartAlertRecord[]> {
   let query = supabase
     .from('smart_alerts')
     .select('*')
@@ -746,7 +746,7 @@ export async function dismissAlert(alertId: string): Promise<void> {
     .eq('id', alertId);
 }
 
-export async function createAlert(alert: Omit<SmartAlert, 'id' | 'created_at'>): Promise<SmartAlert | null> {
+export async function createAlert(alert: Omit<SmartAlertRecord, 'id' | 'created_at'>): Promise<SmartAlertRecord | null> {
   const { data, error } = await supabase
     .from('smart_alerts')
     .insert(alert)
@@ -761,7 +761,7 @@ export async function createAlert(alert: Omit<SmartAlert, 'id' | 'created_at'>):
 // Equipment Bundle Functions
 // ============================================
 
-export interface EquipmentBundle {
+export interface EquipmentBundleRecord {
   id: string;
   owner_id: string;
   name: string;
@@ -780,7 +780,7 @@ export async function getEquipmentBundles(filters?: {
   ownerId?: string;
   isActive?: boolean;
   limit?: number;
-}): Promise<EquipmentBundle[]> {
+}): Promise<EquipmentBundleRecord[]> {
   let query = supabase
     .from('equipment_bundles')
     .select('*')
@@ -801,7 +801,7 @@ export async function getEquipmentBundles(filters?: {
   return data || [];
 }
 
-export async function createEquipmentBundle(bundle: Omit<EquipmentBundle, 'id' | 'created_at'>): Promise<EquipmentBundle | null> {
+export async function createEquipmentBundle(bundle: Omit<EquipmentBundleRecord, 'id' | 'created_at'>): Promise<EquipmentBundleRecord | null> {
   const { data, error } = await supabase
     .from('equipment_bundles')
     .insert(bundle)
@@ -812,7 +812,7 @@ export async function createEquipmentBundle(bundle: Omit<EquipmentBundle, 'id' |
   return data;
 }
 
-export async function updateEquipmentBundle(bundleId: string, updates: Partial<EquipmentBundle>): Promise<EquipmentBundle | null> {
+export async function updateEquipmentBundle(bundleId: string, updates: Partial<EquipmentBundleRecord>): Promise<EquipmentBundleRecord | null> {
   const { data, error } = await supabase
     .from('equipment_bundles')
     .update(updates)

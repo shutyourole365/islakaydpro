@@ -38,28 +38,33 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       return;
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (error) {
-      // Provide user-friendly error messages
-      if (error.message.includes('Invalid login credentials')) {
-        setError('Invalid email or password. Please try again.');
-      } else if (error.message.includes('Email not confirmed')) {
-        setError('Please verify your email address. Check your inbox for the confirmation link.');
-      } else {
-        setError(error.message);
+      if (authError) {
+        // Provide user-friendly error messages
+        if (authError.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password. Please try again.');
+        } else if (authError.message.includes('Email not confirmed')) {
+          setError('Please verify your email address. Check your inbox for the confirmation link.');
+        } else {
+          setError(authError.message);
+        }
+      } else if (data.session) {
+        setSuccess('✅ Successfully signed in! Redirecting...');
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 800);
       }
-    } else if (data.session) {
-      setSuccess('✅ Successfully signed in! Redirecting...');
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 800);
+    } catch (err) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Sign in failed. Please try again.');
     }
   };
 
@@ -117,16 +122,21 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setSuccess('Password reset email sent! Check your inbox.');
+      if (resetError) {
+        setError(resetError.message);
+      } else {
+        setSuccess('Password reset email sent! Check your inbox.');
+      }
+    } catch (err) {
+      setLoading(false);
+      setError(err instanceof Error ? err.message : 'Password reset failed. Please try again.');
     }
   };
 

@@ -300,8 +300,8 @@ export async function sendMessageNotification(
   return result.success;
 }
 
-// Send price alert notification
-export async function sendPriceAlertNotification(
+// Send price alert push notification
+export async function sendPriceAlertPushNotification(
   userId: string,
   equipmentName: string,
   oldPrice: number,
