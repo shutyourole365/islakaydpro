@@ -159,6 +159,23 @@ const MaintenanceScheduler = lazy(() => import('./components/maintenance/Mainten
 const SchedulingOptimizer = lazy(() => import('./components/scheduling/SchedulingOptimizer'));
 const ReferralSystem = lazy(() => import('./components/referral/ReferralSystem'));
 
+// Orphaned Feature Components - Now Integrated
+const ARVRExperience = lazy(() => import('./components/arvr/ARVRExperience'));
+const BlockchainIntegration = lazy(() => import('./components/blockchain/BlockchainIntegration'));
+const RentalContractViewer = lazy(() => import('./components/contract/RentalContractViewer'));
+const WishlistCollections = lazy(() => import('./components/favorites/WishlistCollections'));
+const EquipmentTimeline = lazy(() => import('./components/history/EquipmentTimeline'));
+const HolographicInterface = lazy(() => import('./components/holographic/HolographicInterface'));
+const IoTEquipmentMonitor = lazy(() => import('./components/iot/IoTEquipmentMonitor'));
+const LoyaltyRewardsTracker = lazy(() => import('./components/loyalty/LoyaltyRewardsTracker'));
+const QuantumComputingHub = lazy(() => import('./components/quantum/QuantumComputingHub'));
+// Settings Components
+const AISettings = lazy(() => import('./components/settings/AISettings'));
+const AccessibilitySettings = lazy(() => import('./components/settings/AccessibilitySettings'));
+const DataExportManager = lazy(() => import('./components/settings/DataExportManager'));
+const EmailPreferences = lazy(() => import('./components/settings/EmailPreferences'));
+const NotificationSettings = lazy(() => import('./components/settings/NotificationSettings'));
+
 // Loading fallback component
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -589,7 +606,7 @@ const sampleEquipment: Equipment[] = [
 ];
 
 function AppContent() {
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler' | 'equipment-health' | 'cost-estimator' | 'seasonal-deals' | 'rental-history' | 'multi-language' | 'availability-calendar' | 'revenue-dashboard' | 'certification-tracker' | 'agreement-generator' | 'support-tickets';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler' | 'equipment-health' | 'cost-estimator' | 'seasonal-deals' | 'rental-history' | 'multi-language' | 'availability-calendar' | 'revenue-dashboard' | 'certification-tracker' | 'agreement-generator' | 'support-tickets' | 'arvr-experience' | 'blockchain-integration' | 'rental-contract' | 'wishlist' | 'equipment-timeline' | 'holographic' | 'iot-monitor' | 'loyalty-rewards' | 'quantum-hub' | 'settings';
   const { isAuthenticated, user, profile, signOut } = useAuth();
   const {
     showBanner,
@@ -2769,6 +2786,98 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           </div>
         </Suspense>
       )}
+      {/* Integrated Feature Pages */}
+      {currentPage === 'arvr-experience' && (
+        <Suspense fallback={<PageLoader />}>
+          <ARVRExperience />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'blockchain-integration' && (
+        <Suspense fallback={<PageLoader />}>
+          <BlockchainIntegration />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'rental-contract' && (
+        <Suspense fallback={<PageLoader />}>
+          <RentalContractViewer />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'wishlist' && (
+        <Suspense fallback={<PageLoader />}>
+          <WishlistCollections
+            onCreateCollection={async () => {}}
+            onDeleteCollection={async () => {}}
+            onUpdateCollection={async () => {}}
+            onAddToCollection={async () => {}}
+            onRemoveFromCollection={async () => {}}
+            onEquipmentClick={() => {
+              setCurrentPage('home');
+            }}
+          />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'equipment-timeline' && (
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentTimeline
+            equipmentId={selectedEquipment?.id || 'demo'}
+            equipmentName={selectedEquipment?.title || 'Equipment'}
+          />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'holographic' && (
+        <Suspense fallback={<PageLoader />}>
+          <HolographicInterface />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'iot-monitor' && (
+        <Suspense fallback={<PageLoader />}>
+          <IoTEquipmentMonitor />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'loyalty-rewards' && (
+        <Suspense fallback={<PageLoader />}>
+          <LoyaltyRewardsTracker userId={user?.id} />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'quantum-hub' && (
+        <Suspense fallback={<PageLoader />}>
+          <QuantumComputingHub />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'settings' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gray-50">
+            <div className="max-w-4xl mx-auto px-4 space-y-8">
+              <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+              <AISettings />
+              <AccessibilitySettings onSettingsChange={() => {}} />
+              <EmailPreferences />
+              <NotificationSettings />
+              <DataExportManager />
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
       {/* Cookie Consent */}
       {showBanner && (
         <CookieConsentBanner

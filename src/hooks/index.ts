@@ -73,3 +73,9 @@ export {
   useRentalDates,
 } from './useAdvanced';
 
+// Cookie consent hook
+export { useCookieConsent } from './useCookieConsent';
+
+// Mobile app hook
+export { useMobileApp } from './useMobileApp';
+
