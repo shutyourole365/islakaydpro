@@ -169,6 +169,13 @@ const HolographicInterface = lazy(() => import('./components/holographic/Hologra
 const IoTEquipmentMonitor = lazy(() => import('./components/iot/IoTEquipmentMonitor'));
 const LoyaltyRewardsTracker = lazy(() => import('./components/loyalty/LoyaltyRewardsTracker'));
 const QuantumComputingHub = lazy(() => import('./components/quantum/QuantumComputingHub'));
+// Additional Integrated Components
+const GamificationHub = lazy(() => import('./components/gamification/GamificationHub'));
+const CarbonFootprintCalculator = lazy(() => import('./components/sustainability/CarbonFootprintCalculator'));
+const SustainabilityTracker = lazy(() => import('./components/sustainability/SustainabilityTracker'));
+const EquipmentConditionReport = lazy(() => import('./components/inspection/EquipmentConditionReport'));
+const EquipmentInspection = lazy(() => import('./components/inspection/EquipmentInspection'));
+
 // Settings Components
 const AISettings = lazy(() => import('./components/settings/AISettings'));
 const AccessibilitySettings = lazy(() => import('./components/settings/AccessibilitySettings'));
@@ -606,7 +613,7 @@ const sampleEquipment: Equipment[] = [
 ];
 
 function AppContent() {
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler' | 'equipment-health' | 'cost-estimator' | 'seasonal-deals' | 'rental-history' | 'multi-language' | 'availability-calendar' | 'revenue-dashboard' | 'certification-tracker' | 'agreement-generator' | 'support-tickets' | 'arvr-experience' | 'blockchain-integration' | 'rental-contract' | 'wishlist' | 'equipment-timeline' | 'holographic' | 'iot-monitor' | 'loyalty-rewards' | 'quantum-hub' | 'settings';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler' | 'equipment-health' | 'cost-estimator' | 'seasonal-deals' | 'rental-history' | 'multi-language' | 'availability-calendar' | 'revenue-dashboard' | 'certification-tracker' | 'agreement-generator' | 'support-tickets' | 'arvr-experience' | 'blockchain-integration' | 'rental-contract' | 'wishlist' | 'equipment-timeline' | 'holographic' | 'iot-monitor' | 'loyalty-rewards' | 'quantum-hub' | 'settings' | 'gamification-hub' | 'carbon-calculator' | 'sustainability-tracker' | 'equipment-inspection' | 'condition-report';
   const { isAuthenticated, user, profile, signOut } = useAuth();
   const {
     showBanner,
@@ -2874,6 +2881,46 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               <DataExportManager />
             </div>
           </div>
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'gamification-hub' && (
+        <Suspense fallback={<PageLoader />}>
+          <GamificationHub />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'carbon-calculator' && (
+        <Suspense fallback={<PageLoader />}>
+          <CarbonFootprintCalculator />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'sustainability-tracker' && (
+        <Suspense fallback={<PageLoader />}>
+          <SustainabilityTracker />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'equipment-inspection' && selectedEquipment && (
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentInspection equipment={selectedEquipment} />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'condition-report' && (
+        <Suspense fallback={<PageLoader />}>
+          <EquipmentConditionReport
+            equipmentId={selectedEquipment?.id || 'demo'}
+            equipmentName={selectedEquipment?.title || 'Equipment'}
+            reportType="inspection"
+            onSubmit={() => setCurrentPage('dashboard')}
+          />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
