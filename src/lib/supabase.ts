@@ -1,23 +1,36 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Read env vars lazily to avoid module-load timing issues
+function getSupabaseUrl(): string {
+  return import.meta.env.VITE_SUPABASE_URL || '';
+}
 
-// Check if Supabase credentials are configured
-export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
+function getSupabaseAnonKey(): string {
+  return import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+}
 
-// Create a mock client if credentials are not available (for demo mode)
+// Check if Supabase credentials are configured (evaluated lazily at call time)
+export function checkSupabaseConfigured(): boolean {
+  return !!(getSupabaseUrl() && getSupabaseAnonKey());
+}
+
+// Backwards-compatible constant for existing imports
+export const isSupabaseConfigured = !!(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+
+// Create the Supabase client with available credentials
 function createSupabaseClient(): SupabaseClient {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase credentials not configured. Running in demo mode.');
-    // Return a minimal mock that won't crash the app
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
+
+  if (!url || !key) {
+    // Return a placeholder client that won't crash the app in demo mode
     return createClient(
       'https://placeholder.supabase.co',
       'placeholder-key',
       { auth: { persistSession: false } }
     );
   }
-  return createClient(supabaseUrl, supabaseAnonKey);
+  return createClient(url, key);
 }
 
 export const supabase = createSupabaseClient();

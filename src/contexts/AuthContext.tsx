@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, checkSupabaseConfigured } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
 import { getProfile, getUserAnalytics, getUnreadNotificationCount, subscribeToNotifications, logAuditEvent } from '../services/database';
@@ -152,7 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.user]);
 
   const signIn = async (email: string, password: string) => {
-    if (!isSupabaseConfigured) {
+    if (!checkSupabaseConfigured()) {
       throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file.');
     }
     try {
@@ -183,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    if (!isSupabaseConfigured) {
+    if (!checkSupabaseConfigured()) {
       throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file.');
     }
     try {
@@ -240,7 +240,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    if (!isSupabaseConfigured) {
+    if (!checkSupabaseConfigured()) {
       throw new Error('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file.');
     }
     const { error } = await supabase.auth.signInWithOAuth({

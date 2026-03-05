@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase, isSupabaseConfigured } from '../../lib/supabase';
+import { supabase, checkSupabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface SocialAuthProps {
@@ -99,7 +99,7 @@ export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps
       {/* Magic Link Option */}
       <button
         onClick={async () => {
-          if (!isSupabaseConfigured) {
+          if (!checkSupabaseConfigured()) {
             onError('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file.');
             return;
           }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { supabase, checkSupabaseConfigured } from '../lib/supabase';
 
 interface SupabaseStatus {
   isConfigured: boolean;
@@ -15,7 +15,7 @@ interface SupabaseStatus {
  */
 export function useSupabaseStatus(): SupabaseStatus {
   const [status, setStatus] = useState<SupabaseStatus>({
-    isConfigured: isSupabaseConfigured,
+    isConfigured: checkSupabaseConfigured(),
     isConnected: false,
     isLoading: true,
     error: null,
@@ -23,7 +23,7 @@ export function useSupabaseStatus(): SupabaseStatus {
   });
 
   const checkConnection = useCallback(async () => {
-    if (!isSupabaseConfigured) {
+    if (!checkSupabaseConfigured()) {
       setStatus({
         isConfigured: false,
         isConnected: false,
