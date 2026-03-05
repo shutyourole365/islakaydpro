@@ -709,7 +709,12 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    
+
+    // Update SEO metadata for current page
+    import('./utils/seoMetadata').then(({ updatePageMeta }) => {
+      updatePageMeta(currentPage);
+    });
+
     // Track page views in analytics
     if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
       import('./services/analytics').then(({ analytics }) => {
@@ -739,6 +744,13 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   useEffect(() => {
     if (user) {
       loadFavorites();
+
+      // Auto-trigger onboarding for first-time users
+      const onboardingKey = `islakayd_onboarding_${user.id}`;
+      if (!localStorage.getItem(onboardingKey)) {
+        localStorage.setItem(onboardingKey, 'shown');
+        setIsOnboardingOpen(true);
+      }
     } else {
       setFavorites(new Set());
     }

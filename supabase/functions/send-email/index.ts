@@ -81,6 +81,9 @@ function generateEmailHTML(template: string, data: Record<string, unknown>): str
     'welcome': welcomeTemplate,
     'password-reset': passwordResetTemplate,
     'verification-approved': verificationApprovedTemplate,
+    'owner-payout': ownerPayoutTemplate,
+    'booking-return-reminder': bookingReturnReminderTemplate,
+    'account-deactivation': accountDeactivationTemplate,
   };
 
   const templateFn = templates[template];
@@ -528,7 +531,7 @@ function verificationApprovedTemplate(data: Record<string, unknown>): string {
     <h2>You're Verified! ✅</h2>
     <p>Hello <strong>${data.userName}</strong>,</p>
     <p>Congratulations! Your ${data.verificationType} verification has been approved.</p>
-    
+
     <div class="success-box">
       🏆 You now have a verified badge on your profile, which helps build trust with other users.
     </div>
@@ -539,9 +542,122 @@ function verificationApprovedTemplate(data: Record<string, unknown>): string {
       <li>Increased booking approval rates</li>
       <li>Access to premium equipment listings</li>
     </ul>
-    
+
     <center>
       <a href="https://islakayd.com/dashboard" class="btn">View Your Profile</a>
     </center>
+  `;
+}
+
+function ownerPayoutTemplate(data: Record<string, unknown>): string {
+  return `
+    <h2>Payout Processed 🏦</h2>
+    <p>Hello <strong>${data.ownerName}</strong>,</p>
+    <p>Your earnings payout has been processed and is on its way to your bank account.</p>
+
+    <div class="info-box">
+      <h3 style="margin-top: 0;">Payout Details</h3>
+      <div class="info-row">
+        <span class="info-label">Amount</span>
+        <span class="info-value highlight">$${data.amount}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Period</span>
+        <span class="info-value">${data.periodStart} - ${data.periodEnd}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Bookings</span>
+        <span class="info-value">${data.bookingCount} completed</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Bank Account</span>
+        <span class="info-value">****${data.lastFour}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Expected Arrival</span>
+        <span class="info-value">${data.arrivalDate}</span>
+      </div>
+    </div>
+
+    <div class="success-box">
+      ✅ Funds typically arrive within 2-3 business days.
+    </div>
+
+    <center>
+      <a href="https://islakayd.com/dashboard/earnings" class="btn">View Earnings Dashboard</a>
+    </center>
+  `;
+}
+
+function bookingReturnReminderTemplate(data: Record<string, unknown>): string {
+  return `
+    <h2>Equipment Return Reminder ⏰</h2>
+    <p>Hello <strong>${data.renterName}</strong>,</p>
+    <p>This is a friendly reminder that your rental period is ending ${data.daysLeft === 0 ? '<strong>today</strong>' : `in <strong>${data.daysLeft} day${Number(data.daysLeft) > 1 ? 's' : ''}</strong>`}.</p>
+
+    <div class="info-box">
+      <h3 style="margin-top: 0;">Return Details</h3>
+      <div class="info-row">
+        <span class="info-label">Equipment</span>
+        <span class="info-value">${data.equipmentTitle}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Return Date</span>
+        <span class="info-value">${data.returnDate}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Return Location</span>
+        <span class="info-value">${data.returnLocation}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Deposit</span>
+        <span class="info-value">$${data.depositAmount} (refundable)</span>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      ⚠️ <strong>Late returns</strong> may incur additional charges at the daily rate. Please return equipment clean and in good condition to receive your full deposit refund.
+    </div>
+
+    <p><strong>Before returning:</strong></p>
+    <ul>
+      <li>Clean the equipment and remove any personal items</li>
+      <li>Take photos of the equipment's condition</li>
+      <li>Return all accessories and attachments</li>
+      <li>Contact the owner if you need to extend your rental</li>
+    </ul>
+
+    <center>
+      <a href="https://islakayd.com/bookings/${data.bookingId}" class="btn">View Booking</a>
+    </center>
+
+    <p style="margin-top: 20px; text-align: center;">
+      Need more time? <a href="https://islakayd.com/bookings/${data.bookingId}/extend" style="color: #0d9488; font-weight: 600;">Request an Extension</a>
+    </p>
+  `;
+}
+
+function accountDeactivationTemplate(data: Record<string, unknown>): string {
+  return `
+    <h2>Account Notice</h2>
+    <p>Hello <strong>${data.userName}</strong>,</p>
+    <p>We noticed your account has been inactive for a while. We'd love to have you back!</p>
+
+    <div class="info-box">
+      <h3 style="margin-top: 0;">What's New on Islakayd</h3>
+      <p>🤖 <strong>AI Equipment Matching</strong> — Find the perfect gear instantly</p>
+      <p>🎉 <strong>Seasonal Deals</strong> — Save up to 30% on popular rentals</p>
+      <p>📱 <strong>Mobile App</strong> — Book on the go with our PWA</p>
+      <p>🛡️ <strong>Enhanced Protection</strong> — New insurance options for every rental</p>
+    </div>
+
+    <center>
+      <a href="https://islakayd.com/browse" class="btn">Explore New Equipment</a>
+    </center>
+
+    <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
+      If you wish to permanently delete your account, please visit your
+      <a href="https://islakayd.com/settings/account" style="color: #0d9488;">account settings</a>.
+    </p>
   `;
 }

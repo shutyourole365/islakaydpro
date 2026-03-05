@@ -385,7 +385,7 @@ async function seedEquipment() {
     }
 
     // Get category IDs
-    const { data: categories, error: catError } = await supabase
+    let { data: categories, error: catError } = await supabase
       .from('categories')
       .select('id, name, slug');
 
@@ -396,8 +396,27 @@ async function seedEquipment() {
 
     if (!categories || categories.length === 0) {
       console.log('⚠️  No categories found. Creating default categories...');
-      // Create default categories would go here
-      return;
+      const defaultCategories = [
+        { name: 'Construction Equipment', slug: 'construction', description: 'Heavy machinery and construction equipment', icon: 'hard-hat', image_url: 'https://images.pexels.com/photos/2058128/pexels-photo-2058128.jpeg', equipment_count: 0 },
+        { name: 'Power Tools', slug: 'power-tools', description: 'Drills, saws, and power equipment', icon: 'wrench', image_url: 'https://images.pexels.com/photos/1249611/pexels-photo-1249611.jpeg', equipment_count: 0 },
+        { name: 'Photography', slug: 'photography', description: 'Cameras, lenses, and studio equipment', icon: 'camera', image_url: 'https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg', equipment_count: 0 },
+        { name: 'Events', slug: 'events', description: 'Tents, tables, chairs, and party supplies', icon: 'party-popper', image_url: 'https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg', equipment_count: 0 },
+        { name: 'Landscaping', slug: 'landscaping', description: 'Tractors, mowers, and garden equipment', icon: 'leaf', image_url: 'https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg', equipment_count: 0 },
+        { name: 'Audio & Video', slug: 'audio-video', description: 'DJ gear, sound systems, and AV equipment', icon: 'headphones', image_url: 'https://images.pexels.com/photos/164938/pexels-photo-164938.jpeg', equipment_count: 0 },
+      ];
+
+      const { data: newCats, error: createCatError } = await supabase
+        .from('categories')
+        .insert(defaultCategories)
+        .select();
+
+      if (createCatError) {
+        console.error('❌ Error creating categories:', createCatError.message);
+        return;
+      }
+
+      console.log(`✅ Created ${newCats?.length || 0} default categories`);
+      categories = newCats || [];
     }
 
     console.log(`✅ Found ${categories.length} categories\n`);
@@ -472,6 +491,45 @@ async function seedEquipment() {
     if (successCount > 0) {
       console.log('🎉 Equipment seeding completed successfully!');
       console.log('   Visit your app to see the new listings.\n');
+
+      // Seed sample reviews for seeded equipment
+      console.log('📝 Seeding sample reviews...\n');
+      const { data: seededEquipment } = await supabase
+        .from('equipment')
+        .select('id, title')
+        .eq('owner_id', ownerId)
+        .limit(6);
+
+      if (seededEquipment && seededEquipment.length > 0) {
+        const sampleReviews = [
+          { rating: 5, title: 'Excellent equipment!', comment: 'Everything was in perfect condition and worked flawlessly. Owner was very helpful with setup instructions. Would definitely rent again!' },
+          { rating: 5, title: 'Great value for the price', comment: 'Much cheaper than buying and the quality was top-notch. Delivery was on time and pickup was hassle-free.' },
+          { rating: 4, title: 'Very good, minor wear', comment: 'Equipment worked great for our project. Some cosmetic wear but everything functioned perfectly. Good communication with owner.' },
+          { rating: 5, title: 'Perfect for our wedding', comment: 'Exactly what we needed for our outdoor ceremony. Professional setup and beautiful result. Highly recommend!' },
+          { rating: 4, title: 'Solid rental experience', comment: 'Easy booking process, fair pricing, and good condition equipment. Will use Islakayd again for future projects.' },
+          { rating: 5, title: 'Saved our project deadline', comment: 'Needed equipment last minute and the owner was incredibly accommodating. Fast delivery and premium quality gear.' },
+        ];
+
+        let reviewCount = 0;
+        for (let i = 0; i < Math.min(seededEquipment.length, sampleReviews.length); i++) {
+          const { error: reviewError } = await supabase
+            .from('reviews')
+            .insert({
+              equipment_id: seededEquipment[i].id,
+              reviewer_id: ownerId,
+              reviewee_id: ownerId,
+              rating: sampleReviews[i].rating,
+              title: sampleReviews[i].title,
+              comment: sampleReviews[i].comment,
+              is_equipment_review: true,
+            });
+
+          if (!reviewError) {
+            reviewCount++;
+          }
+        }
+        console.log(`✅ Created ${reviewCount} sample reviews\n`);
+      }
     }
 
   } catch (error) {

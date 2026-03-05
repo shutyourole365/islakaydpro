@@ -22,6 +22,7 @@
     "preview:build": "npm run build && npm run preview",
     "analyze": "npm run build && npx vite-bundle-analyzer dist",
     "clean": "rm -rf dist node_modules/.vite",
+    "seed:equipment": "npx tsx scripts/seed-equipment.ts",
     "perf:audit": "npx tsx scripts/perf-audit.ts",
     "mobile:verify": "npx tsx scripts/verify-mobile-build.ts",
     "postinstall": "npm run typecheck"
