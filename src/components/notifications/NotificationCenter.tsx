@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft,
   Bell,
@@ -13,10 +13,14 @@ import {
   Trash2,
   Settings,
   MailOpen,
+  Wifi,
+  WifiOff,
 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 interface NotificationCenterProps {
   onBack: () => void;
+  userId?: string;
 }
 
 interface Notification {
@@ -29,66 +33,152 @@ interface Notification {
   actionUrl?: string;
 }
 
-export default function NotificationCenter({ onBack }: NotificationCenterProps) {
+const SAMPLE_NOTIFICATIONS: Notification[] = [
+  {
+    id: '1',
+    type: 'booking',
+    title: 'New Booking Request',
+    message: 'John Smith wants to rent your CAT 320 Excavator from Jan 25-28, 2026.',
+    time: '5 min ago',
+    read: false,
+  },
+  {
+    id: '2',
+    type: 'message',
+    title: 'New Message',
+    message: 'Sarah Johnson: "Is the camera kit available this weekend?"',
+    time: '1 hour ago',
+    read: false,
+  },
+  {
+    id: '3',
+    type: 'payment',
+    title: 'Payment Received',
+    message: 'You received $450.00 for booking #12345. Funds will be available in 2 days.',
+    time: '3 hours ago',
+    read: true,
+  },
+  {
+    id: '4',
+    type: 'review',
+    title: 'New Review',
+    message: 'Mike Wilson left a 5-star review on your Power Tool Set.',
+    time: '1 day ago',
+    read: true,
+  },
+  {
+    id: '5',
+    type: 'security',
+    title: 'New Sign-in Detected',
+    message: 'Your account was accessed from a new device in Los Angeles, CA.',
+    time: '2 days ago',
+    read: true,
+  },
+  {
+    id: '6',
+    type: 'system',
+    title: 'Listing Approved',
+    message: 'Your new listing "Professional DJ Equipment" is now live.',
+    time: '3 days ago',
+    read: true,
+  },
+  {
+    id: '7',
+    type: 'booking',
+    title: 'Booking Confirmed',
+    message: 'Your booking for Sony A7IV Camera Kit has been confirmed.',
+    time: '4 days ago',
+    read: true,
+  },
+];
+
+function formatTimeAgo(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (seconds < 60) return 'just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
+export default function NotificationCenter({ onBack, userId }: NotificationCenterProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'bookings' | 'messages'>('all');
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      type: 'booking',
-      title: 'New Booking Request',
-      message: 'John Smith wants to rent your CAT 320 Excavator from Jan 25-28, 2026.',
-      time: '5 min ago',
-      read: false,
-    },
-    {
-      id: '2',
-      type: 'message',
-      title: 'New Message',
-      message: 'Sarah Johnson: "Is the camera kit available this weekend?"',
-      time: '1 hour ago',
-      read: false,
-    },
-    {
-      id: '3',
-      type: 'payment',
-      title: 'Payment Received',
-      message: 'You received $450.00 for booking #12345. Funds will be available in 2 days.',
-      time: '3 hours ago',
-      read: true,
-    },
-    {
-      id: '4',
-      type: 'review',
-      title: 'New Review',
-      message: 'Mike Wilson left a 5-star review on your Power Tool Set.',
-      time: '1 day ago',
-      read: true,
-    },
-    {
-      id: '5',
-      type: 'security',
-      title: 'New Sign-in Detected',
-      message: 'Your account was accessed from a new device in Los Angeles, CA.',
-      time: '2 days ago',
-      read: true,
-    },
-    {
-      id: '6',
-      type: 'system',
-      title: 'Listing Approved',
-      message: 'Your new listing "Professional DJ Equipment" is now live.',
-      time: '3 days ago',
-      read: true,
-    },
-    {
-      id: '7',
-      type: 'booking',
-      title: 'Booking Confirmed',
-      message: 'Your booking for Sony A7IV Camera Kit has been confirmed.',
-      time: '4 days ago',
-      read: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>(SAMPLE_NOTIFICATIONS);
+  const [isLive, setIsLive] = useState(false);
+
+  // Load notifications from Supabase and subscribe to real-time updates
+  useEffect(() => {
+    if (!userId || !isSupabaseConfigured) return;
+
+    let mounted = true;
+
+    // Fetch existing notifications
+    async function fetchNotifications() {
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (error) {
+        console.warn('Could not fetch notifications, using sample data:', error.message);
+        return;
+      }
+
+      if (mounted && data && data.length > 0) {
+        setNotifications(data.map(n => ({
+          id: n.id,
+          type: n.type || 'system',
+          title: n.title,
+          message: n.message || n.body || '',
+          time: formatTimeAgo(n.created_at),
+          read: n.read ?? false,
+          actionUrl: n.action_url,
+        })));
+      }
+    }
+
+    fetchNotifications();
+
+    // Subscribe to real-time inserts on the notifications table
+    const channel = supabase
+      .channel(`notifications:${userId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          const n = payload.new as Record<string, unknown>;
+          const newNotification: Notification = {
+            id: n.id as string,
+            type: (n.type as Notification['type']) || 'system',
+            title: n.title as string,
+            message: (n.message || n.body || '') as string,
+            time: 'just now',
+            read: false,
+            actionUrl: n.action_url as string | undefined,
+          };
+          setNotifications(prev => [newNotification, ...prev]);
+        }
+      )
+      .subscribe((status) => {
+        setIsLive(status === 'SUBSCRIBED');
+      });
+
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+    };
+  }, [userId]);
 
   const getIcon = (type: Notification['type']) => {
     switch (type) {
@@ -124,25 +214,37 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
     }
   };
 
-  const markAsRead = (id: string) => {
+  const markAsRead = useCallback((id: string) => {
     setNotifications(prev =>
       prev.map(n => (n.id === id ? { ...n, read: true } : n))
     );
-  };
+    if (userId && isSupabaseConfigured) {
+      supabase.from('notifications').update({ read: true }).eq('id', id).then(() => {});
+    }
+  }, [userId]);
 
-  const markAllAsRead = () => {
+  const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
+    if (userId && isSupabaseConfigured) {
+      supabase.from('notifications').update({ read: true }).eq('user_id', userId).eq('read', false).then(() => {});
+    }
+  }, [userId]);
 
-  const deleteNotification = (id: string) => {
+  const deleteNotification = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
-  };
+    if (userId && isSupabaseConfigured) {
+      supabase.from('notifications').delete().eq('id', id).then(() => {});
+    }
+  }, [userId]);
 
-  const clearAll = () => {
+  const clearAll = useCallback(() => {
     if (confirm('Are you sure you want to clear all notifications?')) {
       setNotifications([]);
+      if (userId && isSupabaseConfigured) {
+        supabase.from('notifications').delete().eq('user_id', userId).then(() => {});
+      }
     }
-  };
+  }, [userId]);
 
   const filteredNotifications = notifications.filter(n => {
     if (activeTab === 'unread') return !n.read;
@@ -181,7 +283,17 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                   </span>
                 )}
               </h1>
-              <p className="text-gray-600">Stay updated on your rentals and messages</p>
+              <p className="text-gray-600 flex items-center gap-2">
+                Stay updated on your rentals and messages
+                {userId && isSupabaseConfigured && (
+                  <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
+                    isLive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {isLive ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
+                    {isLive ? 'Live' : 'Connecting...'}
+                  </span>
+                )}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">

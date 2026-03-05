@@ -1,4 +1,4 @@
-import { useState, useDeferredValue, useMemo } from 'react';
+import { useState, useDeferredValue, useMemo, useEffect } from 'react';
 import {
   Search,
   MapPin,
@@ -12,6 +12,8 @@ import {
   Clock,
   ArrowLeft,
   Map,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import type { Equipment, Category } from '../../types';
 import EquipmentMap from '../map/EquipmentMap';
@@ -46,6 +48,43 @@ export default function BrowsePage({
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedMapEquipment, setSelectedMapEquipment] = useState<string | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 12;
+
+  // Sync filters to URL search params for shareable links
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedCategory) params.set('category', selectedCategory);
+    if (location) params.set('location', location);
+    if (sortBy !== 'featured') params.set('sort', sortBy);
+    if (condition) params.set('condition', condition);
+    if (priceRange[0] > 0) params.set('minPrice', String(priceRange[0]));
+    if (priceRange[1] < 1000) params.set('maxPrice', String(priceRange[1]));
+    if (currentPage > 1) params.set('page', String(currentPage));
+    const qs = params.toString();
+    const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+    window.history.replaceState(null, '', newUrl);
+  }, [searchQuery, selectedCategory, location, sortBy, condition, priceRange, currentPage]);
+
+  // Read URL params on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('q')) setSearchQuery(params.get('q')!);
+    if (params.get('category')) setSelectedCategory(params.get('category')!);
+    if (params.get('location')) setLocation(params.get('location')!);
+    if (params.get('sort')) setSortBy(params.get('sort')!);
+    if (params.get('condition')) setCondition(params.get('condition')!);
+    if (params.get('minPrice')) setPriceRange(prev => [Number(params.get('minPrice')), prev[1]]);
+    if (params.get('maxPrice')) setPriceRange(prev => [prev[0], Number(params.get('maxPrice'))]);
+    if (params.get('page')) setCurrentPage(Number(params.get('page')));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, location, priceRange, condition, sortBy]);
 
   // Use deferred value for search to improve performance during typing
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -106,6 +145,12 @@ export default function BrowsePage({
 
     return filtered;
   }, [deferredSearchQuery, selectedCategory, location, priceRange, condition, sortBy, equipment, categories]);
+
+  const totalPages = Math.ceil(filteredEquipment.length / ITEMS_PER_PAGE);
+  const paginatedEquipment = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredEquipment.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredEquipment, currentPage]);
 
   const clearFilters = () => {
     setSearchQuery('');
@@ -427,7 +472,7 @@ export default function BrowsePage({
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredEquipment.map((item) => (
+            {paginatedEquipment.map((item) => (
               <div
                 key={item.id}
                 className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300"
@@ -522,7 +567,7 @@ export default function BrowsePage({
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredEquipment.map((item) => (
+            {paginatedEquipment.map((item) => (
               <button
                 key={item.id}
                 onClick={() => onEquipmentClick(item)}
@@ -599,6 +644,62 @@ export default function BrowsePage({
               </button>
             ))}
           </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && viewMode !== 'map' && (
+          <div className="flex items-center justify-center gap-2 mt-10">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </button>
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                let page: number;
+                if (totalPages <= 5) {
+                  page = i + 1;
+                } else if (currentPage <= 3) {
+                  page = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  page = totalPages - 4 + i;
+                } else {
+                  page = currentPage - 2 + i;
+                }
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-xl font-medium transition-colors ${
+                      currentPage === page
+                        ? 'bg-teal-500 text-white'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-1 px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Results summary */}
+        {filteredEquipment.length > ITEMS_PER_PAGE && viewMode !== 'map' && (
+          <p className="text-center text-sm text-gray-500 mt-4">
+            Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredEquipment.length)} of {filteredEquipment.length} results
+          </p>
         )}
       </div>
     </div>

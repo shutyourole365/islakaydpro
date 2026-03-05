@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowLeft,
   Users,
@@ -17,7 +17,9 @@ import {
   Mail,
   Activity,
   Clock,
+  Loader2,
 } from 'lucide-react';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 interface AdminPanelProps {
   onBack: () => void;
@@ -44,30 +46,91 @@ interface Report {
   date: string;
 }
 
+const FALLBACK_STATS = {
+  totalUsers: '12,458',
+  activeListings: '3,847',
+  monthlyRevenue: '$284,500',
+  pendingReports: '23',
+};
+
+const FALLBACK_USERS: User[] = [
+  { id: '1', name: 'John Smith', email: 'john@example.com', status: 'active', verified: true, joinDate: '2024-06-15', listings: 5, bookings: 12 },
+  { id: '2', name: 'Sarah Johnson', email: 'sarah@example.com', status: 'active', verified: true, joinDate: '2024-08-22', listings: 3, bookings: 28 },
+  { id: '3', name: 'Mike Wilson', email: 'mike@example.com', status: 'suspended', verified: false, joinDate: '2025-01-10', listings: 0, bookings: 2 },
+  { id: '4', name: 'Emily Davis', email: 'emily@example.com', status: 'active', verified: true, joinDate: '2024-03-05', listings: 8, bookings: 45 },
+  { id: '5', name: 'Robert Brown', email: 'robert@example.com', status: 'banned', verified: false, joinDate: '2024-11-20', listings: 1, bookings: 0 },
+];
+
+const FALLBACK_REPORTS: Report[] = [
+  { id: '1', type: 'equipment', reason: 'Misleading description', reporter: 'User123', reported: 'Excavator XL200', status: 'pending', date: '2026-01-22' },
+  { id: '2', type: 'user', reason: 'Fraudulent activity', reporter: 'User456', reported: 'Mike Wilson', status: 'pending', date: '2026-01-21' },
+  { id: '3', type: 'booking', reason: 'No-show', reporter: 'OwnerABC', reported: 'Booking #12345', status: 'resolved', date: '2026-01-20' },
+  { id: '4', type: 'equipment', reason: 'Damaged equipment', reporter: 'User789', reported: 'Camera Kit Pro', status: 'dismissed', date: '2026-01-19' },
+];
+
 export default function AdminPanel({ onBack }: AdminPanelProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'equipment' | 'reports' | 'settings'>('overview');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState(FALLBACK_STATS);
+  const [users, setUsers] = useState<User[]>(FALLBACK_USERS);
+  const [reports] = useState<Report[]>(FALLBACK_REPORTS);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+      return;
+    }
+
+    async function fetchAdminData() {
+      try {
+        const [usersRes, equipmentRes, bookingsRes] = await Promise.all([
+          supabase.from('profiles').select('id, full_name, email, created_at, is_verified, status', { count: 'exact' }),
+          supabase.from('equipment').select('id', { count: 'exact' }).eq('is_available', true),
+          supabase.from('bookings').select('total_price').gte('created_at', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+        ]);
+
+        const totalUsers = usersRes.count ?? 0;
+        const activeListings = equipmentRes.count ?? 0;
+        const monthlyRevenue = bookingsRes.data?.reduce((sum, b) => sum + (b.total_price || 0), 0) ?? 0;
+
+        if (totalUsers > 0 || activeListings > 0) {
+          setStats({
+            totalUsers: totalUsers.toLocaleString(),
+            activeListings: activeListings.toLocaleString(),
+            monthlyRevenue: `$${monthlyRevenue.toLocaleString()}`,
+            pendingReports: FALLBACK_STATS.pendingReports,
+          });
+        }
+
+        // Fetch real users
+        if (usersRes.data && usersRes.data.length > 0) {
+          setUsers(usersRes.data.slice(0, 20).map(u => ({
+            id: u.id,
+            name: u.full_name || 'Unknown',
+            email: u.email || '',
+            status: (u.status as User['status']) || 'active',
+            verified: u.is_verified ?? false,
+            joinDate: u.created_at ? new Date(u.created_at).toISOString().split('T')[0] : '',
+            listings: 0,
+            bookings: 0,
+          })));
+        }
+      } catch (error) {
+        console.warn('Admin data fetch failed, using fallback data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAdminData();
+  }, []);
 
   const platformStats = [
-    { label: 'Total Users', value: '12,458', change: '+234', icon: Users, color: 'bg-blue-100 text-blue-600' },
-    { label: 'Active Listings', value: '3,847', change: '+89', icon: Package, color: 'bg-green-100 text-green-600' },
-    { label: 'Monthly Revenue', value: '$284,500', change: '+12.4%', icon: DollarSign, color: 'bg-purple-100 text-purple-600' },
-    { label: 'Pending Reports', value: '23', change: '-5', icon: Flag, color: 'bg-red-100 text-red-600' },
-  ];
-
-  const users: User[] = [
-    { id: '1', name: 'John Smith', email: 'john@example.com', status: 'active', verified: true, joinDate: '2024-06-15', listings: 5, bookings: 12 },
-    { id: '2', name: 'Sarah Johnson', email: 'sarah@example.com', status: 'active', verified: true, joinDate: '2024-08-22', listings: 3, bookings: 28 },
-    { id: '3', name: 'Mike Wilson', email: 'mike@example.com', status: 'suspended', verified: false, joinDate: '2025-01-10', listings: 0, bookings: 2 },
-    { id: '4', name: 'Emily Davis', email: 'emily@example.com', status: 'active', verified: true, joinDate: '2024-03-05', listings: 8, bookings: 45 },
-    { id: '5', name: 'Robert Brown', email: 'robert@example.com', status: 'banned', verified: false, joinDate: '2024-11-20', listings: 1, bookings: 0 },
-  ];
-
-  const reports: Report[] = [
-    { id: '1', type: 'equipment', reason: 'Misleading description', reporter: 'User123', reported: 'Excavator XL200', status: 'pending', date: '2026-01-22' },
-    { id: '2', type: 'user', reason: 'Fraudulent activity', reporter: 'User456', reported: 'Mike Wilson', status: 'pending', date: '2026-01-21' },
-    { id: '3', type: 'booking', reason: 'No-show', reporter: 'OwnerABC', reported: 'Booking #12345', status: 'resolved', date: '2026-01-20' },
-    { id: '4', type: 'equipment', reason: 'Damaged equipment', reporter: 'User789', reported: 'Camera Kit Pro', status: 'dismissed', date: '2026-01-19' },
+    { label: 'Total Users', value: stats.totalUsers, change: '+234', icon: Users, color: 'bg-blue-100 text-blue-600' },
+    { label: 'Active Listings', value: stats.activeListings, change: '+89', icon: Package, color: 'bg-green-100 text-green-600' },
+    { label: 'Monthly Revenue', value: stats.monthlyRevenue, change: '+12.4%', icon: DollarSign, color: 'bg-purple-100 text-purple-600' },
+    { label: 'Pending Reports', value: stats.pendingReports, change: '-5', icon: Flag, color: 'bg-red-100 text-red-600' },
   ];
 
   const tabs = [
@@ -145,6 +208,12 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
+            {loading && (
+              <div className="flex items-center justify-center gap-2 py-4 text-gray-500">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Loading dashboard data...
+              </div>
+            )}
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {platformStats.map((stat, index) => (

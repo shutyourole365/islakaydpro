@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,8 +10,10 @@ import {
   CheckCircle2,
   Camera,
   Info,
+  Loader2,
 } from 'lucide-react';
 import type { Category } from '../../types';
+import { uploadMultipleFiles } from '../../services/storage';
 
 interface ListEquipmentFormProps {
   categories: Category[];
@@ -66,6 +68,8 @@ export default function ListEquipmentForm({
     max_rental_days: 30,
   });
   const [newFeature, setNewFeature] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const totalSteps = 4;
 
@@ -114,6 +118,39 @@ export default function ListEquipmentForm({
       ...formData,
       images: formData.images.filter((_, i) => i !== index),
     });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const validFiles = Array.from(files).filter(file => {
+      if (!file.type.startsWith('image/')) return false;
+      if (file.size > 10 * 1024 * 1024) return false; // 10MB limit
+      return true;
+    });
+
+    if (validFiles.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      const results = await uploadMultipleFiles(validFiles, `listings/${Date.now()}`);
+      const urls = results
+        .filter(r => r.url && !r.error)
+        .map(r => r.url as string);
+
+      if (urls.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, ...urls],
+        }));
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const isStepValid = () => {
@@ -361,9 +398,31 @@ export default function ListEquipmentForm({
                   <p className="text-gray-600 mb-4">
                     Drag and drop photos here, or click to browse
                   </p>
-                  <button className="px-6 py-3 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors">
-                    <Upload className="w-5 h-5 inline mr-2" />
-                    Upload Photos
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="px-6 py-3 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors disabled:opacity-50"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 inline mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5 inline mr-2" />
+                        Upload Photos
+                      </>
+                    )}
                   </button>
                 </div>
 
