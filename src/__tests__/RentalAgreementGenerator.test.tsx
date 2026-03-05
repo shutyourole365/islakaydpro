@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RentalAgreementGenerator from '../components/agreements/RentalAgreementGenerator';
 
@@ -277,7 +277,7 @@ describe('RentalAgreementGenerator', () => {
 
     it('should allow equipment name modification', async () => {
       const user = userEvent.setup();
-      render(<RentalAgreementGenerator onBase={mockOnBack} />);
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
 
       const templatesTab = screen.getByRole('button', { name: /Templates/i });
       await user.click(templatesTab);

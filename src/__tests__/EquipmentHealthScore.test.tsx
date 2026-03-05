@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EquipmentHealthScore from '../components/health/EquipmentHealthScore';
 
@@ -140,7 +140,7 @@ describe('EquipmentHealthScore', () => {
 
     it('should display schedule maintenance message', async () => {
       const user = userEvent.setup();
-      render(<EquipmentHealthScore onBase={mockOnBack} />);
+      render(<EquipmentHealthScore onBack={mockOnBack} />);
 
       const toolsButton = screen.getByRole('button', { name: /DeWalt Power Tool Kit/i });
       await user.click(toolsButton);
@@ -189,7 +189,6 @@ describe('EquipmentHealthScore', () => {
 
   describe('Status Color Mapping', () => {
     it('should apply correct color for excellent status', async () => {
-      const user = userEvent.setup();
       render(<EquipmentHealthScore onBack={mockOnBack} />);
 
       // CAT 320 should show excellent (green)
