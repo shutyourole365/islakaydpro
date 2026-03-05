@@ -1,6 +1,6 @@
 import { useState, useId } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, Package, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { signUpWithRetry, getAuthErrorMessage } from '../../services/authHelpers';
 import SocialAuth from './SocialAuth';
 import BiometricAuth from './BiometricAuth';
@@ -32,6 +32,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setError('');
     setSuccess('');
 
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file to enable authentication.');
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -62,6 +68,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setLoading(true);
     setError('');
     setSuccess('');
+
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file to enable authentication.');
+      setLoading(false);
+      return;
+    }
 
     try {
       const data = await signUpWithRetry(
@@ -98,6 +110,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env.local file to enable authentication.');
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
