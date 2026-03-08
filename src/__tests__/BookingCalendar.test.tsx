@@ -63,7 +63,7 @@ describe('BookingCalendar', () => {
     render(<BookingCalendar {...defaultProps} />);
     
     // Click on the 15th of the month
-    const day15 = screen.getByRole('button', { name: '15' });
+    const day15 = screen.getByRole('button', { name: /15/ });
     await user.click(day15);
     
     expect(mockOnDateSelect).toHaveBeenCalledWith(
@@ -145,9 +145,14 @@ describe('BookingCalendar', () => {
     render(<BookingCalendar {...defaultProps} />);
     
     // Day 1-4 of February 2026 are in the past (today is Feb 5)
-    const pastDays = ['1', '2', '3', '4'];
-    pastDays.forEach(day => {
-      const dayButton = screen.getByRole('button', { name: day });
+    const pastDates = [
+      'Select date Sun Feb 01 2026',
+      'Select date Mon Feb 02 2026',
+      'Select date Tue Feb 03 2026',
+      'Select date Wed Feb 04 2026',
+    ];
+    pastDates.forEach(label => {
+      const dayButton = screen.getByRole('button', { name: label });
       expect(dayButton).toBeDisabled();
     });
   });
@@ -165,9 +170,9 @@ describe('BookingCalendar', () => {
       />
     );
     
-    const day15 = screen.getByRole('button', { name: '15' });
-    const day16 = screen.getByRole('button', { name: '16' });
-    
+    const day15 = screen.getByRole('button', { name: /15/ });
+    const day16 = screen.getByRole('button', { name: /16/ });
+
     expect(day15).toBeDisabled();
     expect(day16).toBeDisabled();
   });
@@ -185,7 +190,7 @@ describe('BookingCalendar', () => {
     );
     
     // Try to select Feb 16 (only 2 days from start)
-    const day16 = screen.getByRole('button', { name: '16' });
+    const day16 = screen.getByRole('button', { name: /16/ });
     await user.click(day16);
     
     // Should not complete selection (less than 3 days)
@@ -205,7 +210,7 @@ describe('BookingCalendar', () => {
     );
     
     // Try to select Feb 20 (11 days from start)
-    const day20 = screen.getByRole('button', { name: '20' });
+    const day20 = screen.getByRole('button', { name: /20/ });
     await user.click(day20);
     
     // Should not complete selection (exceeds 5 days)
@@ -232,7 +237,7 @@ describe('BookingCalendar', () => {
     );
     
     // Click on a date before the start date
-    const day10 = screen.getByRole('button', { name: '10' });
+    const day10 = screen.getByRole('button', { name: /10/ });
     await user.click(day10);
     
     // Should start new selection from the clicked date

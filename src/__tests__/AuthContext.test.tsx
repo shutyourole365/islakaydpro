@@ -21,6 +21,7 @@ vi.mock('../lib/supabase', () => ({
       upsert: vi.fn(() => Promise.resolve({ error: null })),
     })),
   },
+  checkSupabaseConfigured: vi.fn(() => true),
 }));
 
 // Mock database services

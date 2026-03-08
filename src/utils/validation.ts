@@ -9,7 +9,7 @@ export function sanitizeInput(input: string): string {
   sanitized = sanitized.replace(/<[^>]*>/g, '');
 
   // strip event handlers like onclick= etc
-  sanitized = sanitized.replace(/on\w+\s*=\s*[^\s>]*?/gi, '');
+  sanitized = sanitized.replace(/on\w+\s*=\s*[^\s>]*/gi, '');
 
   // remove dangerous URI schemes
   sanitized = sanitized.replace(/(?:javascript|data|vbscript|file|about)\s*:/gi, '');

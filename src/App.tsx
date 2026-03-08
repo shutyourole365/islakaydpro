@@ -176,6 +176,22 @@ const SustainabilityTracker = lazy(() => import('./components/sustainability/Sus
 const EquipmentConditionReport = lazy(() => import('./components/inspection/EquipmentConditionReport'));
 const EquipmentInspection = lazy(() => import('./components/inspection/EquipmentInspection'));
 
+// Newly Integrated Orphaned Components
+const AIMachineLearningHub = lazy(() => import('./components/ai/AIMachineLearningHub'));
+const GroupBookingCoordinator = lazy(() => import('./components/booking/GroupBookingCoordinator'));
+const DeliveryTracker = lazy(() => import('./components/delivery/DeliveryTracker'));
+const IoTMaintenance = lazy(() => import('./components/features/IoTMaintenance'));
+const EnhancedMap = lazy(() => import('./components/map/EnhancedMap'));
+const PushNotificationManager = lazy(() => import('./components/notifications/PushNotificationManager'));
+const RealTimeNotifications = lazy(() => import('./components/notifications/RealTimeNotifications'));
+const AdvancedPayments = lazy(() => import('./components/payments/AdvancedPayments'));
+const PriceOptimization = lazy(() => import('./components/pricing/PriceOptimization'));
+const QuickRent = lazy(() => import('./components/rental/QuickRent'));
+const ReviewsSection = lazy(() => import('./components/reviews/ReviewsSection'));
+const AdvancedSearch = lazy(() => import('./components/search/AdvancedSearch'));
+const SocialCommunity = lazy(() => import('./components/social/SocialCommunity'));
+const PWATestSuite = lazy(() => import('./components/testing/PWATestSuite'));
+
 // Settings Components
 const AISettings = lazy(() => import('./components/settings/AISettings'));
 const AccessibilitySettings = lazy(() => import('./components/settings/AccessibilitySettings'));
@@ -2921,6 +2937,104 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             reportType="inspection"
             onSubmit={() => setCurrentPage('dashboard')}
           />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'ml-hub' && (
+        <Suspense fallback={<PageLoader />}>
+          <AIMachineLearningHub />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'group-booking' && (
+        <Suspense fallback={<PageLoader />}>
+          <GroupBookingCoordinator />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'delivery-tracker' && (
+        <Suspense fallback={<PageLoader />}>
+          <DeliveryTracker />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'iot-maintenance' && (
+        <Suspense fallback={<PageLoader />}>
+          <IoTMaintenance />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'enhanced-map' && (
+        <Suspense fallback={<PageLoader />}>
+          <EnhancedMap />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'push-notifications' && (
+        <Suspense fallback={<PageLoader />}>
+          <PushNotificationManager />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'realtime-notifications' && (
+        <Suspense fallback={<PageLoader />}>
+          <RealTimeNotifications />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'advanced-payments' && (
+        <Suspense fallback={<PageLoader />}>
+          <AdvancedPayments />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'price-optimization' && (
+        <Suspense fallback={<PageLoader />}>
+          <PriceOptimization />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'quick-rent' && (
+        <Suspense fallback={<PageLoader />}>
+          <QuickRent />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'reviews' && (
+        <Suspense fallback={<PageLoader />}>
+          <ReviewsSection />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'advanced-search' && (
+        <Suspense fallback={<PageLoader />}>
+          <AdvancedSearch />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'community' && (
+        <Suspense fallback={<PageLoader />}>
+          <SocialCommunity />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'pwa-test' && (
+        <Suspense fallback={<PageLoader />}>
+          <PWATestSuite />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
