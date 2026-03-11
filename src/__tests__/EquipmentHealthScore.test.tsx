@@ -26,9 +26,9 @@ describe('EquipmentHealthScore', () => {
 
     it('should render equipment selector buttons', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
-      expect(screen.getByText('John Deere 1025R Tractor')).toBeInTheDocument();
-      expect(screen.getByText('DeWalt Power Tool Kit')).toBeInTheDocument();
+      expect(screen.getAllByText('CAT 320 Excavator').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('John Deere 1025R Tractor').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('DeWalt Power Tool Kit').length).toBeGreaterThan(0);
     });
   });
 

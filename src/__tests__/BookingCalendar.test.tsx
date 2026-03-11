@@ -210,7 +210,7 @@ describe('BookingCalendar', () => {
     );
     
     // Try to select Feb 20 (11 days from start)
-    const day20 = screen.getByRole('button', { name: /20/ });
+    const day20 = screen.getByRole('button', { name: /Select date.*Feb 20/ });
     await user.click(day20);
     
     // Should not complete selection (exceeds 5 days)
