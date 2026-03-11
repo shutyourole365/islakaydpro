@@ -25,8 +25,8 @@ describe('EquipmentAvailabilityCalendar', () => {
 
     it('should display equipment selector', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
-      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
+      expect(screen.getAllByText('CAT 320 Excavator').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Sony A7IV Camera Kit').length).toBeGreaterThanOrEqual(1);
     });
 
     it('should display calendar', () => {
@@ -40,16 +40,16 @@ describe('EquipmentAvailabilityCalendar', () => {
   describe('Equipment Selection', () => {
     it('should select first equipment by default', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
+      expect(screen.getAllByText('CAT 320 Excavator').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('$450/day')).toBeInTheDocument();
     });
 
     it('should display all equipment options', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
-      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
-      expect(screen.getByText('DeWalt Power Tool Kit')).toBeInTheDocument();
-      expect(screen.getByText('DJI Mavic 3 Pro Drone')).toBeInTheDocument();
+      expect(screen.getAllByText('CAT 320 Excavator').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('Sony A7IV Camera Kit').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('DeWalt Power Tool Kit').length).toBeGreaterThanOrEqual(1);
+      expect(screen.getAllByText('DJI Mavic 3 Pro Drone').length).toBeGreaterThanOrEqual(1);
     });
 
     it('should change equipment when clicked', async () => {

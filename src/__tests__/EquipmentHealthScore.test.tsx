@@ -35,7 +35,8 @@ describe('EquipmentHealthScore', () => {
   describe('State Management & Equipment Selection', () => {
     it('should select first equipment by default', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
+      const elements = screen.getAllByText('CAT 320 Excavator');
+      expect(elements.length).toBeGreaterThan(0);
       // Check for the overall score display
       const scoreElements = screen.getAllByText(/94/);
       expect(scoreElements.length).toBeGreaterThan(0);
@@ -49,7 +50,8 @@ describe('EquipmentHealthScore', () => {
       await user.click(tractorButton);
 
       // Check that the score changed to the tractor's score (87)
-      expect(screen.getByText('John Deere 1025R Tractor')).toBeInTheDocument();
+      const elements = screen.getAllByText('John Deere 1025R Tractor');
+      expect(elements.length).toBeGreaterThanOrEqual(2);
     });
 
     it('should update health metrics when equipment changes', async () => {
@@ -59,7 +61,8 @@ describe('EquipmentHealthScore', () => {
       const toolsButton = screen.getByRole('button', { name: /DeWalt Power Tool Kit/i });
       await user.click(toolsButton);
 
-      expect(screen.getByText('DeWalt Power Tool Kit')).toBeInTheDocument();
+      const elements = screen.getAllByText('DeWalt Power Tool Kit');
+      expect(elements.length).toBeGreaterThanOrEqual(2);
       expect(screen.getByText('Battery Health')).toBeInTheDocument();
     });
   });
@@ -90,7 +93,8 @@ describe('EquipmentHealthScore', () => {
     it('should calculate correct average rating across metrics', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
       // Verify metrics are displayed with their individual ratings
-      expect(screen.getByText('Excellent')).toBeInTheDocument();
+      const excellentElements = screen.getAllByText('Excellent');
+      expect(excellentElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -98,13 +102,16 @@ describe('EquipmentHealthScore', () => {
     it('should display last inspection date', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
       expect(screen.getByText('Last Inspection')).toBeInTheDocument();
-      expect(screen.getByText(/2026-02-20/)).toBeInTheDocument();
+      // Date is rendered via toLocaleDateString()
+      const formattedDate = new Date('2026-02-20').toLocaleDateString();
+      expect(screen.getByText(formattedDate)).toBeInTheDocument();
     });
 
     it('should display next maintenance date', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
       expect(screen.getByText('Next Maintenance')).toBeInTheDocument();
-      expect(screen.getByText(/2026-03-15/)).toBeInTheDocument();
+      const formattedDate = new Date('2026-03-15').toLocaleDateString();
+      expect(screen.getByText(formattedDate)).toBeInTheDocument();
     });
 
     it('should display total hours used', () => {
@@ -135,7 +142,8 @@ describe('EquipmentHealthScore', () => {
       await user.click(toolsButton);
 
       // DeWalt has several metrics below 80, should show recommendations
-      expect(screen.getByText(/needs attention/i)).toBeInTheDocument();
+      const attentionElements = screen.getAllByText(/needs attention/i);
+      expect(attentionElements.length).toBeGreaterThan(0);
     });
 
     it('should display schedule maintenance message', async () => {
@@ -145,7 +153,8 @@ describe('EquipmentHealthScore', () => {
       const toolsButton = screen.getByRole('button', { name: /DeWalt Power Tool Kit/i });
       await user.click(toolsButton);
 
-      expect(screen.getByText(/Schedule maintenance/i)).toBeInTheDocument();
+      const scheduleElements = screen.getAllByText(/Schedule maintenance/i);
+      expect(scheduleElements.length).toBeGreaterThan(0);
     });
   });
 

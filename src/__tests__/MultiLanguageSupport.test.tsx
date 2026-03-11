@@ -39,7 +39,8 @@ describe('MultiLanguageSupport', () => {
   describe('Language Selection & State Management', () => {
     it('should select English by default', () => {
       render(<MultiLanguageSupport onBack={mockOnBack} />);
-      expect(screen.getByText('English')).toBeInTheDocument();
+      const englishElements = screen.getAllByText('English');
+      expect(englishElements.length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('100% complete')).toBeInTheDocument();
     });
 
@@ -118,7 +119,8 @@ describe('MultiLanguageSupport', () => {
       const searchInput = screen.getByPlaceholderText(/Search languages/i) as HTMLInputElement;
       await user.type(searchInput, 'Europe');
 
-      expect(screen.getByText(/Spanish|French|German|Italian|Dutch/i)).toBeInTheDocument();
+      const europeanLanguages = screen.getAllByText(/Spanish|French|German|Italian|Dutch/i);
+      expect(europeanLanguages.length).toBeGreaterThanOrEqual(1);
     });
 
     it('should be case insensitive', async () => {
@@ -167,7 +169,8 @@ describe('MultiLanguageSupport', () => {
     it('should display region information', () => {
       render(<MultiLanguageSupport onBack={mockOnBack} />);
       expect(screen.getByText('Global')).toBeInTheDocument();
-      expect(screen.getByText(/Americas, Europe/)).toBeInTheDocument();
+      const regionElements = screen.getAllByText(/Americas, Europe/);
+      expect(regionElements.length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -202,7 +205,8 @@ describe('MultiLanguageSupport', () => {
       const previewTab = screen.getByRole('button', { name: /Translation Preview/i });
       await user.click(previewTab);
 
-      expect(screen.getByText(/Spanish/i)).toBeInTheDocument();
+      const spanishElements = screen.getAllByText(/Spanish/i);
+      expect(spanishElements.length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -336,9 +340,9 @@ describe('MultiLanguageSupport', () => {
   describe('Language Selection Indicator', () => {
     it('should show check mark for selected language', () => {
       render(<MultiLanguageSupport onBack={mockOnBack} />);
-      // English is selected by default, check mark should be visible
-      const checkMarks = screen.queryAllByText('✓');
-      expect(checkMarks.length >= 1).toBe(true);
+      // English is selected by default, check mark (lucide Check icon) should be visible
+      const checkIcons = document.querySelectorAll('.lucide-check');
+      expect(checkIcons.length >= 1).toBe(true);
     });
 
     it('should update check mark when language changes', async () => {

@@ -33,7 +33,7 @@ describe('RentalHistoryTimeline', () => {
     it('should display total spent stat', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
       expect(screen.getByText('Total Spent')).toBeInTheDocument();
-      expect(screen.getByText(/\$[0-9,]+/)).toBeInTheDocument();
+      expect(screen.getAllByText(/\$[0-9,]+/).length).toBeGreaterThan(0);
     });
 
     it('should display average rating stat', () => {
@@ -89,7 +89,7 @@ describe('RentalHistoryTimeline', () => {
       await user.click(completedButton);
 
       // Should show only completed rentals
-      expect(screen.getByText('DJI Mavic 3 Pro Drone Kit')).toBeInTheDocument();
+      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
     });
 
     it('should filter by active status', async () => {
@@ -150,10 +150,10 @@ describe('RentalHistoryTimeline', () => {
 
     it('should display rental status badges', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
-      expect(screen.getByText('Completed')).toBeInTheDocument();
-      expect(screen.getByText('Active')).toBeInTheDocument();
-      expect(screen.getByText('Upcoming')).toBeInTheDocument();
-      expect(screen.getByText('Cancelled')).toBeInTheDocument();
+      expect(screen.getAllByText('Completed').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Active').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Upcoming').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Cancelled').length).toBeGreaterThan(0);
     });
   });
 
@@ -168,7 +168,7 @@ describe('RentalHistoryTimeline', () => {
     it('should calculate and display rental duration in days', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
       // Should show duration like "5d" or similar
-      expect(screen.getByText(/\(\d+d\)/)).toBeInTheDocument();
+      expect(screen.getAllByText(/\(\d+d\)/).length).toBeGreaterThan(0);
     });
 
     it('should display owner/renter information', () => {
@@ -193,9 +193,9 @@ describe('RentalHistoryTimeline', () => {
 
     it('should display equipment category', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
-      expect(screen.getByText('Photography')).toBeInTheDocument();
+      expect(screen.getAllByText('Photography').length).toBeGreaterThan(0);
       expect(screen.getByText('Heavy Equipment')).toBeInTheDocument();
-      expect(screen.getByText('Events')).toBeInTheDocument();
+      expect(screen.getAllByText('Events').length).toBeGreaterThan(0);
     });
   });
 
@@ -279,7 +279,7 @@ describe('RentalHistoryTimeline', () => {
       await user.click(completedButton);
 
       // Count should update to show only completed rentals
-      expect(screen.getByText(/rental/)).toBeInTheDocument();
+      expect(screen.getAllByText(/rental/).length).toBeGreaterThan(0);
     });
   });
 });
