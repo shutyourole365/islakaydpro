@@ -259,7 +259,7 @@ export default function BookingSystem({
       // Create the booking record in the database
       const newBooking = await createBooking({
         equipment_id: equipment.id,
-        renter_id: user.id,
+        renter_id: user.id as unknown as import('../../types').UserId,
         owner_id: equipment.owner_id,
         start_date: selectedStart.toISOString().split('T')[0],
         end_date: selectedEnd.toISOString().split('T')[0],

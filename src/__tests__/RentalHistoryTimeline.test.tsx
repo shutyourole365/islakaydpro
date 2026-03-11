@@ -33,7 +33,8 @@ describe('RentalHistoryTimeline', () => {
     it('should display total spent stat', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
       expect(screen.getByText('Total Spent')).toBeInTheDocument();
-      expect(screen.getByText(/\$[0-9,]+/)).toBeInTheDocument();
+      const allMatches = screen.getAllByText(/\$[0-9,]+/);
+      expect(allMatches.length).toBeGreaterThan(0);
     });
 
     it('should display average rating stat', () => {

@@ -40,43 +40,6 @@ import {
   FileText,
   HelpCircle
 } from 'lucide-react';
-import {
-  Sparkles,
-  DollarSign,
-  Wrench,
-  Gift,
-  Calendar,
-  Zap,
-  X,
-  ChevronRight,
-  BarChart3,
-  Camera,
-  Star,
-  Smartphone,
-  CreditCard,
-  Cloud,
-  Users,
-  Fingerprint,
-  Bell,
-  Trophy,
-  Package,
-  TrendingUp,
-  Shield,
-  QrCode,
-  Eye,
-  Activity,
-  Navigation,
-  Leaf,
-  Cpu,
-  Brain,
-  Plane,
-  Building,
-  HeartPulse,
-  Calculator,
-  Tag,
-  Clock,
-  Globe
-} from 'lucide-react';
 
 interface FeatureShowcaseProps {
   onFeatureSelect: (feature: string) => void;
@@ -613,7 +576,7 @@ export default function FeatureShowcase({ onFeatureSelect, onClose }: FeatureSho
       color: 'from-blue-500 to-purple-600',
       badge: '🌐 i18n',
       demo: true,
-,
+    },
     // NEWEST Features (10-15) - Availability, Revenue, Certification, Agreements, Support
     {
       id: 'availability-calendar',

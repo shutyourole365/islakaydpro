@@ -68,7 +68,6 @@ describe('RentalCostEstimator', () => {
     });
 
     it('should allow duration adjustment via slider', async () => {
-      const user = userEvent.setup();
       render(<RentalCostEstimator onBack={mockOnBack} />);
 
       const slider = screen.getByRole('slider', { name: /number of days/i });
@@ -101,7 +100,6 @@ describe('RentalCostEstimator', () => {
     });
 
     it('should calculate monthly discount when >= 30 days', async () => {
-      const user = userEvent.setup();
       render(<RentalCostEstimator onBack={mockOnBack} />);
 
       const slider = screen.getByRole('slider', { name: /number of days/i });
@@ -139,8 +137,6 @@ describe('RentalCostEstimator', () => {
     it('should update cost when insurance changes', async () => {
       const user = userEvent.setup();
       render(<RentalCostEstimator onBack={mockOnBack} />);
-
-      const initialTotal = screen.getByRole('heading', { level: 2, name: /Cost Summary/i });
 
       const enterpriseButton = screen.getByRole('button', { name: /Enterprise Coverage/i });
       await user.click(enterpriseButton);

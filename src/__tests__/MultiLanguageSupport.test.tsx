@@ -39,7 +39,7 @@ describe('MultiLanguageSupport', () => {
   describe('Language Selection & State Management', () => {
     it('should select English by default', () => {
       render(<MultiLanguageSupport onBack={mockOnBack} />);
-      expect(screen.getByText('English')).toBeInTheDocument();
+      expect(screen.getAllByText('English').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('100% complete')).toBeInTheDocument();
     });
 
@@ -118,7 +118,7 @@ describe('MultiLanguageSupport', () => {
       const searchInput = screen.getByPlaceholderText(/Search languages/i) as HTMLInputElement;
       await user.type(searchInput, 'Europe');
 
-      expect(screen.getByText(/Spanish|French|German|Italian|Dutch/i)).toBeInTheDocument();
+      expect(screen.queryAllByText(/Spanish|French|German|Italian|Dutch/i).length).toBeGreaterThanOrEqual(1);
     });
 
     it('should be case insensitive', async () => {

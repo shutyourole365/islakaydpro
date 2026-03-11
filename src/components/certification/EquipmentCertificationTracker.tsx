@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Award, CheckCircle, Clock, AlertTriangle, Download, FileText, Zap } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, AlertTriangle } from 'lucide-react';
 
 interface EquipmentCertificationTrackerProps {
   onBack: () => void;
