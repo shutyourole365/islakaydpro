@@ -75,24 +75,24 @@ describe('RentalAgreementGenerator', () => {
     it('should display agreement status badges', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
       expect(screen.getByText('Draft')).toBeInTheDocument();
-      expect(screen.getByText('Signed')).toBeInTheDocument();
+      expect(screen.getAllByText('Signed').length).toBeGreaterThan(0);
     });
 
     it('should show renter names on agreements', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      expect(screen.getByText('John D.')).toBeInTheDocument();
-      expect(screen.getByText('Sarah M.')).toBeInTheDocument();
+      expect(screen.getByText(/John D\./)).toBeInTheDocument();
+      expect(screen.getByText(/Sarah M\./)).toBeInTheDocument();
     });
 
     it('should display rental dates on agreements', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
       // Should show date ranges
-      expect(screen.getByText(/2026/)).toBeInTheDocument();
+      expect(screen.getAllByText(/2026/).length).toBeGreaterThan(0);
     });
 
     it('should display total cost on agreements', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      expect(screen.getByText(/\$[0-9,]+/)).toBeInTheDocument();
+      expect(screen.getAllByText(/\$[0-9,]+/).length).toBeGreaterThan(0);
     });
 
     it('should display download button on agreements', () => {
@@ -104,7 +104,7 @@ describe('RentalAgreementGenerator', () => {
     it('should display action buttons based on status', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
       // Should show different buttons for different statuses
-      expect(screen.getByRole('button', { name: /Download/i })).toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: /Download/i }).length).toBeGreaterThan(0);
     });
   });
 
