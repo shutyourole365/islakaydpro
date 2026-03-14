@@ -31,23 +31,27 @@ describe('SeasonalDeals', () => {
 
     it('should show first featured deal', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      expect(screen.getByText('Winter Construction Blowout')).toBeInTheDocument();
+      // Multiple elements may show the title, check all exist
+      const winterElements = screen.getAllByText('Winter Construction Blowout');
+      expect(winterElements.length).toBeGreaterThan(0);
     });
 
     it('should display discount amount in banner', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      // Winter Construction Blowout is 25%
+      // Winter Construction Blowout is 25% - banner shows "25% OFF"
       expect(screen.getByText(/25% OFF/)).toBeInTheDocument();
     });
 
     it('should show featured deal code button', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      expect(screen.getByText(/WINTER25/)).toBeInTheDocument();
+      // Code is shown as "Code: WINTER25" on the featured banner button
+      expect(screen.getByText(/Code: WINTER25/)).toBeInTheDocument();
     });
 
     it('should display countdown timer for featured deal', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      expect(screen.getByText(/Expires|left/i)).toBeInTheDocument();
+      const timerElements = screen.queryAllByText(/Expires|left/i);
+      expect(timerElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -55,29 +59,36 @@ describe('SeasonalDeals', () => {
     it('should display all season filter buttons', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
       expect(screen.getByRole('button', { name: /All Deals/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Winter/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Spring/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Summer/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Fall/i })).toBeInTheDocument();
+      // Season buttons have exact text "Winter (N)" - use regex to match
+      const winterButtons = screen.getAllByRole('button', { name: /^Winter/i });
+      expect(winterButtons.length).toBeGreaterThan(0);
+      const springButtons = screen.getAllByRole('button', { name: /^Spring/i });
+      expect(springButtons.length).toBeGreaterThan(0);
+      const summerButtons = screen.getAllByRole('button', { name: /^Summer/i });
+      expect(summerButtons.length).toBeGreaterThan(0);
+      const fallButtons = screen.getAllByRole('button', { name: /^Fall/i });
+      expect(fallButtons.length).toBeGreaterThan(0);
     });
 
     it('should filter deals by winter season', async () => {
       const user = userEvent.setup();
       render(<SeasonalDeals onBack={mockOnBack} />);
 
-      const winterButton = screen.getByRole('button', { name: /Winter/i });
-      await user.click(winterButton);
+      // Get the winter season filter button (starts with "Winter")
+      const winterButtons = screen.getAllByRole('button', { name: /^Winter/i });
+      await user.click(winterButtons[0]);
 
       // Should show winter deals
-      expect(screen.getByText('Winter Construction Blowout')).toBeInTheDocument();
+      const winterDealElements = screen.getAllByText('Winter Construction Blowout');
+      expect(winterDealElements.length).toBeGreaterThan(0);
     });
 
     it('should filter deals by spring season', async () => {
       const user = userEvent.setup();
       render(<SeasonalDeals onBack={mockOnBack} />);
 
-      const springButton = screen.getByRole('button', { name: /Spring/i });
-      await user.click(springButton);
+      const springButtons = screen.getAllByRole('button', { name: /^Spring/i });
+      await user.click(springButtons[0]);
 
       // Should show spring deals
       expect(screen.getByText('Spring Event Package')).toBeInTheDocument();
@@ -87,8 +98,8 @@ describe('SeasonalDeals', () => {
       const user = userEvent.setup();
       render(<SeasonalDeals onBack={mockOnBack} />);
 
-      const summerButton = screen.getByRole('button', { name: /Summer/i });
-      await user.click(summerButton);
+      const summerButtons = screen.getAllByRole('button', { name: /^Summer/i });
+      await user.click(summerButtons[0]);
 
       // Should show summer deals
       expect(screen.getByText('Summer Landscaping Bundle')).toBeInTheDocument();
@@ -102,7 +113,8 @@ describe('SeasonalDeals', () => {
       await user.click(allButton);
 
       // Should show multiple deals
-      expect(screen.getByText('Winter Construction Blowout')).toBeInTheDocument();
+      const winterElements = screen.getAllByText('Winter Construction Blowout');
+      expect(winterElements.length).toBeGreaterThan(0);
       expect(screen.getByText('Spring Event Package')).toBeInTheDocument();
     });
   });
@@ -110,7 +122,8 @@ describe('SeasonalDeals', () => {
   describe('Deal Cards Display', () => {
     it('should display all deal cards', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      expect(screen.getByText('Winter Construction Blowout')).toBeInTheDocument();
+      const winterElements = screen.getAllByText('Winter Construction Blowout');
+      expect(winterElements.length).toBeGreaterThan(0);
       expect(screen.getByText('Spring Event Package')).toBeInTheDocument();
       expect(screen.getByText('Drone Photography Week')).toBeInTheDocument();
       expect(screen.getByText('Summer Landscaping Bundle')).toBeInTheDocument();
@@ -118,9 +131,13 @@ describe('SeasonalDeals', () => {
 
     it('should show discount percentage correctly', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      expect(screen.getByText(/25% OFF/)).toBeInTheDocument();
-      expect(screen.getByText(/30% OFF/)).toBeInTheDocument();
-      expect(screen.getByText(/20% OFF/)).toBeInTheDocument();
+      // Deal cards show "25%" and "OFF" separately, banner shows "25% OFF" together
+      const elements25 = screen.queryAllByText(/25%/);
+      expect(elements25.length).toBeGreaterThan(0);
+      const elements30 = screen.queryAllByText(/30%/);
+      expect(elements30.length).toBeGreaterThan(0);
+      const elements20 = screen.queryAllByText(/20%/);
+      expect(elements20.length).toBeGreaterThan(0);
     });
 
     it('should show flat discount amount when applicable', () => {
@@ -148,18 +165,21 @@ describe('SeasonalDeals', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
       expect(screen.getByText('Excavators')).toBeInTheDocument();
       expect(screen.getByText('Tents')).toBeInTheDocument();
-      expect(screen.getByText('Tractors')).toBeInTheDocument();
+      const tractorElements = screen.queryAllByText('Tractors');
+      expect(tractorElements.length).toBeGreaterThan(0);
     });
 
     it('should show usage progress bar', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
       // Should show usage percentages
-      expect(screen.getByText(/uses left/i)).toBeInTheDocument();
+      const usesLeftElements = screen.queryAllByText(/uses left/i);
+      expect(usesLeftElements.length).toBeGreaterThan(0);
     });
 
     it('should display minimum rental days requirement', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      expect(screen.getByText(/Min/)).toBeInTheDocument();
+      const minElements = screen.queryAllByText(/Min/);
+      expect(minElements.length).toBeGreaterThan(0);
     });
 
     it('should show countdown timer for each deal', () => {
@@ -234,11 +254,12 @@ describe('SeasonalDeals', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
 
       // Filter by a season and manually hide deals
-      const winterButton = screen.getByRole('button', { name: /Winter/i });
-      await user.click(winterButton);
+      const winterButtons = screen.getAllByRole('button', { name: /^Winter/i });
+      await user.click(winterButtons[0]);
 
       // Should display deals for winter
-      expect(screen.getByText('Winter Construction Blowout')).toBeInTheDocument();
+      const winterDealElements = screen.getAllByText('Winter Construction Blowout');
+      expect(winterDealElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -257,8 +278,9 @@ describe('SeasonalDeals', () => {
   describe('Deal Type Display', () => {
     it('should indicate percentage discount type', () => {
       render(<SeasonalDeals onBack={mockOnBack} />);
-      // Winter Construction Blowout is percentage type
-      expect(screen.getByText(/25%/)).toBeInTheDocument();
+      // Winter Construction Blowout is percentage type - shows 25%
+      const percentElements = screen.queryAllByText(/25%/);
+      expect(percentElements.length).toBeGreaterThan(0);
     });
 
     it('should indicate flat discount type', () => {

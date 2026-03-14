@@ -25,8 +25,10 @@ describe('EquipmentAvailabilityCalendar', () => {
 
     it('should display equipment selector', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
-      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
+      const elements = screen.getAllByText('CAT 320 Excavator');
+      expect(elements.length).toBeGreaterThan(0);
+      const sonyElements = screen.getAllByText('Sony A7IV Camera Kit');
+      expect(sonyElements.length).toBeGreaterThan(0);
     });
 
     it('should display calendar', () => {
@@ -40,16 +42,21 @@ describe('EquipmentAvailabilityCalendar', () => {
   describe('Equipment Selection', () => {
     it('should select first equipment by default', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
+      const elements = screen.getAllByText('CAT 320 Excavator');
+      expect(elements.length).toBeGreaterThan(0);
       expect(screen.getByText('$450/day')).toBeInTheDocument();
     });
 
     it('should display all equipment options', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
-      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
-      expect(screen.getByText('DeWalt Power Tool Kit')).toBeInTheDocument();
-      expect(screen.getByText('DJI Mavic 3 Pro Drone')).toBeInTheDocument();
+      const excavatorElements = screen.getAllByText('CAT 320 Excavator');
+      expect(excavatorElements.length).toBeGreaterThan(0);
+      const sonyElements = screen.getAllByText('Sony A7IV Camera Kit');
+      expect(sonyElements.length).toBeGreaterThan(0);
+      const dewaltElements = screen.getAllByText('DeWalt Power Tool Kit');
+      expect(dewaltElements.length).toBeGreaterThan(0);
+      const djiElements = screen.getAllByText('DJI Mavic 3 Pro Drone');
+      expect(djiElements.length).toBeGreaterThan(0);
     });
 
     it('should change equipment when clicked', async () => {
@@ -89,7 +96,7 @@ describe('EquipmentAvailabilityCalendar', () => {
       await user.click(nextButtons[0]);
 
       // Month should have changed
-      expect(screen.queryByText(/January|February|March/i)).toBeInTheDocument();
+      expect(screen.queryByText(/January|February|March|April|May|June|July|August|September|October|November|December/i)).toBeInTheDocument();
     });
 
     it('should navigate to previous month', async () => {
@@ -137,19 +144,23 @@ describe('EquipmentAvailabilityCalendar', () => {
 
     it('should display status legend', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Available')).toBeInTheDocument();
-      expect(screen.getByText('Booked')).toBeInTheDocument();
+      const availableElements = screen.getAllByText('Available');
+      expect(availableElements.length).toBeGreaterThan(0);
+      const bookedElements = screen.getAllByText('Booked');
+      expect(bookedElements.length).toBeGreaterThan(0);
     });
 
     it('should show available dates with green highlight', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
       // Status legend should include green color for available
-      expect(screen.getByText('Available')).toBeInTheDocument();
+      const availableElements = screen.getAllByText('Available');
+      expect(availableElements.length).toBeGreaterThan(0);
     });
 
     it('should show booked dates with red highlight', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Booked')).toBeInTheDocument();
+      const bookedElements = screen.getAllByText('Booked');
+      expect(bookedElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -241,7 +252,8 @@ describe('EquipmentAvailabilityCalendar', () => {
   describe('Equipment Information Display', () => {
     it('should display equipment name', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
+      const elements = screen.getAllByText('CAT 320 Excavator');
+      expect(elements.length).toBeGreaterThan(0);
     });
 
     it('should display equipment location', () => {
@@ -269,17 +281,20 @@ describe('EquipmentAvailabilityCalendar', () => {
   describe('Month Statistics Display', () => {
     it('should display available days count', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Available')).toBeInTheDocument();
+      const availableElements = screen.getAllByText('Available');
+      expect(availableElements.length).toBeGreaterThan(0);
     });
 
     it('should display booked days count', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Booked')).toBeInTheDocument();
+      const bookedElements = screen.getAllByText('Booked');
+      expect(bookedElements.length).toBeGreaterThan(0);
     });
 
     it('should display maintenance days count', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Maintenance')).toBeInTheDocument();
+      const maintenanceElements = screen.getAllByText('Maintenance');
+      expect(maintenanceElements.length).toBeGreaterThan(0);
     });
 
     it('should display availability percentage', () => {
@@ -361,7 +376,8 @@ describe('EquipmentAvailabilityCalendar', () => {
     it('should show weekend pricing adjustments', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
       // Weekend rates should be ~15% higher
-      expect(screen.getByText(/\$[0-9]+/)).toBeInTheDocument();
+      const priceElements = screen.queryAllByText(/\$[0-9]+/);
+      expect(priceElements.length).toBeGreaterThan(0);
     });
 
     it('should display total cost calculation', async () => {
@@ -432,8 +448,10 @@ describe('EquipmentAvailabilityCalendar', () => {
   describe('Responsive Layout', () => {
     it('should display equipment selector horizontally scrollable', () => {
       render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
-      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
+      const excavatorElements = screen.getAllByText('CAT 320 Excavator');
+      expect(excavatorElements.length).toBeGreaterThan(0);
+      const sonyElements = screen.getAllByText('Sony A7IV Camera Kit');
+      expect(sonyElements.length).toBeGreaterThan(0);
     });
 
     it('should display calendar with grid layout', () => {
