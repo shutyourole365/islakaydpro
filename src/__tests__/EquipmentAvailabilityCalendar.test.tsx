@@ -319,7 +319,10 @@ describe('EquipmentAvailabilityCalendar', () => {
 
       if (firstDate) {
         await user.click(firstDate);
-        expect(screen.getByText(/Status/i)).toBeInTheDocument();
+        // After clicking a date, the info panel shows the status badge text (Available/Booked/Maintenance/Blocked)
+        // Component does NOT have a "Status:" label - it shows the status value directly
+        const statusElements = screen.queryAllByText(/Available|Booked|Maintenance|Blocked/i);
+        expect(statusElements.length).toBeGreaterThan(0);
       }
     });
 
@@ -332,8 +335,9 @@ describe('EquipmentAvailabilityCalendar', () => {
 
       if (availableDate) {
         await user.click(availableDate);
-        // Status should show available, booked, or maintenance
-        expect(screen.getByText(/Status/i)).toBeInTheDocument();
+        // Component shows status as badge text (Available/Booked/Maintenance/Blocked), not as "Status:" label
+        const statusElements = screen.queryAllByText(/Available|Booked|Maintenance|Blocked/i);
+        expect(statusElements.length).toBeGreaterThan(0);
       }
     });
 

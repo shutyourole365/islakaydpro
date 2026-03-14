@@ -33,7 +33,9 @@ describe('RentalHistoryTimeline', () => {
     it('should display total spent stat', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
       expect(screen.getByText('Total Spent')).toBeInTheDocument();
-      expect(screen.getByText(/\$[0-9,]+/)).toBeInTheDocument();
+      // Multiple dollar amounts shown (stat + each rental)
+      const dollarElements = screen.queryAllByText(/\$[0-9,]+/);
+      expect(dollarElements.length).toBeGreaterThan(0);
     });
 
     it('should display average rating stat', () => {
@@ -88,8 +90,8 @@ describe('RentalHistoryTimeline', () => {
       const completedButton = screen.getByRole('button', { name: /Completed/i });
       await user.click(completedButton);
 
-      // Should show only completed rentals
-      expect(screen.getByText('DJI Mavic 3 Pro Drone Kit')).toBeInTheDocument();
+      // Should show only completed rentals (Sony A7IV Camera Kit is completed)
+      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
     });
 
     it('should filter by active status', async () => {
@@ -150,7 +152,9 @@ describe('RentalHistoryTimeline', () => {
 
     it('should display rental status badges', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
-      expect(screen.getByText('Completed')).toBeInTheDocument();
+      // Multiple completed rentals - use queryAllByText
+      const completedElements = screen.queryAllByText('Completed');
+      expect(completedElements.length).toBeGreaterThan(0);
       expect(screen.getByText('Active')).toBeInTheDocument();
       expect(screen.getByText('Upcoming')).toBeInTheDocument();
       expect(screen.getByText('Cancelled')).toBeInTheDocument();
@@ -167,8 +171,10 @@ describe('RentalHistoryTimeline', () => {
 
     it('should calculate and display rental duration in days', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
-      // Should show duration like "5d" or similar
-      expect(screen.getByText(/\(\d+d\)/)).toBeInTheDocument();
+      // Duration is part of date string like "3/10/2026 - 3/14/2026 (4d)"
+      // Multiple spans contain duration info
+      const durationElements = screen.queryAllByText(/\(\d+d\)/);
+      expect(durationElements.length).toBeGreaterThan(0);
     });
 
     it('should display owner/renter information', () => {
@@ -193,9 +199,13 @@ describe('RentalHistoryTimeline', () => {
 
     it('should display equipment category', () => {
       render(<RentalHistoryTimeline onBack={mockOnBack} />);
-      expect(screen.getByText('Photography')).toBeInTheDocument();
+      // Photography appears twice (two photography rentals)
+      const photographyElements = screen.queryAllByText('Photography');
+      expect(photographyElements.length).toBeGreaterThan(0);
       expect(screen.getByText('Heavy Equipment')).toBeInTheDocument();
-      expect(screen.getByText('Events')).toBeInTheDocument();
+      // Events appears twice (two event rentals)
+      const eventsElements = screen.queryAllByText('Events');
+      expect(eventsElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -278,8 +288,9 @@ describe('RentalHistoryTimeline', () => {
       const completedButton = screen.getByRole('button', { name: /Completed/i });
       await user.click(completedButton);
 
-      // Count should update to show only completed rentals
-      expect(screen.getByText(/rental/)).toBeInTheDocument();
+      // Count should update - multiple elements match /rental/ (description + count span)
+      const rentalElements = screen.queryAllByText(/rental/i);
+      expect(rentalElements.length).toBeGreaterThan(0);
     });
   });
 });

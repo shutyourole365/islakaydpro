@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RentalAgreementGenerator from '../components/agreements/RentalAgreementGenerator';
 
@@ -447,13 +447,13 @@ describe('RentalAgreementGenerator', () => {
       const templatesTab = screen.getByRole('button', { name: /Templates/i });
       await user.click(templatesTab);
 
-      const dateInputs = screen.getAllByDisplayValue('') as HTMLInputElement[];
-      if (dateInputs.length >= 2) {
-        await user.type(dateInputs[0], '2026-03-01');
-        await user.type(dateInputs[1], '2026-03-05');
+      // Use fireEvent.change to directly set date input values (user.type doesn't work on type="date")
+      const startDateInput = screen.getByLabelText(/Start Date/i);
+      const endDateInput = screen.getByLabelText(/End Date/i);
+      fireEvent.change(startDateInput, { target: { value: '2026-03-01' } });
+      fireEvent.change(endDateInput, { target: { value: '2026-03-05' } });
 
-        expect(screen.getByText('Rental Period:')).toBeInTheDocument();
-      }
+      expect(screen.getByText('Rental Period:')).toBeInTheDocument();
     });
 
     it('should calculate duration in preview', async () => {
@@ -463,13 +463,13 @@ describe('RentalAgreementGenerator', () => {
       const templatesTab = screen.getByRole('button', { name: /Templates/i });
       await user.click(templatesTab);
 
-      const dateInputs = screen.getAllByDisplayValue('') as HTMLInputElement[];
-      if (dateInputs.length >= 2) {
-        await user.type(dateInputs[0], '2026-03-01');
-        await user.type(dateInputs[1], '2026-03-05');
+      // Use fireEvent.change to directly set date input values (user.type doesn't work on type="date")
+      const startDateInput = screen.getByLabelText(/Start Date/i);
+      const endDateInput = screen.getByLabelText(/End Date/i);
+      fireEvent.change(startDateInput, { target: { value: '2026-03-01' } });
+      fireEvent.change(endDateInput, { target: { value: '2026-03-05' } });
 
-        expect(screen.getByText('Duration:')).toBeInTheDocument();
-      }
+      expect(screen.getByText('Duration:')).toBeInTheDocument();
     });
 
     it('should show total cost in preview', async () => {
@@ -524,13 +524,13 @@ describe('RentalAgreementGenerator', () => {
       const templatesTab = screen.getByRole('button', { name: /Templates/i });
       await user.click(templatesTab);
 
-      const dateInputs = screen.getAllByDisplayValue('') as HTMLInputElement[];
-      if (dateInputs.length >= 2) {
-        await user.type(dateInputs[0], '2026-03-01');
-        await user.type(dateInputs[1], '2026-03-06');
+      // Use fireEvent.change to directly set date input values (user.type doesn't work on type="date")
+      const startDateInput = screen.getByLabelText(/Start Date/i);
+      const endDateInput = screen.getByLabelText(/End Date/i);
+      fireEvent.change(startDateInput, { target: { value: '2026-03-01' } });
+      fireEvent.change(endDateInput, { target: { value: '2026-03-06' } });
 
-        expect(screen.getByText('Duration:')).toBeInTheDocument();
-      }
+      expect(screen.getByText('Duration:')).toBeInTheDocument();
     });
   });
 

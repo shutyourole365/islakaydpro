@@ -26,16 +26,22 @@ describe('EquipmentHealthScore', () => {
 
     it('should render equipment selector buttons', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
-      expect(screen.getByText('John Deere 1025R Tractor')).toBeInTheDocument();
-      expect(screen.getByText('DeWalt Power Tool Kit')).toBeInTheDocument();
+      // Equipment names appear in selector buttons and selected equipment header
+      const excavatorElements = screen.queryAllByText('CAT 320 Excavator');
+      expect(excavatorElements.length).toBeGreaterThan(0);
+      const tractorElements = screen.queryAllByText('John Deere 1025R Tractor');
+      expect(tractorElements.length).toBeGreaterThan(0);
+      const dewaltElements = screen.queryAllByText('DeWalt Power Tool Kit');
+      expect(dewaltElements.length).toBeGreaterThan(0);
     });
   });
 
   describe('State Management & Equipment Selection', () => {
     it('should select first equipment by default', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
-      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
+      // CAT 320 appears in selector button + score card header
+      const excavatorElements = screen.queryAllByText('CAT 320 Excavator');
+      expect(excavatorElements.length).toBeGreaterThan(0);
       // Check for the overall score display
       const scoreElements = screen.getAllByText(/94/);
       expect(scoreElements.length).toBeGreaterThan(0);
@@ -48,8 +54,9 @@ describe('EquipmentHealthScore', () => {
       const tractorButton = screen.getByRole('button', { name: /John Deere 1025R Tractor/i });
       await user.click(tractorButton);
 
-      // Check that the score changed to the tractor's score (87)
-      expect(screen.getByText('John Deere 1025R Tractor')).toBeInTheDocument();
+      // Name appears in selector + score card; check at least one exists
+      const tractorElements = screen.queryAllByText('John Deere 1025R Tractor');
+      expect(tractorElements.length).toBeGreaterThan(0);
     });
 
     it('should update health metrics when equipment changes', async () => {
@@ -59,7 +66,8 @@ describe('EquipmentHealthScore', () => {
       const toolsButton = screen.getByRole('button', { name: /DeWalt Power Tool Kit/i });
       await user.click(toolsButton);
 
-      expect(screen.getByText('DeWalt Power Tool Kit')).toBeInTheDocument();
+      const dewaltElements = screen.queryAllByText('DeWalt Power Tool Kit');
+      expect(dewaltElements.length).toBeGreaterThan(0);
       expect(screen.getByText('Battery Health')).toBeInTheDocument();
     });
   });
@@ -90,7 +98,9 @@ describe('EquipmentHealthScore', () => {
     it('should calculate correct average rating across metrics', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
       // Verify metrics are displayed with their individual ratings
-      expect(screen.getByText('Excellent')).toBeInTheDocument();
+      // "Excellent" appears in both selector badges and metric status badges
+      const excellentElements = screen.queryAllByText('Excellent');
+      expect(excellentElements.length).toBeGreaterThan(0);
     });
   });
 
@@ -98,13 +108,17 @@ describe('EquipmentHealthScore', () => {
     it('should display last inspection date', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
       expect(screen.getByText('Last Inspection')).toBeInTheDocument();
-      expect(screen.getByText(/2026-02-20/)).toBeInTheDocument();
+      // Date rendered with toLocaleDateString() as 2/20/2026 format
+      const dateElements = screen.queryAllByText(/2\/20\/2026|2026-02-20/);
+      expect(dateElements.length).toBeGreaterThan(0);
     });
 
     it('should display next maintenance date', () => {
       render(<EquipmentHealthScore onBack={mockOnBack} />);
       expect(screen.getByText('Next Maintenance')).toBeInTheDocument();
-      expect(screen.getByText(/2026-03-15/)).toBeInTheDocument();
+      // Date rendered with toLocaleDateString() as 3/15/2026 format
+      const dateElements = screen.queryAllByText(/3\/15\/2026|2026-03-15/);
+      expect(dateElements.length).toBeGreaterThan(0);
     });
 
     it('should display total hours used', () => {
@@ -135,7 +149,9 @@ describe('EquipmentHealthScore', () => {
       await user.click(toolsButton);
 
       // DeWalt has several metrics below 80, should show recommendations
-      expect(screen.getByText(/needs attention/i)).toBeInTheDocument();
+      // Multiple "needs attention" items may render for each bad metric
+      const needsAttentionElements = screen.queryAllByText(/needs attention/i);
+      expect(needsAttentionElements.length).toBeGreaterThan(0);
     });
 
     it('should display schedule maintenance message', async () => {
@@ -145,7 +161,9 @@ describe('EquipmentHealthScore', () => {
       const toolsButton = screen.getByRole('button', { name: /DeWalt Power Tool Kit/i });
       await user.click(toolsButton);
 
-      expect(screen.getByText(/Schedule maintenance/i)).toBeInTheDocument();
+      // Multiple schedule maintenance messages may render
+      const scheduleElements = screen.queryAllByText(/Schedule maintenance/i);
+      expect(scheduleElements.length).toBeGreaterThan(0);
     });
   });
 
