@@ -55,7 +55,7 @@ export async function sendMessage(
           content: m.content,
         })),
         context: enhancedContext,
-        provider: 'openai', // or 'anthropic'
+        provider: 'anthropic',
       }),
     });
 
@@ -108,7 +108,7 @@ export async function streamMessage(
           ...context,
           userId: session?.user?.id,
         },
-        provider: 'openai',
+        provider: 'anthropic',
         stream: true,
       }),
     });
