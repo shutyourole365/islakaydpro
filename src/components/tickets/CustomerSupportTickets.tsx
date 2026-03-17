@@ -192,7 +192,7 @@ export default function CustomerSupportTickets({ onBack }: CustomerSupportTicket
               <div className="flex gap-2 mb-4 flex-wrap">
                 <select
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value as any)}
+                  onChange={(e) => setFilterStatus(e.target.value as 'all' | SupportTicket['status'])}
                   className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 >
                   <option value="all">All Status</option>
@@ -205,7 +205,7 @@ export default function CustomerSupportTickets({ onBack }: CustomerSupportTicket
 
                 <select
                   value={filterCategory}
-                  onChange={(e) => setFilterCategory(e.target.value as any)}
+                  onChange={(e) => setFilterCategory(e.target.value as 'all' | SupportTicket['category'])}
                   className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                 >
                   <option value="all">All Categories</option>

@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import { useState, useEffect } from 'react';
 import {
   Cloud,
