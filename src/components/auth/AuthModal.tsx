@@ -126,7 +126,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex">
+      <div role="dialog" aria-modal="true" aria-label="Sign in" className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex">
         <div className="hidden lg:flex flex-col w-2/5 bg-gradient-to-br from-teal-600 to-emerald-600 p-10 text-white">
           <div className="flex items-center gap-2 mb-8">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
