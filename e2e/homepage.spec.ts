@@ -5,10 +5,10 @@ test.describe('Homepage', () => {
     await page.goto('/');
     
     // Check main heading
-    await expect(page.getByRole('heading', { name: /rent equipment/i })).toBeVisible();
-    
+    await expect(page.getByRole('heading', { name: /rent any equipment/i })).toBeVisible();
+
     // Check navigation elements
-    await expect(page.getByRole('link', { name: /browse/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /browse equipment/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
   });
 
@@ -30,7 +30,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
     
     // Click search to open modal
-    const searchButton = page.getByRole('button', { name: /search/i });
+    const searchButton = page.getByText('Search equipment...');
     await searchButton.click();
     
     // Search modal should open
@@ -42,7 +42,7 @@ test.describe('Navigation', () => {
   test('should navigate to browse page', async ({ page }) => {
     await page.goto('/');
     
-    await page.getByRole('link', { name: /browse/i }).click();
+    await page.getByRole('button', { name: /browse equipment/i }).click();
     
     // Should show equipment listings
     await expect(page.getByText(/equipment/i)).toBeVisible();
