@@ -29,8 +29,8 @@ test.describe('Homepage', () => {
   test('should have working search button', async ({ page }) => {
     await page.goto('/');
     
-    // Click search to open modal
-    const searchButton = page.getByText('Search equipment...');
+    // Click search to open modal (use role selector to avoid strict mode on span/button match)
+    const searchButton = page.getByRole('button', { name: /search equipment/i });
     await searchButton.click();
     
     // Search modal should open
