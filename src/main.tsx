@@ -23,8 +23,9 @@ errorMonitoring.initialize();
 const envValidation = validateEnvironment();
 logValidationResults(envValidation);
 
-// Stop app initialization if critical env vars are missing
-if (!envValidation.isValid) {
+// Stop app initialization if critical env vars are missing (only in production)
+// In development/E2E mode the app runs with placeholder credentials and sample data
+if (!envValidation.isValid && import.meta.env.PROD) {
   // Show error to user (accessible colors + main landmark)
   document.body.innerHTML = `
     <div style="

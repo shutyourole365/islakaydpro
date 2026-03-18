@@ -45,7 +45,7 @@ test.describe('Navigation', () => {
     await page.getByRole('button', { name: /browse equipment/i }).click();
     
     // Should show equipment listings
-    await expect(page.getByText(/equipment/i)).toBeVisible();
+    await expect(page.getByText(/equipment/i).first()).toBeVisible();
   });
 
   test('should open auth modal on sign in click', async ({ page }) => {
@@ -55,7 +55,7 @@ test.describe('Navigation', () => {
     
     // Auth modal should appear
     await expect(page.getByRole('textbox', { name: /email/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /sign in/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /sign in/i }).first()).toBeVisible();
   });
 });
 
