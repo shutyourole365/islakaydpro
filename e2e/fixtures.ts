@@ -16,7 +16,7 @@ const TRANSPARENT_PNG = Buffer.from(
 export const test = base.extend({
   page: async ({ page }, use) => {
     // Intercept Supabase REST API — return empty array so app falls back to sampleEquipment
-    await page.route(/supabase\.co\/rest\//, (route) => {
+    await page.route(/^https?:\/\/[a-z0-9-]+\.supabase\.co\/rest\//, (route) => {
       route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -26,27 +26,27 @@ export const test = base.extend({
     });
 
     // Intercept Supabase Auth — return unauthenticated state
-    await page.route(/supabase\.co\/auth\//, (route) => {
+    await page.route(/^https?:\/\/[a-z0-9-]+\.supabase\.co\/auth\//, (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     });
 
     // Stub Google Fonts CSS to avoid blocking page load
-    await page.route(/fonts\.googleapis\.com/, (route) => {
+    await page.route(/^https?:\/\/fonts\.googleapis\.com\//, (route) => {
       route.fulfill({ status: 200, contentType: 'text/css', body: '' });
     });
 
     // Stub Google Font files
-    await page.route(/fonts\.gstatic\.com/, (route) => {
+    await page.route(/^https?:\/\/fonts\.gstatic\.com\//, (route) => {
       route.abort();
     });
 
     // Stub Google Analytics / Tag Manager
-    await page.route(/googletagmanager\.com|google-analytics\.com/, (route) => {
+    await page.route(/^https?:\/\/(www\.)?googletagmanager\.com\/|^https?:\/\/(www\.)?google-analytics\.com\//, (route) => {
       route.fulfill({ status: 200, contentType: 'application/javascript', body: '' });
     });
 
     // Stub Pexels images with a tiny transparent PNG
-    await page.route(/pexels\.com/, (route) => {
+    await page.route(/^https?:\/\/[a-z0-9-]+\.pexels\.com\/|^https?:\/\/pexels\.com\//, (route) => {
       route.fulfill({
         status: 200,
         contentType: 'image/png',
