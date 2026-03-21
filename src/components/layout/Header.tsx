@@ -20,6 +20,7 @@ import {
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
 import LogoPro from '../branding/LogoPro';
 import ThemeToggle from '../ui/ThemeToggle';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -40,6 +41,7 @@ export default function Header({
   onSignOut,
   currentPage,
 }: HeaderProps) {
+  const { user, profile } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -377,8 +379,8 @@ export default function Header({
                   {isProfileMenuOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden">
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                        <p className="font-semibold text-gray-900 dark:text-white">John Doe</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">john@example.com</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{profile?.full_name || user?.email?.split('@')[0] || 'User'}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email || ''}</p>
                       </div>
                       <div className="py-2">
                         <button
