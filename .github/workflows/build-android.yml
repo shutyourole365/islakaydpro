@@ -46,6 +46,10 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Android SDK platform and build tools
+        run: |
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
       - name: Install dependencies
         run: npm ci
 
@@ -61,68 +65,35 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Set ANDROID_KEYSTORE_BASE64 env
-        run: |
-          echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-
       - name: Decode Keystore
-        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | \
-            base64 -d > android/app/keystore.jks
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/keystore.jks
 
       - name: Build Release AAB
         if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == '' }}
-        env:
-          SIGN_STORE_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          SIGN_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          SIGN_KEY_PW: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
           if [ -f "app/keystore.jks" ]; then
-            SIGN_STORE=keystore.jks
-
-            K1=android.injected.signing.store.file
-            K2=android.injected.signing.store.password
-            K3=android.injected.signing.key.alias
-            K4=android.injected.signing.key.password
-
-            echo "$K1=$SIGN_STORE" > signing.properties
-            echo "$K2=$SIGN_STORE_PW" >> signing.properties
-            echo "$K3=$SIGN_ALIAS" >> signing.properties
-            echo "$K4=$SIGN_KEY_PW" >> signing.properties
-
-            ./gradlew bundleRelease
+            ./gradlew bundleRelease \
+              "-Pandroid.injected.signing.store.file=$PWD/app/keystore.jks" \
+              "-Pandroid.injected.signing.store.password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+              "-Pandroid.injected.signing.key.alias=${{ secrets.ANDROID_KEY_ALIAS }}" \
+              "-Pandroid.injected.signing.key.password=${{ secrets.ANDROID_KEY_PASSWORD }}"
           else
             ./gradlew bundleRelease
           fi
 
       - name: Build Release APK
         if: ${{ github.event.inputs.build_type == 'apk' }}
-        env:
-          SIGN_STORE_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          SIGN_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-          SIGN_KEY_PW: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
           if [ -f "app/keystore.jks" ]; then
-            SIGN_STORE=keystore.jks
-
-            K1=android.injected.signing.store.file
-            K2=android.injected.signing.store.password
-            K3=android.injected.signing.key.alias
-            K4=android.injected.signing.key.password
-
-            echo "$K1=$SIGN_STORE" > signing.properties
-            echo "$K2=$SIGN_STORE_PW" >> signing.properties
-            echo "$K3=$SIGN_ALIAS" >> signing.properties
-            echo "$K4=$SIGN_KEY_PW" >> signing.properties
-
-            ./gradlew assembleRelease
+            ./gradlew assembleRelease \
+              "-Pandroid.injected.signing.store.file=$PWD/app/keystore.jks" \
+              "-Pandroid.injected.signing.store.password=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" \
+              "-Pandroid.injected.signing.key.alias=${{ secrets.ANDROID_KEY_ALIAS }}" \
+              "-Pandroid.injected.signing.key.password=${{ secrets.ANDROID_KEY_PASSWORD }}"
           else
             ./gradlew assembleRelease
           fi
@@ -143,14 +114,10 @@ jobs:
           path: android/app/build/outputs/apk/release/*.apk
           retention-days: 30
 
-      - name: Set GOOGLE_PLAY_SERVICE_ACCOUNT_JSON env
-        run: |
-          echo "::add-mask::${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}"
-        env:
-          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
-
       - name: Upload to Google Play (Internal Testing)
-        if: ${{ env.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        if: >
+          ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == '' }}
+          && ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
