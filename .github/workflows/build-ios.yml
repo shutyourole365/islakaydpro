@@ -11,11 +11,13 @@ name: Build iOS IPA
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: '20'
 
 jobs:
   build-ios:
-    runs-on: macos-14
+    runs-on: macos-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -28,7 +30,7 @@ jobs:
           cache: 'npm'
 
       - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
 
       - name: Install dependencies
         run: npm ci
