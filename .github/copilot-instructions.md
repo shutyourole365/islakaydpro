@@ -75,8 +75,8 @@ npm run typecheck    # Type check without emitting (tsconfig.app.json)
 ### Environment Setup
 Create `.env.local` with Supabase credentials:
 ```
-VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhbHhseWt5c2JxeWllamVwemt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxNDY2ODgsImV4cCI6MjA4NDcyMjY4OH0.xVQYWWYZDc2YSsTEgTGhCjyArgwrhaXgGaCZAk1fqZs
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
 ### Database Migrations

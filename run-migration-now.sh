@@ -9,8 +9,13 @@ BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-SERVICE_ROLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhbHhseWt5c2JxeWllamVwemt4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTE0NjY4OCwiZXhwIjoyMDg0NzIyNjg4fQ.RpReLoatOcBOEMYADx4Cq29oHB12xMLODvM9ji2g-nY"
-SUPABASE_URL="https://ialxlykysbqyiejepzkx.supabase.co"
+# Require env vars
+if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ] || [ -z "$SUPABASE_URL" ]; then
+  echo "❌ Error: Required environment variables are not set"
+  echo "   export SUPABASE_URL='https://your-project.supabase.co'"
+  echo "   export SUPABASE_SERVICE_ROLE_KEY='your-service-role-key'"
+  exit 1
+fi
 
 # Read the migration SQL
 SQL_FILE="supabase/migrations/20260203000000_auto_create_profiles.sql"
@@ -25,8 +30,8 @@ echo ""
 # Try using Supabase SQL API endpoint
 RESPONSE=$(curl -s -X POST \
   "${SUPABASE_URL}/rest/v1/rpc/query" \
-  -H "apikey: ${SERVICE_ROLE_KEY}" \
-  -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
+  -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+  -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
   -H "Content-Type: application/json" \
   -H "Prefer: return=representation" \
   -d "{\"query\":$(echo "$SQL_CONTENT" | jq -Rs .)}")
@@ -45,7 +50,7 @@ else
   echo -e "${YELLOW}⚠️  Could not execute via API${NC}"
   echo ""
   echo "Please run the SQL manually:"
-  echo "1. Open: https://supabase.com/dashboard/project/ialxlykysbqyiejepzkx/sql/new"
+  echo "1. Open the Supabase SQL Editor for your project"
   echo "2. Copy the SQL from: $SQL_FILE"
   echo "3. Click RUN"
 fi

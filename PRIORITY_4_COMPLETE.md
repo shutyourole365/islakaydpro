@@ -71,8 +71,8 @@
 1. Click here: https://vercel.com/new/clone?repository-url=https://github.com/shutyourole365/islakaydpro
 2. Connect GitHub → Import repository
 3. Add environment variables:
-   - `VITE_SUPABASE_URL` = `https://ialxlykysbqyiejepzkx.supabase.co`
-   - `VITE_SUPABASE_ANON_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...` (your key)
+   - `VITE_SUPABASE_URL` = `https://your-project-ref.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = `your-supabase-anon-key`
 4. Click "Deploy" → Wait 30 seconds → **LIVE!** 🎉
 
 **Your app**: `https://your-project.vercel.app`

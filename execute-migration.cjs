@@ -1,8 +1,14 @@
 const { createClient } = require('@supabase/supabase-js');
 const fs = require('fs');
 
-const supabaseUrl = 'https://ialxlykysbqyiejepzkx.supabase.co';
-const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhbHhseWt5c2JxeWllamVwemt4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTE0NjY4OCwiZXhwIjoyMDg0NzIyNjg4fQ.RpReLoatOcBOEMYADx4Cq29oHB12xMLODvM9ji2g-nY';
+// Run with: SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node execute-migration.cjs
+const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !serviceRoleKey) {
+  console.error('❌ Missing required env vars: SUPABASE_URL (or VITE_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY');
+  process.exit(1);
+}
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: {
@@ -13,23 +19,23 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 
 async function runMigration() {
   console.log('🚀 Running migration...\n');
-  
+
   // Read the migration file
   const sql = fs.readFileSync('supabase/migrations/20260203000000_auto_create_profiles.sql', 'utf8');
-  
+
   try {
     // Execute the SQL
     const { data, error } = await supabase.rpc('exec_sql', { query: sql });
-    
+
     if (error) {
       // Try alternative method - execute each statement separately
       console.log('📝 Executing SQL statements...\n');
-      
+
       const statements = sql
         .split(';')
         .map(s => s.trim())
         .filter(s => s.length > 0 && !s.startsWith('--'));
-      
+
       for (const statement of statements) {
         if (statement.includes('DROP FUNCTION')) {
           console.log('✓ Dropping old function...');
@@ -47,20 +53,19 @@ async function runMigration() {
           console.log('✓ Adding documentation...');
         }
       }
-      
+
       console.log('\n✅ Migration completed successfully!\n');
       console.log('🎉 User signups will now work perfectly!\n');
       console.log('Test it at: https://www.islakayd.com\n');
-      
+
     } else {
       console.log('✅ Migration executed successfully!\n');
       console.log('Response:', data);
     }
-    
+
   } catch (err) {
     console.error('❌ Error running migration:', err.message);
-    console.log('\nPlease run the SQL manually in Supabase SQL Editor:');
-    console.log('https://supabase.com/dashboard/project/ialxlykysbqyiejepzkx/sql/new');
+    console.log('\nPlease run the SQL manually in Supabase SQL Editor.');
   }
 }
 

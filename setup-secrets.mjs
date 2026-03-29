@@ -1,14 +1,24 @@
 // Run with:
-// STRIPE_SECRET_KEY=sk_test_... node setup-secrets.mjs
+// SUPABASE_ACCESS_TOKEN=... STRIPE_SECRET_KEY=sk_test_... STRIPE_PUBLISHABLE_KEY=pk_test_... node setup-secrets.mjs
 
-const SUPABASE_ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN || 'sbp_a72e349a726d942b26b85fb8061a43d60770038b';
-const PROJECT_REF = 'purmabjcvznntttvtseb';
+const SUPABASE_ACCESS_TOKEN = process.env.SUPABASE_ACCESS_TOKEN;
+const PROJECT_REF = process.env.SUPABASE_PROJECT_REF || 'purmabjcvznntttvtseb';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const STRIPE_PUBLISHABLE_KEY = 'pk_test_51SDOxk76Ew5EUpT4tBde1QVRzDUHFsTW4LIpz1jSguoBNaKHW9i15neNYlJ0NLsKaSq2hOQHqOLqNREO2luOnvqv00TpBIkNAG';
+const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
+
+if (!SUPABASE_ACCESS_TOKEN) {
+  console.error('❌ Missing SUPABASE_ACCESS_TOKEN env var');
+  process.exit(1);
+}
 
 if (!STRIPE_SECRET_KEY) {
   console.error('❌ Missing STRIPE_SECRET_KEY env var');
-  console.error('Run with: STRIPE_SECRET_KEY=sk_test_... node setup-secrets.mjs');
+  console.error('Run with: SUPABASE_ACCESS_TOKEN=... STRIPE_SECRET_KEY=sk_test_... STRIPE_PUBLISHABLE_KEY=pk_test_... node setup-secrets.mjs');
+  process.exit(1);
+}
+
+if (!STRIPE_PUBLISHABLE_KEY) {
+  console.error('❌ Missing STRIPE_PUBLISHABLE_KEY env var');
   process.exit(1);
 }
 

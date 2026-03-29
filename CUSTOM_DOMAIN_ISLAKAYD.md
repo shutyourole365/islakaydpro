@@ -148,8 +148,8 @@ Make sure these are set in your deployment platform:
 # Vercel: Project Settings → Environment Variables
 # Netlify: Site Settings → Build & Deploy → Environment
 
-VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 VITE_APP_URL=https://islakayd.com
 VITE_ENABLE_ANALYTICS=true
 VITE_ENABLE_PWA=true

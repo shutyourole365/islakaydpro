@@ -143,8 +143,8 @@ Test on:
 Make sure these are set in Vercel/Netlify:
 
 ```bash
-VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGci...
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 VITE_APP_URL=https://islakayd.com
 VITE_ENABLE_ANALYTICS=true
 VITE_ENABLE_PWA=true

@@ -81,8 +81,8 @@ supabase db push
 cat .env.local | grep SUPABASE
 
 # Expected output:
-# VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
-# VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+# VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+# VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
 #### Test Connection Manually

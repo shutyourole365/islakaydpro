@@ -90,8 +90,8 @@ vercel --prod
    - Output Directory: `dist` ✅ (auto-detected)
 5. **Add environment variables** (click "Environment Variables" tab):
    ```
-   VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
    VITE_STRIPE_PUBLIC_KEY=pk_live_... (if using Stripe)
    VITE_ENABLE_ANALYTICS=true
    ```
@@ -168,8 +168,8 @@ netlify deploy --prod
    - Node version: 20 ✅ (set in netlify.toml)
 5. **Add environment variables**:
    ```
-   VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
-   VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
    VITE_STRIPE_PUBLIC_KEY=pk_live_...
    VITE_ENABLE_ANALYTICS=true
    ```
@@ -246,7 +246,7 @@ Go to Site Settings → Domain Management → Add custom domain
 ```bash
 # From your browser console on deployed site
 console.log(import.meta.env.VITE_SUPABASE_URL)
-// Should show: "https://ialxlykysbqyiejepzkx.supabase.co"
+// Should show: "https://your-project-ref.supabase.co"
 
 console.log(import.meta.env.VITE_ENABLE_ANALYTICS)
 // Should show: "true"

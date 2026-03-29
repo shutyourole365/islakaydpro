@@ -1,9 +1,15 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-  'https://ialxlykysbqyiejepzkx.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlhbHhseWt5c2JxeWllamVwemt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkxNDY2ODgsImV4cCI6MjA4NDcyMjY4OH0.xVQYWWYZDc2YSsTEgTGhCjyArgwrhaXgGaCZAk1fqZs'
-);
+// Run with: VITE_SUPABASE_URL=... VITE_SUPABASE_ANON_KEY=... node seed-categories.cjs
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Missing required env vars: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY');
+  process.exit(1);
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const categories = [
   {
@@ -123,5 +129,4 @@ const categories = [
   });
 
   console.log('\n🎉 Database seeding complete!');
-  console.log('   Visit: https://app.supabase.com/project/ialxlykysbqyiejepzkx/editor');
 })();
