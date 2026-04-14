@@ -52,45 +52,26 @@ const PaymentSettings = lazy(() => import('./components/payments/PaymentSettings
 
 // Premium Features - Lazy loaded for performance
 const SubscriptionPlans = lazy(() => import('./components/subscription/SubscriptionPlans'));
-const CarbonFootprintTracker = lazy(() => import('./components/sustainability/CarbonFootprintTracker'));
-const AREquipmentTutorial = lazy(() => import('./components/tutorials/AREquipmentTutorial'));
 const GroupBooking = lazy(() => import('./components/booking/GroupBooking'));
-const DroneDeliveryTracking = lazy(() => import('./components/delivery/DroneDeliveryTracking'));
 const QRCheckInOut = lazy(() => import('./components/booking/QRCheckInOut'));
-const BlockchainContract = lazy(() => import('./components/contracts/BlockchainContract'));
 const AIDamageDetection = lazy(() => import('./components/inspection/AIDamageDetection'));
 const SplitPayment = lazy(() => import('./components/payments/SplitPayment'));
 const InstantInsuranceQuote = lazy(() => import('./components/insurance/InstantInsuranceQuote'));
 const SmartPricingEngine = lazy(() => import('./components/pricing/SmartPricingEngine'));
-const Equipment3DViewer = lazy(() => import('./components/equipment/Equipment3DViewer'));
 const VoiceSearch = lazy(() => import('./components/search/VoiceSearch'));
 const LiveLocationTracker = lazy(() => import('./components/booking/LiveLocationTracker'));
 const DamageReportWizard = lazy(() => import('./components/booking/DamageReportWizard'));
 const EquipmentMapEnhanced = lazy(() => import('./components/map/EquipmentMapEnhanced'));
 
 // Additional Premium Features
-const LoyaltyProgram = lazy(() => import('./components/gamification/LoyaltyProgram'));
 const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
 const PriceNegotiator = lazy(() => import('./components/negotiation/PriceNegotiator'));
-const MaintenancePredictor = lazy(() => import('./components/predictive/MaintenancePredictor'));
 const ReferralProgram = lazy(() => import('./components/referral/ReferralProgram'));
 const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler'));
 
 // NEW Premium Features - AI Matching, Smart Contracts, AR Preview
-const AIMatching = lazy(() => import('./components/features/AIMatching'));
-const SmartContracts = lazy(() => import('./components/features/SmartContracts'));
-const ARPreview = lazy(() => import('./components/features/ARPreview'));
-const CarbonTracker = lazy(() => import('./components/features/CarbonTracker'));
-const EquipmentFinancing = lazy(() => import('./components/features/EquipmentFinancing'));
-const IoTTelematics = lazy(() => import('./components/features/IoTTelematics'));
-const AREquipmentVisualization = lazy(() => import('./components/features/AREquipmentVisualization'));
-const GPSTracking = lazy(() => import('./components/features/GPSTracking'));
-const CryptoPayments = lazy(() => import('./components/features/CryptoPayments'));
-const AIInsurance = lazy(() => import('./components/features/AIInsurance'));
-const SustainabilityDashboard = lazy(() => import('./components/features/SustainabilityDashboard'));
 const SocialCommunities = lazy(() => import('./components/features/SocialCommunities'));
 const VoiceAIAssistant = lazy(() => import('./components/features/VoiceAIAssistant'));
-const BlockchainContracts = lazy(() => import('./components/features/BlockchainContracts'));
 const VRTraining = lazy(() => import('./components/features/VRTraining'));
 const DroneDelivery = lazy(() => import('./components/features/DroneDelivery'));
 const IndustryIntegrations = lazy(() => import('./components/features/IndustryIntegrations'));
@@ -1470,7 +1451,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         <Suspense fallback={<PageLoader />}>
           <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
             <div className="max-w-3xl mx-auto px-4">
-              <CarbonFootprintTracker
                 userId={user?.id || ''}
                 bookings={[
                   { id: '1', equipmentTitle: 'CAT Excavator', category: 'Heavy Equipment', rentalDays: 5, date: new Date('2026-01-15'), carbonSaved: 45, treesEquivalent: 2 },
@@ -1496,7 +1476,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               >
                 ← Back to Dashboard
               </button>
-              <LoyaltyProgram userId={user?.id || ''} />
             </div>
           </div>
           <Footer onNavigate={handleNavigate} />
@@ -1523,67 +1502,56 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
 
       {currentPage === 'ai-matching' && (
         <Suspense fallback={<PageLoader />}>
-          <AIMatching onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'smart-contracts' && (
         <Suspense fallback={<PageLoader />}>
-          <SmartContracts onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'ar-preview' && (
         <Suspense fallback={<PageLoader />}>
-          <ARPreview onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'carbon-tracker' && (
         <Suspense fallback={<PageLoader />}>
-          <CarbonTracker onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'equipment-financing' && (
         <Suspense fallback={<PageLoader />}>
-          <EquipmentFinancing onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'iot-telematics' && (
         <Suspense fallback={<PageLoader />}>
-          <IoTTelematics onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'ar-visualization' && (
         <Suspense fallback={<PageLoader />}>
-          <AREquipmentVisualization onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'gps-tracking' && (
         <Suspense fallback={<PageLoader />}>
-          <GPSTracking onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'crypto-payments' && (
         <Suspense fallback={<PageLoader />}>
-          <CryptoPayments onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'ai-insurance' && (
         <Suspense fallback={<PageLoader />}>
-          <AIInsurance onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
       {currentPage === 'sustainability-dashboard' && (
         <Suspense fallback={<PageLoader />}>
-          <SustainabilityDashboard onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
@@ -1601,7 +1569,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
 
       {currentPage === 'blockchain-contracts' && (
         <Suspense fallback={<PageLoader />}>
-          <BlockchainContracts onBack={() => setCurrentPage('dashboard')} />
         </Suspense>
       )}
 
@@ -1796,7 +1763,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIs3DViewerOpen(false)} />
             <div className="relative z-10 w-full max-w-4xl">
-              <Equipment3DViewer
                 images={viewerEquipment.images}
                 title={viewerEquipment.title}
                 onClose={() => {
@@ -1886,7 +1852,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsDroneTrackingOpen(false)} />
             <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DroneDeliveryTracking
                 bookingId="demo-booking-123"
                 equipmentTitle="CAT 320 Excavator"
                 pickupLocation={{ address: '123 Equipment Way, LA', lat: 34.0522, lng: -118.2437 }}
@@ -1950,7 +1915,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsBlockchainOpen(false)} />
             <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <BlockchainContract
                 bookingId="demo-booking-123"
                 renterId={user?.id || ''}
                 ownerId={bookingEquipment.owner_id}
@@ -1985,7 +1949,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsARTutorialOpen(false)} />
             <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-              <AREquipmentTutorial
                 equipmentId={bookingEquipment.id}
                 equipmentTitle={bookingEquipment.title}
                 equipmentType={bookingEquipment.category?.name || 'Equipment'}
@@ -2118,7 +2081,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {/* Maintenance Predictor Modal */}
       {isMaintenancePredictorOpen && bookingEquipment && (
         <Suspense fallback={<PageLoader />}>
-          <MaintenancePredictor
             equipmentId={bookingEquipment.id}
             equipmentTitle={bookingEquipment.title}
             category={bookingEquipment.category?.name || 'Equipment'}
