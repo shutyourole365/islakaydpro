@@ -28,6 +28,8 @@ jobs:
           cache: 'npm'
 
       - name: Show Xcode version
+        # Keep the runner default Xcode to avoid plugin/framework API mismatches
+        # introduced by pinning an older Xcode toolchain.
         run: xcodebuild -version
 
       - name: Install dependencies
