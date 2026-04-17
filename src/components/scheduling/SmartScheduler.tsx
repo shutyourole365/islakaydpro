@@ -36,6 +36,7 @@ interface AIRecommendation {
 }
 
 export default function SmartScheduler({
+  equipmentId,
   equipmentTitle,
   dailyRate,
   onSelectDates,

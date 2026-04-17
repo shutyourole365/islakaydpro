@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState, useEffect } from 'react';
 import {
   Search,
   Menu,
@@ -18,7 +17,6 @@ import {
   Users,
 } from 'lucide-react';
 import RealTimeNotifications from '../notifications/RealTimeNotifications';
-import LogoPro from '../branding/LogoPro';
 import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
@@ -40,23 +38,11 @@ export default function Header({
   onSignOut,
   currentPage,
 }: HeaderProps) {
-  const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
-  const unsubRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    if (!user) { setUnreadNotifCount(0); return; }
-    getUnreadNotificationCount(user.id).then(setUnreadNotifCount).catch(() => {});
-    const unsub = subscribeToNotifications(user.id, () => {
-      getUnreadNotificationCount(user.id).then(setUnreadNotifCount).catch(() => {});
-    });
-    unsubRef.current = unsub?.unsubscribe ? () => unsub.unsubscribe() : null;
-    return () => { unsubRef.current?.(); };
-  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,11 +84,7 @@ export default function Header({
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-12">
             <button onClick={() => onNavigate('home')} aria-label="Go to home page" className="flex items-center">
-              <LogoPro 
-                variant={showTransparent ? 'light' : 'default'} 
-                size="md" 
-                showText={true}
-              />
+              <span className="font-bold text-xl text-teal-600">IslaKayd</span>
             </button>
 
             <nav className="hidden lg:flex items-center gap-8">
