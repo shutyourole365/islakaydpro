@@ -1,474 +1,382 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowLeft,
   CreditCard,
   Building2,
   DollarSign,
-  Plus,
-  Trash2,
-  Edit,
-  Clock,
-  Download,
-  Filter,
+  ExternalLink,
   TrendingUp,
   Wallet,
   RefreshCw,
   Shield,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  ArrowDownRight,
 } from 'lucide-react';
+import {
+  createConnectAccount,
+  getOwnerPayouts,
+  getOwnerBalance,
+  hasCompletedStripeConnect,
+} from '../../services/payments';
 
 interface PaymentSettingsProps {
   onBack: () => void;
 }
 
-interface PaymentMethod {
+interface Payout {
   id: string;
-  type: 'card' | 'bank';
-  name: string;
-  last4: string;
-  expiry?: string;
-  isDefault: boolean;
-}
-
-interface Transaction {
-  id: string;
-  type: 'payout' | 'payment' | 'refund';
   amount: number;
-  description: string;
-  date: string;
-  status: 'completed' | 'pending' | 'failed';
+  platform_fee: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed';
+  created_at: string;
+  booking?: {
+    start_date?: string;
+    end_date?: string;
+    equipment?: { title?: string; images?: string[] };
+  };
 }
 
 export default function PaymentSettings({ onBack }: PaymentSettingsProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'methods' | 'transactions' | 'payouts'>('overview');
-  const [showAddMethod, setShowAddMethod] = useState(false);
+  const [activeTab, setActiveTab] = useState<'overview' | 'payouts' | 'connect'>('overview');
+  const [connectStatus, setConnectStatus] = useState<{
+    hasAccount: boolean;
+    isOnboarded: boolean;
+    accountId?: string;
+  } | null>(null);
+  const [balance, setBalance] = useState<{ available: number; pending: number } | null>(null);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [connectLoading, setConnectLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const balance = {
-    available: 2450.00,
-    pending: 850.00,
-    total: 3300.00,
-  };
+  useEffect(() => {
+    load();
+  }, []);
 
-  const paymentMethods: PaymentMethod[] = [
-    { id: '1', type: 'card', name: 'Visa ending in', last4: '4242', expiry: '12/28', isDefault: true },
-    { id: '2', type: 'card', name: 'Mastercard ending in', last4: '5555', expiry: '08/27', isDefault: false },
-    { id: '3', type: 'bank', name: 'Chase Bank ending in', last4: '9876', isDefault: false },
-  ];
+  async function load() {
+    setLoading(true);
+    setError('');
+    try {
+      const status = await hasCompletedStripeConnect();
+      setConnectStatus(status);
 
-  const transactions: Transaction[] = [
-    { id: '1', type: 'payout', amount: 1250.00, description: 'Weekly payout to Chase Bank', date: '2026-01-22', status: 'completed' },
-    { id: '2', type: 'payment', amount: 450.00, description: 'Booking #12345 - CAT Excavator', date: '2026-01-21', status: 'completed' },
-    { id: '3', type: 'payment', amount: 125.00, description: 'Booking #12346 - Camera Kit', date: '2026-01-20', status: 'pending' },
-    { id: '4', type: 'refund', amount: -75.00, description: 'Refund for Booking #12340', date: '2026-01-18', status: 'completed' },
-    { id: '5', type: 'payment', amount: 295.00, description: 'Booking #12344 - DJ Equipment', date: '2026-01-15', status: 'completed' },
-  ];
-
-  const getStatusColor = (status: Transaction['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-700';
-      case 'pending':
-        return 'bg-amber-100 text-amber-700';
-      case 'failed':
-        return 'bg-red-100 text-red-700';
+      if (status.isOnboarded) {
+        const [bal, payoutList] = await Promise.all([
+          getOwnerBalance().catch(() => null),
+          getOwnerPayouts().catch(() => []),
+        ]);
+        setBalance(bal);
+        setPayouts(payoutList);
+      }
+    } catch (e) {
+      setError('Could not load payment data. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
-  const getTypeIcon = (type: Transaction['type']) => {
-    switch (type) {
-      case 'payout':
-        return <TrendingUp className="w-4 h-4 text-blue-600" />;
-      case 'payment':
-        return <DollarSign className="w-4 h-4 text-green-600" />;
-      case 'refund':
-        return <RefreshCw className="w-4 h-4 text-red-600" />;
+  async function handleConnectStripe() {
+    setConnectLoading(true);
+    setError('');
+    try {
+      const origin = window.location.origin;
+      const { url } = await createConnectAccount({
+        returnUrl: `${origin}/?tab=payments&connect=success`,
+        refreshUrl: `${origin}/?tab=payments&connect=refresh`,
+      });
+      window.location.href = url;
+    } catch (e) {
+      setError('Failed to start Stripe Connect. Please try again.');
+      setConnectLoading(false);
     }
-  };
+  }
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Wallet },
-    { id: 'methods', label: 'Payment Methods', icon: CreditCard },
-    { id: 'transactions', label: 'Transactions', icon: DollarSign },
-    { id: 'payouts', label: 'Payouts', icon: Building2 },
-  ];
+    { id: 'payouts', label: 'Payout History', icon: TrendingUp },
+    { id: 'connect', label: 'Payout Setup', icon: Building2 },
+  ] as const;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onBack}
-              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
-            >
-              <ArrowLeft className="w-6 h-6 text-gray-600" />
-            </button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Payments & Payouts</h1>
-              <p className="text-gray-600">Manage your payment methods and view transactions</p>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-4">
+          <button
+            onClick={onBack}
+            className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Payments & Payouts</h1>
+            <p className="text-sm text-gray-500">Powered by Stripe</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
-                activeTab === tab.id
-                  ? 'bg-teal-500 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Balance Cards */}
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl p-6 text-white">
-                <p className="text-white/80 text-sm mb-1">Available Balance</p>
-                <p className="text-3xl font-bold">${balance.available.toLocaleString()}</p>
-                <button className="mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors">
-                  Withdraw Funds
-                </button>
-              </div>
-              <div className="bg-white rounded-2xl p-6 border border-gray-100">
-                <p className="text-gray-500 text-sm mb-1">Pending Balance</p>
-                <p className="text-3xl font-bold text-gray-900">${balance.pending.toLocaleString()}</p>
-                <p className="text-sm text-gray-500 mt-4 flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  Clears in 2-3 business days
-                </p>
-              </div>
-              <div className="bg-white rounded-2xl p-6 border border-gray-100">
-                <p className="text-gray-500 text-sm mb-1">Total Earnings</p>
-                <p className="text-3xl font-bold text-gray-900">${balance.total.toLocaleString()}</p>
-                <p className="text-sm text-green-600 mt-4 flex items-center gap-1">
-                  <TrendingUp className="w-4 h-4" />
-                  +12% this month
-                </p>
-              </div>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Earnings Summary</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: 'This Week', value: '$450', change: '+15%' },
-                  { label: 'This Month', value: '$2,850', change: '+12%' },
-                  { label: 'Last Month', value: '$2,400', change: '+8%' },
-                  { label: 'All Time', value: '$24,500', change: null },
-                ].map((stat, index) => (
-                  <div key={index} className="p-4 bg-gray-50 rounded-xl">
-                    <p className="text-sm text-gray-500">{stat.label}</p>
-                    <p className="text-xl font-bold text-gray-900">{stat.value}</p>
-                    {stat.change && (
-                      <p className="text-sm text-green-600 mt-1">{stat.change}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Transactions */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Transactions</h2>
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex gap-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
                 <button
-                  onClick={() => setActiveTab('transactions')}
-                  className="text-sm text-teal-600 hover:text-teal-700 font-medium"
-                >
-                  View all
-                </button>
-              </div>
-              <div className="space-y-3">
-                {transactions.slice(0, 4).map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                        {getTypeIcon(tx.type)}
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{tx.description}</p>
-                        <p className="text-sm text-gray-500">{tx.date}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className={`font-semibold ${tx.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                        {tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}
-                      </p>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(tx.status)}`}>
-                        {tx.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Payment Methods Tab */}
-        {activeTab === 'methods' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Your Payment Methods</h2>
-              <button
-                onClick={() => setShowAddMethod(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Add Method
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {paymentMethods.map((method) => (
-                <div
-                  key={method.id}
-                  className={`bg-white rounded-xl p-4 border ${
-                    method.isDefault ? 'border-teal-200 bg-teal-50/50' : 'border-gray-100'
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-teal-500 text-teal-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        method.type === 'card' ? 'bg-blue-100' : 'bg-purple-100'
-                      }`}>
-                        {method.type === 'card' ? (
-                          <CreditCard className="w-6 h-6 text-blue-600" />
-                        ) : (
-                          <Building2 className="w-6 h-6 text-purple-600" />
-                        )}
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {loading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="flex items-center gap-3 p-4 bg-red-50 rounded-xl text-red-700">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <div>
+              <p className="font-medium">{error}</p>
+              <button onClick={load} className="text-sm underline mt-1">Try again</button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* ── OVERVIEW TAB ── */}
+            {activeTab === 'overview' && (
+              <div className="space-y-6">
+                {/* Connect banner */}
+                {!connectStatus?.isOnboarded && (
+                  <div className="bg-gradient-to-r from-teal-500 to-emerald-500 rounded-2xl p-6 text-white">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-6 h-6 text-white" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900">
-                            {method.name} {method.last4}
-                          </p>
-                          {method.isDefault && (
-                            <span className="px-2 py-0.5 bg-teal-500 text-white text-xs font-medium rounded-full">
-                              Default
-                            </span>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold mb-1">Set up payouts to start earning</h3>
+                        <p className="text-white/80 text-sm mb-4">
+                          Connect your Australian bank account via Stripe. Payouts are processed in AUD, usually within 2 business days.
+                        </p>
+                        <button
+                          onClick={handleConnectStripe}
+                          disabled={connectLoading}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors disabled:opacity-70"
+                        >
+                          {connectLoading ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" />Connecting…</>
+                          ) : (
+                            <><ExternalLink className="w-4 h-4" />Connect with Stripe</>
                           )}
-                        </div>
-                        {method.expiry && (
-                          <p className="text-sm text-gray-500">Expires {method.expiry}</p>
-                        )}
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {!method.isDefault && (
-                        <button className="px-3 py-1.5 text-sm text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
-                          Set as default
+                  </div>
+                )}
+
+                {/* Balance cards (only if connected) */}
+                {connectStatus?.isOnboarded && balance && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        Available balance
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900">
+                        ${balance.available.toFixed(2)}
+                        <span className="text-base font-normal text-gray-400 ml-1">AUD</span>
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">Ready to be paid out</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                      <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                        <RefreshCw className="w-4 h-4 text-amber-500" />
+                        Pending
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900">
+                        ${balance.pending.toFixed(2)}
+                        <span className="text-base font-normal text-gray-400 ml-1">AUD</span>
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">In transit from bookings</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* How payouts work */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                  <h3 className="font-semibold text-gray-900 mb-4">How payouts work</h3>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        icon: CreditCard,
+                        color: 'bg-blue-100 text-blue-600',
+                        title: 'Renter pays securely',
+                        desc: 'Stripe processes all payments. Funds are held until rental is confirmed.',
+                      },
+                      {
+                        icon: Shield,
+                        color: 'bg-teal-100 text-teal-600',
+                        title: 'Platform fee deducted',
+                        desc: 'Islakayd deducts a 10% service fee to cover insurance, support and the platform.',
+                      },
+                      {
+                        icon: DollarSign,
+                        color: 'bg-green-100 text-green-600',
+                        title: 'You get paid',
+                        desc: 'Your share is transferred to your Australian bank account, usually within 2 business days.',
+                      },
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-4">
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                          <item.icon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">{item.title}</p>
+                          <p className="text-sm text-gray-500 mt-0.5">{item.desc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── PAYOUT HISTORY TAB ── */}
+            {activeTab === 'payouts' && (
+              <div className="space-y-4">
+                {!connectStatus?.isOnboarded ? (
+                  <div className="text-center py-16 text-gray-400">
+                    <Building2 className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                    <p className="font-medium text-gray-600">No payout history yet</p>
+                    <p className="text-sm mt-1">Set up your bank account to start receiving payouts</p>
+                    <button
+                      onClick={() => setActiveTab('connect')}
+                      className="mt-4 px-5 py-2.5 rounded-xl bg-teal-500 text-white text-sm font-medium hover:bg-teal-600 transition-colors"
+                    >
+                      Set up payouts
+                    </button>
+                  </div>
+                ) : payouts.length === 0 ? (
+                  <div className="text-center py-16 text-gray-400">
+                    <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                    <p className="font-medium text-gray-600">No payouts yet</p>
+                    <p className="text-sm mt-1">Payouts will appear here after your first completed booking</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="divide-y divide-gray-50">
+                      {payouts.map((p) => (
+                        <div key={p.id} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-50/50 transition-colors">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                            p.status === 'completed' ? 'bg-green-100' : p.status === 'pending' ? 'bg-amber-100' : 'bg-red-100'
+                          }`}>
+                            {p.status === 'completed' ? (
+                              <ArrowDownRight className="w-5 h-5 text-green-600" />
+                            ) : p.status === 'failed' ? (
+                              <AlertCircle className="w-5 h-5 text-red-500" />
+                            ) : (
+                              <RefreshCw className="w-4 h-4 text-amber-500" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">
+                              {p.booking?.equipment?.title || 'Rental payout'}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {new Date(p.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              {' · '}
+                              <span className={`font-medium ${
+                                p.status === 'completed' ? 'text-green-600' : p.status === 'pending' ? 'text-amber-600' : 'text-red-500'
+                              }`}>
+                                {p.status.charAt(0).toUpperCase() + p.status.slice(1)}
+                              </span>
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900">+${p.amount.toFixed(2)}</p>
+                            <p className="text-xs text-gray-400">AUD</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── CONNECT TAB ── */}
+            {activeTab === 'connect' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      connectStatus?.isOnboarded ? 'bg-green-100' : 'bg-gray-100'
+                    }`}>
+                      {connectStatus?.isOnboarded ? (
+                        <CheckCircle2 className="w-6 h-6 text-green-500" />
+                      ) : (
+                        <Building2 className="w-6 h-6 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">
+                        {connectStatus?.isOnboarded ? 'Stripe Connect active' : 'Connect your bank account'}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {connectStatus?.isOnboarded
+                          ? 'Your Australian bank account is connected and ready to receive payouts.'
+                          : 'Link your Australian bank account so Islakayd can pay you when rentals are completed.'}
+                      </p>
+                      {!connectStatus?.isOnboarded && (
+                        <button
+                          onClick={handleConnectStripe}
+                          disabled={connectLoading}
+                          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-xl hover:shadow-md transition-all disabled:opacity-70"
+                        >
+                          {connectLoading ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" />Connecting…</>
+                          ) : (
+                            <><ExternalLink className="w-4 h-4" />Set up via Stripe</>
+                          )}
                         </button>
                       )}
-                      <button aria-label="Edit payment method" className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                        <Edit className="w-4 h-4 text-gray-600" />
-                      </button>
-                      <button className="p-2 hover:bg-red-50 rounded-lg transition-colors" aria-label="Delete payment method">
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
+                      {connectStatus?.isOnboarded && (
+                        <button
+                          onClick={handleConnectStripe}
+                          disabled={connectLoading}
+                          className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-200 transition-colors"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Manage on Stripe dashboard
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Security Notice */}
-            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
-              <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium text-blue-900">Your payment information is secure</p>
-                <p className="text-sm text-blue-700 mt-1">
-                  We use industry-standard encryption to protect your financial data. 
-                  All transactions are processed through secure payment partners.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Transactions Tab */}
-        {activeTab === 'transactions' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">Transaction History</h2>
-              <div className="flex items-center gap-2">
-                <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                  <Filter className="w-4 h-4" />
-                  Filter
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
-                  <Download className="w-4 h-4" />
-                  Export
-                </button>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr className="text-left text-sm text-gray-500">
-                    <th className="px-6 py-4 font-medium">Transaction</th>
-                    <th className="px-6 py-4 font-medium">Date</th>
-                    <th className="px-6 py-4 font-medium">Status</th>
-                    <th className="px-6 py-4 font-medium text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((tx) => (
-                    <tr key={tx.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                            {getTypeIcon(tx.type)}
-                          </div>
-                          <span className="font-medium text-gray-900">{tx.description}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">{tx.date}</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(tx.status)}`}>
-                          {tx.status}
-                        </span>
-                      </td>
-                      <td className={`px-6 py-4 text-right font-semibold ${tx.amount < 0 ? 'text-red-600' : 'text-green-600'}`}>
-                        {tx.amount < 0 ? '-' : '+'}${Math.abs(tx.amount).toFixed(2)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* Payouts Tab */}
-        {activeTab === 'payouts' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Payout Settings</h2>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-gray-900">Payout Method</p>
-                    <p className="text-sm text-gray-500">Where you receive your earnings</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-gray-400" />
-                    <span className="text-gray-900">Chase Bank •••• 9876</span>
-                    <button className="text-teal-600 hover:text-teal-700 font-medium text-sm">Change</button>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-gray-900">Payout Schedule</p>
-                    <p className="text-sm text-gray-500">How often you get paid</p>
-                  </div>
-                  <select aria-label="Payout schedule" className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
-                    <option>Weekly (every Monday)</option>
-                    <option>Bi-weekly</option>
-                    <option>Monthly</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                  <div>
-                    <p className="font-medium text-gray-900">Minimum Payout</p>
-                    <p className="text-sm text-gray-500">Only payout when balance exceeds</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-600">$</span>
-                    <input
-                      type="number"
-                      defaultValue={50}
-                      aria-label="Minimum payout amount"
-                      className="w-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
+                <div className="bg-blue-50 rounded-xl p-4 flex items-start gap-3">
+                  <Shield className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-blue-800">
+                    <p className="font-medium mb-1">Your banking details are safe</p>
+                    <p>Islakayd never sees your bank account details. Stripe is a PCI-compliant payment processor trusted by millions of Australian businesses.</p>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Next Payout */}
-            <div className="bg-gradient-to-br from-purple-500 to-indigo-500 rounded-2xl p-6 text-white">
-              <h3 className="font-semibold mb-2">Next Scheduled Payout</h3>
-              <p className="text-3xl font-bold">${balance.available.toLocaleString()}</p>
-              <p className="text-white/80 mt-2">
-                Will be deposited to Chase Bank •••• 9876 on Monday, Jan 27, 2026
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Add Payment Method Modal */}
-        {showAddMethod && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddMethod(false)} />
-            <div className="relative bg-white rounded-2xl p-6 max-w-md w-full">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Add Payment Method</h2>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="p-4 border-2 border-teal-500 bg-teal-50 rounded-xl text-center">
-                    <CreditCard className="w-8 h-8 text-teal-600 mx-auto mb-2" />
-                    <span className="font-medium text-gray-900">Credit Card</span>
-                  </button>
-                  <button className="p-4 border-2 border-gray-200 rounded-xl text-center hover:border-gray-300 transition-colors">
-                    <Building2 className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <span className="font-medium text-gray-600">Bank Account</span>
-                  </button>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                  <input
-                    type="text"
-                    placeholder="4242 4242 4242 4242"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expiry</label>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">CVC</label>
-                    <input
-                      type="text"
-                      placeholder="123"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => setShowAddMethod(false)}
-                    className="flex-1 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button className="flex-1 py-3 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors">
-                    Add Card
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>

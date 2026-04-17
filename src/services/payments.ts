@@ -104,7 +104,7 @@ export async function redirectToCheckout(params: CheckoutParams): Promise<void> 
 /**
  * Create or get Stripe Connect account for payouts
  */
-export async function createConnectAccount(): Promise<ConnectAccountResponse> {
+export async function createConnectAccount(params?: { returnUrl?: string; refreshUrl?: string }): Promise<ConnectAccountResponse> {
   const token = await getAuthToken();
   
   const response = await fetch(`${SUPABASE_URL}/functions/v1/payouts/create-connect-account`, {
@@ -114,8 +114,8 @@ export async function createConnectAccount(): Promise<ConnectAccountResponse> {
       'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify({
-      returnUrl: `${window.location.origin}/dashboard?tab=payouts&status=success`,
-      refreshUrl: `${window.location.origin}/dashboard?tab=payouts&status=refresh`,
+      returnUrl: params?.returnUrl || `${window.location.origin}/?tab=payments&connect=success`,
+      refreshUrl: params?.refreshUrl || `${window.location.origin}/?tab=payments&connect=refresh`,
     }),
   });
 
@@ -252,7 +252,7 @@ export async function verifyCheckoutSession(sessionId: string): Promise<{
 /**
  * Format currency for display
  */
-export function formatCurrency(amount: number, currency = 'USD'): string {
+export function formatCurrency(amount: number, currency = 'AUD'): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency,
@@ -291,4 +291,24 @@ export function calculateTotal(
     insurance: insuranceAmount,
     total: subtotal + serviceFee + depositAmount + insuranceAmount,
   };
+}
+
+/** Alias used by PaymentSettings — get owner's AUD balance */
+export async function getOwnerBalance(): Promise<{ available: number; pending: number }> {
+  const bal = await getBalance();
+  return { available: bal.available, pending: bal.pending };
+}
+
+/** Alias used by PaymentSettings — get owner's payout history */
+export async function getOwnerPayouts(): Promise<Payout[]> {
+  return getPayouts();
+}
+
+/** Alias for checkPayoutStatus — used by PaymentSettings */
+export async function hasCompletedStripeConnect(): Promise<{
+  hasAccount: boolean;
+  isOnboarded: boolean;
+  accountId?: string;
+}> {
+  return checkPayoutStatus();
 }

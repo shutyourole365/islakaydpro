@@ -93,6 +93,7 @@ async function createConnectAccount(user: any, body: ConnectAccountRequest) {
     // Create new Connect Express account
     const account = await stripe.accounts.create({
       type: 'express',
+      country: 'AU',
       email: user.email,
       metadata: {
         supabase_user_id: user.id,
@@ -181,14 +182,14 @@ async function createPayout(user: any, body: PayoutRequest) {
   }
 
   // Calculate owner's share (subtotal - platform fee)
-  // Platform keeps 12% service fee, owner gets subtotal
+  // Platform keeps 10% service fee, owner gets subtotal
   const ownerAmount = booking.subtotal;
   const platformFee = booking.service_fee;
 
   // Create transfer to connected account
   const transfer = await stripe.transfers.create({
     amount: Math.round(ownerAmount * 100), // Convert to cents
-    currency: 'usd',
+    currency: 'aud',
     destination: profile.stripe_connect_account_id,
     transfer_group: `booking_${body.bookingId}`,
     metadata: {
@@ -206,7 +207,7 @@ async function createPayout(user: any, body: PayoutRequest) {
       owner_id: user.id,
       amount: ownerAmount,
       platform_fee: platformFee,
-      currency: 'usd',
+      currency: 'aud',
       status: 'pending',
       stripe_transfer_id: transfer.id,
     })
@@ -267,7 +268,7 @@ async function getBalance(user: any) {
       JSON.stringify({ 
         available: 0,
         pending: 0,
-        currency: 'usd',
+        currency: 'aud',
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -281,14 +282,14 @@ async function getBalance(user: any) {
     stripeAccount: profile.stripe_connect_account_id,
   });
 
-  const available = balance.available.find(b => b.currency === 'usd')?.amount || 0;
-  const pending = balance.pending.find(b => b.currency === 'usd')?.amount || 0;
+  const available = balance.available.find(b => b.currency === 'aud')?.amount || 0;
+  const pending = balance.pending.find(b => b.currency === 'aud')?.amount || 0;
 
   return new Response(
     JSON.stringify({ 
       available: available / 100,
       pending: pending / 100,
-      currency: 'usd',
+      currency: 'aud',
     }),
     {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
