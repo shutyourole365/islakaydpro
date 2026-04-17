@@ -96,6 +96,7 @@ const BulkBookingSystem = lazy(() => import('./components/booking/BulkBookingSys
 
 // Additional Feature Components - Weather, Social, Onboarding, Security
 const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow'));
+import OwnerActivationFlow, { shouldShowOwnerActivation } from './components/onboarding/OwnerActivationFlow';
 const BiometricAuth = lazy(() => import('./components/security/BiometricAuth'));
 const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
 
@@ -546,6 +547,7 @@ const sampleEquipment: Equipment[] = [
 function AppContent() {
 type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications } = useAuth();
+  const [showOwnerActivation, setShowOwnerActivation] = useState(false);
   const { addToast } = useToast();
   const {
     showBanner,
@@ -816,7 +818,16 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
   const handleEquipmentClick = (equipment: Equipment) => {
     setSelectedEquipment(equipment);
 
-    // Track recently viewed in localStorage
+    // Owner activation flow — show once after login if user hasn't dismissed
+  useEffect(() => {
+    if (isAuthenticated && user && shouldShowOwnerActivation(user.id)) {
+      // Slight delay so the page renders first
+      const t = setTimeout(() => setShowOwnerActivation(true), 1200);
+      return () => clearTimeout(t);
+    }
+  }, [isAuthenticated, user]);
+
+  // Track recently viewed in localStorage
     try {
       const stored = localStorage.getItem('recentlyViewed');
       const recent: Equipment[] = stored ? JSON.parse(stored) : [];
@@ -1429,6 +1440,26 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
         <Suspense fallback={null}>
           <AIAssistantEnhanced />
         </Suspense>
+      )}
+
+      {/* Owner Activation Flow — shown to logged-in users who haven't dismissed */}
+      {isAuthenticated && showOwnerActivation && user && (
+        <OwnerActivationFlow
+          userId={user.id}
+          onListEquipment={() => {
+            setShowOwnerActivation(false);
+            setCurrentPage('list-equipment');
+          }}
+          onGoToVerification={() => {
+            setShowOwnerActivation(false);
+            setCurrentPage('id-verification');
+          }}
+          onGoToPayments={() => {
+            setShowOwnerActivation(false);
+            setCurrentPage('payments');
+          }}
+          onDismiss={() => setShowOwnerActivation(false)}
+        />
       )}
 
       <Suspense fallback={null}>
