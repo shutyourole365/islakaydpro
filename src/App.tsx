@@ -18,6 +18,7 @@ import SearchModal from './components/search/SearchModal';
 import EquipmentDetail from './components/equipment/EquipmentDetail';
 import AuthModal from './components/auth/AuthModal';
 import AIAssistantEnhanced from './components/ai/AIAssistantEnhanced';
+const ProjectPlanner = lazy(() => import('./components/ai/ProjectPlanner'));
 import BrowsePage from './components/browse/BrowsePage';
 import Dashboard from './components/dashboard/Dashboard';
 import ErrorBoundary from './components/ui/ErrorBoundary';
@@ -543,7 +544,7 @@ const sampleEquipment: Equipment[] = [
 ];
 
 function AppContent() {
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | '404';
+type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications } = useAuth();
   const { addToast } = useToast();
   const {
@@ -790,7 +791,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   };
 
   const handleNavigate = (page: string) => {
-    const knownPages: PageType[] = ['home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', '404'];
+    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
   };
 
@@ -1175,7 +1176,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {currentPage === 'home' && (
         <>
           <main>
-            <Hero onSearch={handleSearch} />
+            <Hero onSearch={handleSearch} onPlanProject={() => setCurrentPage('project-planner')} />
 
               <EquipmentShowcase
                 equipment={featuredEquipment.slice(0, 5)} // Show top 5 featured items
@@ -2300,6 +2301,29 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
+
+      {/* AI Project Planner */}
+      {currentPage === 'project-planner' && (
+        <Suspense fallback={<PageLoader />}>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="max-w-2xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('home')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              >
+                ← Back
+              </button>
+              <ProjectPlanner
+                onClose={() => setCurrentPage('home')}
+                onBrowseEquipment={(query) => {
+                  setCurrentPage('browse');
+                  setTimeout(() => handleSearch(query), 100);
+                }}
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
       {currentPage === '404' && (
         <>
           <NotFound onNavigate={handleNavigate} />

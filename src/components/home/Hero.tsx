@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Search, MapPin, Calendar, Sparkles, ArrowRight, Play } from 'lucide-react';
+import { Search, MapPin, Calendar, Sparkles, ArrowRight, Hammer } from 'lucide-react';
 
 interface HeroProps {
   onSearch: (query: string, location: string) => void;
+  onPlanProject?: () => void;
 }
 
-export default function Hero({ onSearch }: HeroProps) {
+export default function Hero({ onSearch, onPlanProject }: HeroProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useState('');
 
@@ -131,11 +132,13 @@ export default function Hero({ onSearch }: HeroProps) {
             Browse Categories
             <ArrowRight className="w-5 h-5" />
           </a>
-          <button className="flex items-center gap-2 px-6 py-3 text-white font-semibold hover:bg-white/10 rounded-full transition-colors">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <Play className="w-5 h-5 fill-white" />
-            </div>
-            Watch How It Works
+          <button
+            onClick={onPlanProject}
+            className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-full transition-colors border border-white/20 backdrop-blur-sm"
+          >
+            <Hammer className="w-5 h-5" />
+            Plan My Project with AI
+            <Sparkles className="w-4 h-4 text-yellow-300" />
           </button>
         </div>
       </div>
