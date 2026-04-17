@@ -31,13 +31,9 @@ export default defineConfig({
           // Premium feature chunks - lazy loaded
           'premium-features': [
             './src/components/subscription/SubscriptionPlans',
-            './src/components/sustainability/CarbonFootprintTracker',
-            './src/components/tutorials/AREquipmentTutorial',
             './src/components/booking/GroupBooking',
-            './src/components/delivery/DroneDeliveryTracking',
             './src/components/inspection/AIDamageDetection',
             './src/components/contracts/BlockchainContract',
-            './src/components/gamification/LoyaltyProgram',
             './src/components/fleet/FleetManager',
           ],
           
