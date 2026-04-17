@@ -20,7 +20,6 @@ import {
 import type { Equipment } from '../../types';
 import ShareEquipment from './ShareEquipment';
 import PriceNegotiator from '../negotiation/PriceNegotiator';
-import MaintenancePredictor from '../predictive/MaintenancePredictor';
 
 interface EquipmentDetailProps {
   equipment: Equipment;
@@ -44,7 +43,6 @@ export default function EquipmentDetail({
   const [endDate, setEndDate] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showNegotiator, setShowNegotiator] = useState(false);
-  const [showMaintenance, setShowMaintenance] = useState(false);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -270,12 +268,6 @@ export default function EquipmentDetail({
                   <h2 className="text-lg font-semibold text-gray-900">
                     Maintenance Status
                   </h2>
-                  <button
-                    onClick={() => setShowMaintenance(true)}
-                    className="text-teal-600 hover:text-teal-700 text-sm font-medium"
-                  >
-                    View Details →
-                  </button>
                 </div>
                 <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl">
                   <CheckCircle2 className="w-6 h-6 text-green-600" />
@@ -462,20 +454,6 @@ export default function EquipmentDetail({
         />
       )}
 
-      {showMaintenance && (
-        <MaintenancePredictor
-          equipmentId={equipment.id}
-          equipmentTitle={equipment.title}
-          category={equipment.category_id ?? ''}
-          hoursUsed={500} // Mock data
-          lastMaintenanceDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)} // 2 weeks ago
-          onScheduleMaintenance={() => {
-            // Handle scheduling
-            setShowMaintenance(false);
-          }}
-          onClose={() => setShowMaintenance(false)}
-        />
-      )}
     </div>
   );
 }
