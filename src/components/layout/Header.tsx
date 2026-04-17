@@ -1,6 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { getUnreadNotificationCount, subscribeToNotifications } from '../../services/database';
+import { useState, useEffect } from 'react';
 import {
   Search,
   Menu,
@@ -8,7 +6,6 @@ import {
   User,
   Heart,
   MessageSquare,
-  Bell,
   Plus,
   ChevronDown,
   LogOut,
@@ -19,8 +16,7 @@ import {
   Calendar,
   Users,
 } from 'lucide-react';
-import NotificationsDropdown from '../notifications/NotificationsDropdown';
-import LogoPro from '../branding/LogoPro';
+import RealTimeNotifications from '../notifications/RealTimeNotifications';
 import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
@@ -42,25 +38,11 @@ export default function Header({
   onSignOut,
   currentPage,
 }: HeaderProps) {
-  const { user } = useAuth();
-  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
-  const unsubRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    if (!user) { setUnreadNotifCount(0); return; }
-    getUnreadNotificationCount(user.id).then(setUnreadNotifCount).catch(() => {});
-    const unsub = subscribeToNotifications(user.id, () => {
-      getUnreadNotificationCount(user.id).then(setUnreadNotifCount).catch(() => {});
-    });
-    unsubRef.current = unsub?.unsubscribe ? () => unsub.unsubscribe() : null;
-    return () => { unsubRef.current?.(); };
-  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,9 +57,6 @@ export default function Header({
       const target = e.target as HTMLElement;
       if (!target.closest('.profile-menu') && !target.closest('.profile-button')) {
         setIsProfileMenuOpen(false);
-      }
-      if (!target.closest('.notifications-menu') && !target.closest('.notifications-button')) {
-        setIsNotificationsOpen(false);
       }
       if (!target.closest('.company-menu') && !target.closest('.company-button')) {
         setIsCompanyMenuOpen(false);
@@ -105,11 +84,7 @@ export default function Header({
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-12">
             <button onClick={() => onNavigate('home')} aria-label="Go to home page" className="flex items-center">
-              <LogoPro 
-                variant={showTransparent ? 'light' : 'default'} 
-                size="md" 
-                showText={true}
-              />
+              <span className="font-bold text-xl text-teal-600">IslaKayd</span>
             </button>
 
             <nav className="hidden lg:flex items-center gap-8">
@@ -352,29 +327,7 @@ export default function Header({
                     <MessageSquare className="w-5 h-5" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
                   </button>
-                  <div className="relative notifications-menu">
-                    <button
-                      onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                      aria-label="Notifications"
-                      className={`notifications-button p-2.5 rounded-full transition-colors relative ${
-                        showTransparent
-                          ? 'text-white hover:bg-white/10'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      }`}
-                    >
-                      <Bell className="w-5 h-5" />
-                      {unreadNotifCount > 0 && (
-                        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-                      )}
-                    </button>
-                    <NotificationsDropdown
-                      isOpen={isNotificationsOpen}
-                      onClose={() => {
-                        setIsNotificationsOpen(false);
-                        if (user) getUnreadNotificationCount(user.id).then(setUnreadNotifCount).catch(() => {});
-                      }}
-                    />
-                  </div>
+                  <RealTimeNotifications className="notifications-menu" />
                   <ThemeToggle variant="dropdown" />
                 </div>
 

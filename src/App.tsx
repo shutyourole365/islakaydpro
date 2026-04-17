@@ -14,7 +14,6 @@ import HowItWorks from './components/home/HowItWorks';
 import Testimonials from './components/home/Testimonials';
 import CTASection from './components/home/CTASection';
 import RecentlyViewed from './components/home/RecentlyViewed';
-import AboutPage from './components/home/AboutPage';
 import SearchModal from './components/search/SearchModal';
 import EquipmentDetail from './components/equipment/EquipmentDetail';
 import AuthModal from './components/auth/AuthModal';
@@ -52,18 +51,12 @@ const PaymentSettings = lazy(() => import('./components/payments/PaymentSettings
 
 // Premium Features - Lazy loaded for performance
 const SubscriptionPlans = lazy(() => import('./components/subscription/SubscriptionPlans'));
-const CarbonFootprintTracker = lazy(() => import('./components/sustainability/CarbonFootprintTracker'));
-const AREquipmentTutorial = lazy(() => import('./components/tutorials/AREquipmentTutorial'));
 const GroupBooking = lazy(() => import('./components/booking/GroupBooking'));
-const DroneDeliveryTracking = lazy(() => import('./components/delivery/DroneDeliveryTracking'));
 const QRCheckInOut = lazy(() => import('./components/booking/QRCheckInOut'));
-const BlockchainContract = lazy(() => import('./components/contracts/BlockchainContract'));
 const AIDamageDetection = lazy(() => import('./components/inspection/AIDamageDetection'));
 const SplitPayment = lazy(() => import('./components/payments/SplitPayment'));
 const InstantInsuranceQuote = lazy(() => import('./components/insurance/InstantInsuranceQuote'));
 const SmartPricingEngine = lazy(() => import('./components/pricing/SmartPricingEngine'));
-const Equipment3DViewer = lazy(() => import('./components/equipment/Equipment3DViewer'));
-const MaintenancePredictor = lazy(() => import('./components/predictive/MaintenancePredictor'));
 const VoiceSearch = lazy(() => import('./components/search/VoiceSearch'));
 const LiveLocationTracker = lazy(() => import('./components/booking/LiveLocationTracker'));
 const DamageReportWizard = lazy(() => import('./components/booking/DamageReportWizard'));
@@ -71,16 +64,8 @@ const EquipmentMapEnhanced = lazy(() => import('./components/map/EquipmentMapEnh
 
 // Additional Premium Features
 const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
-const PriceNegotiator = lazy(() => import('./components/negotiation/PriceNegotiator'));
-const ReferralProgram = lazy(() => import('./components/referral/ReferralProgram'));
-const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler'));
 
 // NEW Premium Features - AI Matching, Smart Contracts, AR Preview
-const SocialCommunities = lazy(() => import('./components/features/SocialCommunities'));
-const VoiceAIAssistant = lazy(() => import('./components/features/VoiceAIAssistant'));
-const VRTraining = lazy(() => import('./components/features/VRTraining'));
-const DroneDelivery = lazy(() => import('./components/features/DroneDelivery'));
-const IndustryIntegrations = lazy(() => import('./components/features/IndustryIntegrations'));
 
 // NEW Premium Features - Live Chat & Advanced Search
 const LiveChat = lazy(() => import('./components/chat/LiveChat'));
@@ -88,7 +73,6 @@ const AdvancedFilters = lazy(() => import('./components/search/AdvancedFilters')
 const DetailedComparison = lazy(() => import('./components/comparison/DetailedComparison'));
 const SavedSearches = lazy(() => import('./components/search/SavedSearches'));
 const EquipmentRecommendations = lazy(() => import('./components/recommendations/EquipmentRecommendations'));
-const QRCodeScanner = lazy(() => import('./components/scanner/QRCodeScanner'));
 const QuickBook = lazy(() => import('./components/booking/QuickBook'));
 
 // Balanced Approach Features - NEW Components
@@ -99,11 +83,6 @@ const PWAEnhancedFeatures = lazy(() => import('./components/pwa/PWAEnhancedFeatu
 const MultiPaymentSystem = lazy(() => import('./components/payments/MultiPaymentSystem'));
 
 // NEW Features - Health Score, Cost Estimator, Seasonal Deals, History Timeline, Multi-Language
-const EquipmentHealthScore = lazy(() => import('./components/health/EquipmentHealthScore'));
-const RentalCostEstimator = lazy(() => import('./components/estimator/RentalCostEstimator'));
-const SeasonalDeals = lazy(() => import('./components/promotions/SeasonalDeals'));
-const RentalHistoryTimeline = lazy(() => import('./components/timeline/RentalHistoryTimeline'));
-const MultiLanguageSupport = lazy(() => import('./components/i18n/MultiLanguageSupport'));
 
 // New Feature Components - Trust, Alerts, Bundles, Warranties, Insights
 const RenterTrustScore = lazy(() => import('./components/trust/RenterTrustScore'));
@@ -111,38 +90,17 @@ const SmartAlertsSystem = lazy(() => import('./components/alerts/SmartAlertsSyst
 // NEW Features - Availability Calendar, Revenue Dashboard, Certification, Agreements, Support
 const EquipmentAvailabilityCalendar = lazy(() => import('./components/availability/EquipmentAvailabilityCalendar'));
 const OwnerRevenueDashboard = lazy(() => import('./components/revenue/OwnerRevenueDashboard'));
-const EquipmentCertificationTracker = lazy(() => import('./components/certification/EquipmentCertificationTracker'));
 const RentalAgreementGenerator = lazy(() => import('./components/agreements/RentalAgreementGenerator'));
-const CustomerSupportTickets = lazy(() => import('./components/tickets/CustomerSupportTickets'));
-const EquipmentBundleDeals = lazy(() => import('./components/bundles/EquipmentBundleDeals'));
-const EquipmentWarrantyTracker = lazy(() => import('./components/warranty/EquipmentWarrantyTracker'));
 const BulkBookingSystem = lazy(() => import('./components/booking/BulkBookingSystem'));
-const MarketplaceInsights = lazy(() => import('./components/insights/MarketplaceInsights'));
 
 // Additional Feature Components - Weather, Social, Onboarding, Security
-const WeatherAdvisor = lazy(() => import('./components/weather/WeatherAdvisor'));
-const SocialProof = lazy(() => import('./components/social/SocialProof'));
 const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow'));
 const BiometricAuth = lazy(() => import('./components/security/BiometricAuth'));
-const PriceAlerts = lazy(() => import('./components/pricing/PriceAlerts'));
 const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
-const AchievementsSystem = lazy(() => import('./components/gamification/AchievementsSystem'));
 
 // Legal Pages
-const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
-const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
-const CookiePolicy = lazy(() => import('./components/legal/CookiePolicy'));
-const RefundPolicy = lazy(() => import('./components/legal/RefundPolicy'));
-const Accessibility = lazy(() => import('./components/legal/Accessibility'));
-const CancellationPolicy = lazy(() => import('./components/legal/CancellationPolicy'));
 
 // Company Pages
-const AboutUs = lazy(() => import('./components/company/AboutUs'));
-const Careers = lazy(() => import('./components/company/Careers'));
-const Press = lazy(() => import('./components/company/Press'));
-const Blog = lazy(() => import('./components/company/Blog'));
-const Partnerships = lazy(() => import('./components/company/Partnerships'));
-const Investors = lazy(() => import('./components/company/Investors'));
 
 // Support Pages
 const HelpCenter = lazy(() => import('./components/support/HelpCenter'));
@@ -151,10 +109,6 @@ const TrustAndVerification = lazy(() => import('./components/support/TrustAndVer
 const ContactUs = lazy(() => import('./components/support/ContactUs'));
 
 // Utility Pages
-const PricingCalculator = lazy(() => import('./components/utility/PricingCalculator'));
-const InsuranceOptions = lazy(() => import('./components/utility/InsuranceOptions'));
-const HostResources = lazy(() => import('./components/utility/HostResources'));
-const HostCommunity = lazy(() => import('./components/utility/HostCommunity'));
 const MaintenanceScheduler = lazy(() => import('./components/maintenance/MaintenanceScheduler'));
 const SchedulingOptimizer = lazy(() => import('./components/scheduling/SchedulingOptimizer'));
 const ReferralSystem = lazy(() => import('./components/referral/ReferralSystem'));
@@ -589,7 +543,7 @@ const sampleEquipment: Equipment[] = [
 ];
 
 function AppContent() {
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler' | 'equipment-health' | 'cost-estimator' | 'seasonal-deals' | 'rental-history' | 'multi-language' | 'availability-calendar' | 'revenue-dashboard' | 'certification-tracker' | 'agreement-generator' | 'support-tickets' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | '404';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications } = useAuth();
   const { addToast } = useToast();
   const {
@@ -621,23 +575,15 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
   // Premium feature states
   const [isVoiceSearchOpen, setIsVoiceSearchOpen] = useState(false);
-  const [is3DViewerOpen, setIs3DViewerOpen] = useState(false);
-  const [viewerEquipment, setViewerEquipment] = useState<Equipment | null>(null);
   const [isGroupBookingOpen, setIsGroupBookingOpen] = useState(false);
   const [isSplitPaymentOpen, setIsSplitPaymentOpen] = useState(false);
   const [isInsuranceQuoteOpen, setIsInsuranceQuoteOpen] = useState(false);
-  const [isDroneTrackingOpen, setIsDroneTrackingOpen] = useState(false);
   const [isQRCheckInOpen, setIsQRCheckInOpen] = useState(false);
   const [isDamageDetectionOpen, setIsDamageDetectionOpen] = useState(false);
-  const [isBlockchainOpen, setIsBlockchainOpen] = useState(false);
-  const [isARTutorialOpen, setIsARTutorialOpen] = useState(false);
   const [isSmartPricingOpen, setIsSmartPricingOpen] = useState(false);
   const [isLiveTrackerOpen, setIsLiveTrackerOpen] = useState(false);
   const [isDamageWizardOpen, setIsDamageWizardOpen] = useState(false);
   // New premium features
-  const [isPriceNegotiatorOpen, setIsPriceNegotiatorOpen] = useState(false);
-  const [isMaintenancePredictorOpen, setIsMaintenancePredictorOpen] = useState(false);
-  const [isSmartSchedulerOpen, setIsSmartSchedulerOpen] = useState(false);
   const [isFeatureShowcaseOpen, setIsFeatureShowcaseOpen] = useState(false);
   // New Balanced Approach modal states
   const [isAISearchOpen, setIsAISearchOpen] = useState(false);
@@ -655,13 +601,9 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isBulkBookingOpen, setIsBulkBookingOpen] = useState(false);
   const [isMarketInsightsOpen, setIsMarketInsightsOpen] = useState(false);
   // Additional Feature modal states - Weather, Social, Onboarding, Security
-  const [isWeatherAdvisorOpen, setIsWeatherAdvisorOpen] = useState(false);
-  const [isSocialProofOpen, setIsSocialProofOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isBiometricAuthOpen, setIsBiometricAuthOpen] = useState(false);
-  const [isPriceAlertsOpen, setIsPriceAlertsOpen] = useState(false);
   const [isSmartRecommendationsOpen, setIsSmartRecommendationsOpen] = useState(false);
-  const [isAchievementsOpen, setIsAchievementsOpen] = useState(false);
   const [isLiveChatOpen, setIsLiveChatOpen] = useState(false);
   const [chatRecipient, setChatRecipient] = useState<{id: string; name: string; avatar?: string} | null>(null);
   const [isRealTimeChatOpen, setIsRealTimeChatOpen] = useState(false);
@@ -673,7 +615,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isRecommendationsOpen, setIsRecommendationsOpen] = useState(false);
   const [isQuickBookOpen, setIsQuickBookOpen] = useState(false);
   const [quickBookEquipment, setQuickBookEquipment] = useState<Equipment | null>(null);
-  const [isQRCodeScannerOpen, setIsQRCodeScannerOpen] = useState(false);
   // Search filter state (used by Advanced Filters and Saved Searches)
    
   const [_searchFilters, _setSearchFilters] = useState<Partial<SearchFilters>>({});
@@ -849,7 +790,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   };
 
   const handleNavigate = (page: string) => {
-    const knownPages: PageType[] = ['home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'sustainability', 'tutorials', 'loyalty', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bundles', 'warranties', 'bulk-booking', 'insights', 'terms', 'privacy', 'cookies', 'refund', 'accessibility', 'cancellation', 'about', 'careers', 'press', 'blog', 'partnerships', 'investors', 'help', 'safety', 'trust', 'contact', 'pricing-calculator', 'insurance', 'host-resources', 'host-community', 'ai-matching', 'smart-contracts', 'ar-preview', 'carbon-tracker', 'equipment-financing', 'iot-telematics', 'ar-visualization', 'gps-tracking', 'crypto-payments', 'ai-insurance', 'sustainability-dashboard', 'social-communities', 'voice-ai-assistant', 'blockchain-contracts', 'vr-training', 'drone-delivery', 'industry-integrations', 'maintenance', 'scheduler', 'equipment-health', 'cost-estimator', 'seasonal-deals', 'rental-history', 'multi-language', 'availability-calendar', 'revenue-dashboard', 'certification-tracker', 'agreement-generator', 'support-tickets', 'requests', '404'];
+    const knownPages: PageType[] = ['home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
   };
 
@@ -1007,13 +948,10 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
 
     switch (featureId) {
       case 'price-negotiator':
-        setIsPriceNegotiatorOpen(true);
         break;
       case 'smart-scheduler':
-        setIsSmartSchedulerOpen(true);
         break;
       case 'maintenance-predictor':
-        setIsMaintenancePredictorOpen(true);
         break;
       case 'referral-program':
         setCurrentPage('referrals');
@@ -1038,11 +976,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         setIsEnhancedReviewOpen(true);
         setReviewEquipment(demoEquipment);
         setReviewBookingId('demo-booking-123');
-        break;
-      case 'pwa-features':
-        setCurrentPage('pwa');
-        break;
-      case 'multi-payment':
+        break;      case 'multi-payment':
         setIsMultiPaymentOpen(true);
         break;
       case 'live-chat':
@@ -1107,10 +1041,8 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         break;
       // Weather, Social, Onboarding, Security Features
       case 'weather-advisor':
-        setIsWeatherAdvisorOpen(true);
         break;
       case 'social-proof':
-        setIsSocialProofOpen(true);
         break;
       case 'onboarding':
         setIsOnboardingOpen(true);
@@ -1119,105 +1051,52 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         setIsBiometricAuthOpen(true);
         break;
       case 'price-alerts':
-        setIsPriceAlertsOpen(true);
         break;
       case 'smart-recommendations':
         setIsSmartRecommendationsOpen(true);
         break;
       case 'achievements':
-        setIsAchievementsOpen(true);
         break;
       case 'qr-code-scanner':
-        setIsQRCodeScannerOpen(true);
         break;
       case '3d-viewer':
-        setViewerEquipment(demoEquipment);
-        setIs3DViewerOpen(true);
         break;
       // NEW Advanced Premium Features
       case 'ai-matching':
-        setCurrentPage('ai-matching');
         break;
       case 'smart-contracts':
-        setCurrentPage('smart-contracts');
         break;
       case 'ar-preview':
-        setCurrentPage('ar-preview');
         break;
       case 'carbon-tracker':
-        setCurrentPage('carbon-tracker');
         break;
       case 'equipment-financing':
-        setCurrentPage('equipment-financing');
         break;
       case 'iot-telematics':
-        setCurrentPage('iot-telematics');
         break;
       case 'ar-visualization':
-        setCurrentPage('ar-visualization');
         break;
       case 'gps-tracking':
-        setCurrentPage('gps-tracking');
         break;
       case 'crypto-payments':
-        setCurrentPage('crypto-payments');
         break;
       case 'ai-insurance':
-        setCurrentPage('ai-insurance');
-        break;
-      case 'sustainability-dashboard':
-        setCurrentPage('sustainability-dashboard');
-        break;
-      case 'social-communities':
-        setCurrentPage('social-communities');
-        break;
-      case 'voice-ai-assistant':
-        setCurrentPage('voice-ai-assistant');
-        break;
-      case 'blockchain-contracts':
-        setCurrentPage('blockchain-contracts');
+        break;      case 'social-communities':
+        break;      case 'blockchain-contracts':
         break;
       case 'vr-training':
-        setCurrentPage('vr-training');
+        break;      case 'industry-integrations':
         break;
-      case 'drone-delivery':
-        setCurrentPage('drone-delivery');
-        break;
-      case 'industry-integrations':
-        setCurrentPage('industry-integrations');
-        break;
-      // NEW Features
-      case 'equipment-health':
-        setCurrentPage('equipment-health');
-        break;
-      case 'cost-estimator':
-        setCurrentPage('cost-estimator');
-        break;
-      case 'seasonal-deals':
-        setCurrentPage('seasonal-deals');
-        break;
-      case 'rental-history':
-        setCurrentPage('rental-history');
-        break;
-      case 'multi-language':
-        setCurrentPage('multi-language');
-        break;
-      case 'availability-calendar':
+      // NEW Features      case 'cost-estimator':
+        break;      case 'rental-history':
+        break;      case 'availability-calendar':
         setCurrentPage('availability-calendar');
         break;
       case 'revenue-dashboard':
         setCurrentPage('revenue-dashboard');
-        break;
-      case 'certification-tracker':
-        setCurrentPage('certification-tracker');
-        break;
-      case 'agreement-generator':
+        break;      case 'agreement-generator':
         setCurrentPage('agreement-generator');
-        break;
-      case 'support-tickets':
-        setCurrentPage('support-tickets');
-        break;
-      default:
+        break;      default:
         addToast({ type: 'info', title: 'Coming soon!', message: `${featureId} feature is coming soon.` });
     }
     setIsFeatureShowcaseOpen(false);
@@ -1359,12 +1238,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </>
       )}
 
-      {currentPage === 'about' && (
-        <>
-          <AboutPage />
-          <Footer />
-        </>
-      )}
 
       {currentPage === 'help' && (
         <>
@@ -1453,41 +1326,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {currentPage === 'sustainability' && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-            <div className="max-w-3xl mx-auto px-4">
-              <CarbonFootprintTracker
-                userId={user?.id || ''}
-                bookings={[
-                  { id: '1', equipmentTitle: 'CAT Excavator', category: 'Heavy Equipment', rentalDays: 5, date: new Date('2026-01-15'), carbonSaved: 45, treesEquivalent: 2 },
-                  { id: '2', equipmentTitle: 'Sony Camera Kit', category: 'Photography', rentalDays: 3, date: new Date('2026-01-10'), carbonSaved: 12, treesEquivalent: 1 },
-                  { id: '3', equipmentTitle: 'DeWalt Tool Kit', category: 'Power Tools', rentalDays: 7, date: new Date('2026-01-05'), carbonSaved: 28, treesEquivalent: 1 },
-                ]}
-                onClose={() => setCurrentPage('dashboard')}
-              />
-            </div>
-          </div>
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
-      {currentPage === 'loyalty' && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-amber-50 to-orange-100">
-            <div className="max-w-3xl mx-auto px-4">
-              <button
-                onClick={() => setCurrentPage('dashboard')}
-                aria-label="Back to dashboard"
-                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              >
-                ← Back to Dashboard
-              </button>
-            </div>
-          </div>
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
       {currentPage === 'fleet' && (
         <Suspense fallback={<PageLoader />}>
@@ -1507,95 +1346,22 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {currentPage === 'ai-matching' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'smart-contracts' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'ar-preview' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'carbon-tracker' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'equipment-financing' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'iot-telematics' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'ar-visualization' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'gps-tracking' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'crypto-payments' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'ai-insurance' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'sustainability-dashboard' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'social-communities' && (
-        <Suspense fallback={<PageLoader />}>
-          <SocialCommunities onBack={() => setCurrentPage('dashboard')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'voice-ai-assistant' && (
-        <Suspense fallback={<PageLoader />}>
-          <VoiceAIAssistant onBack={() => setCurrentPage('dashboard')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'blockchain-contracts' && (
-        <Suspense fallback={<PageLoader />}>
-        </Suspense>
-      )}
 
-      {currentPage === 'vr-training' && (
-        <Suspense fallback={<PageLoader />}>
-          <VRTraining onBack={() => setCurrentPage('dashboard')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'drone-delivery' && (
-        <Suspense fallback={<PageLoader />}>
-          <DroneDelivery onBack={() => setCurrentPage('dashboard')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'industry-integrations' && (
-        <Suspense fallback={<PageLoader />}>
-          <IndustryIntegrations onBack={() => setCurrentPage('dashboard')} />
-        </Suspense>
-      )}
 
       {currentPage === 'maintenance' && (
         <Suspense fallback={<PageLoader />}>
@@ -1764,24 +1530,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {/* 3D Equipment Viewer Modal */}
-      {is3DViewerOpen && viewerEquipment && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIs3DViewerOpen(false)} />
-            <div className="relative z-10 w-full max-w-4xl">
-              <Equipment3DViewer
-                images={viewerEquipment.images}
-                title={viewerEquipment.title}
-                onClose={() => {
-                  setIs3DViewerOpen(false);
-                  setViewerEquipment(null);
-                }}
-              />
-            </div>
-          </div>
-        </Suspense>
-      )}
+      
 
       {/* Group Booking Modal */}
       {isGroupBookingOpen && bookingEquipment && (
@@ -1854,24 +1603,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {/* Drone Delivery Tracking Modal */}
-      {isDroneTrackingOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsDroneTrackingOpen(false)} />
-            <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DroneDeliveryTracking
-                bookingId="demo-booking-123"
-                equipmentTitle="CAT 320 Excavator"
-                pickupLocation={{ address: '123 Equipment Way, LA', lat: 34.0522, lng: -118.2437 }}
-                deliveryLocation={{ address: '456 Construction Site, LA', lat: 34.0622, lng: -118.2537 }}
-                estimatedDelivery={new Date(Date.now() + 3600000)}
-                onClose={() => setIsDroneTrackingOpen(false)}
-              />
-            </div>
-          </div>
-        </Suspense>
-      )}
+      
 
       {/* QR Check-In/Out Modal */}
       {isQRCheckInOpen && (
@@ -1918,61 +1650,9 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {/* Blockchain Contract Modal */}
-      {isBlockchainOpen && bookingEquipment && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsBlockchainOpen(false)} />
-            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <BlockchainContract
-                bookingId="demo-booking-123"
-                renterId={user?.id || ''}
-                ownerId={bookingEquipment.owner_id}
-                equipmentId={bookingEquipment.id}
-                equipmentTitle={bookingEquipment.title}
-                startDate={new Date()}
-                endDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)}
-                totalAmount={bookingEquipment.daily_rate * 7}
-                depositAmount={bookingEquipment.deposit_amount}
-                terms={{
-                  cancellationPolicy: '48 hours notice required for full refund',
-                  damagePolicy: 'Renter responsible for damages beyond normal wear',
-                  usageRules: ['Equipment must be operated by trained personnel', 'No use for illegal activities'],
-                  insuranceCoverage: 'Comprehensive damage protection included',
-                  disputeResolution: 'Mediation followed by arbitration if needed'
-                }}
-                onSign={(signature) => {
-                  console.log('Contract signed:', signature);
-                  setIsBlockchainOpen(false);
-                  addToast({ type: 'success', title: 'Smart contract signed!', message: 'Agreement recorded on blockchain.' });
-                }}
-                onClose={() => setIsBlockchainOpen(false)}
-              />
-            </div>
-          </div>
-        </Suspense>
-      )}
+      
 
-      {/* AR Equipment Tutorial Modal */}
-      {isARTutorialOpen && bookingEquipment && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsARTutorialOpen(false)} />
-            <div className="relative z-10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
-              <AREquipmentTutorial
-                equipmentId={bookingEquipment.id}
-                equipmentTitle={bookingEquipment.title}
-                equipmentType={bookingEquipment.category?.name || 'Equipment'}
-                onComplete={() => {
-                  setIsARTutorialOpen(false);
-                  addToast({ type: 'success', title: 'Tutorial completed!', message: 'You are ready to get started.' });
-                }}
-                onClose={() => setIsARTutorialOpen(false)}
-              />
-            </div>
-          </div>
-        </Suspense>
-      )}
+      
 
       {/* Smart Pricing Engine Modal */}
       {isSmartPricingOpen && bookingEquipment && (
@@ -2054,76 +1734,10 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               >
                 ← Back to Dashboard
               </button>
-              <ReferralProgram 
-                userId={user?.id || ''}
-                userName={user?.email || 'User'}
-                onClose={() => setCurrentPage('dashboard')}
-              />
+              <div className="p-8 text-center text-gray-500">Referral program coming soon.</div>
             </div>
           </div>
           <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
-
-      {/* Price Negotiator Modal */}
-      {isPriceNegotiatorOpen && bookingEquipment && (
-        <Suspense fallback={<PageLoader />}>
-          <PriceNegotiator
-            equipmentId={bookingEquipment.id}
-            equipmentTitle={bookingEquipment.title}
-            originalDailyRate={bookingEquipment.daily_rate}
-            rentalDays={7}
-            ownerId={bookingEquipment.owner_id}
-            ownerName={bookingEquipment.owner?.full_name || 'Owner'}
-            onAccepted={(finalPrice: number) => {
-              console.log('Negotiation accepted:', finalPrice);
-              setIsPriceNegotiatorOpen(false);
-              addToast({ type: 'success', title: 'Offer accepted!', message: `Final price: ${finalPrice.toFixed(2)}` });
-            }}
-            onRejected={() => {
-              setIsPriceNegotiatorOpen(false);
-              addToast({ type: 'info', title: 'Negotiation ended', message: '' });
-            }}
-            onClose={() => setIsPriceNegotiatorOpen(false)}
-          />
-        </Suspense>
-      )}
-
-      {/* Maintenance Predictor Modal */}
-      {isMaintenancePredictorOpen && bookingEquipment && (
-        <Suspense fallback={<PageLoader />}>
-          <MaintenancePredictor
-            equipmentId={bookingEquipment.id}
-            equipmentTitle={bookingEquipment.title}
-            category={bookingEquipment.category?.name || 'Equipment'}
-            hoursUsed={1850}
-            lastMaintenanceDate={new Date('2025-12-10')}
-            onScheduleMaintenance={(date: Date, type: string) => {
-              console.log('Maintenance scheduled:', date, type);
-              setIsMaintenancePredictorOpen(false);
-              addToast({ type: 'success', title: 'Maintenance scheduled', message: `${type} on ${date.toLocaleDateString()}` });
-            }}
-            onClose={() => setIsMaintenancePredictorOpen(false)}
-          />
-        </Suspense>
-      )}
-
-      {/* Smart Scheduler Modal */}
-      {isSmartSchedulerOpen && bookingEquipment && (
-        <Suspense fallback={<PageLoader />}>
-          <SmartScheduler
-            equipmentId={bookingEquipment.id}
-            equipmentTitle={bookingEquipment.title}
-            dailyRate={bookingEquipment.daily_rate}
-            onSelectDates={(start: Date, end: Date, discount: number) => {
-              console.log('Smart schedule:', start, end, discount);
-              setIsSmartSchedulerOpen(false);
-              const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-              const total = bookingEquipment.daily_rate * days * (1 - discount / 100);
-              addToast({ type: 'success', title: 'Booking optimized!', message: `${days} days at ${discount}% off. Total: ${total.toFixed(2)}` });
-            }}
-            onClose={() => setIsSmartSchedulerOpen(false)}
-          />
         </Suspense>
       )}
 
@@ -2457,40 +2071,8 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       )}
 
       {/* Equipment Bundles Page */}
-      {currentPage === 'bundles' && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-purple-50 to-pink-100">
-            <div className="max-w-6xl mx-auto px-4">
-              <button
-                onClick={() => setCurrentPage('browse')}
-                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              >
-                ← Back to Browse
-              </button>
-              <EquipmentBundleDeals mode="browse" onClose={() => setCurrentPage('browse')} />
-            </div>
-          </div>
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
       {/* Warranty Tracker Page */}
-      {currentPage === 'warranties' && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-green-50 to-emerald-100">
-            <div className="max-w-4xl mx-auto px-4">
-              <button
-                onClick={() => setCurrentPage('dashboard')}
-                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              >
-                ← Back to Dashboard
-              </button>
-              <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setCurrentPage('dashboard')} />
-            </div>
-          </div>
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
       {/* Bulk Booking Page */}
       {currentPage === 'bulk-booking' && (
@@ -2511,58 +2093,12 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       )}
 
       {/* Marketplace Insights Page */}
-      {currentPage === 'insights' && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-            <div className="max-w-6xl mx-auto px-4">
-              <button
-                onClick={() => setCurrentPage('dashboard')}
-                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              >
-                ← Back to Dashboard
-              </button>
-              <MarketplaceInsights onClose={() => setCurrentPage('dashboard')} />
-            </div>
-          </div>
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
       {/* NEW Feature Pages - Health Score, Cost Estimator, Seasonal Deals, Rental History, Multi-Language */}
-      {currentPage === 'equipment-health' && (
-        <Suspense fallback={<PageLoader />}>
-          <EquipmentHealthScore onBack={() => setCurrentPage('home')} />
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
-      {currentPage === 'cost-estimator' && (
-        <Suspense fallback={<PageLoader />}>
-          <RentalCostEstimator onBack={() => setCurrentPage('home')} />
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
-      {currentPage === 'seasonal-deals' && (
-        <Suspense fallback={<PageLoader />}>
-          <SeasonalDeals onBack={() => setCurrentPage('home')} />
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
-      {currentPage === 'rental-history' && (
-        <Suspense fallback={<PageLoader />}>
-          <RentalHistoryTimeline onBack={() => setCurrentPage('dashboard')} />
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
-      {currentPage === 'multi-language' && (
-        <Suspense fallback={<PageLoader />}>
-          <MultiLanguageSupport onBack={() => setCurrentPage('home')} />
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
             {currentPage === 'availability-calendar' && (
         <Suspense fallback={<PageLoader />}>
@@ -2578,12 +2114,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {currentPage === 'certification-tracker' && (
-        <Suspense fallback={<PageLoader />}>
-          <EquipmentCertificationTracker onBack={() => setCurrentPage('dashboard')} />
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
       {currentPage === 'agreement-generator' && (
         <Suspense fallback={<PageLoader />}>
@@ -2592,86 +2122,20 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {currentPage === 'support-tickets' && (
-        <Suspense fallback={<PageLoader />}>
-          <CustomerSupportTickets onBack={() => setCurrentPage('dashboard')} />
-          <Footer onNavigate={handleNavigate} />
-        </Suspense>
-      )}
 
 {/* Legal Pages */}
-      {currentPage === 'terms' && (
-        <Suspense fallback={<PageLoader />}>
-          <TermsOfService onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'privacy' && (
-        <Suspense fallback={<PageLoader />}>
-          <PrivacyPolicy onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'cookies' && (
-        <Suspense fallback={<PageLoader />}>
-          <CookiePolicy onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'refund' && (
-        <Suspense fallback={<PageLoader />}>
-          <RefundPolicy onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'accessibility' && (
-        <Suspense fallback={<PageLoader />}>
-          <Accessibility onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'cancellation' && (
-        <Suspense fallback={<PageLoader />}>
-          <CancellationPolicy onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
       {/* Company Pages */}
-      {currentPage === 'about' && (
-        <Suspense fallback={<PageLoader />}>
-          <AboutUs onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'careers' && (
-        <Suspense fallback={<PageLoader />}>
-          <Careers onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'press' && (
-        <Suspense fallback={<PageLoader />}>
-          <Press onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'blog' && (
-        <Suspense fallback={<PageLoader />}>
-          <Blog onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'partnerships' && (
-        <Suspense fallback={<PageLoader />}>
-          <Partnerships onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'investors' && (
-        <Suspense fallback={<PageLoader />}>
-          <Investors onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
       {/* Support Pages */}
       {currentPage === 'help' && (
@@ -2699,29 +2163,10 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       )}
 
       {/* Utility Pages */}
-      {currentPage === 'pricing-calculator' && (
-        <Suspense fallback={<PageLoader />}>
-          <PricingCalculator onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'insurance' && (
-        <Suspense fallback={<PageLoader />}>
-          <InsuranceOptions onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'host-resources' && (
-        <Suspense fallback={<PageLoader />}>
-          <HostResources onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
 
-      {currentPage === 'host-community' && (
-        <Suspense fallback={<PageLoader />}>
-          <HostCommunity onBack={() => setCurrentPage('home')} />
-        </Suspense>
-      )}
+
 
       {/* New Feature Modals */}
       {isTrustScoreOpen && (
@@ -2743,7 +2188,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {isBundleDealsOpen && (
         <Suspense fallback={<PageLoader />}>
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <EquipmentBundleDeals mode="browse" onClose={() => setIsBundleDealsOpen(false)} />
           </div>
         </Suspense>
       )}
@@ -2751,7 +2195,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {isWarrantyTrackerOpen && (
         <Suspense fallback={<PageLoader />}>
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <EquipmentWarrantyTracker ownerId={user?.id} onClose={() => setIsWarrantyTrackerOpen(false)} />
           </div>
         </Suspense>
       )}
@@ -2767,35 +2210,14 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {isMarketInsightsOpen && (
         <Suspense fallback={<PageLoader />}>
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <MarketplaceInsights onClose={() => setIsMarketInsightsOpen(false)} />
           </div>
         </Suspense>
       )}
 
       {/* Additional Feature Modals - Weather, Social, Onboarding, Security */}
-      {isWeatherAdvisorOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <WeatherAdvisor
-              location={bookingEquipment?.location || 'San Francisco, CA'}
-              startDate={new Date().toISOString()}
-              endDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()}
-              onClose={() => setIsWeatherAdvisorOpen(false)}
-            />
-          </div>
-        </Suspense>
-      )}
+      
 
-      {isSocialProofOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <SocialProof
-              equipmentId={bookingEquipment?.id || 'demo'}
-              onClose={() => setIsSocialProofOpen(false)}
-            />
-          </div>
-        </Suspense>
-      )}
+      
 
       {isOnboardingOpen && (
         <Suspense fallback={<PageLoader />}>
@@ -2823,16 +2245,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {isPriceAlertsOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <PriceAlerts
-              userId={user?.id || ''}
-              onClose={() => setIsPriceAlertsOpen(false)}
-            />
-          </div>
-        </Suspense>
-      )}
+      
 
       {isSmartRecommendationsOpen && (
         <Suspense fallback={<PageLoader />}>
@@ -2849,33 +2262,9 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {isQRCodeScannerOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <QRCodeScanner
-              isOpen={isQRCodeScannerOpen}
-              onScan={(data) => {
-                console.log('QR Code scanned:', data);
-                // Handle QR code data (could be equipment ID, booking code, etc.)
-                addToast({ type: 'info', title: 'QR Code scanned', message: `${data}` });
-                setIsQRCodeScannerOpen(false);
-              }}
-              onClose={() => setIsQRCodeScannerOpen(false)}
-            />
-          </div>
-        </Suspense>
-      )}
+      
 
-      {isAchievementsOpen && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <AchievementsSystem
-              userId={user?.id || ''}
-              onClose={() => setIsAchievementsOpen(false)}
-            />
-          </div>
-        </Suspense>
-      )}
+      
       {currentPage === 'requests' && (
         <Suspense fallback={<PageLoader />}>
           <EquipmentRequestBoard onBack={() => setCurrentPage('home')} />

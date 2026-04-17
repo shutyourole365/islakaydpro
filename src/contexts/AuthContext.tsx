@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
 import { getProfile, getUserAnalytics, getUnreadNotificationCount, subscribeToNotifications, logAuditEvent } from '../services/database';
+import { errorMonitoring } from '../services/errorMonitoring';
 import { 
   signInWithRetry, 
   signUpWithRetry,
@@ -77,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         analyticsService.trackError(`Auth data load failed: ${(error as Error).message}`, false);
       }
       // Send to Sentry if configured
-      const { errorMonitoring } = await import('../services/errorMonitoring');
       errorMonitoring.captureException(error as Error, {
         context: 'AuthContext.loadUserData',
         userId,
@@ -170,7 +170,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           analytics.setUserId(data.user.id);
         }
         // Set user context in error monitoring
-        const { errorMonitoring } = await import('../services/errorMonitoring');
         errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
       }
     } catch (error) {
@@ -214,7 +213,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           analytics.setUserId(data.user.id);
         }
         // Set user context in error monitoring
-        const { errorMonitoring } = await import('../services/errorMonitoring');
         errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
 
         // Check if email confirmation is required
@@ -259,7 +257,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Clear user context from error monitoring
-    const { errorMonitoring } = await import('../services/errorMonitoring');
     errorMonitoring.clearUser();
 
     const { error } = await supabase.auth.signOut();

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { Notification } from '../../types';
 import { getNotifications, markNotificationRead, markAllNotificationsRead } from '../../services/database';
+import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface RealTimeNotificationsProps {
@@ -60,10 +61,26 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
 
     loadNotifications();
 
-    // Set up real-time subscription (simulated with polling for demo)
-    const interval = setInterval(loadNotifications, 30000); // Poll every 30 seconds
+    // Set up real Supabase realtime subscription for instant notifications
+    const channel = supabase
+      .channel(`notifications:${user?.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user?.id}`,
+        },
+        () => {
+          loadNotifications();
+        }
+      )
+      .subscribe();
 
-    return () => clearInterval(interval);
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   useEffect(() => {
