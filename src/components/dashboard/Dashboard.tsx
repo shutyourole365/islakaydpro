@@ -57,6 +57,7 @@ import {
   updateBookingStatus,
   logAuditEvent,
 } from '../../services/database';
+import { sendBookingApproved, sendBookingDeclined } from '../../services/email';
 import { supabase } from '../../lib/supabase';
 import ReferralProgram from '../referral/ReferralProgram';
 
@@ -216,9 +217,35 @@ export default function Dashboard({
 
   const handleBookingAction = async (bookingId: string, action: 'confirm' | 'cancel') => {
     const status = action === 'confirm' ? 'confirmed' : 'cancelled';
-    await updateBookingStatus(bookingId, status);
+    const updated = await updateBookingStatus(bookingId, status);
     setOwnerBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b));
     if (user) logAuditEvent({ userId: user.id, action: `booking_${action}`, metadata: { bookingId } }).catch(() => {});
+
+    // Fire email notification to the renter
+    const renter = updated.renter as { email?: string; full_name?: string } | undefined;
+    const equipment = updated.equipment as { title?: string; location?: string } | undefined;
+    if (renter?.email && equipment?.title) {
+      if (action === 'confirm') {
+        sendBookingApproved(renter.email, {
+          renterName: renter.full_name || 'there',
+          equipmentTitle: equipment.title,
+          startDate: updated.start_date,
+          endDate: updated.end_date,
+          totalDays: updated.total_days,
+          totalAmount: updated.total_amount,
+          pickupLocation: equipment.location || 'To be confirmed',
+          bookingId: updated.id,
+        }).catch(() => {});
+      } else {
+        sendBookingDeclined(renter.email, {
+          renterName: renter.full_name || 'there',
+          equipmentTitle: equipment.title,
+          startDate: updated.start_date,
+          endDate: updated.end_date,
+          bookingId: updated.id,
+        }).catch(() => {});
+      }
+    }
   };
 
   const filteredBookings = bookings.filter(b => bookingFilter === 'all' || b.status === bookingFilter);
