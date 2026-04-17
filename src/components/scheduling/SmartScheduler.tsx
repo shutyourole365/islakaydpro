@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Star,
 } from 'lucide-react';
+import { getEquipmentAvailability } from '../../services/database';
 
 interface SmartSchedulerProps {
   equipmentId: string;
@@ -53,50 +54,64 @@ export default function SmartScheduler({
 
   const loadSmartData = async () => {
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Generate smart time slots
-    const slots: TimeSlot[] = [];
     const startOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
     const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Fetch real blocked/booked dates from database
+    let bookedRanges: { start_date: string; end_date: string }[] = [];
+    try {
+      const availability = await getEquipmentAvailability(
+        equipmentId,
+        startOfMonth.toISOString().split('T')[0],
+        endOfMonth.toISOString().split('T')[0]
+      );
+      bookedRanges = availability.map(a => ({ start_date: a.start_date, end_date: a.end_date }));
+    } catch (e) {
+      console.error('Failed to load availability:', e);
+    }
+
+    const isDateBlocked = (date: Date): boolean => {
+      const dateStr = date.toISOString().split('T')[0];
+      return bookedRanges.some(r => dateStr >= r.start_date && dateStr <= r.end_date);
+    };
+
+    // Generate smart time slots based on real availability
+    const slots: TimeSlot[] = [];
     for (let d = new Date(startOfMonth); d <= endOfMonth; d.setDate(d.getDate() + 1)) {
       const dayOfWeek = d.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const dayOfMonth = d.getDate();
-      
-      // Simulate demand patterns
+      const isPast = d < today;
+      const isBooked = isDateBlocked(new Date(d));
+      const available = !isPast && !isBooked;
+
       let demand: TimeSlot['demand'] = 'medium';
       let discount = 0;
       let recommended = false;
       let reason: string | undefined;
-      
-      // Weekdays generally lower demand
-      if (!isWeekend) {
-        demand = 'low';
-        discount = 15;
-        if (dayOfWeek === 2 || dayOfWeek === 3) { // Tue/Wed best
-          discount = 20;
-          recommended = true;
-          reason = 'Best day of the week - 20% off';
-        }
-      } else {
-        demand = 'high';
-        discount = 0;
-      }
-      
-      // End of month often less busy
-      if (dayOfMonth >= 25) {
-        discount = Math.max(discount, 10);
+
+      if (available) {
         if (!isWeekend) {
+          demand = 'low';
+          discount = 15;
+          if (dayOfWeek === 2 || dayOfWeek === 3) {
+            discount = 20;
+            recommended = true;
+            reason = 'Mid-week — 20% off';
+          }
+        } else {
+          demand = 'high';
+        }
+        if (dayOfMonth >= 25 && !isWeekend) {
+          discount = Math.max(discount, 10);
           recommended = true;
-          reason = 'End of month special';
+          reason = reason || 'End of month deal';
         }
       }
-      
-      // Future dates only
-      const available = d >= new Date();
-      
+
       slots.push({
         date: new Date(d),
         available,
@@ -108,30 +123,29 @@ export default function SmartScheduler({
       });
     }
 
-    // Generate AI recommendations
-    const recs: AIRecommendation[] = [
-      {
-        startDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 15),
-        endDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 18),
-        totalSavings: 85,
-        reason: 'Mid-week booking with 20% discount. Lowest demand period.',
-        confidence: 95,
-      },
-      {
-        startDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 27),
-        endDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
-        totalSavings: 120,
-        reason: 'End of month pricing + weekend rates. Great value!',
-        confidence: 88,
-      },
-      {
-        startDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 8),
-        endDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 10),
-        totalSavings: 45,
-        reason: 'Popular dates but still 15% off for weekday portion.',
-        confidence: 75,
-      },
-    ];
+    // Build smart recommendations from available stretches
+    const availableSlots = slots.filter(s => s.available && s.discount > 0);
+    const recs: AIRecommendation[] = [];
+    if (availableSlots.length >= 3) {
+      const best = availableSlots.slice(0, 3);
+      recs.push({
+        startDate: best[0].date,
+        endDate: best[2].date,
+        totalSavings: Math.round(best.reduce((sum, s) => sum + (dailyRate - s.price), 0)),
+        reason: 'Best available dates with lowest demand pricing.',
+        confidence: 92,
+      });
+    }
+    if (availableSlots.length >= 6) {
+      const mid = availableSlots.slice(3, 6);
+      recs.push({
+        startDate: mid[0].date,
+        endDate: mid[2].date,
+        totalSavings: Math.round(mid.reduce((sum, s) => sum + (dailyRate - s.price), 0)),
+        reason: 'Good availability window with discount pricing.',
+        confidence: 78,
+      });
+    }
 
     setTimeSlots(slots);
     setRecommendations(recs);

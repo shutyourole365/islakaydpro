@@ -63,7 +63,6 @@ const SplitPayment = lazy(() => import('./components/payments/SplitPayment'));
 const InstantInsuranceQuote = lazy(() => import('./components/insurance/InstantInsuranceQuote'));
 const SmartPricingEngine = lazy(() => import('./components/pricing/SmartPricingEngine'));
 const Equipment3DViewer = lazy(() => import('./components/equipment/Equipment3DViewer'));
-const MaintenancePredictor = lazy(() => import('./components/predictive/MaintenancePredictor'));
 const VoiceSearch = lazy(() => import('./components/search/VoiceSearch'));
 const LiveLocationTracker = lazy(() => import('./components/booking/LiveLocationTracker'));
 const DamageReportWizard = lazy(() => import('./components/booking/DamageReportWizard'));
@@ -71,9 +70,6 @@ const EquipmentMapEnhanced = lazy(() => import('./components/map/EquipmentMapEnh
 
 // Additional Premium Features
 const FleetManager = lazy(() => import('./components/fleet/FleetManager'));
-const PriceNegotiator = lazy(() => import('./components/negotiation/PriceNegotiator'));
-const ReferralProgram = lazy(() => import('./components/referral/ReferralProgram'));
-const SmartScheduler = lazy(() => import('./components/scheduling/SmartScheduler'));
 
 // NEW Premium Features - AI Matching, Smart Contracts, AR Preview
 const SocialCommunities = lazy(() => import('./components/features/SocialCommunities'));

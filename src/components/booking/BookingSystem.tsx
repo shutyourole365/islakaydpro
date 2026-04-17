@@ -21,7 +21,7 @@ import {
 import type { Equipment, InsurancePlan, UserId } from '../../types';
 import SmartScheduler from '../scheduling/SmartScheduler';
 import { useAuth } from '../../contexts/AuthContext';
-import { createBooking, getBookingById } from '../../services/database';
+import { createBooking, getBookingById, checkAvailability } from '../../services/database';
 import type { Booking } from '../../types';
 import { createCheckoutSession } from '../../services/payments';
 import { sendBookingConfirmation } from '../../services/email';
@@ -259,6 +259,21 @@ export default function BookingSystem({
     setIsProcessing(true);
 
     try {
+      // Check real-time availability before creating booking
+      const startStr = selectedStart.toISOString().split('T')[0];
+      const endStr = selectedEnd.toISOString().split('T')[0];
+      const isAvailable = await checkAvailability(equipment.id, startStr, endStr);
+      if (!isAvailable) {
+        setIsProcessing(false);
+        addToast({
+          type: 'error',
+          title: 'Dates unavailable',
+          message: 'These dates are no longer available. Please select different dates.',
+        });
+        setCurrentStep('dates');
+        return;
+      }
+
       // Create the booking record in the database
       const newBooking = await createBooking({
         equipment_id: equipment.id,

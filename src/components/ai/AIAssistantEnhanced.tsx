@@ -681,7 +681,6 @@ export default function AIAssistantEnhanced() {
                       const newVal = !aiEnabledByUser;
                       setAiEnabledByUser(prev => !prev);
                       try {
-                        const { useAuth } = await import('../../contexts/AuthContext');
                         const auth = useAuth ? useAuth() : null;
                         if (auth?.user?.id) {
                           const db = await import('../../services/database');

@@ -169,28 +169,62 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     });
 
   // Send confirmation emails via send-email function
-  const emailPayload = {
-    template: 'booking-confirmation',
-    to: booking.renter?.email,
-    data: {
-      renterName: booking.renter?.full_name,
-      equipmentTitle: booking.equipment?.title,
-      startDate: booking.start_date,
-      endDate: booking.end_date,
-      totalAmount: session.amount_total ? session.amount_total / 100 : booking.total_amount,
-      bookingId: bookingId,
-    },
-  };
-
-  // Call send-email function
-  await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`, {
+  const emailBase = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
     },
-    body: JSON.stringify(emailPayload),
+  };
+  const emailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
+
+  // Renter confirmation email
+  await fetch(emailUrl, {
+    ...emailBase,
+    body: JSON.stringify({
+      template: 'booking-confirmation',
+      to: booking.renter?.email,
+      subject: `Booking Confirmed — ${booking.equipment?.title}`,
+      data: {
+        renterName: booking.renter?.full_name,
+        equipmentTitle: booking.equipment?.title,
+        startDate: booking.start_date,
+        endDate: booking.end_date,
+        totalAmount: session.amount_total ? session.amount_total / 100 : booking.total_amount,
+        bookingId: bookingId,
+      },
+    }),
   });
+
+  // Owner notification email
+  if (booking.equipment?.owner) {
+    const { data: ownerProfile } = await supabase
+      .from('profiles')
+      .select('email:id, full_name')
+      .eq('id', booking.owner_id)
+      .single();
+    const { data: ownerAuth } = await supabase.auth.admin.getUserById(booking.owner_id);
+    const ownerEmail = ownerAuth?.user?.email;
+    if (ownerEmail) {
+      await fetch(emailUrl, {
+        ...emailBase,
+        body: JSON.stringify({
+          template: 'booking-request',
+          to: ownerEmail,
+          subject: `New Booking — ${booking.equipment?.title}`,
+          data: {
+            ownerName: ownerProfile?.full_name || 'there',
+            renterName: booking.renter?.full_name || 'A renter',
+            equipmentTitle: booking.equipment?.title,
+            startDate: booking.start_date,
+            endDate: booking.end_date,
+            totalAmount: session.amount_total ? session.amount_total / 100 : booking.total_amount,
+            bookingId: bookingId,
+          },
+        }),
+      });
+    }
+  }
 
   console.log(`Booking ${bookingId} confirmed and paid`);
 }
