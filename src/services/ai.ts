@@ -456,7 +456,7 @@ Equipment: ${parts}`;
 
   try {
     // Strip any markdown code fences if present
-    const cleaned = response.content.replace(/^\`\`\`json?\n?/i, '').replace(/\`\`\`$/,'').trim();
+    const cleaned = response.content.replace(/^```json?\n?/i, '').replace(/```$/,'').trim();
     const parsed = JSON.parse(cleaned);
     return {
       daily: Number(parsed.daily) || 0,

@@ -71,7 +71,7 @@ export default function PaymentSettings({ onBack }: PaymentSettingsProps) {
         setBalance(bal);
         setPayouts(payoutList);
       }
-    } catch (e) {
+    } catch {
       setError('Could not load payment data. Please try again.');
     } finally {
       setLoading(false);
@@ -88,7 +88,7 @@ export default function PaymentSettings({ onBack }: PaymentSettingsProps) {
         refreshUrl: `${origin}/?tab=payments&connect=refresh`,
       });
       window.location.href = url;
-    } catch (e) {
+    } catch {
       setError('Failed to start Stripe Connect. Please try again.');
       setConnectLoading(false);
     }

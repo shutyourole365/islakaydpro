@@ -125,7 +125,7 @@ export default function ProjectPlanner({ onClose, onBrowseEquipment }: ProjectPl
       await matchListings(parsed);
       setPlan(parsed);
       setStep('results');
-    } catch (e) {
+    } catch {
       setError('Could not generate your plan. Please try again.');
       setStep('details');
     }
