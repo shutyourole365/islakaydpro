@@ -10,10 +10,13 @@ import {
   CheckCircle2,
   Camera,
   Loader2,
+  Sparkles,
+  Wand2,
 } from 'lucide-react';
 import type { Category } from '../../types';
 import { uploadMultipleFiles } from '../../services/storage';
 import { supabase } from '../../lib/supabase';
+import { generateListingDescription, suggestRentalPricing } from '../../services/ai';
 
 interface ListEquipmentFormProps {
   categories: Category[];
@@ -65,6 +68,12 @@ export default function ListEquipmentForm({
   const [newFeature, setNewFeature] = useState('');
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [generatingDesc, setGeneratingDesc] = useState(false);
+  const [genError, setGenError] = useState('');
+  const [ownerNotes, setOwnerNotes] = useState('');
+  const [suggestingPrice, setSuggestingPrice] = useState(false);
+  const [priceReasoning, setPriceReasoning] = useState('');
+  const [priceError, setPriceError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const totalSteps = 4;
@@ -98,6 +107,58 @@ export default function ListEquipmentForm({
       ...formData,
       features: formData.features.filter((_, i) => i !== index),
     });
+  };
+
+  const handleSuggestPricing = async () => {
+    if (!formData.title) return;
+    setSuggestingPrice(true);
+    setPriceError('');
+    setPriceReasoning('');
+    try {
+      const categoryName = categories.find(c => c.id === formData.category_id)?.name;
+      const suggestion = await suggestRentalPricing({
+        title: formData.title,
+        brand: formData.brand || undefined,
+        model: formData.model || undefined,
+        condition: formData.condition,
+        category: categoryName,
+      });
+      setFormData(prev => ({
+        ...prev,
+        daily_rate: suggestion.daily,
+        weekly_rate: suggestion.weekly,
+        monthly_rate: suggestion.monthly,
+        deposit_amount: suggestion.deposit,
+      }));
+      setPriceReasoning(suggestion.reasoning);
+    } catch {
+      setPriceError('Could not suggest pricing — try again or enter manually.');
+    } finally {
+      setSuggestingPrice(false);
+    }
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!formData.title) return;
+    setGeneratingDesc(true);
+    setGenError('');
+    try {
+      const categoryName = categories.find(c => c.id === formData.category_id)?.name;
+      const description = await generateListingDescription({
+        title: formData.title,
+        brand: formData.brand || undefined,
+        model: formData.model || undefined,
+        condition: formData.condition,
+        category: categoryName,
+        features: formData.features.length > 0 ? formData.features : undefined,
+        notes: ownerNotes || undefined,
+      });
+      setFormData(prev => ({ ...prev, description }));
+    } catch {
+      setGenError('Could not generate description — please check your AI is enabled.');
+    } finally {
+      setGeneratingDesc(false);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,18 +315,53 @@ export default function ListEquipmentForm({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Description *
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Description *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleGenerateDescription}
+                      disabled={!formData.title || generatingDesc}
+                      title={!formData.title ? 'Enter a title first' : 'Generate description with AI'}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm"
+                    >
+                      {generatingDesc ? (
+                        <><Loader2 className="w-3.5 h-3.5 animate-spin" />Writing…</>
+                      ) : (
+                        <><Wand2 className="w-3.5 h-3.5" /><Sparkles className="w-3 h-3" />Generate with AI</>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Quick notes for AI — only visible before generating */}
+                  {!formData.description && (
+                    <input
+                      type="text"
+                      value={ownerNotes}
+                      onChange={(e) => setOwnerNotes(e.target.value)}
+                      placeholder="Optional: any extra context for AI (e.g. 'comes with 3 drill bits, used twice')"
+                      className="w-full px-4 py-2 mb-2 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-400 text-sm text-gray-700 placeholder-gray-400"
+                    />
+                  )}
+
                   <textarea
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    rows={4}
-                    placeholder="Describe your equipment, its condition, and what's included..."
+                    rows={5}
+                    placeholder="Describe your equipment, its condition, and what's included — or use AI to write it for you ✨"
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 resize-none"
                   />
+                  {genError && (
+                    <p className="text-xs text-red-500 mt-1">{genError}</p>
+                  )}
+                  {formData.description && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      ✏️ You can edit this — the AI draft is just a starting point.
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -445,9 +541,24 @@ export default function ListEquipmentForm({
             {step === 3 && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    Set your pricing
-                  </h2>
+                  <div className="flex items-start justify-between mb-2">
+                    <h2 className="text-2xl font-bold text-gray-900">
+                      Set your pricing
+                    </h2>
+                    <button
+                      type="button"
+                      onClick={handleSuggestPricing}
+                      disabled={!formData.title || suggestingPrice}
+                      title="Let AI suggest market rates for this gear"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-sm mt-1"
+                    >
+                      {suggestingPrice ? (
+                        <><Loader2 className="w-3.5 h-3.5 animate-spin" />Researching…</>
+                      ) : (
+                        <><Sparkles className="w-3.5 h-3.5" />Suggest Prices</>
+                      )}
+                    </button>
+                  </div>
                   <p className="text-gray-600">
                     Choose competitive rates to attract more renters
                   </p>
@@ -604,6 +715,16 @@ export default function ListEquipmentForm({
                       />
                     </div>
                   </div>
+
+                  {priceReasoning && (
+                    <div className="flex items-start gap-2 px-4 py-3 bg-teal-50 rounded-xl border border-teal-100 text-sm text-teal-800 mt-2">
+                      <Sparkles className="w-4 h-4 text-teal-500 mt-0.5 flex-shrink-0" />
+                      <span><strong>AI tip:</strong> {priceReasoning}</span>
+                    </div>
+                  )}
+                  {priceError && (
+                    <p className="text-xs text-red-500 mt-1">{priceError}</p>
+                  )}
                 </div>
               </div>
             )}

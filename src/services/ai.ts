@@ -377,3 +377,95 @@ export async function getPersonalizedRecommendations(
     basedOn: `Your interest in ${recentCategories.join(', ')}`,
   };
 }
+
+export interface ListingGenerationInput {
+  title: string;
+  brand?: string;
+  model?: string;
+  condition: string;
+  category?: string;
+  features?: string[];
+  notes?: string;
+}
+
+export async function generateListingDescription(input: ListingGenerationInput): Promise<string> {
+  const parts = [
+    input.title,
+    input.brand && `Brand: ${input.brand}`,
+    input.model && `Model: ${input.model}`,
+    `Condition: ${input.condition}`,
+    input.category && `Category: ${input.category}`,
+    input.features?.length && `Key features: ${input.features.join(', ')}`,
+    input.notes && `Owner notes: ${input.notes}`,
+  ].filter(Boolean).join('\n');
+
+  // Build a single user message that includes the system instruction inline
+  // (Message type only allows 'user' | 'assistant')
+  const prompt = `You are a listing copywriter for an Australian peer-to-peer tool and equipment rental marketplace called Islakayd.
+Write a compelling, honest, and practical listing description for this equipment.
+Tone: friendly, like a mate describing their gear. Under 120 words. Cover what it is, its condition, suited jobs, and included accessories.
+Do NOT invent specs. Do NOT use hype words. Output ONLY the description — no title, no bullets, no markdown.
+
+Equipment details:
+${parts}`;
+
+  const messages: Message[] = [
+    {
+      role: 'user',
+      content: prompt,
+    },
+  ];
+
+  const response = await sendMessage(messages);
+  if (response.error || !response.content) {
+    throw new Error(response.error || 'No content returned');
+  }
+  return response.content.trim();
+}
+
+export async function suggestRentalPricing(input: {
+  title: string;
+  brand?: string;
+  model?: string;
+  condition: string;
+  category?: string;
+}): Promise<{ daily: number; weekly: number; monthly: number; deposit: number; reasoning: string }> {
+  const parts = [
+    input.title,
+    input.brand && `Brand: ${input.brand}`,
+    input.model && `Model: ${input.model}`,
+    `Condition: ${input.condition}`,
+    input.category && `Category: ${input.category}`,
+  ].filter(Boolean).join(', ');
+
+  const prompt = `You are a pricing expert for an Australian peer-to-peer tool and equipment rental marketplace.
+Suggest realistic rental prices in AUD for this equipment. Research typical market rates for this type of gear in Australia.
+Respond ONLY with valid JSON in this exact shape (no markdown, no explanation outside JSON):
+{
+  "daily": <number>,
+  "weekly": <number>,
+  "monthly": <number>,
+  "deposit": <number>,
+  "reasoning": "<one sentence why>"
+}
+
+Equipment: ${parts}`;
+
+  const messages: Message[] = [{ role: 'user', content: prompt }];
+  const response = await sendMessage(messages);
+
+  try {
+    // Strip any markdown code fences if present
+    const cleaned = response.content.replace(/^\`\`\`json?\n?/i, '').replace(/\`\`\`$/,'').trim();
+    const parsed = JSON.parse(cleaned);
+    return {
+      daily: Number(parsed.daily) || 0,
+      weekly: Number(parsed.weekly) || 0,
+      monthly: Number(parsed.monthly) || 0,
+      deposit: Number(parsed.deposit) || 0,
+      reasoning: parsed.reasoning || '',
+    };
+  } catch {
+    throw new Error('Could not parse pricing suggestion');
+  }
+}
