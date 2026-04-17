@@ -57,11 +57,13 @@ import {
   updateBookingStatus,
   logAuditEvent,
 } from '../../services/database';
+import { supabase } from '../../lib/supabase';
 import ReferralProgram from '../referral/ReferralProgram';
 
 // Lazy load components for better performance
 const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
 const NotificationSettings = lazy(() => import('../settings/NotificationSettings'));
+const RenterTrustScore = lazy(() => import('../trust/RenterTrustScore'));
 
 interface DashboardProps {
   onBack: () => void;
@@ -100,6 +102,8 @@ export default function Dashboard({
   });
   const [saving, setSaving] = useState(false);
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
+  const [renterTrustScores, setRenterTrustScores] = useState<Record<string, number>>({});
+  const [viewingTrustUserId, setViewingTrustUserId] = useState<string | null>(null);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   // Use transition for non-urgent updates
@@ -219,6 +223,46 @@ export default function Dashboard({
 
   const filteredBookings = bookings.filter(b => bookingFilter === 'all' || b.status === bookingFilter);
   const pendingOwnerBookings = ownerBookings.filter(b => b.status === 'pending');
+
+  // Fetch trust scores for all pending renters (non-blocking)
+  useEffect(() => {
+    if (pendingOwnerBookings.length === 0) return;
+    const renterIds = [...new Set(pendingOwnerBookings.map(b => b.renter_id as string).filter(Boolean))];
+    
+    Promise.all(
+      renterIds.map(async (renterId) => {
+        try {
+          const [profileRes, bookingsRes, reviewsRes] = await Promise.all([
+            supabase.from('profiles').select('is_verified, email_verified, phone_verified, identity_verified, two_factor_enabled, rating, total_reviews').eq('id', renterId).single(),
+            supabase.from('bookings').select('status').eq('renter_id', renterId),
+            supabase.from('reviews').select('rating').eq('reviewee_id', renterId),
+          ]);
+          const p = profileRes.data;
+          const bk = bookingsRes.data ?? [];
+          const rv = reviewsRes.data ?? [];
+          const completed = bk.filter(b => b.status === 'completed').length;
+          const cancelled = bk.filter(b => b.status === 'cancelled').length;
+          const avgRating = rv.length > 0 ? rv.reduce((s: number, r: { rating: number }) => s + r.rating, 0) / rv.length : 0;
+          let score = 0;
+          if (p?.email_verified) score += 5;
+          if (p?.phone_verified) score += 5;
+          if (p?.is_verified) score += 5;
+          if (p?.identity_verified) score += 5;
+          score += Math.min(25, completed * 3);
+          score += rv.length > 0 ? Math.min(25, Math.round(((avgRating - 1) / 4) * 25)) : 0;
+          score += Math.min(10, cancelled === 0 ? 10 : Math.max(0, 10 - cancelled * 3));
+          if (p?.two_factor_enabled) score += 5;
+          return { renterId, score };
+        } catch {
+          return { renterId, score: 0 };
+        }
+      })
+    ).then(results => {
+      const scores: Record<string, number> = {};
+      results.forEach(r => { scores[r.renterId] = r.score; });
+      setRenterTrustScores(scores);
+    });
+  }, [pendingOwnerBookings]);
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -634,40 +678,86 @@ export default function Dashboard({
                       <h3 className="font-semibold text-gray-900">Pending Requests ({pendingOwnerBookings.length})</h3>
                     </div>
                     <div className="divide-y divide-gray-100">
-                      {pendingOwnerBookings.map((booking) => (
-                        <div key={booking.id} className="p-4">
-                          <div className="flex items-center gap-4">
-                            <img
-                              src={booking.equipment?.images[0] || ''}
-                              alt={booking.equipment?.title || 'Equipment image'}
-                              className="w-16 h-16 rounded-lg object-cover"
-                            />
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{booking.equipment?.title}</p>
-                              <p className="text-sm text-gray-500">
-                                {formatDate(booking.start_date)} - {formatDate(booking.end_date)} ({booking.total_days} days)
-                              </p>
-                              <p className="text-sm font-medium text-gray-900">${booking.total_amount.toFixed(2)}</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handleBookingAction(booking.id, 'confirm')}
-                                className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
-                                aria-label="Approve request"
-                              >
-                                <Check className="w-5 h-5" aria-hidden="true" />
-                              </button>
-                              <button
-                                onClick={() => handleBookingAction(booking.id, 'cancel')}
-                                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                                aria-label="Reject request"
-                              >
-                                <X className="w-5 h-5" aria-hidden="true" />
-                              </button>
+                      {pendingOwnerBookings.map((booking) => {
+                        const renterId = booking.renter_id as string;
+                        const trustScore = renterTrustScores[renterId];
+                        const trustLevel = trustScore !== undefined
+                          ? trustScore >= 90 ? 'excellent' : trustScore >= 75 ? 'good' : trustScore >= 50 ? 'fair' : trustScore >= 25 ? 'building' : 'new'
+                          : null;
+                        const trustColorMap: Record<string, string> = {
+                          excellent: 'text-emerald-600 bg-emerald-50 ring-emerald-200',
+                          good:      'text-teal-600 bg-teal-50 ring-teal-200',
+                          fair:      'text-blue-600 bg-blue-50 ring-blue-200',
+                          building:  'text-amber-600 bg-amber-50 ring-amber-200',
+                          new:       'text-gray-500 bg-gray-50 ring-gray-200',
+                        };
+                        const trustLabelMap: Record<string, string> = {
+                          excellent: 'Trusted', good: 'Good', fair: 'Fair', building: 'Building', new: 'New',
+                        };
+                        return (
+                          <div key={booking.id} className="p-4 hover:bg-gray-50 transition-colors">
+                            <div className="flex items-start gap-4">
+                              <img
+                                src={booking.equipment?.images[0] || ''}
+                                alt={booking.equipment?.title || 'Equipment image'}
+                                className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-gray-900 truncate">{booking.equipment?.title}</p>
+                                <p className="text-sm text-gray-500 mb-1">
+                                  {formatDate(booking.start_date)} → {formatDate(booking.end_date)} · {booking.total_days} days
+                                </p>
+                                <p className="text-sm font-semibold text-gray-900 mb-2">${booking.total_amount.toFixed(2)}</p>
+
+                                {/* Renter trust badge */}
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  {trustScore !== undefined && trustLevel ? (
+                                    <button
+                                      onClick={() => setViewingTrustUserId(renterId)}
+                                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ring-1 transition-opacity hover:opacity-80 ${trustColorMap[trustLevel]}`}
+                                    >
+                                      <Shield className="w-3 h-3" />
+                                      {trustScore} · {trustLabelMap[trustLevel]}
+                                    </button>
+                                  ) : (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-gray-400 bg-gray-50 ring-1 ring-gray-200">
+                                      <Shield className="w-3 h-3" />Checking score…
+                                    </span>
+                                  )}
+                                  {trustScore !== undefined && trustScore < 50 && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-amber-700 bg-amber-50 ring-1 ring-amber-200">
+                                      <AlertCircle className="w-3 h-3" />Low trust
+                                    </span>
+                                  )}
+                                  {booking.renter && (
+                                    <span className="text-xs text-gray-400">
+                                      {(booking.renter as { full_name?: string }).full_name || 'Renter'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex flex-col gap-2 shrink-0">
+                                <button
+                                  onClick={() => handleBookingAction(booking.id, 'confirm')}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                                  aria-label="Approve request"
+                                >
+                                  <Check className="w-4 h-4" />Approve
+                                </button>
+                                <button
+                                  onClick={() => handleBookingAction(booking.id, 'cancel')}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
+                                  aria-label="Reject request"
+                                >
+                                  <X className="w-4 h-4" />Decline
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -1225,6 +1315,17 @@ export default function Dashboard({
           </div>
         </div>
       </div>
+
+      {/* Renter Trust Score Modal */}
+      {viewingTrustUserId && (
+        <Suspense fallback={null}>
+          <RenterTrustScore
+            userId={viewingTrustUserId}
+            viewMode="full"
+            onClose={() => setViewingTrustUserId(null)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
