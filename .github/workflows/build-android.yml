@@ -23,6 +23,7 @@ name: Build Android APK/AAB
 env:
   JAVA_VERSION: '21'
   NODE_VERSION: '22'
+  BUILD_TYPE: ${{ github.event.inputs.build_type || 'aab' }}
 
 jobs:
   build-android:
@@ -47,6 +48,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-cache-${{ runner.os }}-
+
       - name: Install dependencies
         run: npm ci
 
@@ -59,14 +69,42 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Copy web assets to Android
-        run: ./node_modules/.bin/cap copy android
+      - name: Sync web assets and Android plugins
+        run: ./node_modules/.bin/cap sync android
 
       - name: Set ANDROID_KEYSTORE_BASE64 env
         run: |
           echo "::add-mask::${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: Validate Android signing secrets
+        if: ${{ env.BUILD_TYPE == 'aab' }}
+        run: |
+          missing=0
+
+          check_secret() {
+            local name="$1"
+            local value="$2"
+            if [ -z "$value" ]; then
+              echo "::error::Missing required secret: ${name}. Configure it in Settings > Secrets and variables > Actions."
+              missing=1
+            fi
+          }
+
+          check_secret "ANDROID_KEYSTORE_BASE64" "$ANDROID_KEYSTORE_BASE64"
+          check_secret "ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEYSTORE_PASSWORD"
+          check_secret "ANDROID_KEY_ALIAS" "$ANDROID_KEY_ALIAS"
+          check_secret "ANDROID_KEY_PASSWORD" "$ANDROID_KEY_PASSWORD"
+
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Decode Keystore
         if: env.ANDROID_KEYSTORE_BASE64 != ''
@@ -77,7 +115,7 @@ jobs:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
       - name: Build Release AAB
-        if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == '' }}
+        if: ${{ env.BUILD_TYPE == 'aab' }}
         env:
           SIGN_STORE_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           SIGN_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -97,13 +135,13 @@ jobs:
             echo "$K3=$SIGN_ALIAS" >> signing.properties
             echo "$K4=$SIGN_KEY_PW" >> signing.properties
 
-            ./gradlew bundleRelease
+            ./gradlew bundleRelease --info --stacktrace
           else
-            ./gradlew bundleRelease
+            ./gradlew bundleRelease --info --stacktrace
           fi
 
       - name: Build Release APK
-        if: ${{ github.event.inputs.build_type == 'apk' }}
+        if: ${{ env.BUILD_TYPE == 'apk' }}
         env:
           SIGN_STORE_PW: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           SIGN_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -129,7 +167,7 @@ jobs:
           fi
 
       - name: Upload AAB
-        if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == '' }}
+        if: ${{ env.BUILD_TYPE == 'aab' }}
         uses: actions/upload-artifact@v4
         with:
           name: android-aab
@@ -137,7 +175,7 @@ jobs:
           retention-days: 30
 
       - name: Upload APK
-        if: ${{ github.event.inputs.build_type == 'apk' }}
+        if: ${{ env.BUILD_TYPE == 'apk' }}
         uses: actions/upload-artifact@v4
         with:
           name: android-apk
