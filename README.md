@@ -43,6 +43,15 @@ Security / notes
 - Do NOT commit API keys to Git. Use environment variables or your deployment provider secrets.
 - Edge Function requires `SUPABASE_SERVICE_ROLE_KEY` locally for some operations.
 
+## Android GitHub Actions signing secrets (required for signed AAB)
+
+- `ANDROID_KEYSTORE_BASE64`
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
+
+Set these in **GitHub → Settings → Secrets and variables → Actions** before running `.github/workflows/build-android.yml`.
+
 
 # Trigger: CodeQL rerun
 This trivial edit was committed to trigger GitHub Code Scanning re-run.
