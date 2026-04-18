@@ -12,26 +12,22 @@ jobs:
         with:
           version: latest
 
-      - name: Link project
+      - name: Test supabase db query --linked
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASS }}
         run: |
+          # First link the project
           supabase link --project-ref purmabjcvznntttvtseb
 
-      - name: Push migrations via Supabase CLI
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASS }}
-        run: |
-          echo "Pushing migrations..."
-          supabase db push --project-ref purmabjcvznntttvtseb || true
-          echo "Migration push done"
-
-      - name: Verify tables exist
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: |
-          supabase db query \
-            --project-ref purmabjcvznntttvtseb \
-            "SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename IN ('equipment','categories','payouts','equipment_availability') ORDER BY tablename;" || true
+          # Try db query with --linked flag (uses Management API, no direct DB)
+          echo "Testing with --linked..."
+          supabase db query --linked "SELECT 1 as test" 2>&1 || true
+          
+          echo "---"
+          # Try with --project-ref instead
+          echo "Testing with --project-ref..."
+          supabase db query --project-ref purmabjcvznntttvtseb "SELECT 1 as test" 2>&1 || true
+          
+          echo "---"
+          # Check available db subcommands
+          supabase db --help 2>&1 | head -20
