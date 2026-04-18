@@ -4,22 +4,24 @@ on:
 jobs:
   migrate:
     runs-on: ubuntu-latest
-    env:
-      DB_PASS: ${{ secrets.SUPABASE_DB_PASS }}
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client dnsutils
 
-      - name: Test connection methods
+      - name: DNS lookup for DB host
         run: |
-          echo "--- Method 1: Direct host ---"
-          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres@db.purmabjcvznntttvtseb.supabase.co:5432/postgres?sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 1 failed"
-          
-          echo "--- Method 2: Pooler US-east-2 port 5432 ---"
-          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres.purmabjcvznntttvtseb@aws-0-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 2 failed"
-          
-          echo "--- Method 3: Pooler US-east-2 port 6543 ---"
-          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres.purmabjcvznntttvtseb@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 3 failed"
+          echo "=== DNS for direct DB ==="
+          host db.purmabjcvznntttvtseb.supabase.co || true
+          echo "=== DNS for pooler ==="
+          host aws-0-us-east-2.pooler.supabase.com || true
 
-          echo "--- Method 4: Pooler with just postgres user ---"
-          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres@aws-0-us-east-2.pooler.supabase.com:5432/postgres?options=project%3Dpurmabjcvznntttvtseb&sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 4 failed"
+      - name: Test connection with URL-encoded password
+        run: |
+          echo "--- URL-encoded pass, pooler port 5432 ---"
+          psql "postgresql://postgres.purmabjcvznntttvtseb:Kaydeni%24la21123@aws-0-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require" -c "SELECT 1" 2>&1 || true
+
+          echo "--- URL-encoded pass, pooler port 6543 ---"
+          psql "postgresql://postgres.purmabjcvznntttvtseb:Kaydeni%24la21123@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require" -c "SELECT 1" 2>&1 || true
+
+          echo "--- Using PGPASSWORD env var, pooler port 5432 ---"
+          PGPASSWORD=${{ secrets.SUPABASE_DB_PASS }} psql "host=aws-0-us-east-2.pooler.supabase.com port=5432 dbname=postgres user=postgres.purmabjcvznntttvtseb sslmode=require" -c "SELECT 1" 2>&1 || true
