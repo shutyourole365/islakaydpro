@@ -6,22 +6,55 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y postgresql-client dnsutils
 
-      - name: DNS lookup for DB host
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Deploy migration edge function
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          echo "=== DNS for direct DB ==="
-          host db.purmabjcvznntttvtseb.supabase.co || true
-          echo "=== DNS for pooler ==="
-          host aws-0-us-east-2.pooler.supabase.com || true
+          supabase functions deploy run-migration \
+            --project-ref purmabjcvznntttvtseb \
+            --no-verify-jwt
+          echo "Function deployed!"
 
-      - name: Test connection with URL-encoded password
+      - name: Run migration via edge function
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
         run: |
-          echo "--- URL-encoded pass, pooler port 5432 ---"
-          psql "postgresql://postgres.purmabjcvznntttvtseb:Kaydeni%24la21123@aws-0-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require" -c "SELECT 1" 2>&1 || true
+          echo "Calling migration function..."
+          RESULT=$(curl -s -X POST \
+            "https://purmabjcvznntttvtseb.supabase.co/functions/v1/run-migration" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_KEY}" \
+            -H "Content-Type: application/json" \
+            --max-time 60)
+          echo "Result: $RESULT"
+          
+          # Check if it succeeded
+          echo "$RESULT" | python3 -c "
+import json,sys
+try:
+    d=json.load(sys.stdin)
+    if d.get('success'):
+        print('✅ Migration succeeded!')
+        for step in d.get('steps',[]):
+            print(f'  {step}')
+    else:
+        print('❌ Migration failed:', d.get('error'))
+        sys.exit(1)
+except:
+    print('Raw response:', sys.stdin.read())
+    sys.exit(1)
+" 2>/dev/null || python3 -c "print('$RESULT'[:500])"
 
-          echo "--- URL-encoded pass, pooler port 6543 ---"
-          psql "postgresql://postgres.purmabjcvznntttvtseb:Kaydeni%24la21123@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require" -c "SELECT 1" 2>&1 || true
-
-          echo "--- Using PGPASSWORD env var, pooler port 5432 ---"
-          PGPASSWORD=${{ secrets.SUPABASE_DB_PASS }} psql "host=aws-0-us-east-2.pooler.supabase.com port=5432 dbname=postgres user=postgres.purmabjcvznntttvtseb sslmode=require" -c "SELECT 1" 2>&1 || true
+      - name: Cleanup - delete edge function
+        if: always()
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          supabase functions delete run-migration \
+            --project-ref purmabjcvznntttvtseb || true
+          echo "Function cleaned up"
