@@ -4,29 +4,22 @@ on:
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    env:
+      DB_PASS: ${{ secrets.SUPABASE_DB_PASS }}
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get install -y postgresql-client
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-      - name: Run Migration via Pooler (Transaction mode port 6543)
+      - name: Test connection methods
         run: |
-          echo "Trying pooler us-east-2 port 6543..."
-          PGPASSWORD='Kaydeni$la21123' psql \
-            "postgresql://postgres.purmabjcvznntttvtseb@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require" \
-            -f supabase/migrations/20260418102009_align_schema_with_codebase.sql \
-            2>&1 && echo "SUCCESS" || echo "FAILED - trying direct..."
+          echo "--- Method 1: Direct host ---"
+          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres@db.purmabjcvznntttvtseb.supabase.co:5432/postgres?sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 1 failed"
+          
+          echo "--- Method 2: Pooler US-east-2 port 5432 ---"
+          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres.purmabjcvznntttvtseb@aws-0-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 2 failed"
+          
+          echo "--- Method 3: Pooler US-east-2 port 6543 ---"
+          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres.purmabjcvznntttvtseb@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 3 failed"
 
-      - name: Try direct connection if pooler failed
-        run: |
-          echo "Trying direct DB connection..."
-          PGPASSWORD='Kaydeni$la21123' psql \
-            "postgresql://postgres@db.purmabjcvznntttvtseb.supabase.co:5432/postgres?sslmode=require" \
-            -f supabase/migrations/20260418102009_align_schema_with_codebase.sql \
-            2>&1 || echo "Direct also failed"
-
-      - name: Verify tables created
-        run: |
-          PGPASSWORD='Kaydeni$la21123' psql \
-            "postgresql://postgres.purmabjcvznntttvtseb@aws-0-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require" \
-            -c "SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename IN ('equipment','categories','payouts','equipment_availability') ORDER BY tablename;" \
-            2>&1 || true
+          echo "--- Method 4: Pooler with just postgres user ---"
+          PGPASSWORD="${DB_PASS}" psql "postgresql://postgres@aws-0-us-east-2.pooler.supabase.com:5432/postgres?options=project%3Dpurmabjcvznntttvtseb&sslmode=require" -c "SELECT 1" 2>&1 || echo "Method 4 failed"
