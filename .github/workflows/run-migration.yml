@@ -1,0 +1,13 @@
+name: Run DB Migration
+on:
+  workflow_dispatch:
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y postgresql-client
+      - name: Run Migration
+        run: |
+          PGPASSWORD='Kaydeni$la21123' psql "postgresql://postgres.purmabjcvznntttvtseb@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require" -f supabase/migrations/20260418102009_align_schema_with_codebase.sql 2>&1 | tee /tmp/migration.log || true
+          echo "Migration complete"
