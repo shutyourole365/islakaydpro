@@ -875,13 +875,13 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
     }
   };
 
-  const handleBook = (equipment: Equipment) => {
+  const handleBook = (equipment: Equipment, _dates?: { start: string; end: string }) => {
     if (!isAuthenticated) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);
       return;
     }
-    // Open the booking system modal
+    // Open the booking system modal (dates are handled inside BookingSystem)
     setBookingEquipment(equipment);
     setIsBookingOpen(true);
     setSelectedEquipment(null);
