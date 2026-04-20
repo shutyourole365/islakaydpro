@@ -896,7 +896,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
     if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
       import('./services/analytics').then(({ analytics }) => {
         const booking = bookingData as { id: string; total_amount: number };
-        analytics.trackBooking(booking.id, booking.total_amount, 'USD');
+        analytics.trackBooking(booking.id, booking.total_amount, 'AUD');
       });
     }
     
