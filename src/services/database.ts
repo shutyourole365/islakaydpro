@@ -231,7 +231,7 @@ export async function getBookingById(id: string): Promise<Booking | null> {
   return data;
 }
 
-export async function createBooking(booking: Omit<Booking, 'id' | 'created_at' | 'updated_at'>): Promise<Booking> {
+export async function createBooking(booking: Omit<Booking, 'id' | 'created_at' | 'updated_at'> & { listing_id?: string | null }): Promise<Booking> {
   const { data, error } = await supabase
     .from('bookings')
     .insert(booking)
@@ -276,7 +276,8 @@ export async function getEquipmentAvailability(equipmentId: string, startDate?: 
 }
 
 export async function checkAvailability(equipmentId: string, startDate: string, endDate: string): Promise<boolean> {
-  const { data, error } = await supabase
+  // Check equipment_availability (blocked dates)
+  const { data: blocked, error: blockedError } = await supabase
     .from('equipment_availability')
     .select('id')
     .eq('equipment_id', equipmentId)
@@ -284,8 +285,25 @@ export async function checkAvailability(equipmentId: string, startDate: string, 
     .gte('end_date', startDate)
     .limit(1);
 
-  if (error) throw error;
-  return !data || data.length === 0;
+  if (blockedError) {
+    // If table doesn't exist yet, fall back to checking bookings
+    console.warn('equipment_availability check failed, falling back to bookings check');
+  } else if (blocked && blocked.length > 0) {
+    return false;
+  }
+
+  // Also check active bookings directly
+  const { data: bookings, error: bookingsError } = await supabase
+    .from('bookings')
+    .select('id')
+    .eq('equipment_id', equipmentId)
+    .in('status', ['pending', 'confirmed', 'active'])
+    .lte('start_date', endDate)
+    .gte('end_date', startDate)
+    .limit(1);
+
+  if (bookingsError) throw bookingsError;
+  return !bookings || bookings.length === 0;
 }
 
 export async function blockDates(equipmentId: string, startDate: string, endDate: string, reason: EquipmentAvailability['reason']): Promise<EquipmentAvailability> {
