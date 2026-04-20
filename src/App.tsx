@@ -1159,7 +1159,8 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
         is_featured: false,
         is_active: true,
       });
-      addToast({ type: 'success', title: 'Equipment listed!', message: 'Your listing is now visible to renters.' });
+      addToast({ type: 'success', title: 'Equipment listed!', message: 'Your listing is now live and visible to renters.' });
+      await fetchEquipment(); // refresh listings so new item appears immediately
       setCurrentPage('dashboard');
     } catch (err) {
       addToast({ type: 'error', title: 'Listing failed', message: err instanceof Error ? err.message : 'Could not save listing.' });
