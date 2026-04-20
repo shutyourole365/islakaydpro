@@ -86,6 +86,7 @@ export interface Equipment {
 export interface Booking {
   id: BookingId;
   equipment_id: EquipmentId;
+  listing_id?: string | null; // legacy field, optional
   renter_id: UserId;
   owner_id: UserId;
   start_date: string;
