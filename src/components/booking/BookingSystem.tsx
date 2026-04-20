@@ -277,6 +277,7 @@ export default function BookingSystem({
       // Create the booking record in the database
       const newBooking = await createBooking({
         equipment_id: equipment.id,
+        listing_id: null, // equipment-based bookings don't use the legacy listings table
         renter_id: user.id as UserId,
         owner_id: equipment.owner_id,
         start_date: selectedStart.toISOString().split('T')[0],
