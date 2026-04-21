@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Star, ThumbsUp, User, CheckCircle2, MessageSquare, ChevronDown } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, ChevronDown } from 'lucide-react';
 import { getReviews, createReview } from '../../services/database';
 import type { Review } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
@@ -57,7 +57,7 @@ function RatingBar({ label, count, total }: { label: string; count: number; tota
 export default function ReviewsSection({
   equipmentId,
   bookingId,
-  reviewerId,
+  reviewerId: _reviewerId,
   revieweeId,
   canReview = false,
   className = '',
@@ -112,7 +112,6 @@ export default function ReviewsSection({
         rating: formRating,
         title: formTitle || null,
         comment: formComment,
-        response: null,
         is_equipment_review: true,
         equipment_condition: formCondition || undefined,
         communication: formComm || undefined,
@@ -121,8 +120,8 @@ export default function ReviewsSection({
       setSuccess(true);
       setShowForm(false);
       await loadReviews();
-    } catch (e: any) {
-      if (e?.code === '23505') {
+    } catch (e: unknown) {
+      if ((e as {code?: string})?.code === '23505') {
         setError('You have already reviewed this booking.');
       } else {
         setError('Failed to submit review. Please try again.');
@@ -310,8 +309,8 @@ export default function ReviewsSection({
 
 function ReviewCard({ review }: { review: Review }) {
   const [showResponse, setShowResponse] = useState(false);
-  const reviewerName = (review.reviewer as any)?.full_name || 'Anonymous';
-  const isVerified = (review.reviewer as any)?.is_verified || false;
+  const reviewerName = (review.reviewer as {full_name?: string})?.full_name || 'Anonymous';
+  const isVerified = (review.reviewer as {is_verified?: boolean})?.is_verified || false;
   const date = new Date(review.created_at).toLocaleDateString('en-AU', {
     day: 'numeric',
     month: 'short',
@@ -395,3 +394,4 @@ function AspectBadge({ label, rating }: { label: string; rating: number }) {
     </div>
   );
 }
+
