@@ -45,11 +45,11 @@ export default function BrowsePage({
     loading: searchLoading,
     loadingMore,
     hasMore,
-    filters: searchFilters,
-    setFilters: setSearchFilters,
-    resetFilters: resetSearchFilters,
+    filters: _searchFilters,
+    setFilters: _setSearchFilters,
+    resetFilters: _resetSearchFilters,
     loadMore,
-    activeFilterCount: searchActiveFilterCount,
+    activeFilterCount: _searchActiveFilterCount,
   } = useEquipmentSearch(categories, {
     query: initialQuery,
     category: initialCategory,
@@ -716,4 +716,5 @@ export default function BrowsePage({
     </div>
   );
 }
+
 
