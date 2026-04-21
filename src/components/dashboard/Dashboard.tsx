@@ -1380,6 +1380,34 @@ export default function Dashboard({
           />
         </Suspense>
       )}
+      {/* Review Modal */}
+      {activeReviewBooking && (
+        <Suspense fallback={null}>
+          <EnhancedReviewSystem
+            equipmentId={activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || ''}
+            equipmentTitle={activeReviewBooking.equipment?.title || 'Equipment'}
+            bookingId={activeReviewBooking.id}
+            onSubmit={async (reviewData) => {
+              if (!user) return;
+              await submitReview({
+                bookingId: activeReviewBooking.id,
+                equipmentId: activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || '',
+                reviewerId: user.id,
+                revieweeId: activeReviewBooking.owner_id || '',
+                rating: reviewData.rating,
+                title: reviewData.title,
+                comment: reviewData.comment,
+                aspectRatings: reviewData.aspectRatings,
+                photos: reviewData.photos,
+                wouldRecommend: reviewData.wouldRecommend,
+              });
+              setReviewedBookingIds(prev => new Set([...prev, activeReviewBooking.id]));
+              setActiveReviewBooking(null);
+            }}
+            onClose={() => setActiveReviewBooking(null)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }
@@ -1442,36 +1470,6 @@ function VerificationItem({ icon: Icon, title, description, verified }: {
         <button className="px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-lg transition-colors">
           Verify
         </button>
-      )}
-    </div>
-      {/* Review Modal */}
-      {activeReviewBooking && (
-        <Suspense fallback={null}>
-          <EnhancedReviewSystem
-            equipmentId={activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || ''}
-            equipmentTitle={activeReviewBooking.equipment?.title || 'Equipment'}
-            bookingId={activeReviewBooking.id}
-            onSubmit={async (reviewData) => {
-              if (!user) return;
-              await submitReview({
-                bookingId: activeReviewBooking.id,
-                equipmentId: activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || '',
-                reviewerId: user.id,
-                revieweeId: activeReviewBooking.owner_id || '',
-                rating: reviewData.rating,
-                title: reviewData.title,
-                comment: reviewData.comment,
-                aspectRatings: reviewData.aspectRatings,
-                photos: reviewData.photos,
-                wouldRecommend: reviewData.wouldRecommend,
-              });
-              // Mark as reviewed locally immediately
-              setReviewedBookingIds(prev => new Set([...prev, activeReviewBooking.id]));
-              setActiveReviewBooking(null);
-            }}
-            onClose={() => setActiveReviewBooking(null)}
-          />
-        </Suspense>
       )}
     </div>
   );
