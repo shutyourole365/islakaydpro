@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const VAPID_PUBLIC_KEY = 'BBjkO4vNGNtrQk0vucOPsrYVNGR9-lf1EY4NoYQDjwKooETldDqoeUEPFRLLm9sunv_Nm7G5f2xQ4b95TaMyCkA';
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const rawData = window.atob(base64);
@@ -13,7 +13,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i);
   }
-  return outputArray;
+  return outputArray.buffer;
 }
 
 interface PushNotificationManagerProps {
@@ -221,3 +221,4 @@ export default function PushNotificationManager({ className = '', compact = fals
     </div>
   );
 }
+
