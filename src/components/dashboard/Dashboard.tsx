@@ -130,15 +130,16 @@ export default function Dashboard({
         getConversations(user.id),
       ]);
 
+      // Load reviewed booking IDs (async, must be outside startTransition)
+      if (user?.id) {
+        const reviewed = await getReviewedBookingIds(user.id);
+        setReviewedBookingIds(reviewed);
+      }
+
       // Use startTransition for non-urgent state updates
       startTransition(() => {
         setAnalytics(analyticsData);
         setBookings(bookingsData);
-        // Load which bookings the user has already reviewed
-        if (user?.id) {
-          const reviewed = await getReviewedBookingIds(user.id);
-          setReviewedBookingIds(reviewed);
-        }
         setOwnerBookings(ownerBookingsData);
         setMyListings(listingsData.data);
         setFavorites(favoritesData.map(f => f.equipment!).filter(Boolean));
@@ -1474,3 +1475,4 @@ function VerificationItem({ icon: Icon, title, description, verified }: {
     </div>
   );
 }
+
