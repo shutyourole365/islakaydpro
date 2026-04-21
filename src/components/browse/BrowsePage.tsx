@@ -14,10 +14,11 @@ import {
   Map,
 } from 'lucide-react';
 import type { Equipment, Category } from '../../types';
+import { useEquipmentSearch } from '../../hooks/useEquipmentSearch';
 import EquipmentMap from '../map/EquipmentMap';
 
 interface BrowsePageProps {
-  equipment: Equipment[];
+  equipment?: Equipment[]; // kept for backward compat, ignored if hook loads data
   categories: Category[];
   initialQuery?: string;
   initialCategory?: string;
@@ -28,7 +29,7 @@ interface BrowsePageProps {
 }
 
 export default function BrowsePage({
-  equipment,
+  equipment: equipmentProp = [],
   categories,
   initialQuery = '',
   initialCategory = '',
@@ -37,6 +38,25 @@ export default function BrowsePage({
   favorites,
   onBack,
 }: BrowsePageProps) {
+  // Server-side search with pagination
+  const {
+    results: searchResults,
+    totalCount,
+    loading: searchLoading,
+    loadingMore,
+    hasMore,
+    filters: searchFilters,
+    setFilters: setSearchFilters,
+    resetFilters: resetSearchFilters,
+    loadMore,
+    activeFilterCount: searchActiveFilterCount,
+  } = useEquipmentSearch(categories, {
+    query: initialQuery,
+    category: initialCategory,
+  });
+
+  // Use server results if available, fall back to prop
+  const equipment = searchResults.length > 0 || searchLoading ? searchResults : equipmentProp;
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [location, setLocation] = useState('');
@@ -670,7 +690,30 @@ export default function BrowsePage({
             ))}
           </div>
         )}
+      {/* Load More */}
+      {hasMore && (
+        <div className="flex justify-center py-8">
+          <button
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="flex items-center gap-2 px-8 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 disabled:opacity-50 transition-colors"
+          >
+            {loadingMore ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                Loading...
+              </>
+            ) : (
+              `Load More (${totalCount - equipment.length} remaining)`
+            )}
+          </button>
+        </div>
+      )}
       </div>
     </div>
   );
 }
+
