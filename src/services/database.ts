@@ -1069,3 +1069,87 @@ export async function trackPriceChange(equipmentId: string, oldPrice: number, ne
     }
   }
 }
+
+
+// ============================================
+// Review Functions
+// ============================================
+
+export interface ReviewSubmission {
+  bookingId: string;
+  equipmentId: string;
+  reviewerId: string;
+  revieweeId: string;
+  rating: number;
+  title: string;
+  comment: string;
+  aspectRatings?: {
+    condition: number;
+    cleanliness: number;
+    accuracy: number;
+    communication: number;
+    value: number;
+  };
+  photos?: string[];
+  wouldRecommend?: boolean;
+}
+
+export async function submitReview(data: ReviewSubmission): Promise<void> {
+  const { error } = await supabase.from('reviews').insert({
+    booking_id: data.bookingId,
+    listing_id: data.equipmentId, // reviews table uses listing_id
+    equipment_id: data.equipmentId,
+    reviewer_id: data.reviewerId,
+    reviewee_id: data.revieweeId,
+    rating: data.rating,
+    title: data.title,
+    comment: data.comment,
+    review_type: 'renter_to_owner',
+    is_equipment_review: true,
+    aspect_condition: data.aspectRatings?.condition,
+    aspect_cleanliness: data.aspectRatings?.cleanliness,
+    aspect_accuracy: data.aspectRatings?.accuracy,
+    aspect_communication: data.aspectRatings?.communication,
+    aspect_value: data.aspectRatings?.value,
+    photos: data.photos ?? [],
+    would_recommend: data.wouldRecommend ?? true,
+  });
+
+  if (error) throw error;
+}
+
+// Check if the current user can review a booking
+// Rules: booking must be 'completed', user must be the renter, no existing review
+export async function canReviewBooking(bookingId: string, userId: string): Promise<boolean> {
+  const [bookingRes, existingRes] = await Promise.all([
+    supabase
+      .from('bookings')
+      .select('id, status, renter_id')
+      .eq('id', bookingId)
+      .single(),
+    supabase
+      .from('reviews')
+      .select('id')
+      .eq('booking_id', bookingId)
+      .eq('reviewer_id', userId)
+      .maybeSingle(),
+  ]);
+
+  const booking = bookingRes.data;
+  if (!booking) return false;
+  if (booking.renter_id !== userId) return false;
+  if (booking.status !== 'completed') return false;
+  if (existingRes.data) return false; // already reviewed
+
+  return true;
+}
+
+// Fetch all reviews for a booking/reviewer (to show "already reviewed" state in UI)
+export async function getReviewedBookingIds(userId: string): Promise<Set<string>> {
+  const { data } = await supabase
+    .from('reviews')
+    .select('booking_id')
+    .eq('reviewer_id', userId);
+
+  return new Set((data ?? []).map(r => r.booking_id));
+}
