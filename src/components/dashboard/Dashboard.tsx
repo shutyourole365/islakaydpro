@@ -56,6 +56,8 @@ import {
   updateProfile,
   updateBookingStatus,
   logAuditEvent,
+  submitReview,
+  getReviewedBookingIds,
 } from '../../services/database';
 import { sendBookingApproved, sendBookingDeclined } from '../../services/email';
 import { supabase } from '../../lib/supabase';
@@ -65,6 +67,7 @@ import ReferralProgram from '../referral/ReferralProgram';
 const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
 const NotificationSettings = lazy(() => import('../settings/NotificationSettings'));
 const RenterTrustScore = lazy(() => import('../trust/RenterTrustScore'));
+const EnhancedReviewSystem = lazy(() => import('../reviews/EnhancedReviewSystem'));
 
 interface DashboardProps {
   onBack: () => void;
@@ -87,6 +90,8 @@ export default function Dashboard({
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [reviewedBookingIds, setReviewedBookingIds] = useState<Set<string>>(new Set());
+  const [activeReviewBooking, setActiveReviewBooking] = useState<Booking | null>(null);
   const [myListings, setMyListings] = useState<Equipment[]>([]);
   const [favorites, setFavorites] = useState<Equipment[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -129,6 +134,11 @@ export default function Dashboard({
       startTransition(() => {
         setAnalytics(analyticsData);
         setBookings(bookingsData);
+        // Load which bookings the user has already reviewed
+        if (user?.id) {
+          const reviewed = await getReviewedBookingIds(user.id);
+          setReviewedBookingIds(reviewed);
+        }
         setOwnerBookings(ownerBookingsData);
         setMyListings(listingsData.data);
         setFavorites(favoritesData.map(f => f.equipment!).filter(Boolean));
@@ -668,14 +678,31 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center justify-between">
                               <p className="text-lg font-semibold text-gray-900">${booking.total_amount.toFixed(2)}</p>
-                              <button
-                               
-                                onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
-                                className="flex items-center gap-2 px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-xl transition-colors"
-                              >
-                                View Details
-                                <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                              </button>
+                              <div className="flex items-center gap-2">
+                                {booking.status === 'completed' && !reviewedBookingIds.has(booking.id) && (
+                                  <button
+                                    onClick={() => setActiveReviewBooking(booking)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 rounded-xl transition-colors border border-amber-200"
+                                  >
+                                    <Star className="w-4 h-4" />
+                                    Leave a Review
+                                  </button>
+                                )}
+                                {booking.status === 'completed' && reviewedBookingIds.has(booking.id) && (
+                                  <span className="flex items-center gap-1.5 px-3 py-2 text-sm text-green-700 bg-green-50 rounded-xl border border-green-200">
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Reviewed
+                                  </span>
+                                )}
+                                <button
+                                 
+                                  onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
+                                  className="flex items-center gap-2 px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-xl transition-colors"
+                                >
+                                  View Details
+                                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1415,6 +1442,36 @@ function VerificationItem({ icon: Icon, title, description, verified }: {
         <button className="px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-lg transition-colors">
           Verify
         </button>
+      )}
+    </div>
+      {/* Review Modal */}
+      {activeReviewBooking && (
+        <Suspense fallback={null}>
+          <EnhancedReviewSystem
+            equipmentId={activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || ''}
+            equipmentTitle={activeReviewBooking.equipment?.title || 'Equipment'}
+            bookingId={activeReviewBooking.id}
+            onSubmit={async (reviewData) => {
+              if (!user) return;
+              await submitReview({
+                bookingId: activeReviewBooking.id,
+                equipmentId: activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || '',
+                reviewerId: user.id,
+                revieweeId: activeReviewBooking.owner_id || '',
+                rating: reviewData.rating,
+                title: reviewData.title,
+                comment: reviewData.comment,
+                aspectRatings: reviewData.aspectRatings,
+                photos: reviewData.photos,
+                wouldRecommend: reviewData.wouldRecommend,
+              });
+              // Mark as reviewed locally immediately
+              setReviewedBookingIds(prev => new Set([...prev, activeReviewBooking.id]));
+              setActiveReviewBooking(null);
+            }}
+            onClose={() => setActiveReviewBooking(null)}
+          />
+        </Suspense>
       )}
     </div>
   );
