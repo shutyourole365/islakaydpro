@@ -86,7 +86,7 @@ export function useEquipmentSearch(
       });
 
       // Client-side sort (API returns newest-first by default)
-      let sorted = [...data];
+      const sorted = [...data];
       switch (filters.sortBy) {
         case 'price-low':
           sorted.sort((a, b) => a.daily_rate - b.daily_rate);
@@ -167,3 +167,4 @@ export function useEquipmentSearch(
     refresh,
   };
 }
+
