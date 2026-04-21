@@ -369,6 +369,19 @@ export async function createReview(review: Omit<Review, 'id' | 'created_at' | 'r
   return data;
 }
 
+
+export async function addReviewResponse(reviewId: string, response: string): Promise<Review> {
+  const { data, error } = await supabase
+    .from("reviews")
+    .update({ response })
+    .eq("id", reviewId)
+    .select("*, reviewer:profiles!reviews_reviewer_id_fkey(*)")
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function getFavorites(userId: string): Promise<Favorite[]> {
   const { data, error } = await supabase
     .from('favorites')
@@ -1056,4 +1069,3 @@ export async function trackPriceChange(equipmentId: string, oldPrice: number, ne
     }
   }
 }
-
