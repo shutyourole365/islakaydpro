@@ -317,7 +317,7 @@ export default function Header({
                   >
                     <Heart className="w-5 h-5" />
                   </button>
-                  <button                    aria-label="Messages"                    onClick={() => onNavigate('dashboard')}
+                  <button                    aria-label="Messages"                    onClick={() => onNavigate('messaging')}
                     className={`p-2.5 rounded-full transition-colors relative ${
                       showTransparent
                         ? 'text-white hover:bg-white/10'
@@ -626,3 +626,4 @@ export default function Header({
     </header>
   );
 }
+
