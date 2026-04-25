@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Send, ChevronLeft, User, Clock, CheckCheck } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { MessageSquare, Send, ChevronLeft, User, Clock, CheckCheck, Bell } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -18,6 +18,7 @@ interface Conversation {
   last_message: string | null;
   last_message_at: string | null;
   created_at: string;
+  unread_count?: number;
   otherUser?: {
     id: string;
     full_name: string;
@@ -44,20 +45,10 @@ export default function MessagingPage({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const convChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
-  useEffect(() => {
-    if (user) loadConversations();
-  }, [user]);
-
-  useEffect(() => {
-    if (selectedConv) loadMessages(selectedConv.id);
-  }, [selectedConv]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  async function loadConversations() {
+  const loadConversations = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     try {
@@ -65,29 +56,37 @@ export default function MessagingPage({
         .from('conversations')
         .select('*')
         .contains('participants', [user.id])
-        .order('last_message_at', { ascending: false });
+        .order('last_message_at', { ascending: false, nullsFirst: false });
 
       if (error) throw error;
 
-      // Fetch other user profiles
       const convs: Conversation[] = await Promise.all(
         (data || []).map(async (conv) => {
-          const otherId = conv.participants.find((p: string) => p !== user.id);
+          const otherId = conv.participants?.find((p: string) => p !== user.id);
+          let otherUser = undefined;
           if (otherId) {
             const { data: profile } = await supabase
               .from('profiles')
               .select('id, full_name, avatar_url')
               .eq('id', otherId)
               .single();
-            return { ...conv, otherUser: profile };
+            otherUser = profile ?? undefined;
           }
-          return conv;
+
+          // Count unread messages
+          const { count } = await supabase
+            .from('messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('conversation_id', conv.id)
+            .neq('sender_id', user.id)
+            .eq('read', false);
+
+          return { ...conv, otherUser, unread_count: count ?? 0 };
         })
       );
 
       setConversations(convs);
 
-      // Auto-select if initialConversationId provided
       if (initialConversationId) {
         const found = convs.find((c) => c.id === initialConversationId);
         if (found) setSelectedConv(found);
@@ -97,9 +96,9 @@ export default function MessagingPage({
     } finally {
       setLoading(false);
     }
-  }
+  }, [user, initialConversationId]);
 
-  async function loadMessages(conversationId: string) {
+  const loadMessages = useCallback(async (conversationId: string) => {
     const { data, error } = await supabase
       .from('messages')
       .select('*')
@@ -112,7 +111,7 @@ export default function MessagingPage({
     }
     setMessages(data || []);
 
-    // Mark messages as read
+    // Mark as read
     if (user) {
       await supabase
         .from('messages')
@@ -120,8 +119,117 @@ export default function MessagingPage({
         .eq('conversation_id', conversationId)
         .neq('sender_id', user.id)
         .eq('read', false);
+
+      // Update local unread count
+      setConversations((prev) =>
+        prev.map((c) => (c.id === conversationId ? { ...c, unread_count: 0 } : c))
+      );
     }
-  }
+  }, [user]);
+
+  // Subscribe to new messages in selected conversation
+  useEffect(() => {
+    if (!selectedConv) return;
+
+    loadMessages(selectedConv.id);
+
+    // Unsubscribe from previous channel
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+    }
+
+    const channel = supabase
+      .channel(`messages:${selectedConv.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${selectedConv.id}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as Message;
+          setMessages((prev) => {
+            if (prev.find((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
+          // Auto-mark as read if it's not from me
+          if (user && newMsg.sender_id !== user.id) {
+            supabase
+              .from('messages')
+              .update({ read: true })
+              .eq('id', newMsg.id)
+              .then(() => {});
+          }
+        }
+      )
+      .subscribe();
+
+    channelRef.current = channel;
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [selectedConv, loadMessages, user]);
+
+  // Subscribe to conversation list changes (new convs, last_message updates)
+  useEffect(() => {
+    if (!user) return;
+
+    if (convChannelRef.current) {
+      supabase.removeChannel(convChannelRef.current);
+    }
+
+    const channel = supabase
+      .channel(`conversations:${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+        },
+        () => {
+          loadConversations();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          const msg = payload.new as Message;
+          // If message is not in current conv, increment unread
+          if (user && msg.sender_id !== user.id && msg.conversation_id !== selectedConv?.id) {
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.id === msg.conversation_id
+                  ? { ...c, unread_count: (c.unread_count ?? 0) + 1, last_message: msg.content, last_message_at: msg.created_at }
+                  : c
+              )
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    convChannelRef.current = channel;
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, loadConversations, selectedConv]);
+
+  useEffect(() => {
+    if (user) loadConversations();
+  }, [user, loadConversations]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   async function sendMessage() {
     if (!newMessage.trim() || !selectedConv || !user || sending) return;
@@ -139,14 +247,10 @@ export default function MessagingPage({
 
       if (error) throw error;
 
-      // Update conversation last message
       await supabase
         .from('conversations')
         .update({ last_message: content, last_message_at: new Date().toISOString() })
         .eq('id', selectedConv.id);
-
-      loadMessages(selectedConv.id);
-      loadConversations();
     } catch (e) {
       console.error('Failed to send message:', e);
       setNewMessage(content);
@@ -165,6 +269,8 @@ export default function MessagingPage({
     return d.toLocaleDateString([], { day: 'numeric', month: 'short' });
   }
 
+  const totalUnread = conversations.reduce((sum, c) => sum + (c.unread_count ?? 0), 0);
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -182,6 +288,11 @@ export default function MessagingPage({
         <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
           <MessageSquare className="w-6 h-6 text-teal-500" />
           Messages
+          {totalUnread > 0 && (
+            <span className="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-teal-500 text-white text-xs font-bold">
+              {totalUnread > 99 ? '99+' : totalUnread}
+            </span>
+          )}
         </h1>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex h-[calc(100vh-180px)]">
@@ -191,10 +302,16 @@ export default function MessagingPage({
               selectedConv ? 'hidden md:flex' : 'flex'
             }`}
           >
-            <div className="p-4 border-b border-gray-100">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
               <p className="text-sm text-gray-500 font-medium">
                 {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
               </p>
+              {totalUnread > 0 && (
+                <span className="flex items-center gap-1 text-xs text-teal-600 font-medium">
+                  <Bell className="w-3.5 h-3.5" />
+                  {totalUnread} unread
+                </span>
+              )}
             </div>
 
             {loading ? (
@@ -219,14 +336,21 @@ export default function MessagingPage({
                       selectedConv?.id === conv.id ? 'bg-teal-50' : ''
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                      {conv.otherUser?.full_name?.charAt(0)?.toUpperCase() || (
-                        <User className="w-5 h-5" />
+                    <div className="relative flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+                        {conv.otherUser?.full_name?.charAt(0)?.toUpperCase() || (
+                          <User className="w-5 h-5" />
+                        )}
+                      </div>
+                      {(conv.unread_count ?? 0) > 0 && (
+                        <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-teal-500 text-white text-[10px] font-bold flex items-center justify-center">
+                          {(conv.unread_count ?? 0) > 9 ? '9+' : conv.unread_count}
+                        </span>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="font-semibold text-gray-900 text-sm truncate">
+                        <p className={`font-semibold text-sm truncate ${(conv.unread_count ?? 0) > 0 ? 'text-gray-900' : 'text-gray-700'}`}>
                           {conv.otherUser?.full_name || 'User'}
                         </p>
                         {conv.last_message_at && (
@@ -235,7 +359,7 @@ export default function MessagingPage({
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                      <p className={`text-xs truncate mt-0.5 ${(conv.unread_count ?? 0) > 0 ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
                         {conv.last_message || 'Start a conversation'}
                       </p>
                     </div>
@@ -348,7 +472,7 @@ export default function MessagingPage({
                 <MessageSquare className="w-12 h-12 text-gray-200 mx-auto mb-4" />
                 <p className="text-gray-400 font-medium">Select a conversation</p>
                 <p className="text-gray-300 text-sm mt-1">
-                  Or start one from an equipment listing
+                  Choose from your conversations on the left
                 </p>
               </div>
             </div>
@@ -358,4 +482,3 @@ export default function MessagingPage({
     </div>
   );
 }
-
