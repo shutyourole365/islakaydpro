@@ -932,7 +932,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
     setComparisonItems(prev => prev.filter(item => item.id !== equipmentId));
   };
 
-  const handleMessage = async (equipment: Equipment) => {
+  const handleMessage = async (_equipment: Equipment) => {
     if (!isAuthenticated || !user) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);
@@ -2396,4 +2396,5 @@ function App() {
 }
 
 export default App;
+
 
