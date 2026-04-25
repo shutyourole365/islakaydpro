@@ -18,6 +18,7 @@ import {
   DollarSign,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
+import ReviewsSection from '../reviews/ReviewsSection';
 import ShareEquipment from './ShareEquipment';
 import PriceNegotiator from '../negotiation/PriceNegotiator';
 
@@ -465,4 +466,5 @@ export default function EquipmentDetail({
     </div>
   );
 }
+
 
