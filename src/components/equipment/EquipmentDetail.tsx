@@ -277,6 +277,14 @@ export default function EquipmentDetail({
                   </div>
                 </div>
               </div>
+
+              {/* Reviews Section */}
+              <div className="border-t border-gray-100 pt-6 mt-6">
+                <ReviewsSection
+                  equipmentId={equipment.id}
+                  canReview={false}
+                />
+              </div>
             </div>
           </div>
 
@@ -457,3 +465,4 @@ export default function EquipmentDetail({
     </div>
   );
 }
+
