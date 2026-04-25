@@ -1,7 +1,6 @@
----
 name: Build iOS IPA
 
-"on":
+on:
   push:
     branches: [main]
     paths:
@@ -11,11 +10,11 @@ name: Build iOS IPA
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: "22"
 
 jobs:
   build-ios:
-    runs-on: macos-14
+    runs-on: macos-15
 
     steps:
       - name: Checkout code
@@ -25,10 +24,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: npm
 
       - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app
 
       - name: Install dependencies
         run: npm ci
@@ -68,3 +67,4 @@ jobs:
           name: ios-archive
           path: ios/App/build/App.xcarchive
           retention-days: 30
+
