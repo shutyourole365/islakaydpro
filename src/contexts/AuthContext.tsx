@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback, type React
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
-import { getProfile, getUserAnalytics, getUnreadNotificationCount, subscribeToNotifications, logAuditEvent } from '../services/database';
+import { getProfile, getUserAnalytics, getUnreadNotificationCount, getUnreadMessageCount, subscribeToNotifications, logAuditEvent } from '../services/database';
 import { errorMonitoring } from '../services/errorMonitoring';
 import { 
   signInWithRetry, 
@@ -19,6 +19,7 @@ interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   unreadNotifications: number;
+  unreadMessages: number;
 }
 
 interface AuthContextType extends AuthState {
@@ -30,6 +31,7 @@ interface AuthContextType extends AuthState {
   updatePassword: (password: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   refreshNotifications: () => Promise<void>;
+  refreshMessages: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -43,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: true,
     isAuthenticated: false,
     unreadNotifications: 0,
+    unreadMessages: 0,
   });
 
   const loadUserData = useCallback(async (userId: string) => {
@@ -51,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         getProfile(userId),
         getUserAnalytics(userId),
         getUnreadNotificationCount(userId),
+        getUnreadMessageCount(userId),
       ]);
 
       setState(prev => ({
@@ -58,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         analytics,
         unreadNotifications: unreadCount,
+        unreadMessages: unreadMsgCount,
       }));
 
       // sync server-side AI preference to local storage so UI toggles reflect user's saved preference
@@ -89,6 +94,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (state.user) {
       const profile = await getProfile(state.user.id);
       setState(prev => ({ ...prev, profile }));
+    }
+  }, [state.user]);
+
+  const refreshMessages = useCallback(async () => {
+    if (!state.user) return;
+    try {
+      const count = await getUnreadMessageCount(state.user.id);
+      setState(prev => ({ ...prev, unreadMessages: count }));
+    } catch (e) {
+      console.error('refreshMessages error', e);
     }
   }, [state.user]);
 
@@ -270,6 +285,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
       isAuthenticated: false,
       unreadNotifications: 0,
+    unreadMessages: 0,
     });
   };
 
@@ -304,6 +320,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updatePassword,
         refreshProfile,
         refreshNotifications,
+      refreshMessages,
       }}
     >
       {children}
@@ -318,3 +335,5 @@ export function useAuth() {
   }
   return context;
 }
+
+
