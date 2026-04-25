@@ -38,28 +38,36 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - name: Sync Capacitor (generates plugin files)
+      - name: Sync Capacitor
         run: ./node_modules/.bin/cap sync ios
+
+      - name: List Xcode schemes and destinations
+        run: |
+          cd ios/App
+          xcodebuild -project App.xcodeproj -list
+          xcodebuild -project App.xcodeproj -scheme App -showdestinations 2>/dev/null | head -20 || true
 
       - name: Resolve Swift Package Manager dependencies
         run: |
           cd ios/App
           xcodebuild -resolvePackageDependencies \
             -project App.xcodeproj \
-            -scheme App
+            -scheme App \
+            -destination "generic/platform=iOS Simulator"
 
-      - name: Build iOS app (unsigned)
+      - name: Build iOS app (unsigned simulator)
         run: |
           cd ios/App
           xcodebuild -project App.xcodeproj \
             -scheme App \
             -configuration Release \
-            -sdk iphoneos \
+            -destination "generic/platform=iOS Simulator" \
             -archivePath build/App.xcarchive \
+            ONLY_ACTIVE_ARCH=NO \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
-            archive
+            archive 2>&1 | tail -30
 
       - name: Upload Archive
         uses: actions/upload-artifact@v4
@@ -67,3 +75,4 @@ jobs:
           name: ios-archive
           path: ios/App/build/App.xcarchive
           retention-days: 30
+          if-no-files-found: warn
