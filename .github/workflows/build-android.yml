@@ -31,6 +31,9 @@ jobs:
           java-version: "17"
           distribution: temurin
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install dependencies
         run: npm ci
 
@@ -40,8 +43,8 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
-      - name: Copy web assets to Android
-        run: ./node_modules/.bin/cap copy android
+      - name: Sync Capacitor (generates cordova gradle files)
+        run: ./node_modules/.bin/cap sync android
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
@@ -57,4 +60,3 @@ jobs:
           name: android-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
-
