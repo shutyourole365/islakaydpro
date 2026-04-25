@@ -42,6 +42,7 @@ const DisputeCenter = lazy(() => import('./components/disputes/DisputeCenter'));
 const IDVerificationFlow = lazy(() => import('./components/verification/IDVerificationFlow'));
 const OwnerEarningsDashboard = lazy(() => import('./components/earnings/OwnerEarningsDashboard'));
 const RecurringRentals = lazy(() => import('./components/subscription/RecurringRentals'));
+const MessagingPage = lazy(() => import('./components/messaging/MessagingPage'));
 
 // Lazy load heavy components for better performance
 const SecurityCenter = lazy(() => import('./components/security/SecurityCenter'));
@@ -545,7 +546,7 @@ const sampleEquipment: Equipment[] = [
 ];
 
 function AppContent() {
-type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | '404';
+type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications } = useAuth();
   const [showOwnerActivation, setShowOwnerActivation] = useState(false);
   const { addToast } = useToast();
@@ -793,7 +794,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
   };
 
   const handleNavigate = (page: string) => {
-    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', '404'];
+    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', 'messaging', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
   };
 
@@ -938,14 +939,9 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       return;
     }
     
-    // Open live chat with the equipment owner
-    setChatRecipient({
-      id: equipment.owner_id,
-      name: equipment.owner?.full_name || 'Equipment Owner',
-      avatar: equipment.owner?.avatar_url || undefined,
-    });
+    // Navigate to messaging page
     setSelectedEquipment(null);
-    setIsLiveChatOpen(true);
+    setCurrentPage('messaging');
   };
 
   const handleFeatureSelect = (featureId: string) => {
@@ -2356,6 +2352,12 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
           </div>
         </Suspense>
       )}
+      {currentPage === 'messaging' && (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-2 border-teal-500 border-t-transparent" /></div>}>
+          <MessagingPage />
+        </Suspense>
+      )}
+
       {currentPage === '404' && (
         <>
           <NotFound onNavigate={handleNavigate} />
@@ -2394,3 +2396,4 @@ function App() {
 }
 
 export default App;
+
