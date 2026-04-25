@@ -123,38 +123,6 @@ export default function MessagingPage({
     }
   }
 
-  async function _startConversationWithUser(recipientId: string) {
-    if (!user) return;
-
-    // Check if conversation already exists
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('*')
-      .contains('participants', [user.id, recipientId])
-      .single();
-
-    if (existing) {
-      setSelectedConv({ ...existing, otherUser: undefined });
-      loadConversations();
-      return;
-    }
-
-    // Create new conversation
-    const { data: newConv, error } = await supabase
-      .from('conversations')
-      .insert({ participants: [user.id, recipientId] })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Failed to create conversation:', error);
-      return;
-    }
-
-    await loadConversations();
-    setSelectedConv(newConv);
-  }
-
   async function sendMessage() {
     if (!newMessage.trim() || !selectedConv || !user || sending) return;
     setSending(true);
