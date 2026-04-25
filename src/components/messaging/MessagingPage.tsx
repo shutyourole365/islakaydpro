@@ -33,7 +33,7 @@ interface MessagingPageProps {
 
 export default function MessagingPage({
   initialConversationId,
-  initialRecipientId,
+  initialRecipientId: _initialRecipientId,
   initialEquipmentTitle,
 }: MessagingPageProps) {
   const { user } = useAuth();
@@ -123,7 +123,7 @@ export default function MessagingPage({
     }
   }
 
-  async function startConversationWithUser(recipientId: string) {
+  async function _startConversationWithUser(recipientId: string) {
     if (!user) return;
 
     // Check if conversation already exists
@@ -390,3 +390,4 @@ export default function MessagingPage({
     </div>
   );
 }
+
