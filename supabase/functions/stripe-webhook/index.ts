@@ -25,8 +25,7 @@ serve(async (req) => {
 
   try {
     const body = await req.text();
-    
-    // Verify webhook signature
+
     let event: Stripe.Event;
     try {
       event = stripe.webhooks.constructEvent(body, signature, endpointSecret);
@@ -43,31 +42,21 @@ serve(async (req) => {
         await handleCheckoutCompleted(session);
         break;
       }
-
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         await handlePaymentSucceeded(paymentIntent);
         break;
       }
-
       case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         await handlePaymentFailed(paymentIntent);
         break;
       }
-
       case 'charge.refunded': {
         const charge = event.data.object as Stripe.Charge;
         await handleRefund(charge);
         break;
       }
-
-      case 'customer.subscription.created':
-      case 'customer.subscription.updated': {
-        // Handle subscription events if you add subscription features
-        break;
-      }
-
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }
@@ -87,19 +76,20 @@ serve(async (req) => {
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const bookingId = session.metadata?.booking_id;
-  
+
   if (!bookingId) {
     console.error('No booking_id in session metadata');
     return;
   }
 
-  // Update booking status
+  // Update booking status - use correct column names
   const { error: updateError } = await supabase
     .from('bookings')
     .update({
       status: 'confirmed',
       payment_status: 'paid',
       stripe_payment_intent_id: session.payment_intent as string,
+      stripe_checkout_session_id: session.id,
       paid_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
@@ -110,7 +100,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
-  // Get booking details for notifications
+  // Get booking details
   const { data: booking } = await supabase
     .from('bookings')
     .select('*, equipment:equipment(*), renter:profiles!bookings_renter_id_fkey(*)')
@@ -125,22 +115,25 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Block dates on equipment calendar
   await supabase
     .from('equipment_availability')
-    .insert({
+    .upsert({
       equipment_id: booking.equipment_id,
       start_date: booking.start_date,
       end_date: booking.end_date,
       reason: 'booked',
       booking_id: bookingId,
-    });
+    }, { onConflict: 'booking_id' });
 
-  // Create payment record
+  // Create payment record - use AUD currency from session
+  const currency = (session.currency || 'aud').toLowerCase();
+  const amount = session.amount_total ? session.amount_total / 100 : (booking.total_amount || 0);
+
   await supabase
     .from('payments')
     .insert({
       booking_id: bookingId,
       user_id: booking.renter_id,
-      amount: session.amount_total ? session.amount_total / 100 : booking.total_amount,
-      currency: session.currency || 'usd',
+      amount,
+      currency,
       status: 'completed',
       stripe_payment_intent_id: session.payment_intent as string,
       stripe_checkout_session_id: session.id,
@@ -153,7 +146,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       },
     });
 
-  // Create notification for owner
+  // Notify owner
   await supabase
     .from('notifications')
     .insert({
@@ -164,11 +157,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       data: {
         booking_id: bookingId,
         equipment_id: booking.equipment_id,
-        amount: session.amount_total ? session.amount_total / 100 : booking.total_amount,
+        amount,
       },
     });
 
-  // Send confirmation emails via send-email function
+  // Send confirmation emails
   const emailBase = {
     method: 'POST',
     headers: {
@@ -178,72 +171,65 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   };
   const emailUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/send-email`;
 
-  // Renter confirmation email
-  await fetch(emailUrl, {
-    ...emailBase,
-    body: JSON.stringify({
-      template: 'booking-confirmation',
-      to: booking.renter?.email,
-      subject: `Booking Confirmed — ${booking.equipment?.title}`,
-      data: {
-        renterName: booking.renter?.full_name,
-        equipmentTitle: booking.equipment?.title,
-        startDate: booking.start_date,
-        endDate: booking.end_date,
-        totalAmount: session.amount_total ? session.amount_total / 100 : booking.total_amount,
-        bookingId: bookingId,
-      },
-    }),
-  });
-
-  // Owner notification email
-  if (booking.equipment?.owner) {
-    const { data: ownerProfile } = await supabase
-      .from('profiles')
-      .select('email:id, full_name')
-      .eq('id', booking.owner_id)
-      .single();
-    const { data: ownerAuth } = await supabase.auth.admin.getUserById(booking.owner_id);
-    const ownerEmail = ownerAuth?.user?.email;
-    if (ownerEmail) {
-      await fetch(emailUrl, {
-        ...emailBase,
-        body: JSON.stringify({
-          template: 'booking-request',
-          to: ownerEmail,
-          subject: `New Booking — ${booking.equipment?.title}`,
-          data: {
-            ownerName: ownerProfile?.full_name || 'there',
-            renterName: booking.renter?.full_name || 'A renter',
-            equipmentTitle: booking.equipment?.title,
-            startDate: booking.start_date,
-            endDate: booking.end_date,
-            totalAmount: session.amount_total ? session.amount_total / 100 : booking.total_amount,
-            bookingId: bookingId,
-          },
-        }),
-      });
-    }
+  // Renter confirmation
+  if (booking.renter?.email) {
+    await fetch(emailUrl, {
+      ...emailBase,
+      body: JSON.stringify({
+        template: 'booking-confirmation',
+        to: booking.renter.email,
+        subject: `Booking Confirmed — ${booking.equipment?.title}`,
+        data: {
+          renterName: booking.renter.full_name,
+          equipmentTitle: booking.equipment?.title,
+          startDate: booking.start_date,
+          endDate: booking.end_date,
+          totalAmount: amount,
+          bookingId,
+        },
+      }),
+    }).catch(e => console.error('Renter email failed:', e));
   }
 
-  console.log(`Booking ${bookingId} confirmed and paid`);
+  // Owner notification email
+  const { data: ownerAuth } = await supabase.auth.admin.getUserById(booking.owner_id);
+  const ownerEmail = ownerAuth?.user?.email;
+  if (ownerEmail) {
+    const { data: ownerProfile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', booking.owner_id)
+      .single();
+
+    await fetch(emailUrl, {
+      ...emailBase,
+      body: JSON.stringify({
+        template: 'booking-request',
+        to: ownerEmail,
+        subject: `New Booking — ${booking.equipment?.title}`,
+        data: {
+          ownerName: ownerProfile?.full_name || 'there',
+          renterName: booking.renter?.full_name || 'A renter',
+          equipmentTitle: booking.equipment?.title,
+          startDate: booking.start_date,
+          endDate: booking.end_date,
+          totalAmount: amount,
+          bookingId,
+        },
+      }),
+    }).catch(e => console.error('Owner email failed:', e));
+  }
+
+  console.log(`Booking ${bookingId} confirmed and paid — ${currency.toUpperCase()} ${amount}`);
 }
 
 async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   const bookingId = paymentIntent.metadata?.booking_id;
-  
-  if (!bookingId) {
-    console.log('No booking_id in payment intent metadata');
-    return;
-  }
+  if (!bookingId) return;
 
-  // Update payment record
   await supabase
     .from('payments')
-    .update({
-      status: 'completed',
-      updated_at: new Date().toISOString(),
-    })
+    .update({ status: 'completed', updated_at: new Date().toISOString() })
     .eq('stripe_payment_intent_id', paymentIntent.id);
 
   console.log(`Payment ${paymentIntent.id} succeeded for booking ${bookingId}`);
@@ -251,49 +237,33 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   const bookingId = paymentIntent.metadata?.booking_id;
-  
-  if (!bookingId) {
-    console.log('No booking_id in payment intent metadata');
-    return;
-  }
+  if (!bookingId) return;
 
-  // Update booking status
   await supabase
     .from('bookings')
-    .update({
-      payment_status: 'failed',
-      updated_at: new Date().toISOString(),
-    })
+    .update({ payment_status: 'failed', updated_at: new Date().toISOString() })
     .eq('id', bookingId);
 
-  // Get booking for notification
   const { data: booking } = await supabase
     .from('bookings')
-    .select('*, renter:profiles!bookings_renter_id_fkey(*)')
+    .select('renter_id')
     .eq('id', bookingId)
     .single();
 
   if (booking) {
-    // Notify renter about failed payment
-    await supabase
-      .from('notifications')
-      .insert({
-        user_id: booking.renter_id,
-        type: 'payment_failed',
-        title: 'Payment Failed',
-        message: 'Your payment could not be processed. Please try again.',
-        data: {
-          booking_id: bookingId,
-          error: paymentIntent.last_payment_error?.message,
-        },
-      });
+    await supabase.from('notifications').insert({
+      user_id: booking.renter_id,
+      type: 'payment_failed',
+      title: 'Payment Failed',
+      message: 'Your payment could not be processed. Please try again.',
+      data: { booking_id: bookingId, error: paymentIntent.last_payment_error?.message },
+    });
   }
 
   console.log(`Payment failed for booking ${bookingId}`);
 }
 
 async function handleRefund(charge: Stripe.Charge) {
-  // Find the payment by charge ID or payment intent
   const { data: payment } = await supabase
     .from('payments')
     .select('*, booking:bookings(*)')
@@ -308,7 +278,6 @@ async function handleRefund(charge: Stripe.Charge) {
   const refundAmount = charge.amount_refunded / 100;
   const isFullRefund = charge.refunded;
 
-  // Update payment status
   await supabase
     .from('payments')
     .update({
@@ -319,37 +288,25 @@ async function handleRefund(charge: Stripe.Charge) {
     })
     .eq('id', payment.id);
 
-  // Update booking if full refund
   if (isFullRefund && payment.booking) {
     await supabase
       .from('bookings')
-      .update({
-        status: 'cancelled',
-        payment_status: 'refunded',
-        updated_at: new Date().toISOString(),
-      })
+      .update({ status: 'cancelled', payment_status: 'refunded', updated_at: new Date().toISOString() })
       .eq('id', payment.booking.id);
 
-    // Remove date blocks
     await supabase
       .from('equipment_availability')
       .delete()
       .eq('booking_id', payment.booking.id);
   }
 
-  // Notify user
-  await supabase
-    .from('notifications')
-    .insert({
-      user_id: payment.user_id,
-      type: 'payment_refunded',
-      title: isFullRefund ? 'Full Refund Processed' : 'Partial Refund Processed',
-      message: `$${refundAmount.toFixed(2)} has been refunded to your payment method.`,
-      data: {
-        booking_id: payment.booking?.id,
-        refund_amount: refundAmount,
-      },
-    });
+  await supabase.from('notifications').insert({
+    user_id: payment.user_id,
+    type: 'payment_refunded',
+    title: isFullRefund ? 'Full Refund Issued' : 'Partial Refund Issued',
+    message: `A refund of AUD ${refundAmount.toFixed(2)} has been processed.`,
+    data: { booking_id: payment.booking_id, amount: refundAmount },
+  });
 
-  console.log(`Refund processed: $${refundAmount}`);
+  console.log(`Refund processed for payment ${payment.id} — AUD ${refundAmount}`);
 }
