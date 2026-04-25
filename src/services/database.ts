@@ -473,6 +473,29 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
   return count || 0;
 }
 
+
+export async function getUnreadMessageCount(userId: string): Promise<number> {
+  // Get conversations this user is in
+  const { data: convs } = await supabase
+    .from('conversations')
+    .select('id')
+    .contains('participants', [userId]);
+
+  if (!convs || convs.length === 0) return 0;
+
+  const convIds = convs.map((c: { id: string }) => c.id);
+
+  const { count, error } = await supabase
+    .from('messages')
+    .select('id', { count: 'exact', head: true })
+    .in('conversation_id', convIds)
+    .neq('sender_id', userId)
+    .eq('read', false);
+
+  if (error) return 0;
+  return count || 0;
+}
+
 export async function getConversations(userId: string): Promise<Conversation[]> {
   const { data, error } = await supabase
     .from('conversation_participants')
@@ -1153,3 +1176,4 @@ export async function getReviewedBookingIds(userId: string): Promise<Set<string>
 
   return new Set((data ?? []).map(r => r.booking_id));
 }
+
