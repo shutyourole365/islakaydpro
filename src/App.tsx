@@ -547,7 +547,7 @@ const sampleEquipment: Equipment[] = [
 
 function AppContent() {
 type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | '404';
-  const { isAuthenticated, user, profile, signOut, unreadNotifications } = useAuth();
+  const { isAuthenticated, user, profile, signOut, unreadNotifications, unreadMessages } = useAuth();
   const [showOwnerActivation, setShowOwnerActivation] = useState(false);
   const { addToast } = useToast();
   const {
@@ -1534,7 +1534,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       {currentPage !== 'list-equipment' && isAuthenticated && (
         <QuickActionsMenu
           onNavigate={handleNavigate}
-          unreadMessages={0}
+          unreadMessages={unreadMessages}
           unreadNotifications={unreadNotifications}
         />
       )}
@@ -2396,5 +2396,6 @@ function App() {
 }
 
 export default App;
+
 
 
