@@ -258,19 +258,22 @@ export default function MessagingPage({
       if (recipientIds.length > 0) {
         const senderName = profile?.full_name || user.email?.split('@')[0] || 'Someone';
         const preview = content.length > 80 ? content.slice(0, 80) + '...' : content;
-        supabase.from('notifications').insert(
-          recipientIds.map(recipientId => ({
-            user_id: recipientId,
-            type: 'new_message',
-            title: 'New Message',
-            message: `${senderName}: ${preview}`,
-            data: { conversation_id: selectedConv.id, sender_id: user.id },
-          }))
-        ).then(() => {
-          recipientIds.forEach(recipientId => {
-            sendMessageNotification(recipientId, senderName, content, selectedConv.id).catch(() => {});
-          });
-        }).catch(() => {});
+        void (async () => {
+          try {
+            await supabase.from('notifications').insert(
+              recipientIds.map(recipientId => ({
+                user_id: recipientId,
+                type: 'new_message',
+                title: 'New Message',
+                message: `${senderName}: ${preview}`,
+                data: { conversation_id: selectedConv.id, sender_id: user.id },
+              }))
+            );
+            recipientIds.forEach(recipientId => {
+              sendMessageNotification(recipientId, senderName, content, selectedConv.id).catch(() => {});
+            });
+          } catch {}
+        })();
       }
     } catch (e) {
       console.error('Failed to send message:', e);
