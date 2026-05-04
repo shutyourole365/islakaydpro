@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import RealTimeNotifications from '../notifications/RealTimeNotifications';
 import ThemeToggle from '../ui/ThemeToggle';
+import Logo from '../ui/Logo';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -84,7 +85,10 @@ export default function Header({
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-12">
             <button onClick={() => onNavigate('home')} aria-label="Go to home page" className="flex items-center">
-              <span className="font-bold text-xl text-teal-600">IslaKayd</span>
+              <Logo
+                size="md"
+                inverse={showTransparent}
+              />
             </button>
 
             <nav className="hidden lg:flex items-center gap-8">
