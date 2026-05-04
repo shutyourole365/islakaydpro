@@ -383,33 +383,33 @@ export default function Dashboard({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Manage your rentals, listings, and account</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage your rentals, listings, and account</p>
           </div>
           <button
             onClick={loadDashboardData}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             aria-label="Reload dashboard data"
           >
             <RefreshCw className="w-5 h-5" />
@@ -418,14 +418,14 @@ export default function Dashboard({
 
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-2xl font-bold">
                   {profile?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">{profile?.full_name || 'User'}</p>
-                  <p className="text-sm text-gray-500">Member since {new Date(profile?.created_at || '').getFullYear()}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white truncate">{profile?.full_name || 'User'}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Member since {new Date(profile?.created_at || '').getFullYear()}</p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -442,15 +442,15 @@ export default function Dashboard({
               </div>
             </div>
 
-            <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <nav className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as TabType)}
                   className={`w-full flex items-center justify-between px-6 py-4 text-left transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-teal-50 text-teal-700 border-l-4 border-teal-500'
-                      : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'
+                      ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 border-l-4 border-teal-500'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-3">
