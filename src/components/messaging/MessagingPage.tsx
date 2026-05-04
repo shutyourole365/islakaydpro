@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageSquare, Send, ChevronLeft, User, Clock, CheckCheck, Bell } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { sendMessageNotification } from '../../services/pushNotifications';
 
 interface Message {
   id: string;
@@ -37,7 +38,7 @@ export default function MessagingPage({
   initialRecipientId: _initialRecipientId,
   initialEquipmentTitle,
 }: MessagingPageProps) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -251,6 +252,26 @@ export default function MessagingPage({
         .from('conversations')
         .update({ last_message: content, last_message_at: new Date().toISOString() })
         .eq('id', selectedConv.id);
+
+      // Notify other participants (fire-and-forget)
+      const recipientIds = selectedConv.participants.filter(id => id !== user.id);
+      if (recipientIds.length > 0) {
+        const senderName = profile?.full_name || user.email?.split('@')[0] || 'Someone';
+        const preview = content.length > 80 ? content.slice(0, 80) + '...' : content;
+        supabase.from('notifications').insert(
+          recipientIds.map(recipientId => ({
+            user_id: recipientId,
+            type: 'new_message',
+            title: 'New Message',
+            message: `${senderName}: ${preview}`,
+            data: { conversation_id: selectedConv.id, sender_id: user.id },
+          }))
+        ).then(() => {
+          recipientIds.forEach(recipientId => {
+            sendMessageNotification(recipientId, senderName, content, selectedConv.id).catch(() => {});
+          });
+        }).catch(() => {});
+      }
     } catch (e) {
       console.error('Failed to send message:', e);
       setNewMessage(content);

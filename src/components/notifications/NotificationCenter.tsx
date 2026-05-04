@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft,
   Bell,
@@ -13,151 +13,198 @@ import {
   Trash2,
   Settings,
   MailOpen,
+  Loader2,
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
+import {
+  getNotifications,
+  markNotificationRead,
+  markAllNotificationsRead,
+  subscribeToNotifications,
+} from '../../services/database';
+import type { Notification as DBNotification, NotificationType } from '../../types';
 
 interface NotificationCenterProps {
   onBack: () => void;
 }
 
-interface Notification {
-  id: string;
-  type: 'booking' | 'message' | 'payment' | 'review' | 'system' | 'security';
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-  actionUrl?: string;
+type DisplayType = 'booking' | 'message' | 'payment' | 'review' | 'system' | 'security';
+
+function toDisplayType(type: NotificationType): DisplayType {
+  if (type.startsWith('booking')) return 'booking';
+  if (type === 'new_message') return 'message';
+  if (type === 'payment_received') return 'payment';
+  if (type === 'new_review') return 'review';
+  if (type === 'verification_approved' || type === 'verification_rejected') return 'security';
+  return 'system';
 }
 
+function formatRelativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return `${days} days ago`;
+  return new Date(dateStr).toLocaleDateString([], { day: 'numeric', month: 'short' });
+}
+
+interface PrefRow {
+  push_booking_requests: boolean;
+  push_booking_updates: boolean;
+  push_messages: boolean;
+  push_reviews: boolean;
+  push_promotions: boolean;
+}
+
+const DEFAULT_PREFS: PrefRow = {
+  push_booking_requests: true,
+  push_booking_updates: true,
+  push_messages: true,
+  push_reviews: true,
+  push_promotions: false,
+};
+
 export default function NotificationCenter({ onBack }: NotificationCenterProps) {
+  const { user, refreshNotifications } = useAuth();
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'bookings' | 'messages'>('all');
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      type: 'booking',
-      title: 'New Booking Request',
-      message: 'John Smith wants to rent your CAT 320 Excavator from Jan 25-28, 2026.',
-      time: '5 min ago',
-      read: false,
-    },
-    {
-      id: '2',
-      type: 'message',
-      title: 'New Message',
-      message: 'Sarah Johnson: "Is the camera kit available this weekend?"',
-      time: '1 hour ago',
-      read: false,
-    },
-    {
-      id: '3',
-      type: 'payment',
-      title: 'Payment Received',
-      message: 'You received $450.00 for booking #12345. Funds will be available in 2 days.',
-      time: '3 hours ago',
-      read: true,
-    },
-    {
-      id: '4',
-      type: 'review',
-      title: 'New Review',
-      message: 'Mike Wilson left a 5-star review on your Power Tool Set.',
-      time: '1 day ago',
-      read: true,
-    },
-    {
-      id: '5',
-      type: 'security',
-      title: 'New Sign-in Detected',
-      message: 'Your account was accessed from a new device in Los Angeles, CA.',
-      time: '2 days ago',
-      read: true,
-    },
-    {
-      id: '6',
-      type: 'system',
-      title: 'Listing Approved',
-      message: 'Your new listing "Professional DJ Equipment" is now live.',
-      time: '3 days ago',
-      read: true,
-    },
-    {
-      id: '7',
-      type: 'booking',
-      title: 'Booking Confirmed',
-      message: 'Your booking for Sony A7IV Camera Kit has been confirmed.',
-      time: '4 days ago',
-      read: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<DBNotification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [prefs, setPrefs] = useState<PrefRow>(DEFAULT_PREFS);
 
-  const getIcon = (type: Notification['type']) => {
-    switch (type) {
-      case 'booking':
-        return <Calendar className="w-5 h-5" />;
-      case 'message':
-        return <MessageSquare className="w-5 h-5" />;
-      case 'payment':
-        return <DollarSign className="w-5 h-5" />;
-      case 'review':
-        return <Star className="w-5 h-5" />;
-      case 'security':
-        return <Shield className="w-5 h-5" />;
-      case 'system':
-        return <Package className="w-5 h-5" />;
+  const load = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const data = await getNotifications(user.id);
+      setNotifications(data);
+    } catch (e) {
+      console.error('Failed to load notifications:', e);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  const loadPrefs = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('notification_preferences')
+      .select('push_booking_requests,push_booking_updates,push_messages,push_reviews,push_promotions')
+      .eq('user_id', user.id)
+      .single();
+    if (data) setPrefs(data as PrefRow);
+  }, [user]);
+
+  useEffect(() => {
+    load();
+    loadPrefs();
+  }, [load, loadPrefs]);
+
+  useEffect(() => {
+    if (!user) return;
+    const channel = subscribeToNotifications(user.id, (n) => {
+      setNotifications(prev => [n, ...prev]);
+    });
+    return () => { channel.unsubscribe(); };
+  }, [user]);
+
+  const markAsRead = async (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    try {
+      await markNotificationRead(id);
+      refreshNotifications();
+    } catch (e) {
+      console.error('Failed to mark read:', e);
     }
   };
 
-  const getIconColor = (type: Notification['type']) => {
-    switch (type) {
-      case 'booking':
-        return 'bg-blue-100 text-blue-600';
-      case 'message':
-        return 'bg-purple-100 text-purple-600';
-      case 'payment':
-        return 'bg-green-100 text-green-600';
-      case 'review':
-        return 'bg-amber-100 text-amber-600';
-      case 'security':
-        return 'bg-red-100 text-red-600';
-      case 'system':
-        return 'bg-gray-100 text-gray-600';
+  const markAllAsRead = async () => {
+    if (!user) return;
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    try {
+      await markAllNotificationsRead(user.id);
+      refreshNotifications();
+    } catch (e) {
+      console.error('Failed to mark all read:', e);
     }
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev =>
-      prev.map(n => (n.id === id ? { ...n, read: true } : n))
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const deleteNotification = (id: string) => {
+  const deleteNotification = async (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
+    try {
+      await supabase.from('notifications').delete().eq('id', id);
+    } catch (e) {
+      console.error('Failed to delete notification:', e);
+    }
   };
 
-  const clearAll = () => {
-    if (confirm('Are you sure you want to clear all notifications?')) {
-      setNotifications([]);
+  const clearAll = async () => {
+    if (!user || !confirm('Are you sure you want to clear all notifications?')) return;
+    setNotifications([]);
+    try {
+      await supabase.from('notifications').delete().eq('user_id', user.id);
+      refreshNotifications();
+    } catch (e) {
+      console.error('Failed to clear notifications:', e);
     }
+  };
+
+  const togglePref = async (key: keyof PrefRow) => {
+    if (!user) return;
+    const updated = { ...prefs, [key]: !prefs[key] };
+    setPrefs(updated);
+    await supabase
+      .from('notification_preferences')
+      .upsert({ user_id: user.id, ...updated, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
   };
 
   const filteredNotifications = notifications.filter(n => {
-    if (activeTab === 'unread') return !n.read;
-    if (activeTab === 'bookings') return n.type === 'booking';
-    if (activeTab === 'messages') return n.type === 'message';
+    if (activeTab === 'unread') return !n.is_read;
+    if (activeTab === 'bookings') return n.type.startsWith('booking');
+    if (activeTab === 'messages') return n.type === 'new_message';
     return true;
   });
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  const getIcon = (type: NotificationType) => {
+    switch (toDisplayType(type)) {
+      case 'booking': return <Calendar className="w-5 h-5" />;
+      case 'message': return <MessageSquare className="w-5 h-5" />;
+      case 'payment': return <DollarSign className="w-5 h-5" />;
+      case 'review': return <Star className="w-5 h-5" />;
+      case 'security': return <Shield className="w-5 h-5" />;
+      case 'system': return <Package className="w-5 h-5" />;
+    }
+  };
+
+  const getIconColor = (type: NotificationType) => {
+    switch (toDisplayType(type)) {
+      case 'booking': return 'bg-blue-100 text-blue-600';
+      case 'message': return 'bg-purple-100 text-purple-600';
+      case 'payment': return 'bg-green-100 text-green-600';
+      case 'review': return 'bg-amber-100 text-amber-600';
+      case 'security': return 'bg-red-100 text-red-600';
+      case 'system': return 'bg-gray-100 text-gray-600';
+    }
+  };
 
   const tabs = [
     { id: 'all', label: 'All', count: notifications.length },
     { id: 'unread', label: 'Unread', count: unreadCount },
-    { id: 'bookings', label: 'Bookings', count: notifications.filter(n => n.type === 'booking').length },
-    { id: 'messages', label: 'Messages', count: notifications.filter(n => n.type === 'message').length },
+    { id: 'bookings', label: 'Bookings', count: notifications.filter(n => n.type.startsWith('booking')).length },
+    { id: 'messages', label: 'Messages', count: notifications.filter(n => n.type === 'new_message').length },
+  ];
+
+  const prefItems: { key: keyof PrefRow; label: string; description: string }[] = [
+    { key: 'push_booking_requests', label: 'Booking updates', description: 'New bookings, confirmations, cancellations' },
+    { key: 'push_messages', label: 'Messages', description: 'New messages from renters and owners' },
+    { key: 'push_reviews', label: 'Reviews', description: 'New reviews on your equipment' },
+    { key: 'push_promotions', label: 'Marketing', description: 'Tips, promotions, and platform updates' },
   ];
 
   return (
@@ -188,14 +235,14 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
             <button
               onClick={markAllAsRead}
               className="flex items-center gap-2 px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
-             >
+            >
               <MailOpen className="w-4 h-4" />
               Mark all read
             </button>
             <button
               onClick={clearAll}
               className="flex items-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-             >
+            >
               <Trash2 className="w-4 h-4" />
               Clear all
             </button>
@@ -226,7 +273,11 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
 
         {/* Notifications List */}
         <div className="space-y-3">
-          {filteredNotifications.length === 0 ? (
+          {loading ? (
+            <div className="bg-white rounded-2xl p-12 border border-gray-100 flex justify-center">
+              <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+            </div>
+          ) : filteredNotifications.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
               <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No notifications</h2>
@@ -237,7 +288,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
               <div
                 key={notification.id}
                 className={`bg-white rounded-xl p-4 border transition-all ${
-                  notification.read
+                  notification.is_read
                     ? 'border-gray-100'
                     : 'border-teal-200 bg-teal-50/50'
                 }`}
@@ -249,19 +300,20 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className={`font-semibold ${notification.read ? 'text-gray-700' : 'text-gray-900'}`}>
+                        <h3 className={`font-semibold ${notification.is_read ? 'text-gray-700' : 'text-gray-900'}`}>
                           {notification.title}
                         </h3>
                         <p className="text-gray-600 text-sm mt-0.5">{notification.message}</p>
                         <p className="text-gray-400 text-xs mt-2 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
-                          {notification.time}
+                          {formatRelativeTime(notification.created_at)}
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
-                        {!notification.read && (
+                        {!notification.is_read && (
                           <button
-                            aria-label="Mark as read" onClick={() => markAsRead(notification.id)}
+                            aria-label="Mark as read"
+                            onClick={() => markAsRead(notification.id)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                             title="Mark as read"
                           >
@@ -269,7 +321,8 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                           </button>
                         )}
                         <button
-                          aria-label="Delete notification" onClick={() => deleteNotification(notification.id)}
+                          aria-label="Delete notification"
+                          onClick={() => deleteNotification(notification.id)}
                           className="p-2 hover:bg-red-50 rounded-lg transition-colors"
                           title="Delete"
                         >
@@ -284,7 +337,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
           )}
         </div>
 
-        {/* Notification Settings */}
+        {/* Notification Preferences */}
         <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -293,23 +346,17 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
             </h2>
           </div>
           <div className="space-y-4">
-            {[
-              { label: 'Booking updates', description: 'New bookings, confirmations, cancellations' },
-              { label: 'Messages', description: 'New messages from renters and owners' },
-              { label: 'Payments', description: 'Payment received, refunds, payouts' },
-              { label: 'Reviews', description: 'New reviews on your equipment' },
-              { label: 'Security alerts', description: 'Sign-in from new devices, password changes' },
-              { label: 'Marketing', description: 'Tips, promotions, and platform updates' },
-            ].map((pref, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            {prefItems.map(({ key, label, description }) => (
+              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                 <div>
-                  <p className="font-medium text-gray-900">{pref.label}</p>
-                  <p className="text-sm text-gray-500">{pref.description}</p>
+                  <p className="font-medium text-gray-900">{label}</p>
+                  <p className="text-sm text-gray-500">{description}</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    defaultChecked={index < 5}
+                    checked={prefs[key]}
+                    onChange={() => togglePref(key)}
                     className="sr-only peer"
                   />
                   <div className="w-11 h-6 bg-gray-200 peer-checked:bg-teal-500 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
