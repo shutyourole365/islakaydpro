@@ -431,6 +431,100 @@ export async function addReviewResponse(reviewId: string, response: string): Pro
   return data;
 }
 
+export async function handlePaymentStatusUpdate(
+  bookingId: string,
+  paymentStatus: 'paid' | 'refunded' | 'failed'
+): Promise<void> {
+  // Get booking details with relations
+  const { data: booking, error: bookingError } = await supabase
+    .from('bookings')
+    .select('*, equipment:equipment(*), renter:profiles!bookings_renter_id_fkey(*), owner:profiles!bookings_owner_id_fkey(*)')
+    .eq('id', bookingId)
+    .single();
+
+  if (bookingError) throw bookingError;
+  if (!booking) return;
+
+  // Determine notification type and details
+  let notificationType: string;
+  let title: string;
+  let message: string;
+  let notificationUser: string;
+
+  if (paymentStatus === 'paid') {
+    notificationType = 'payment_received';
+    title = '💰 Payment Received';
+    message = `Payment of $${booking.total_amount.toFixed(2)} received for your ${booking.equipment?.title} rental`;
+    notificationUser = booking.owner_id; // Notify the owner
+  } else if (paymentStatus === 'refunded') {
+    notificationType = 'payment_refunded';
+    title = '↩️ Payment Refunded';
+    message = `Your $${booking.total_amount.toFixed(2)} refund has been processed`;
+    notificationUser = booking.renter_id; // Notify the renter
+  } else {
+    notificationType = 'payment_failed';
+    title = '❌ Payment Failed';
+    message = `Payment failed for your ${booking.equipment?.title} rental. Please try again.`;
+    notificationUser = booking.renter_id; // Notify the renter
+  }
+
+  const notification = {
+    user_id: notificationUser,
+    type: notificationType,
+    title,
+    message,
+    data: { booking_id: booking.id },
+    is_read: false,
+    created_at: new Date().toISOString(),
+  };
+
+  void (async () => {
+    try {
+      await supabase.from('notifications').insert(notification);
+      // Fire-and-forget push notification
+      const { sendPushNotification } = await import('./pushNotifications');
+      sendPushNotification(notificationUser, {
+        title,
+        body: message,
+        tag: `payment-${booking.id}`,
+        url: '/dashboard?tab=bookings',
+      }).catch(() => {});
+    } catch { /* fire-and-forget */ }
+  })();
+}
+
+export async function updatePaymentStatus(
+  paymentId: string,
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'
+): Promise<void> {
+  // Get payment details
+  const { data: payment, error: paymentError } = await supabase
+    .from('payments')
+    .select('id, booking_id, status')
+    .eq('id', paymentId)
+    .single();
+
+  if (paymentError) throw paymentError;
+  if (!payment) return;
+
+  // Update payment status (this will trigger the on_payment_status_change trigger)
+  const { error: updateError } = await supabase
+    .from('payments')
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq('id', paymentId);
+
+  if (updateError) throw updateError;
+
+  // Send notification based on payment status
+  if (status === 'completed' && payment.status !== 'completed') {
+    await handlePaymentStatusUpdate(payment.booking_id, 'paid');
+  } else if (status === 'refunded' && payment.status !== 'refunded') {
+    await handlePaymentStatusUpdate(payment.booking_id, 'refunded');
+  } else if (status === 'failed' && payment.status !== 'failed') {
+    await handlePaymentStatusUpdate(payment.booking_id, 'failed');
+  }
+}
+
 export async function getFavorites(userId: string): Promise<Favorite[]> {
   const { data, error } = await supabase
     .from('favorites')
