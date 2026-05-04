@@ -251,6 +251,35 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
     .single();
 
   if (error) throw error;
+
+  // Send notification for booking status changes
+  if (status === 'confirmed' || status === 'cancelled') {
+    const notification = {
+      user_id: data.renter_id,
+      type: status === 'confirmed' ? 'booking_confirmed' : 'booking_cancelled',
+      title: status === 'confirmed' ? '✅ Booking Confirmed!' : '❌ Booking Cancelled',
+      message: status === 'confirmed'
+        ? `Your booking for ${data.equipment?.title} is confirmed`
+        : `Your booking for ${data.equipment?.title} has been cancelled`,
+      data: { booking_id: data.id },
+      is_read: false,
+      created_at: new Date().toISOString(),
+    };
+
+    void (async () => {
+      try {
+        await supabase.from('notifications').insert(notification);
+        // Fire-and-forget push notification
+        const { sendBookingNotification } = await import('./pushNotifications');
+        sendBookingNotification(data.renter_id, status, {
+          equipmentName: data.equipment?.title || 'Equipment',
+          dates: `${data.start_date} to ${data.end_date}`,
+          ownerName: data.owner?.full_name,
+        }).catch(() => {});
+      } catch { /* fire-and-forget */ }
+    })();
+  }
+
   return data;
 }
 
