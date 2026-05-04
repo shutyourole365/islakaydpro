@@ -297,19 +297,19 @@ export default function MessagingPage({
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500">Sign in to access messages</p>
+          <MessageSquare className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">Sign in to access messages</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
           <MessageSquare className="w-6 h-6 text-teal-500" />
           Messages
           {totalUnread > 0 && (
@@ -319,19 +319,19 @@ export default function MessagingPage({
           )}
         </h1>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex h-[calc(100vh-180px)]">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex h-[calc(100vh-180px)]">
           {/* Conversation List */}
           <div
-            className={`w-full md:w-80 border-r border-gray-100 flex flex-col ${
+            className={`w-full md:w-80 border-r border-gray-100 dark:border-gray-700 flex flex-col ${
               selectedConv ? 'hidden md:flex' : 'flex'
             }`}
           >
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-              <p className="text-sm text-gray-500 font-medium">
+            <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+              <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                 {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
               </p>
               {totalUnread > 0 && (
-                <span className="flex items-center gap-1 text-xs text-teal-600 font-medium">
+                <span className="flex items-center gap-1 text-xs text-teal-600 dark:text-teal-400 font-medium">
                   <Bell className="w-3.5 h-3.5" />
                   {totalUnread} unread
                 </span>
@@ -344,9 +344,9 @@ export default function MessagingPage({
               </div>
             ) : conversations.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-                <MessageSquare className="w-10 h-10 text-gray-200 mb-3" />
-                <p className="text-gray-400 text-sm">No conversations yet</p>
-                <p className="text-gray-300 text-xs mt-1">
+                <MessageSquare className="w-10 h-10 text-gray-200 dark:text-gray-700 mb-3" />
+                <p className="text-gray-400 dark:text-gray-500 text-sm">No conversations yet</p>
+                <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">
                   Message an owner from any equipment listing
                 </p>
               </div>
@@ -356,8 +356,8 @@ export default function MessagingPage({
                   <button
                     key={conv.id}
                     onClick={() => setSelectedConv(conv)}
-                    className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-50 ${
-                      selectedConv?.id === conv.id ? 'bg-teal-50' : ''
+                    className={`w-full p-4 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left border-b border-gray-50 dark:border-gray-700 ${
+                      selectedConv?.id === conv.id ? 'bg-teal-50 dark:bg-teal-900/30' : ''
                     }`}
                   >
                     <div className="relative flex-shrink-0">
@@ -374,16 +374,16 @@ export default function MessagingPage({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className={`font-semibold text-sm truncate ${(conv.unread_count ?? 0) > 0 ? 'text-gray-900' : 'text-gray-700'}`}>
+                        <p className={`font-semibold text-sm truncate ${(conv.unread_count ?? 0) > 0 ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
                           {conv.otherUser?.full_name || 'User'}
                         </p>
                         {conv.last_message_at && (
-                          <span className="text-xs text-gray-400 ml-2 flex-shrink-0">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 ml-2 flex-shrink-0">
                             {formatTime(conv.last_message_at)}
                           </span>
                         )}
                       </div>
-                      <p className={`text-xs truncate mt-0.5 ${(conv.unread_count ?? 0) > 0 ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
+                      <p className={`text-xs truncate mt-0.5 ${(conv.unread_count ?? 0) > 0 ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
                         {conv.last_message || 'Start a conversation'}
                       </p>
                     </div>
@@ -397,22 +397,22 @@ export default function MessagingPage({
           {selectedConv ? (
             <div className="flex-1 flex flex-col">
               {/* Header */}
-              <div className="p-4 border-b border-gray-100 flex items-center gap-3">
+              <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
                 <button
                   onClick={() => setSelectedConv(null)}
-                  className="md:hidden p-1 rounded-lg hover:bg-gray-100"
+                  className="md:hidden p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-5 h-5 dark:text-gray-400" />
                 </button>
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
                   {selectedConv.otherUser?.full_name?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 text-sm">
+                  <p className="font-semibold text-gray-900 dark:text-white text-sm">
                     {selectedConv.otherUser?.full_name || 'User'}
                   </p>
                   {initialEquipmentTitle && (
-                    <p className="text-xs text-gray-500">{initialEquipmentTitle}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{initialEquipmentTitle}</p>
                   )}
                 </div>
               </div>
@@ -421,7 +421,7 @@ export default function MessagingPage({
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-gray-400 text-sm">No messages yet. Say hello! 👋</p>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm">No messages yet. Say hello! 👋</p>
                   </div>
                 )}
                 {messages.map((msg) => {
@@ -435,7 +435,7 @@ export default function MessagingPage({
                         className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                           isMe
                             ? 'bg-gradient-to-br from-teal-500 to-emerald-500 text-white rounded-br-sm'
-                            : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-sm'
                         }`}
                       >
                         <p className="text-sm leading-relaxed">{msg.content}</p>
@@ -464,7 +464,7 @@ export default function MessagingPage({
               </div>
 
               {/* Input */}
-              <div className="p-4 border-t border-gray-100">
+              <div className="p-4 border-t border-gray-100 dark:border-gray-700">
                 <div className="flex items-end gap-3">
                   <textarea
                     value={newMessage}
@@ -477,7 +477,7 @@ export default function MessagingPage({
                     }}
                     placeholder="Type a message..."
                     rows={1}
-                    className="flex-1 resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-teal-500 max-h-32"
+                    className="flex-1 resize-none rounded-xl border border-gray-200 dark:border-gray-600 px-4 py-3 text-sm focus:outline-none focus:border-teal-500 max-h-32 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                     style={{ minHeight: '46px' }}
                   />
                   <button
@@ -493,9 +493,9 @@ export default function MessagingPage({
           ) : (
             <div className="hidden md:flex flex-1 items-center justify-center text-center p-8">
               <div>
-                <MessageSquare className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                <p className="text-gray-400 font-medium">Select a conversation</p>
-                <p className="text-gray-300 text-sm mt-1">
+                <MessageSquare className="w-12 h-12 text-gray-200 dark:text-gray-700 mx-auto mb-4" />
+                <p className="text-gray-400 dark:text-gray-500 font-medium">Select a conversation</p>
+                <p className="text-gray-300 dark:text-gray-600 text-sm mt-1">
                   Choose from your conversations on the left
                 </p>
               </div>

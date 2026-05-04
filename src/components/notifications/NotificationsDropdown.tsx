@@ -73,12 +73,12 @@ export default function NotificationsDropdown({
   if (!isOpen) return null;
 
   return (
-    <div className="absolute right-0 top-full mt-2 w-96 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+    <div className="absolute right-0 top-full mt-2 w-96 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden z-50">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-gray-900">Notifications</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
           {unreadCount > 0 && (
-            <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs font-medium rounded-full">
+            <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs font-medium rounded-full">
               {unreadCount} new
             </span>
           )}
@@ -88,7 +88,7 @@ export default function NotificationsDropdown({
             <button
               type="button"
               onClick={markAllAsRead}
-              className="text-sm text-teal-600 hover:text-teal-700"
+              className="text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300"
             >
               Mark all read
             </button>
@@ -96,10 +96,10 @@ export default function NotificationsDropdown({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="Close notifications"
           >
-            <X className="w-5 h-5 text-gray-400" />
+            <X className="w-5 h-5 text-gray-400 dark:text-gray-500" />
           </button>
         </div>
       </div>
@@ -111,36 +111,36 @@ export default function NotificationsDropdown({
           </div>
         ) : notifications.length === 0 ? (
           <div className="p-8 text-center">
-            <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No notifications yet</p>
+            <Bell className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-500 dark:text-gray-400">No notifications yet</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-gray-50 dark:divide-gray-700">
             {notifications.map((notification) => (
               <div
                 key={notification.id}
                 onClick={() => !notification.is_read && handleMarkRead(notification.id)}
-                className={`px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer ${
-                  !notification.is_read ? 'bg-teal-50/50' : ''
+                className={`px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
+                  !notification.is_read ? 'bg-teal-50/50 dark:bg-teal-900/20' : ''
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
                     {getIcon(notification.type)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-medium text-gray-900 truncate">
+                      <p className="font-medium text-gray-900 dark:text-white truncate">
                         {notification.title}
                       </p>
                       {!notification.is_read && (
                         <span className="w-2 h-2 bg-teal-500 rounded-full flex-shrink-0" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 truncate">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                       {notification.message}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {formatTime(notification.created_at)}
                     </p>
@@ -152,8 +152,8 @@ export default function NotificationsDropdown({
         )}
       </div>
 
-      <div className="px-6 py-3 border-t border-gray-100 bg-gray-50">
-        <button className="w-full text-center text-sm text-teal-600 hover:text-teal-700 font-medium">
+      <div className="px-6 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+        <button className="w-full text-center text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium">
           View All Notifications
         </button>
       </div>

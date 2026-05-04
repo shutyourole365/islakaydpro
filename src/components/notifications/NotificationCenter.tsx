@@ -208,19 +208,19 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
-              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-600" />
+              <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-gray-400" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 Notifications
                 {unreadCount > 0 && (
                   <span className="px-2.5 py-0.5 bg-red-500 text-white text-sm font-medium rounded-full">
@@ -228,20 +228,20 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                   </span>
                 )}
               </h1>
-              <p className="text-gray-600">Stay updated on your rentals and messages</p>
+              <p className="text-gray-600 dark:text-gray-400">Stay updated on your rentals and messages</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={markAllAsRead}
-              className="flex items-center gap-2 px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
             >
               <MailOpen className="w-4 h-4" />
               Mark all read
             </button>
             <button
               onClick={clearAll}
-              className="flex items-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
             >
               <Trash2 className="w-4 h-4" />
               Clear all
@@ -258,12 +258,12 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium whitespace-nowrap transition-all ${
                 activeTab === tab.id
                   ? 'bg-teal-500 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                  : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
               }`}
             >
               {tab.label}
               <span className={`px-2 py-0.5 rounded-full text-xs ${
-                activeTab === tab.id ? 'bg-white/20' : 'bg-gray-100'
+                activeTab === tab.id ? 'bg-white/20' : 'bg-gray-100 dark:bg-gray-700'
               }`}>
                 {tab.count}
               </span>
@@ -274,23 +274,23 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
         {/* Notifications List */}
         <div className="space-y-3">
           {loading ? (
-            <div className="bg-white rounded-2xl p-12 border border-gray-100 flex justify-center">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 border border-gray-100 dark:border-gray-700 flex justify-center">
               <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
             </div>
           ) : filteredNotifications.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 border border-gray-100 text-center">
-              <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">No notifications</h2>
-              <p className="text-gray-500">You're all caught up!</p>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 border border-gray-100 dark:border-gray-700 text-center">
+              <Bell className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No notifications</h2>
+              <p className="text-gray-500 dark:text-gray-400">You're all caught up!</p>
             </div>
           ) : (
             filteredNotifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`bg-white rounded-xl p-4 border transition-all ${
+                className={`bg-white dark:bg-gray-800 rounded-xl p-4 border transition-all ${
                   notification.is_read
-                    ? 'border-gray-100'
-                    : 'border-teal-200 bg-teal-50/50'
+                    ? 'border-gray-100 dark:border-gray-700'
+                    : 'border-teal-200 dark:border-teal-900 bg-teal-50/50 dark:bg-teal-900/20'
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -300,11 +300,11 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className={`font-semibold ${notification.is_read ? 'text-gray-700' : 'text-gray-900'}`}>
+                        <h3 className={`font-semibold ${notification.is_read ? 'text-gray-700 dark:text-gray-300' : 'text-gray-900 dark:text-white'}`}>
                           {notification.title}
                         </h3>
-                        <p className="text-gray-600 text-sm mt-0.5">{notification.message}</p>
-                        <p className="text-gray-400 text-xs mt-2 flex items-center gap-1">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm mt-0.5">{notification.message}</p>
+                        <p className="text-gray-400 dark:text-gray-500 text-xs mt-2 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {formatRelativeTime(notification.created_at)}
                         </p>
@@ -314,19 +314,19 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                           <button
                             aria-label="Mark as read"
                             onClick={() => markAsRead(notification.id)}
-                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                             title="Mark as read"
                           >
-                            <CheckCircle2 className="w-4 h-4 text-teal-600" />
+                            <CheckCircle2 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                           </button>
                         )}
                         <button
                           aria-label="Delete notification"
                           onClick={() => deleteNotification(notification.id)}
-                          className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                           title="Delete"
                         >
-                          <Trash2 className="w-4 h-4 text-red-600" />
+                          <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                         </button>
                       </div>
                     </div>
@@ -338,19 +338,19 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
         </div>
 
         {/* Notification Preferences */}
-        <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-100">
+        <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Settings className="w-5 h-5 text-gray-500" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <Settings className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               Notification Preferences
             </h2>
           </div>
           <div className="space-y-4">
             {prefItems.map(({ key, label, description }) => (
-              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
                 <div>
-                  <p className="font-medium text-gray-900">{label}</p>
-                  <p className="text-sm text-gray-500">{description}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{label}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -359,7 +359,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                     onChange={() => togglePref(key)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-checked:bg-teal-500 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
+                  <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-checked:bg-teal-500 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
                 </label>
               </div>
             ))}
