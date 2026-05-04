@@ -41,6 +41,7 @@ import {
 import AISettings from '../settings/AISettings';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
+import { useBookingUpdates, useOwnerBookingUpdates } from '../../hooks/useBookingUpdates';
 import {
   getBookings,
   getEquipment,
@@ -68,6 +69,7 @@ const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
 const NotificationSettings = lazy(() => import('../settings/NotificationSettings'));
 const RenterTrustScore = lazy(() => import('../trust/RenterTrustScore'));
 const EnhancedReviewSystem = lazy(() => import('../reviews/EnhancedReviewSystem'));
+const BookingStatusTracker = lazy(() => import('../booking/BookingStatusTracker'));
 
 interface DashboardProps {
   onBack: () => void;
@@ -156,6 +158,36 @@ export default function Dashboard({
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData]);
+
+  // Subscribe to live renter booking updates
+  useBookingUpdates(user?.id || null, {
+    onUpdate: (updatedBooking) => {
+      setBookings(prev =>
+        prev.map(b => b.id === updatedBooking.id ? updatedBooking : b)
+      );
+    },
+    onStatusChange: (bookingId, oldStatus, newStatus) => {
+      // Log the status change for analytics
+      if (import.meta.env.DEV) {
+        console.log(`Booking ${bookingId} status changed: ${oldStatus} → ${newStatus}`);
+      }
+    },
+  });
+
+  // Subscribe to live owner booking updates
+  useOwnerBookingUpdates(user?.id || null, {
+    onUpdate: (updatedBooking) => {
+      setOwnerBookings(prev =>
+        prev.map(b => b.id === updatedBooking.id ? updatedBooking : b)
+      );
+    },
+    onStatusChange: (bookingId, oldStatus, newStatus) => {
+      // Log the status change for analytics
+      if (import.meta.env.DEV) {
+        console.log(`Owner booking ${bookingId} status changed: ${oldStatus} → ${newStatus}`);
+      }
+    },
+  });
 
   useEffect(() => {
     if (profile) {
@@ -677,7 +709,10 @@ export default function Dashboard({
                                 {booking.total_days} days
                               </span>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <Suspense fallback={null}>
+                              <BookingStatusTracker booking={booking} isLive compact showLabel={false} />
+                            </Suspense>
+                            <div className="flex items-center justify-between mt-4">
                               <p className="text-lg font-semibold text-gray-900">${booking.total_amount.toFixed(2)}</p>
                               <div className="flex items-center gap-2">
                                 {booking.status === 'completed' && !reviewedBookingIds.has(booking.id) && (
