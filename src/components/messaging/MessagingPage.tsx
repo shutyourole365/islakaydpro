@@ -272,7 +272,7 @@ export default function MessagingPage({
             recipientIds.forEach(recipientId => {
               sendMessageNotification(recipientId, senderName, content, selectedConv.id).catch(() => {});
             });
-          } catch {}
+          } catch { /* fire-and-forget */ }
         })();
       }
     } catch (e) {
