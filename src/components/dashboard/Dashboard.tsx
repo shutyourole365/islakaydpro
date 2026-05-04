@@ -474,10 +474,10 @@ export default function Dashboard({
                 {onNavigate && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { label: 'Earnings', icon: DollarSign, page: 'earnings', color: 'bg-green-50 text-green-700 hover:bg-green-100' },
-                      { label: 'Disputes', icon: AlertCircle, page: 'disputes', color: 'bg-red-50 text-red-700 hover:bg-red-100' },
-                      { label: 'Verify ID', icon: Shield, page: 'id-verification', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
-                        { label: 'Recurring', icon: RefreshCw, page: 'recurring-rentals', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100' },
+                      { label: 'Earnings', icon: DollarSign, page: 'earnings', color: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30' },
+                      { label: 'Disputes', icon: AlertCircle, page: 'disputes', color: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30' },
+                      { label: 'Verify ID', icon: Shield, page: 'id-verification', color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30' },
+                        { label: 'Recurring', icon: RefreshCw, page: 'recurring-rentals', color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30' },
                     ].map(action => (
                       <button key={action.page} onClick={() => onNavigate(action.page)} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent transition-colors ${action.color}`}>
                         <action.icon className="w-5 h-5" />
@@ -516,7 +516,7 @@ export default function Dashboard({
 
                 {/* Enhanced Analytics Charts - NEW */}
                 <Suspense fallback={
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-center h-64">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-center h-64">
                     <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
                   </div>
                 }>
@@ -527,68 +527,68 @@ export default function Dashboard({
                 </Suspense>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-semibold text-gray-900">Performance Overview</h2>
-                      <select aria-label="Select time range" className="text-sm border-0 text-gray-500 focus:ring-0">
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Performance Overview</h2>
+                      <select aria-label="Select time range" className="text-sm border-0 text-gray-500 dark:text-gray-400 focus:ring-0 bg-white dark:bg-gray-700">
                         <option>Last 30 days</option>
                         <option>Last 90 days</option>
                         <option>This year</option>
                       </select>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-gray-50 rounded-xl">
+                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Eye className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Profile Views</span>
+                          <Eye className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Profile Views</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">{analytics?.profile_views || 0}</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.profile_views || 0}</p>
                       </div>
-                      <div className="p-4 bg-gray-50 rounded-xl">
+                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Users className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Total Rentals</span>
+                          <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Total Rentals</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">{analytics?.total_rentals || 0}</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.total_rentals || 0}</p>
                       </div>
-                      <div className="p-4 bg-gray-50 rounded-xl">
+                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Star className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Reviews Given</span>
+                          <Star className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Reviews Given</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">{analytics?.reviews_given || 0}</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.reviews_given || 0}</p>
                       </div>
-                      <div className="p-4 bg-gray-50 rounded-xl">
+                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Clock className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-500">Avg Response</span>
+                          <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Avg Response</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900">{analytics?.avg_response_time_hours || 0}h</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.avg_response_time_hours || 0}h</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-semibold text-gray-900">Recent Bookings</h2>
+                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Bookings</h2>
                       <button
                         onClick={() => setActiveTab('bookings')}
-                        className="text-teal-600 text-sm font-medium hover:text-teal-700"
+                        className="text-teal-600 dark:text-teal-400 text-sm font-medium hover:text-teal-700 dark:hover:text-teal-300"
                       >
                         View All
                       </button>
                     </div>
                     {bookings.length === 0 ? (
                       <div className="text-center py-8">
-                        <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">No bookings yet</p>
+                        <Calendar className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                        <p className="text-gray-500 dark:text-gray-400">No bookings yet</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {bookings.slice(0, 3).map((booking) => (
                           <div
                             key={booking.id}
-                            className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl"
+                            className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl"
                           >
                             <img
                               src={booking.equipment?.images[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg'}
@@ -596,8 +596,8 @@ export default function Dashboard({
                               className="w-12 h-12 rounded-lg object-cover"
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 truncate">{booking.equipment?.title}</p>
-                              <p className="text-sm text-gray-500">{formatDate(booking.start_date)}</p>
+                              <p className="font-medium text-gray-900 dark:text-white truncate">{booking.equipment?.title}</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(booking.start_date)}</p>
                             </div>
                             {getStatusBadge(booking.status)}
                           </div>
@@ -608,19 +608,19 @@ export default function Dashboard({
                 </div>
 
                 {pendingOwnerBookings.length > 0 && (
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <AlertCircle className="w-6 h-6 text-amber-600" aria-hidden="true" />
+                      <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/40 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-500" aria-hidden="true" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-amber-900 mb-1">Pending Booking Requests</h3>
-                        <p className="text-amber-700 text-sm mb-4">
+                        <h3 className="font-semibold text-amber-900 dark:text-amber-300 mb-1">Pending Booking Requests</h3>
+                        <p className="text-amber-700 dark:text-amber-200 text-sm mb-4">
                           You have {pendingOwnerBookings.length} booking request{pendingOwnerBookings.length > 1 ? 's' : ''} waiting for your approval.
                         </p>
                         <button
                           onClick={() => setActiveTab('listings')}
-                          className="px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition-colors"
+                          className="px-4 py-2 bg-amber-600 dark:bg-amber-700 text-white font-medium rounded-lg hover:bg-amber-700 dark:hover:bg-amber-600 transition-colors"
                         >
                           Review Requests
                         </button>
@@ -648,13 +648,13 @@ export default function Dashboard({
             {activeTab === 'bookings' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">My Bookings</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Bookings</h2>
                   <div className="flex items-center gap-2">
                     <select
                       aria-label="Filter bookings"
                       value={bookingFilter}
                       onChange={(e) => setBookingFilter(e.target.value as BookingFilter)}
-                      className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-500"
+                      className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:border-teal-500 dark:focus:border-teal-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
                     >
                       <option value="all">All Bookings</option>
                       <option value="pending">Pending</option>
@@ -667,10 +667,10 @@ export default function Dashboard({
                 </div>
 
                 {filteredBookings.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
-                    <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No bookings found</h3>
-                    <p className="text-gray-600 mb-6">Start renting equipment to see your bookings here.</p>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-sm border border-gray-100 dark:border-gray-700 text-center">
+                    <Calendar className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No bookings found</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">Start renting equipment to see your bookings here.</p>
                     <button
                       onClick={onBack}
                       className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
@@ -679,7 +679,7 @@ export default function Dashboard({
                     </button>
                   </div>
                 ) : (
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
                     {filteredBookings.map((booking) => (
                       <div key={booking.id} className="p-6">
                         <div className="flex items-start gap-4">
@@ -691,15 +691,15 @@ export default function Dashboard({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between mb-2">
                               <div>
-                                <h3 className="font-semibold text-gray-900">{booking.equipment?.title}</h3>
-                                <p className="text-sm text-gray-500 flex items-center gap-1.5">
+                                <h3 className="font-semibold text-gray-900 dark:text-white">{booking.equipment?.title}</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                                   <MapPin className="w-4 h-4" aria-hidden="true" />
                                   {booking.equipment?.location}
                                 </p>
                               </div>
                               {getStatusBadge(booking.status)}
                             </div>
-                            <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
+                            <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-4">
                               <span className="flex items-center gap-1.5">
                                 <Calendar className="w-4 h-4" aria-hidden="true" />
                                 {formatDate(booking.start_date)} - {formatDate(booking.end_date)}
@@ -713,27 +713,27 @@ export default function Dashboard({
                               <BookingStatusTracker booking={booking} isLive compact showLabel={false} />
                             </Suspense>
                             <div className="flex items-center justify-between mt-4">
-                              <p className="text-lg font-semibold text-gray-900">${booking.total_amount.toFixed(2)}</p>
+                              <p className="text-lg font-semibold text-gray-900 dark:text-white">${booking.total_amount.toFixed(2)}</p>
                               <div className="flex items-center gap-2">
                                 {booking.status === 'completed' && !reviewedBookingIds.has(booking.id) && (
                                   <button
                                     onClick={() => setActiveReviewBooking(booking)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 font-medium hover:bg-amber-100 rounded-xl transition-colors border border-amber-200"
+                                    className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-colors border border-amber-200 dark:border-amber-800"
                                   >
                                     <Star className="w-4 h-4" />
                                     Leave a Review
                                   </button>
                                 )}
                                 {booking.status === 'completed' && reviewedBookingIds.has(booking.id) && (
-                                  <span className="flex items-center gap-1.5 px-3 py-2 text-sm text-green-700 bg-green-50 rounded-xl border border-green-200">
+                                  <span className="flex items-center gap-1.5 px-3 py-2 text-sm text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
                                     <CheckCircle2 className="w-4 h-4" />
                                     Reviewed
                                   </span>
                                 )}
                                 <button
-                                 
+
                                   onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
-                                  className="flex items-center gap-2 px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-xl transition-colors"
+                                  className="flex items-center gap-2 px-4 py-2 text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-xl transition-colors"
                                 >
                                   View Details
                                   <ChevronRight className="w-4 h-4" aria-hidden="true" />
@@ -752,7 +752,7 @@ export default function Dashboard({
             {activeTab === 'listings' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">My Listings ({myListings.length})</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Listings ({myListings.length})</h2>
                   <button
                     onClick={onListEquipment}
                     className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors"
@@ -763,11 +763,11 @@ export default function Dashboard({
                 </div>
 
                 {pendingOwnerBookings.length > 0 && (
-                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
-                    <div className="p-4 border-b border-gray-100">
-                      <h3 className="font-semibold text-gray-900">Pending Requests ({pendingOwnerBookings.length})</h3>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                    <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">Pending Requests ({pendingOwnerBookings.length})</h3>
                     </div>
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-gray-100 dark:divide-gray-700">
                       {pendingOwnerBookings.map((booking) => {
                         const renterId = booking.renter_id as string;
                         const trustScore = renterTrustScores[renterId];
@@ -785,7 +785,7 @@ export default function Dashboard({
                           excellent: 'Trusted', good: 'Good', fair: 'Fair', building: 'Building', new: 'New',
                         };
                         return (
-                          <div key={booking.id} className="p-4 hover:bg-gray-50 transition-colors">
+                          <div key={booking.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             <div className="flex items-start gap-4">
                               <img
                                 src={booking.equipment?.images[0] || ''}
@@ -793,11 +793,11 @@ export default function Dashboard({
                                 className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
                               />
                               <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-900 truncate">{booking.equipment?.title}</p>
-                                <p className="text-sm text-gray-500 mb-1">
+                                <p className="font-semibold text-gray-900 dark:text-white truncate">{booking.equipment?.title}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
                                   {formatDate(booking.start_date)} → {formatDate(booking.end_date)} · {booking.total_days} days
                                 </p>
-                                <p className="text-sm font-semibold text-gray-900 mb-2">${booking.total_amount.toFixed(2)}</p>
+                                <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">${booking.total_amount.toFixed(2)}</p>
 
                                 {/* Renter trust badge */}
                                 <div className="flex items-center gap-2 flex-wrap">
@@ -810,17 +810,17 @@ export default function Dashboard({
                                       {trustScore} · {trustLabelMap[trustLevel]}
                                     </button>
                                   ) : (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-gray-400 bg-gray-50 ring-1 ring-gray-200">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-600">
                                       <Shield className="w-3 h-3" />Checking score…
                                     </span>
                                   )}
                                   {trustScore !== undefined && trustScore < 50 && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-amber-700 bg-amber-50 ring-1 ring-amber-200">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-200 dark:ring-amber-800">
                                       <AlertCircle className="w-3 h-3" />Low trust
                                     </span>
                                   )}
                                   {booking.renter && (
-                                    <span className="text-xs text-gray-400">
+                                    <span className="text-xs text-gray-400 dark:text-gray-500">
                                       {(booking.renter as { full_name?: string }).full_name || 'Renter'}
                                     </span>
                                   )}
@@ -831,14 +831,14 @@ export default function Dashboard({
                               <div className="flex flex-col gap-2 shrink-0">
                                 <button
                                   onClick={() => handleBookingAction(booking.id, 'confirm')}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors text-sm font-medium"
                                   aria-label="Approve request"
                                 >
                                   <Check className="w-4 h-4" />Approve
                                 </button>
                                 <button
                                   onClick={() => handleBookingAction(booking.id, 'cancel')}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium"
+                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium"
                                   aria-label="Reject request"
                                 >
                                   <X className="w-4 h-4" />Decline
@@ -853,10 +853,10 @@ export default function Dashboard({
                 )}
 
                 {myListings.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
-                    <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" aria-hidden="true" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No listings yet</h3>
-                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-sm border border-gray-100 dark:border-gray-700 text-center">
+                    <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" aria-hidden="true" />
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No listings yet</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
                       Start earning money by listing your equipment. It's free to list and you set your own prices.
                     </p>
                     <button
@@ -870,7 +870,7 @@ export default function Dashboard({
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {myListings.map((item) => (
-                      <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                      <div key={item.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm">
                         <div className="relative">
                           <img
                             src={item.images[0]}
@@ -886,11 +886,11 @@ export default function Dashboard({
                           </div>
                         </div>
                         <div className="p-4">
-                          <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
-                          <p className="text-sm text-gray-500 mb-3">{item.location}</p>
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{item.title}</h3>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{item.location}</p>
                           <div className="flex items-center justify-between mb-4">
-                            <p className="font-semibold text-gray-900">${item.daily_rate}/day</p>
-                            <div className="flex items-center gap-1 text-sm text-gray-500">
+                            <p className="font-semibold text-gray-900 dark:text-white">${item.daily_rate}/day</p>
+                            <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                               <Eye className="w-4 h-4" />
                               <span>{item.total_bookings} bookings</span>
                             </div>
@@ -902,10 +902,10 @@ export default function Dashboard({
                             >
                               View
                             </button>
-                            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Edit booking">
+                            <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Edit booking">
                               <Edit className="w-5 h-5" />
                             </button>
-                            <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                            <button aria-label="Delete item" className="p-2 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -919,13 +919,13 @@ export default function Dashboard({
 
             {activeTab === 'favorites' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900">Saved Equipment ({favorites.length})</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Saved Equipment ({favorites.length})</h2>
 
                 {favorites.length === 0 ? (
-                  <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
-                    <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No favorites yet</h3>
-                    <p className="text-gray-600 mb-6">Save equipment you're interested in to easily find them later</p>
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-sm border border-gray-100 dark:border-gray-700 text-center">
+                    <Heart className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No favorites yet</h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-6">Save equipment you're interested in to easily find them later</p>
                     <button
                       onClick={onBack}
                       className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
