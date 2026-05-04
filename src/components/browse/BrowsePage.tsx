@@ -426,34 +426,89 @@ export default function BrowsePage({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-gray-600">
-            <span className="font-semibold text-gray-900">{filteredEquipment.length}</span>{' '}
-            results found
+        {/* Results summary + active filter chips */}
+        <div className="flex flex-wrap items-center gap-3 mb-6">
+          <p className="text-gray-600 text-sm">
+            <span className="font-semibold text-gray-900">{searchLoading ? '…' : filteredEquipment.length}</span>{' '}
+            {filteredEquipment.length === 1 ? 'result' : 'results'}
             {searchQuery && (
-              <span>
-                {' '}
-                for "<span className="font-medium">{searchQuery}</span>"
-              </span>
+              <span> for "<span className="font-medium">{searchQuery}</span>"</span>
             )}
           </p>
+
+          {/* Active filter chips */}
+          {activeFiltersCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              {searchQuery && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                  "{searchQuery}"
+                  <button onClick={() => setSearchQuery('')} aria-label="Remove search filter">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {selectedCategory && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                  {categories.find((c) => c.slug === selectedCategory)?.name ?? selectedCategory}
+                  <button onClick={() => setSelectedCategory('')} aria-label="Remove category filter">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {location && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                  <MapPin className="w-3 h-3" />
+                  {location}
+                  <button onClick={() => { setLocation(''); setUserCoords(null); }} aria-label="Remove location filter">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {condition && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium capitalize">
+                  {condition}
+                  <button onClick={() => setCondition('')} aria-label="Remove condition filter">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {(priceRange[0] > 0 || priceRange[1] < 1000) && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                  ${priceRange[0]}–${priceRange[1]}/day
+                  <button onClick={() => setPriceRange([0, 1000])} aria-label="Remove price filter">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              <button
+                onClick={clearFilters}
+                className="text-xs text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
         </div>
 
         {filteredEquipment.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-10 h-10 text-gray-400" />
+          <div className="text-center py-20">
+            <div className="w-20 h-20 bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft">
+              <Search className="w-9 h-9 text-teal-400" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No equipment found</h3>
-            <p className="text-gray-600 mb-6">
-              Try adjusting your filters or search terms
+            <h3 className="text-2xl font-semibold text-gray-900 mb-2">No equipment found</h3>
+            <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+              {activeFiltersCount > 0
+                ? 'No results match your current filters. Try broadening your search.'
+                : 'No equipment listed yet. Check back soon!'}
             </p>
-            <button
-              onClick={clearFilters}
-              className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
-             >
-              Clear All Filters
-            </button>
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={clearFilters}
+                className="px-6 py-3 bg-brand-gradient text-white font-semibold rounded-xl hover:opacity-90 transition-all shadow-pop"
+               >
+                Clear All Filters
+              </button>
+            )}
           </div>
         ) : viewMode === 'map' ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
