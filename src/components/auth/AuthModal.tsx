@@ -1,10 +1,11 @@
 import { useState, useId } from 'react';
-import { X, Mail, Lock, User, Eye, EyeOff, Package, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { signUpWithRetry, getAuthErrorMessage } from '../../services/authHelpers';
 import { sendWelcomeEmail } from '../../services/email';
 import SocialAuth from './SocialAuth';
 import BiometricAuth from './BiometricAuth';
+import Logo from '../ui/Logo';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -23,7 +24,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  // Generate unique IDs for form accessibility
   const emailId = useId();
   const passwordId = useId();
   const fullNameId = useId();
@@ -33,16 +33,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     setLoading(true);
     setError('');
     setSuccess('');
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-
     if (error) {
-      // Provide user-friendly error messages
       if (error.message.includes('Invalid login credentials')) {
         setError('Invalid email or password. Please try again.');
       } else if (error.message.includes('Email not confirmed')) {
@@ -52,10 +45,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
       }
     } else if (data.session) {
       setSuccess('✅ Successfully signed in! Redirecting...');
-      setTimeout(() => {
-        onSuccess();
-        onClose();
-      }, 800);
+      setTimeout(() => { onSuccess(); onClose(); }, 800);
     }
   };
 
@@ -64,36 +54,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     setLoading(true);
     setError('');
     setSuccess('');
-
     try {
-      const data = await signUpWithRetry(
-        email,
-        password,
-        { full_name: fullName },
-        { maxAttempts: 3, delayMs: 1000 }
-      );
-
+      const data = await signUpWithRetry(email, password, { full_name: fullName }, { maxAttempts: 3, delayMs: 1000 });
       if (data.user) {
-        // If Supabase requires email confirmation, there will be no session
         if (!data.session) {
           sendWelcomeEmail(email, fullName).catch(() => {});
           setSuccess('✅ Account created! Please check your email to confirm your account.');
           setLoading(false);
           return;
         }
-
-        // Auto-confirmed (session exists)
         sendWelcomeEmail(email, fullName).catch(() => {});
-        setSuccess('✅ Account created successfully! Welcome to Islakayd!');
+        setSuccess('✅ Account created successfully! Welcome to IslaKayd!');
         setLoading(false);
-        setTimeout(() => {
-          onSuccess();
-          onClose();
-        }, 800);
+        setTimeout(() => { onSuccess(); onClose(); }, 800);
       }
     } catch (err) {
-      const message = getAuthErrorMessage(err as Error);
-      setError(message);
+      setError(getAuthErrorMessage(err as Error));
       setLoading(false);
     }
   };
@@ -102,38 +78,25 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
-
     setLoading(false);
-
-    if (error) {
-      setError(error.message);
-    } else {
-      setSuccess('Password reset email sent! Check your inbox.');
-    }
+    if (error) setError(error.message);
+    else setSuccess('Password reset email sent! Check your inbox.');
   };
 
   const handleSetNewPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
-      return;
-    }
+    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     setLoading(true);
     setError('');
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) {
-      setError(error.message);
-    } else {
+    if (error) setError(error.message);
+    else {
       setSuccess('Password updated! You can now sign in.');
-      setTimeout(() => {
-        window.history.replaceState({}, '', '/');
-        onSuccess();
-      }, 1500);
+      setTimeout(() => { window.history.replaceState({}, '', '/'); onSuccess(); }, 1500);
     }
   };
 
@@ -147,23 +110,29 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     'Earn money listing your equipment',
   ];
 
+  const inputBase =
+    'w-full py-3.5 rounded-xl border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all border-gray-200 dark:border-gray-600';
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div role="dialog" aria-modal="true" aria-label="Sign in" className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex">
-        <div className="hidden lg:flex flex-col w-2/5 bg-gradient-to-br from-teal-600 to-emerald-600 p-10 text-white">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-              <Package className="w-6 h-6" />
-            </div>
-            <span className="text-2xl font-bold">Islakayd</span>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sign in"
+        className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden flex"
+      >
+        {/* Left panel — brand */}
+        <div className="hidden lg:flex flex-col w-2/5 bg-brand-gradient p-10 text-white">
+          <div className="mb-8">
+            <Logo size="md" inverse />
           </div>
 
-          <h2 className="text-3xl font-bold mb-4">
+          <h2 className="font-display text-3xl font-bold mb-4 leading-tight">
             Join the Future of Equipment Rental
           </h2>
-          <p className="text-white/80 mb-8">
+          <p className="text-white/80 mb-8 leading-relaxed">
             Access thousands of tools and equipment from verified owners. Powered by AI
             for the perfect match every time.
           </p>
@@ -172,7 +141,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-emerald-300 flex-shrink-0" />
-                <span className="text-white/90">{benefit}</span>
+                <span className="text-white/90 text-sm">{benefit}</span>
               </li>
             ))}
           </ul>
@@ -182,10 +151,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
             <div className="flex items-center gap-2 mt-2">
               <div className="flex -space-x-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full bg-white/20 border-2 border-white/30"
-                  />
+                  <div key={i} className="w-8 h-8 rounded-full bg-white/20 border-2 border-white/30" />
                 ))}
               </div>
               <span className="text-sm text-white/80">+120k users</span>
@@ -193,55 +159,58 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
           </div>
         </div>
 
-        <div className="flex-1 p-8 lg:p-10">
+        {/* Right panel — form */}
+        <div className="flex-1 p-8 lg:p-10 bg-white dark:bg-gray-900">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Close authentication dialog"
           >
-            <X className="w-6 h-6 text-gray-500" />
+            <X className="w-6 h-6 text-gray-500 dark:text-gray-400" />
           </button>
 
           <div className="max-w-sm mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {/* Mobile logo */}
+            <div className="lg:hidden mb-6">
+              <Logo size="md" />
+            </div>
+
+            <h2 className="font-display text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {mode === 'signin' && 'Welcome back'}
               {mode === 'reset-password' && 'Set new password'}
               {mode === 'signup' && 'Create your account'}
               {mode === 'forgot' && 'Reset password'}
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-500 dark:text-gray-400 mb-8">
               {mode === 'signin' && 'Sign in to continue to your account'}
               {mode === 'signup' && 'Start renting equipment in minutes'}
               {mode === 'forgot' && "Enter your email and we'll send you a reset link"}
+              {mode === 'reset-password' && 'Choose a new password for your account'}
             </p>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
                 {error}
               </div>
             )}
-
             {success && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl text-green-600 text-sm">
+              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-xl text-green-600 dark:text-green-400 text-sm">
                 {success}
               </div>
             )}
 
             <form
               onSubmit={
-                mode === 'signin'
-                  ? handleSignIn
-                  : mode === 'signup'
-                  ? handleSignUp
-                  : mode === 'reset-password'
-                  ? handleSetNewPassword
+                mode === 'signin' ? handleSignIn
+                  : mode === 'signup' ? handleSignUp
+                  : mode === 'reset-password' ? handleSetNewPassword
                   : handleForgotPassword
               }
               className="space-y-4"
             >
               {mode === 'signup' && (
                 <div>
-                  <label htmlFor={fullNameId} className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={fullNameId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Full Name
                   </label>
                   <div className="relative">
@@ -251,35 +220,37 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      placeholder="John Doe"
+                      placeholder="Your full name"
                       required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
+                      className={`${inputBase} pl-12 pr-4`}
                     />
                   </div>
                 </div>
               )}
 
-              {mode !== 'reset-password' && <div>
-                <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    id={emailId}
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
-                  />
+              {mode !== 'reset-password' && (
+                <div>
+                  <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      id={emailId}
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      required
+                      className={`${inputBase} pl-12 pr-4`}
+                    />
+                  </div>
                 </div>
-              </div>}
+              )}
 
               {(mode === 'signin' || mode === 'signup' || mode === 'reset-password') && (
                 <div>
-                  <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Password
                   </label>
                   <div className="relative">
@@ -292,19 +263,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       placeholder="Enter your password"
                       required
                       minLength={6}
-                      className="w-full pl-12 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
+                      className={`${inputBase} pl-12 pr-12`}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
-                      {showPassword ? (
-                        <EyeOff className="w-5 h-5" />
-                      ) : (
-                        <Eye className="w-5 h-5" />
-                      )}
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
                 </div>
@@ -312,18 +279,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
               {mode === 'signin' && (
                 <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500"
                     />
-                    <span className="text-sm text-gray-600">Remember me</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Remember me</span>
                   </label>
                   <button
                     type="button"
                     onClick={() => setMode('forgot')}
-                    aria-label="Forgot password"
-                    className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                    className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
                   >
                     Forgot password?
                   </button>
@@ -333,8 +299,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-               >
+                className="w-full py-4 bg-brand-gradient text-white font-semibold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-pop"
+              >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
@@ -349,31 +315,27 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
               </button>
             </form>
 
-            {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+                <div className="w-full border-t border-gray-200 dark:border-gray-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">or continue with</span>
+                <span className="px-4 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+                  or continue with
+                </span>
               </div>
             </div>
 
-            {/* Social Auth */}
             <SocialAuth
               onError={(err) => setError(err)}
-              onLoading={(loading) => setLoading(loading)}
+              onLoading={(l) => setLoading(l)}
               mode={mode === 'signin' ? 'signin' : 'signup'}
             />
 
-            {/* Biometric Auth */}
             {mode === 'signin' && (
               <div className="mt-4">
                 <BiometricAuth
-                  onSuccess={() => {
-                    onSuccess();
-                    onClose();
-                  }}
+                  onSuccess={() => { onSuccess(); onClose(); }}
                   onError={(err) => setError(err)}
                 />
               </div>
@@ -381,31 +343,22 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
             <div className="mt-8 text-center">
               {mode === 'signin' && (
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Don't have an account?{' '}
                   <button
-                   
-                    onClick={() => {
-                      setMode('signup');
-                      setError('');
-                    }}
-                    className="text-teal-600 hover:text-teal-700 font-semibold"
+                    onClick={() => { setMode('signup'); setError(''); }}
+                    className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-semibold"
                   >
                     Sign up
                   </button>
                 </p>
               )}
               {(mode === 'signup' || mode === 'forgot') && (
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Already have an account?{' '}
                   <button
-                   
-                    onClick={() => {
-                      setMode('signin');
-                      setError('');
-                      setSuccess('');
-                    }}
-                    className="text-teal-600 hover:text-teal-700 font-semibold"
+                    onClick={() => { setMode('signin'); setError(''); setSuccess(''); }}
+                    className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-semibold"
                   >
                     Sign in
                   </button>
@@ -413,15 +366,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
               )}
             </div>
 
-            <p className="mt-6 text-xs text-center text-gray-500">
-              By continuing, you agree to Islakayd's{' '}
-              <a href="#" className="text-teal-600 hover:underline">
-                Terms of Service
-              </a>{' '}
-              and{' '}
-              <a href="#" className="text-teal-600 hover:underline">
-                Privacy Policy
-              </a>
+            <p className="mt-6 text-xs text-center text-gray-400 dark:text-gray-500">
+              By continuing, you agree to IslaKayd's{' '}
+              <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Terms of Service</a>
+              {' '}and{' '}
+              <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Privacy Policy</a>
             </p>
           </div>
         </div>
