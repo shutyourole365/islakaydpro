@@ -35,6 +35,7 @@ vi.mock('../services/database', () => ({
     total_spent: 1000,
   })),
   getUnreadNotificationCount: vi.fn(() => Promise.resolve(3)),
+  getUnreadMessageCount: vi.fn(() => Promise.resolve(0)),
   subscribeToNotifications: vi.fn(() => ({
     unsubscribe: vi.fn(),
   })),

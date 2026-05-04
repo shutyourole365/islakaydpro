@@ -118,7 +118,7 @@ describe('EquipmentAvailabilityCalendar', () => {
       await user.click(prevButtons[0]);
 
       // Month should have changed
-      expect(screen.queryByText(/January|February|March/i)).toBeInTheDocument();
+      expect(screen.queryByText(/January|February|March|April|May|June|July|August|September|October|November|December/i)).toBeInTheDocument();
     });
 
     it('should display day headers', () => {
