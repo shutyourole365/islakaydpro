@@ -253,14 +253,34 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
   if (error) throw error;
 
   // Send notification for booking status changes
-  if (status === 'confirmed' || status === 'cancelled') {
+  if (status === 'confirmed' || status === 'cancelled' || status === 'completed') {
+    let notificationType: 'booking_confirmed' | 'booking_cancelled' | 'booking_completed';
+    let title: string;
+    let message: string;
+    let pushType: 'confirmed' | 'cancelled' | 'completed';
+
+    if (status === 'confirmed') {
+      notificationType = 'booking_confirmed';
+      title = '✅ Booking Confirmed!';
+      message = `Your booking for ${data.equipment?.title} is confirmed`;
+      pushType = 'confirmed';
+    } else if (status === 'cancelled') {
+      notificationType = 'booking_cancelled';
+      title = '❌ Booking Cancelled';
+      message = `Your booking for ${data.equipment?.title} has been cancelled`;
+      pushType = 'cancelled';
+    } else {
+      notificationType = 'booking_completed';
+      title = '🎉 Rental Completed!';
+      message = `Your rental of ${data.equipment?.title} is complete. Leave a review!`;
+      pushType = 'completed';
+    }
+
     const notification = {
       user_id: data.renter_id,
-      type: status === 'confirmed' ? 'booking_confirmed' : 'booking_cancelled',
-      title: status === 'confirmed' ? '✅ Booking Confirmed!' : '❌ Booking Cancelled',
-      message: status === 'confirmed'
-        ? `Your booking for ${data.equipment?.title} is confirmed`
-        : `Your booking for ${data.equipment?.title} has been cancelled`,
+      type: notificationType,
+      title,
+      message,
       data: { booking_id: data.id },
       is_read: false,
       created_at: new Date().toISOString(),
@@ -271,7 +291,7 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
         await supabase.from('notifications').insert(notification);
         // Fire-and-forget push notification
         const { sendBookingNotification } = await import('./pushNotifications');
-        sendBookingNotification(data.renter_id, status, {
+        sendBookingNotification(data.renter_id, pushType, {
           equipmentName: data.equipment?.title || 'Equipment',
           dates: `${data.start_date} to ${data.end_date}`,
           ownerName: data.owner?.full_name,
