@@ -8,7 +8,7 @@ export default function AISettings({ className = '' }: { className?: string }) {
   const [aiEnabledByUser, setAiEnabledByUser] = useLocalStorage<boolean>('ai_assistant_enabled', true);
   const { user, refreshProfile } = (function tryUseAuth() {    try { // note: profile intentionally omitted, unused
       // dynamic import to avoid circular dependency errors in tests
-       
+
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const ctx = require('../../contexts/AuthContext');
       return ctx.useAuth();
@@ -38,9 +38,9 @@ export default function AISettings({ className = '' }: { className?: string }) {
   };
 
   return (
-    <div className={`${className} bg-white rounded-2xl shadow-sm border border-gray-100`}>
-      <div className="p-6 border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-900">AI Assistant</h2>
+    <div className={`${className} bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700`}>
+      <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">AI Assistant</h2>
       </div>
       <div className="p-6 space-y-4">
         <div className="flex items-center justify-between">
@@ -49,8 +49,8 @@ export default function AISettings({ className = '' }: { className?: string }) {
               <Bot className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-medium text-gray-900">Enable LLM-powered assistant</p>
-              <p className="text-sm text-gray-500">When enabled, Kayd uses a cloud LLM to provide richer, contextual responses.</p>
+              <p className="font-medium text-gray-900 dark:text-white">Enable LLM-powered assistant</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">When enabled, Kayd uses a cloud LLM to provide richer, contextual responses.</p>
             </div>
           </div>
 
@@ -58,17 +58,17 @@ export default function AISettings({ className = '' }: { className?: string }) {
             <button
               aria-label={aiEnabledByUser ? 'Disable AI assistant' : 'Enable AI assistant'} onClick={() => persistPreference(!aiEnabledByUser)}
               disabled={!GLOBAL_AI_ENABLED}
-              className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-12 h-6 rounded-full transition-colors ${aiEnabledByUser && GLOBAL_AI_ENABLED ? 'bg-teal-500' : 'bg-gray-300 dark:bg-gray-600'} ${!GLOBAL_AI_ENABLED ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${aiEnabledByUser ? 'translate-x-6' : 'translate-x-0.5'}`} />
             </button>
             {!GLOBAL_AI_ENABLED && (
-              <span className="text-xs text-gray-400 flex items-center gap-1"><Lock className="w-3 h-3" /> Disabled by server</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1"><Lock className="w-3 h-3" /> Disabled by server</span>
             )}
           </div>
         </div>
 
-        <div className="text-sm text-gray-500">We respect your privacy — user preference is stored locally and (when signed-in) in your profile. To fully disable AI at the platform level, set <code>VITE_ENABLE_AI=false</code> in the environment.</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">We respect your privacy — user preference is stored locally and (when signed-in) in your profile. To fully disable AI at the platform level, set <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">VITE_ENABLE_AI=false</code> in the environment.</div>
       </div>
     </div>
   );

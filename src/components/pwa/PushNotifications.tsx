@@ -160,32 +160,32 @@ export default function PushNotifications({ isOpen, onClose }: PushNotifications
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="flex items-center justify-between p-6 border-b">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+        <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <Bell className="h-6 w-6 text-teal-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Push Notifications</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Push Notifications</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
         <div className="p-6 space-y-4">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             Stay updated with booking confirmations, new equipment in your area, and important updates.
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Browser Permission</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">Browser Permission</span>
               <span className={`px-2 py-1 text-xs rounded-full ${
-                permission === 'granted' ? 'bg-green-100 text-green-800' :
-                permission === 'denied' ? 'bg-red-100 text-red-800' :
-                'bg-yellow-100 text-yellow-800'
+                permission === 'granted' ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' :
+                permission === 'denied' ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' :
+                'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300'
               }`}>
                 {permission === 'granted' ? 'Granted' :
                  permission === 'denied' ? 'Denied' :
@@ -194,9 +194,9 @@ export default function PushNotifications({ isOpen, onClose }: PushNotifications
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Push Subscription</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">Push Subscription</span>
               <span className={`px-2 py-1 text-xs rounded-full ${
-                isSubscribed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                isSubscribed ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
               }`}>
                 {isSubscribed ? 'Active' : 'Inactive'}
               </span>
@@ -239,13 +239,13 @@ export default function PushNotifications({ isOpen, onClose }: PushNotifications
             )}
 
             {permission === 'denied' && (
-              <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
+              <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded">
                 Notifications are blocked. Please enable them in your browser settings.
               </div>
             )}
           </div>
 
-          <div className="text-xs text-gray-500 space-y-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
             <p>• Get notified about booking updates</p>
             <p>• New equipment in your search area</p>
             <p>• Messages from equipment owners</p>

@@ -278,11 +278,11 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
   if (loading) {
     return (
       <div className={`animate-pulse ${className}`}>
-        <div className="bg-white rounded-xl p-6 border border-gray-100">
-          <div className="h-12 bg-gray-200 rounded mb-6"></div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
+          <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-48 bg-gray-200 rounded"></div>
+              <div key={i} className="h-48 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ))}
           </div>
         </div>
@@ -293,7 +293,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
   return (
     <div className={className}>
       {/* Search Header */}
-      <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 mb-6">
         <div className="flex items-center gap-4 mb-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -302,15 +302,15 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
               placeholder="Search equipment, features, locations..."
               value={filters.query}
               onChange={(e) => setFilters(prev => ({ ...prev, query: e.target.value }))}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-4 py-3 rounded-lg border transition-colors ${
               showFilters
-                ? 'bg-blue-100 text-blue-700 border-blue-300'
-                : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-700'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             <SlidersHorizontal className="w-4 h-4" />
@@ -322,15 +322,15 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
         {aiSuggestions.length > 0 && !filters.query && (
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">AI Suggestions</span>
+              <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">AI Suggestions</span>
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2">
               {aiSuggestions.map((suggestion, index) => (
                 <button
                   key={index}
                   onClick={() => handleSuggestionClick(suggestion)}
-                  className="flex-shrink-0 bg-purple-50 hover:bg-purple-100 text-purple-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-purple-200"
+                  className="flex-shrink-0 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-purple-200 dark:border-purple-700"
                 >
                   {suggestion.title}
                 </button>
@@ -342,30 +342,30 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
         {/* Active Filters */}
         {(filters.category || filters.location || filters.rating > 0 || filters.features.length > 0) && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-gray-600">Active filters:</span>
+            <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
             {filters.category && (
-              <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">
+              <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded text-xs">
                 {filters.category}
               </span>
             )}
             {filters.location && (
-              <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+              <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded text-xs">
                 📍 {filters.location}
               </span>
             )}
             {filters.rating > 0 && (
-              <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">
+              <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded text-xs">
                 ⭐ {filters.rating}+ stars
               </span>
             )}
             {filters.features.map((feature, index) => (
-              <span key={index} className="bg-purple-100 text-purple-700 px-2 py-1 rounded text-xs">
+              <span key={index} className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded text-xs">
                 {feature}
               </span>
             ))}
             <button
               onClick={clearFilters}
-              className="text-sm text-gray-500 hover:text-gray-700 underline"
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 underline"
              >
               Clear all
             </button>
@@ -375,17 +375,17 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
 
       {/* Filters Panel */}
       {showFilters && (
-        <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Category
               </label>
               <select
                 value={filters.category}
                 onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -396,7 +396,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
 
             {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Location
               </label>
               <div className="relative">
@@ -406,14 +406,14 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
                   placeholder="Enter location"
                   value={filters.location}
                   onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
 
             {/* Price Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Daily Rate: ${filters.priceRange[0]} - ${filters.priceRange[1]}
               </label>
               <div className="px-2">
@@ -427,14 +427,14 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
                     ...prev,
                     priceRange: [prev.priceRange[0], parseInt(e.target.value)]
                   }))}
-                  className="w-full"
+                  className="w-full accent-blue-500"
                 />
               </div>
             </div>
 
             {/* Rating */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Minimum Rating
               </label>
               <div className="flex items-center gap-2">
@@ -445,8 +445,8 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
                     onClick={() => setFilters(prev => ({ ...prev, rating: prev.rating === rating ? 0 : rating }))}
                     className={`flex items-center gap-1 px-2 py-1 rounded ${
                       filters.rating >= rating
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-gray-100 text-gray-400'
+                        ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
                     }`}
                   >
                     <Star className={`w-4 h-4 ${filters.rating >= rating ? 'fill-current' : ''}`} />
@@ -458,7 +458,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
 
           {/* Features */}
           <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Features
             </label>
             <div className="flex flex-wrap gap-2">
@@ -473,8 +473,8 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
                   }))}
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${
                     filters.features.includes(feature)
-                      ? 'bg-blue-100 text-blue-700 border border-blue-300'
-                      : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   {feature}
@@ -486,11 +486,11 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
           {/* Sort Options */}
           <div className="mt-6 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <label className="text-sm font-medium text-gray-700">Sort by:</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Sort by:</label>
               <select
                 value={filters.sortBy}
                 onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as SearchFilters['sortBy'] }))}
-                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="relevance">Relevance</option>
                 <option value="price_low">Price: Low to High</option>
@@ -500,7 +500,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
                 <option value="newest">Newest</option>
               </select>
             </div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
               {filteredEquipment.length} results found
             </div>
           </div>
@@ -513,7 +513,7 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
           <div
             key={eq.id}
             onClick={() => onEquipmentSelect?.(eq)}
-            className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-lg transition-all cursor-pointer group"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-6 hover:shadow-lg transition-all cursor-pointer group"
           >
             <div className="relative mb-4">
               <img
@@ -521,32 +521,32 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
                 alt={eq.title}
                 className="w-full h-48 object-cover rounded-lg group-hover:scale-105 transition-transform"
               />
-              <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
+              <div className="absolute top-2 right-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm px-2 py-1 rounded-full">
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-medium">{eq.rating?.toFixed(1) || 'N/A'}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{eq.rating?.toFixed(1) || 'N/A'}</span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-3">
               <div>
-                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {eq.title}
                 </h3>
-                <p className="text-sm text-gray-600">{eq.category?.name}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{eq.category?.name}</p>
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <MapPin className="w-4 h-4" />
                 <span>{eq.location || 'Location not specified'}</span>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1">
-                  <DollarSign className="w-4 h-4 text-green-600" />
-                  <span className="text-lg font-bold text-gray-900">${eq.daily_rate}</span>
-                  <span className="text-sm text-gray-600">/day</span>
+                  <DollarSign className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-lg font-bold text-gray-900 dark:text-white">${eq.daily_rate}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">/day</span>
                 </div>
                 <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
                   View Details
@@ -557,13 +557,13 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
                 {eq.features.slice(0, 3).map((feature, index) => (
                   <span
                     key={index}
-                    className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+                    className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs"
                   >
                     {feature}
                   </span>
                 ))}
                 {eq.features.length > 3 && (
-                  <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
+                  <span className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs">
                     +{eq.features.length - 3} more
                   </span>
                 )}
@@ -575,9 +575,9 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
 
       {filteredEquipment.length === 0 && (
         <div className="text-center py-12">
-          <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No equipment found</h3>
-          <p className="text-gray-600 mb-4">Try adjusting your search criteria or filters.</p>
+          <Search className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No equipment found</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Try adjusting your search criteria or filters.</p>
           <button
             onClick={clearFilters}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
