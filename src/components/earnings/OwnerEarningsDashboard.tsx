@@ -378,15 +378,15 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
 
             {/* Payout History */}
             {payouts.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-900">Payout History</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mt-6">
+                <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Payout History</h3>
                 </div>
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
                   {payouts.map(p => (
                     <div key={p.id} className="p-4 flex items-center gap-4">
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900">{fmt(p.amount / 100)}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">{fmt(p.amount / 100)}</p>
                         <p className="text-sm text-gray-500">{new Date(p.created_at).toLocaleDateString()}</p>
                       </div>
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
@@ -405,12 +405,12 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
             {/* Request Payout for completed bookings */}
             {payoutStatus?.isOnboarded && bookings.filter(b => b.status === 'completed' && b.payment_status === 'paid').length > 0 && (
               <div className="mt-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Request Payout</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Request Payout</h3>
                 <div className="space-y-2">
                   {bookings.filter(b => b.status === 'completed' && b.payment_status === 'paid').slice(0, 5).map(b => (
-                    <div key={b.id} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center justify-between gap-4">
+                    <div key={b.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-3 flex items-center justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="font-medium text-gray-900 truncate">{b.equipment?.title || 'Equipment'}</p>
+                        <p className="font-medium text-gray-900 dark:text-white truncate">{b.equipment?.title || 'Equipment'}</p>
                         <p className="text-sm text-gray-500">{fmt(b.total_amount - b.service_fee)}</p>
                       </div>
                       <button
