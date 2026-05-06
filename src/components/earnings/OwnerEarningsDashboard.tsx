@@ -197,31 +197,31 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <button onClick={onBack} className="text-gray-600 hover:text-gray-900 transition-colors">
+            <button onClick={onBack} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Earnings Dashboard</h1>
-              <p className="text-gray-500 text-sm">Track your rental income</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Earnings Dashboard</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Track your rental income</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex rounded-xl overflow-hidden border border-gray-200 bg-white">
+            <div className="flex rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               {(['30d', '90d', 'ytd', 'all'] as const).map(p => (
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
-                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${period === p ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${period === p ? 'bg-teal-500 text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'}`}
                 >
                   {p === '30d' ? '30D' : p === '90d' ? '90D' : p === 'ytd' ? 'YTD' : 'All'}
                 </button>
               ))}
             </div>
-            <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 bg-white rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+            <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -229,12 +229,12 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
 
         {/* Payout setup banner */}
         {payoutStatus && !payoutStatus.isOnboarded && import.meta.env.VITE_STRIPE_PUBLIC_KEY && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div className="mb-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <CreditCard className="w-5 h-5 text-amber-600 flex-shrink-0" />
               <div>
-                <p className="font-medium text-amber-900">Set up payouts to receive your earnings</p>
-                <p className="text-sm text-amber-700">Connect your bank account via Stripe to get paid.</p>
+                <p className="font-medium text-amber-900 dark:text-amber-200">Set up payouts to receive your earnings</p>
+                <p className="text-sm text-amber-700 dark:text-amber-300">Connect your bank account via Stripe to get paid.</p>
               </div>
             </div>
             <button
@@ -250,7 +250,7 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
 
         {/* Stripe balance display */}
         {stripeBalance && (
-          <div className="mb-6 bg-teal-50 border border-teal-200 rounded-2xl p-4 flex items-center gap-6">
+          <div className="mb-6 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-2xl p-4 flex items-center gap-6">
             <CreditCard className="w-5 h-5 text-teal-600 flex-shrink-0" />
             <div className="flex gap-8">
               <div>
@@ -273,7 +273,7 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
           <>
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                     <DollarSign className="w-5 h-5 text-green-600" />
@@ -283,31 +283,31 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
                     {Math.abs(summary.monthlyGrowth).toFixed(0)}%
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{fmt(summary.totalEarned)}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(summary.totalEarned)}</p>
                 <p className="text-xs text-gray-500 mt-1">Total Earned</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-3">
                   <Clock className="w-5 h-5 text-amber-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{fmt(summary.pendingPayout)}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(summary.pendingPayout)}</p>
                 <p className="text-xs text-gray-500 mt-1">Pending Payout</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center mb-3">
                   <TrendingUp className="w-5 h-5 text-teal-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{fmt(summary.thisMonth)}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(summary.thisMonth)}</p>
                 <p className="text-xs text-gray-500 mt-1">This Month</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
                   <Package className="w-5 h-5 text-blue-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{summary.completedBookings}</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{summary.completedBookings}</p>
                 <p className="text-xs text-gray-500 mt-1">Completed Rentals</p>
               </div>
             </div>
@@ -337,9 +337,9 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
             </div>
 
             {/* Transaction list */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Recent Transactions</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
               </div>
               {bookings.length === 0 ? (
                 <div className="text-center py-16">
@@ -347,23 +347,23 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
                   <p className="text-gray-500">No transactions in this period.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
                   {bookings.map(b => {
                     const net = b.total_amount - b.service_fee;
                     const sc = statusColor[b.status] || statusColor.pending;
                     return (
                       <div key={b.id} className="p-4 flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Package className="w-5 h-5 text-gray-500" />
+                        <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Package className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{b.equipment?.title || 'Unknown Equipment'}</p>
+                          <p className="font-medium text-gray-900 dark:text-white truncate">{b.equipment?.title || 'Unknown Equipment'}</p>
                           <p className="text-sm text-gray-500">
                             {b.renter?.full_name || 'Renter'} · {new Date(b.start_date).toLocaleDateString()} – {new Date(b.end_date).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="font-semibold text-gray-900">{fmt(net)}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">{fmt(net)}</p>
                           <p className="text-xs text-gray-400">after {fmt(b.service_fee)} fee</p>
                         </div>
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${sc} flex-shrink-0`}>
