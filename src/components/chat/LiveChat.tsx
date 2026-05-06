@@ -113,7 +113,7 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
     <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full sm:w-[440px] sm:h-[600px] h-full bg-white sm:rounded-2xl shadow-2xl flex flex-col">
+      <div className="relative w-full sm:w-[440px] sm:h-[600px] h-full bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-teal-500 to-emerald-500">
           <div className="flex items-center gap-3">
@@ -170,7 +170,7 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
                       className={`px-4 py-2.5 rounded-2xl ${
                         isMe
                           ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-br-sm'
-                          : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-sm'
                       }`}
                     >
                       <p className="text-sm leading-relaxed">{message.content}</p>
@@ -192,13 +192,13 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-gray-100 bg-gray-50">
+        <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
           <div className="flex items-end gap-2">
-            <button type="button" aria-label="Attach file" className="p-2.5 rounded-full hover:bg-gray-200 text-gray-600 transition-colors">
+            <button type="button" aria-label="Attach file" className="p-2.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors">
               <Paperclip className="w-5 h-5" />
             </button>
 
-            <div className="flex-1 bg-white rounded-2xl border border-gray-200 focus-within:border-teal-500 transition-colors">
+            <div className="flex-1 bg-white dark:bg-gray-700 rounded-2xl border border-gray-200 dark:border-gray-600 focus-within:border-teal-500 transition-colors">
               <textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -209,12 +209,12 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
                   }
                 }}
                 placeholder="Type a message..."
-                className="w-full px-4 py-3 bg-transparent resize-none focus:outline-none text-sm max-h-[120px]"
+                className="w-full px-4 py-3 bg-transparent resize-none focus:outline-none text-sm max-h-[120px] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                 rows={1}
               />
             </div>
 
-            <button type="button" aria-label="Insert emoji" className="p-2.5 rounded-full hover:bg-gray-200 text-gray-600 transition-colors">
+            <button type="button" aria-label="Insert emoji" className="p-2.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors">
               <Smile className="w-5 h-5" />
             </button>
 

@@ -166,12 +166,12 @@ export default function QuickActionsMenu({
       {isOpen && (
         <div
           ref={menuRef}
-          className={`fixed bottom-24 left-6 z-50 w-80 bg-white rounded-2xl shadow-2xl overflow-hidden ${
+          className={`fixed bottom-24 left-6 z-50 w-80 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden ${
             isAnimating ? 'animate-in fade-in slide-in-from-bottom-4 duration-200' : ''
           }`}
         >
           {/* Search header */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-700">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -180,9 +180,9 @@ export default function QuickActionsMenu({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search actions..."
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
-              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-0.5 bg-gray-200 rounded text-xs text-gray-500">
+              <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-2 py-0.5 bg-gray-200 dark:bg-gray-600 rounded text-xs text-gray-500 dark:text-gray-400">
                 ⌘K
               </kbd>
             </div>
@@ -190,7 +190,7 @@ export default function QuickActionsMenu({
 
           {/* Recent actions */}
           {!searchQuery && recentActionItems.length > 0 && (
-            <div className="p-3 border-b border-gray-100">
+            <div className="p-3 border-b border-gray-100 dark:border-gray-700">
               <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-2 px-1">Recent</p>
               <div className="flex items-center gap-2">
                 {recentActionItems.map(action => (
@@ -222,7 +222,7 @@ export default function QuickActionsMenu({
                 <button
                   key={action.id}
                   onClick={() => handleActionClick(action)}
-                  className="group relative flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-gray-50 transition-all"
+                  className="group relative flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
                   style={{
                     animation: 'fadeInUp 0.3s ease-out forwards',
                     animationDelay: `${index * 0.03}s`,
@@ -242,7 +242,7 @@ export default function QuickActionsMenu({
                       </span>
                     )}
                   </div>
-                  <span className="text-xs font-medium text-gray-700 text-center">{action.label}</span>
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center">{action.label}</span>
                 </button>
               ))}
             </div>
@@ -256,16 +256,16 @@ export default function QuickActionsMenu({
           </div>
 
           {/* Voice & Help */}
-          <div className="p-3 border-t border-gray-100 flex items-center justify-between">
+          <div className="p-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Voice command">
+              <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors" title="Voice command">
                 <Mic className="w-5 h-5" />
               </button>
-              <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition-colors" title="Camera search">
+              <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 transition-colors" title="Camera search">
                 <Camera className="w-5 h-5" />
               </button>
             </div>
-            <button className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
+            <button className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
               <HelpCircle className="w-4 h-4" />
               Help
             </button>
