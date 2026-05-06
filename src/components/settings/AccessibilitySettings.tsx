@@ -549,7 +549,7 @@ export default function AccessibilitySettingsComponent({
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
                     }`}
                   >
-                    <Monitor className="w-6 h-6 mx-auto text-gray-500" />
+                    <Monitor className="w-6 h-6 mx-auto text-gray-500 dark:text-gray-400" />
                     <span className="text-sm text-gray-600 dark:text-gray-400 mt-2 block">
                       System
                     </span>
