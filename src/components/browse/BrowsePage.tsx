@@ -186,26 +186,26 @@ export default function BrowsePage({
   ].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
-      <div className="bg-white border-b border-gray-200 sticky top-20 z-40">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-20 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4 mb-4">
             <button
               onClick={onBack}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
              >
               <ArrowLeft className="w-5 h-5" />
               <span className="hidden sm:inline">Back</span>
             </button>
 
-            <div className="flex-1 flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
+            <div className="flex-1 flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
               <Search className="w-5 h-5 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search equipment..."
-                className="flex-1 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none"
+                className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
               />
               {searchQuery && (
                 <button aria-label="Clear search" onClick={() => setSearchQuery('')}>
@@ -215,14 +215,14 @@ export default function BrowsePage({
             </div>
 
             <div className="hidden md:flex items-center gap-2">
-              <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
+              <div className="flex items-center gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
                 <MapPin className="w-5 h-5 text-gray-400" />
                 <input
                   type="text"
                   value={location}
                   onChange={(e) => { setLocation(e.target.value); if (e.target.value !== 'Near Me') setUserCoords(null); }}
                   placeholder="Location"
-                  className="bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none w-32"
+                  className="bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none w-32"
                 />
                 {location && (
                   <button onClick={() => { setLocation(''); setUserCoords(null); }}>
@@ -234,7 +234,7 @@ export default function BrowsePage({
                 onClick={handleNearMe}
                 disabled={locating}
                 title="Find equipment near me"
-                className={`flex items-center gap-1.5 px-3 py-3 rounded-xl text-sm font-medium transition-colors border ${userCoords ? 'bg-teal-500 text-white border-teal-500' : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-teal-400 hover:text-teal-600'}`}
+                className={`flex items-center gap-1.5 px-3 py-3 rounded-xl text-sm font-medium transition-colors border ${userCoords ? 'bg-teal-500 text-white border-teal-500' : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:border-teal-400 hover:text-teal-600'}`}
               >
                 <MapPin className="w-4 h-4" />
                 {locating ? '...' : 'Near Me'}
@@ -243,7 +243,7 @@ export default function BrowsePage({
                 <select
                   value={nearMeRadius}
                   onChange={e => setNearMeRadius(Number(e.target.value))}
-                  className="px-2 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 focus:outline-none"
+                  className="px-2 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-700 dark:text-gray-300 focus:outline-none"
                 >
                   <option value={10}>10 km</option>
                   <option value={25}>25 km</option>
@@ -262,7 +262,7 @@ export default function BrowsePage({
                 className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
                   !selectedCategory
                     ? 'bg-teal-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                 }`}
               >
                 All
@@ -287,8 +287,8 @@ export default function BrowsePage({
                 onClick={() => setShowFilters(!showFilters)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${
                   showFilters || activeFiltersCount > 0
-                    ? 'border-teal-500 bg-teal-50 text-teal-700'
-                    : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300'
+                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'
                 }`}
               >
                 <SlidersHorizontal className="w-4 h-4" />
@@ -300,11 +300,11 @@ export default function BrowsePage({
                 )}
               </button>
 
-              <div className="hidden sm:flex items-center gap-1 border border-gray-200 rounded-xl p-1">
+              <div className="hidden sm:flex items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'
+                    viewMode === 'grid' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'
                   }`}
                   title="Grid view"
                 >
@@ -313,7 +313,7 @@ export default function BrowsePage({
                 <button
                   onClick={() => setViewMode('list')}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'
+                    viewMode === 'list' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'
                   }`}
                   title="List view"
                 >
@@ -322,7 +322,7 @@ export default function BrowsePage({
                 <button
                   onClick={() => setViewMode('map')}
                   className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'map' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'
+                    viewMode === 'map' ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'
                   }`}
                   title="Map view"
                 >
@@ -333,7 +333,7 @@ export default function BrowsePage({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 bg-white focus:outline-none focus:border-teal-500"
+                className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 focus:outline-none focus:border-teal-500"
               >
                 <option value="featured">Featured</option>
                 <option value="price-low">Price: Low to High</option>
@@ -346,17 +346,17 @@ export default function BrowsePage({
         </div>
 
         {showFilters && (
-          <div className="border-t border-gray-100 bg-gray-50">
+          <div className="border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Category
                   </label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
                   >
                     <option value="">All Categories</option>
                     {categories.map((category) => (
@@ -368,7 +368,7 @@ export default function BrowsePage({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Price Range (per day)
                   </label>
                   <div className="flex items-center gap-2">
@@ -379,7 +379,7 @@ export default function BrowsePage({
                         setPriceRange([Number(e.target.value), priceRange[1]])
                       }
                       placeholder="Min"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
                     />
                     <span className="text-gray-400">-</span>
                     <input
@@ -389,19 +389,19 @@ export default function BrowsePage({
                         setPriceRange([priceRange[0], Number(e.target.value)])
                       }
                       placeholder="Max"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Condition
                   </label>
                   <select
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
                   >
                     <option value="">Any Condition</option>
                     <option value="new">New</option>
@@ -414,7 +414,7 @@ export default function BrowsePage({
                 <div className="flex items-end">
                   <button
                     onClick={clearFilters}
-                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                    >
                     Clear All Filters
                   </button>
@@ -428,8 +428,8 @@ export default function BrowsePage({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Results summary + active filter chips */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
-          <p className="text-gray-600 text-sm">
-            <span className="font-semibold text-gray-900">{searchLoading ? '…' : filteredEquipment.length}</span>{' '}
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            <span className="font-semibold text-gray-900 dark:text-white">{searchLoading ? '…' : filteredEquipment.length}</span>{' '}
             {filteredEquipment.length === 1 ? 'result' : 'results'}
             {searchQuery && (
               <span> for "<span className="font-medium">{searchQuery}</span>"</span>
@@ -440,7 +440,7 @@ export default function BrowsePage({
           {activeFiltersCount > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               {searchQuery && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 rounded-full text-xs font-medium">
                   "{searchQuery}"
                   <button onClick={() => setSearchQuery('')} aria-label="Remove search filter">
                     <X className="w-3 h-3" />
@@ -448,7 +448,7 @@ export default function BrowsePage({
                 </span>
               )}
               {selectedCategory && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 rounded-full text-xs font-medium">
                   {categories.find((c) => c.slug === selectedCategory)?.name ?? selectedCategory}
                   <button onClick={() => setSelectedCategory('')} aria-label="Remove category filter">
                     <X className="w-3 h-3" />
@@ -456,7 +456,7 @@ export default function BrowsePage({
                 </span>
               )}
               {location && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 rounded-full text-xs font-medium">
                   <MapPin className="w-3 h-3" />
                   {location}
                   <button onClick={() => { setLocation(''); setUserCoords(null); }} aria-label="Remove location filter">
@@ -473,7 +473,7 @@ export default function BrowsePage({
                 </span>
               )}
               {(priceRange[0] > 0 || priceRange[1] < 1000) && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full text-xs font-medium">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 rounded-full text-xs font-medium">
                   ${priceRange[0]}–${priceRange[1]}/day
                   <button onClick={() => setPriceRange([0, 1000])} aria-label="Remove price filter">
                     <X className="w-3 h-3" />
@@ -482,7 +482,7 @@ export default function BrowsePage({
               )}
               <button
                 onClick={clearFilters}
-                className="text-xs text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors"
+                className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 underline underline-offset-2 transition-colors"
               >
                 Clear all
               </button>
@@ -492,11 +492,11 @@ export default function BrowsePage({
 
         {filteredEquipment.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-20 h-20 bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft">
+            <div className="w-20 h-20 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 border border-teal-100 dark:border-teal-800 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft">
               <Search className="w-9 h-9 text-teal-400" />
             </div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">No equipment found</h3>
-            <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">No equipment found</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-sm mx-auto">
               {activeFiltersCount > 0
                 ? 'No results match your current filters. Try broadening your search.'
                 : 'No equipment listed yet. Check back soon!'}
@@ -534,10 +534,10 @@ export default function BrowsePage({
                   }}
                   onMouseEnter={() => setSelectedMapEquipment(item.id)}
                   onMouseLeave={() => setSelectedMapEquipment(undefined)}
-                  className={`w-full bg-white rounded-xl overflow-hidden border transition-all duration-200 flex text-left ${
+                  className={`w-full bg-white dark:bg-gray-800 rounded-xl overflow-hidden border transition-all duration-200 flex text-left ${
                     selectedMapEquipment === item.id
                       ? 'border-teal-500 shadow-lg'
-                      : 'border-gray-100 hover:border-gray-200 hover:shadow-md'
+                      : 'border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-md'
                   }`}
                 >
                   <div className="w-32 h-28 flex-shrink-0 relative overflow-hidden">
@@ -548,21 +548,21 @@ export default function BrowsePage({
                     />
                   </div>
                   <div className="flex-1 p-4">
-                    <h3 className="font-semibold text-gray-900 line-clamp-1 mb-1">
+                    <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 mb-1">
                       {item.title}
                     </h3>
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
                       <MapPin className="w-3.5 h-3.5" />
                       <span className="line-clamp-1">{item.location}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-lg font-bold text-gray-900">${item.daily_rate}</span>
-                        <span className="text-sm text-gray-500">/day</span>
+                        <span className="text-lg font-bold text-gray-900 dark:text-white">${item.daily_rate}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">/day</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                        <span className="text-sm font-medium text-gray-700">{item.rating}</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.rating}</span>
                       </div>
                     </div>
                   </div>
@@ -575,7 +575,7 @@ export default function BrowsePage({
             {filteredEquipment.map((item) => (
               <div
                 key={item.id}
-                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300"
+                className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-xl transition-all duration-300"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
@@ -627,36 +627,36 @@ export default function BrowsePage({
                   onClick={() => onEquipmentClick(item)}
                   className="w-full p-5 text-left"
                 >
-                  <h3 className="font-semibold text-gray-900 line-clamp-1 group-hover:text-teal-600 transition-colors mb-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-teal-600 transition-colors mb-2">
                     {item.title}
                   </h3>
 
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
                     <MapPin className="w-4 h-4 flex-shrink-0" />
                     <span className="line-clamp-1">{item.location}</span>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
                     <div className="flex items-center gap-1.5">
                       <Clock className="w-4 h-4" />
                       <span>
                         {item.min_rental_days}-{item.max_rental_days} days
                       </span>
                     </div>
-                    <span className="capitalize px-2 py-0.5 bg-gray-100 rounded text-xs">
+                    <span className="capitalize px-2 py-0.5 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded text-xs">
                       {item.condition}
                     </span>
                   </div>
 
-                  <div className="flex items-end justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-end justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                     <div>
-                      <span className="text-2xl font-bold text-gray-900">
+                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
                         ${item.daily_rate}
                       </span>
-                      <span className="text-gray-500">/day</span>
+                      <span className="text-gray-500 dark:text-gray-400">/day</span>
                     </div>
                     {item.weekly_rate && (
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         ${item.weekly_rate}/week
                       </span>
                     )}
@@ -671,7 +671,7 @@ export default function BrowsePage({
               <button
                 key={item.id}
                 onClick={() => onEquipmentClick(item)}
-                className="w-full bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300 flex"
+                className="w-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-lg transition-all duration-300 flex"
               >
                 <div className="w-64 h-48 flex-shrink-0 relative overflow-hidden">
                   <img
@@ -689,7 +689,7 @@ export default function BrowsePage({
 
                 <div className="flex-1 p-6 text-left">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">{item.title}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{item.title}</h3>
                     <button
                      
                       onClick={(e) => {
@@ -708,9 +708,9 @@ export default function BrowsePage({
                     </button>
                   </div>
 
-                  <p className="text-gray-600 line-clamp-2 mb-4">{item.description}</p>
+                  <p className="text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">{item.description}</p>
 
-                  <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-4">
                     <div className="flex items-center gap-1.5">
                       <MapPin className="w-4 h-4" />
                       {item.location}
@@ -719,19 +719,19 @@ export default function BrowsePage({
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                       {item.rating.toFixed(1)} ({item.total_reviews} reviews)
                     </div>
-                    <span className="capitalize px-2 py-0.5 bg-gray-100 rounded">
+                    <span className="capitalize px-2 py-0.5 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded">
                       {item.condition}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-2xl font-bold text-gray-900">
+                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
                         ${item.daily_rate}
                       </span>
-                      <span className="text-gray-500">/day</span>
+                      <span className="text-gray-500 dark:text-gray-400">/day</span>
                       {item.weekly_rate && (
-                        <span className="text-sm text-gray-500 ml-3">
+                        <span className="text-sm text-gray-500 dark:text-gray-400 ml-3">
                           ${item.weekly_rate}/week
                         </span>
                       )}

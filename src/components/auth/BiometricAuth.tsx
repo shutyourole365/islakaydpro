@@ -197,8 +197,8 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
 
   if (!capabilities?.available) {
     return (
-      <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
-        <div className="flex items-center gap-3 text-gray-500">
+      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
           <AlertCircle className="w-5 h-5" />
           <p className="text-sm">Biometric authentication is not available on this device.</p>
         </div>
@@ -208,15 +208,15 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
 
   return (
     <div className="space-y-4">
-      <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl border border-teal-100">
+      <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 rounded-2xl border border-teal-100 dark:border-teal-800">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center text-white">
               {getBiometricIcon()}
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">{getBiometricName()}</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-gray-900 dark:text-white">{getBiometricName()}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {isRegistered ? 'Ready to use' : 'Not set up'}
               </p>
             </div>
@@ -248,7 +248,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
           <button
             onClick={registerBiometric}
             disabled={isRegistering}
-            className="w-full py-4 bg-white border-2 border-teal-500 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+            className="w-full py-4 bg-white dark:bg-gray-800 border-2 border-teal-500 text-teal-600 dark:text-teal-400 font-semibold rounded-xl hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
            >
             {isRegistering ? (
               <>
@@ -265,7 +265,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
         )}
       </div>
 
-      <div className="flex items-start gap-2 text-xs text-gray-500">
+      <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
         <ShieldCheck className="w-4 h-4 mt-0.5 flex-shrink-0" />
         <p>
           Your biometric data never leaves your device. We only store a secure cryptographic key that verifies your identity.

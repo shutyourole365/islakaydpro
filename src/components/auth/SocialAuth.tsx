@@ -117,7 +117,7 @@ export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps
           }
         }}
         aria-label="Send magic link"
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
           <path d="M15 7h2a5 5 0 010 10h-2m-6 0H7A5 5 0 017 7h2"/>
