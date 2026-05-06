@@ -43,12 +43,12 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
             <div className="space-y-6 mb-10">
               {ownerBenefits.map((benefit, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center text-teal-600 flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/40 dark:to-emerald-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 flex-shrink-0">
                     {benefit.icon}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{benefit.title}</h3>
-                    <p className="text-gray-600">{benefit.description}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{benefit.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{benefit.description}</p>
                   </div>
                 </div>
               ))}
@@ -64,7 +64,7 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
               </button>
               <a
                 href="#"
-                className="flex items-center gap-2 px-8 py-4 text-gray-700 font-semibold hover:text-teal-600 transition-colors"
+                className="flex items-center gap-2 px-8 py-4 text-gray-700 dark:text-gray-300 font-semibold hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
               >
                 Learn More
               </a>

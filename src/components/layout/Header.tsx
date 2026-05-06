@@ -89,7 +89,7 @@ export default function Header({
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         showTransparent
           ? 'bg-gradient-to-b from-black/50 to-transparent'
-          : 'bg-white shadow-lg'
+          : 'bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-900/30'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,7 +106,7 @@ export default function Header({
               <button
                 onClick={() => onNavigate('browse')}
                 className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
                 }`}
               >
                 Browse Equipment
@@ -114,7 +114,7 @@ export default function Header({
               <button
                 onClick={() => onNavigate('requests')}
                 className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
                 } ${currentPage === 'requests' ? 'text-teal-500' : ''}`}
               >
                 Wanted
@@ -122,7 +122,7 @@ export default function Header({
               <button
                 onClick={() => onNavigate('help')}
                 className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
                 }`}
               >
                 Help
@@ -130,7 +130,7 @@ export default function Header({
               <button
                 onClick={() => onNavigate('about')}
                 className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
                 }`}
               >
                 About
@@ -144,7 +144,7 @@ export default function Header({
                   }, 100);
                 }}
                 className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
+                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
                 }`}
               >
                 How It Works
@@ -155,21 +155,21 @@ export default function Header({
                 <button
                   onClick={() => setIsCompanyMenuOpen(!isCompanyMenuOpen)}
                   className={`company-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
-                    showTransparent ? 'text-white/90' : 'text-gray-700'
+                    showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   Company
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {isCompanyMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                     <button
-                     
+
                       onClick={() => {
                         onNavigate('about');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       About Us
                     </button>
@@ -179,7 +179,7 @@ export default function Header({
                         onNavigate('careers');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Careers
                     </button>
@@ -189,7 +189,7 @@ export default function Header({
                         onNavigate('press');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Press
                     </button>
@@ -199,7 +199,7 @@ export default function Header({
                         onNavigate('blog');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Blog
                     </button>
@@ -209,7 +209,7 @@ export default function Header({
                         onNavigate('partnerships');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Partnerships
                     </button>
@@ -219,7 +219,7 @@ export default function Header({
                         onNavigate('investors');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Investors
                     </button>
@@ -232,21 +232,21 @@ export default function Header({
                 <button
                   onClick={() => setIsSupportMenuOpen(!isSupportMenuOpen)}
                   className={`support-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
-                    showTransparent ? 'text-white/90' : 'text-gray-700'
+                    showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   Support
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {isSupportMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                     <button
                      
                       onClick={() => {
                         onNavigate('help');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Help Center
                     </button>
@@ -256,7 +256,7 @@ export default function Header({
                         onNavigate('safety');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Safety
                     </button>
@@ -266,7 +266,7 @@ export default function Header({
                         onNavigate('trust');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Trust & Verification
                     </button>
@@ -276,7 +276,7 @@ export default function Header({
                         onNavigate('contact');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                       Contact Us
                     </button>
@@ -292,7 +292,7 @@ export default function Header({
               className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all ${
                 showTransparent
                   ? 'border-white/30 bg-white/10 text-white hover:bg-white/20'
-                  : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 hover:bg-gray-100'
+                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
              
             >
@@ -300,7 +300,7 @@ export default function Header({
               <span className="text-sm">Search equipment...</span>
               <kbd
                 className={`hidden md:inline-flex items-center px-2 py-0.5 rounded text-xs ${
-                  showTransparent ? 'bg-white/20 text-white/70' : 'bg-gray-200 text-gray-500'
+                  showTransparent ? 'bg-white/20 text-white/70' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}
               >
                 /
@@ -327,7 +327,7 @@ export default function Header({
                     className={`p-2.5 rounded-full transition-colors ${
                       showTransparent
                         ? 'text-white hover:bg-white/10'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
                     <Heart className="w-5 h-5" />
@@ -336,7 +336,7 @@ export default function Header({
                     className={`p-2.5 rounded-full transition-colors relative ${
                       showTransparent
                         ? 'text-white hover:bg-white/10'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
                     <MessageSquare className="w-5 h-5" />
@@ -349,7 +349,7 @@ export default function Header({
                 <div className="relative profile-menu">
                   <button                    aria-label="Open profile menu"                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                     className={`profile-button flex items-center gap-2 p-1.5 rounded-full transition-colors ${
-                      showTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+                      showTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center overflow-hidden">
@@ -364,7 +364,7 @@ export default function Header({
                     <ChevronDown
                       className={`w-4 h-4 transition-transform ${
                         isProfileMenuOpen ? 'rotate-180' : ''
-                      } ${showTransparent ? 'text-white' : 'text-gray-600'}`}
+                      } ${showTransparent ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}
                     />
                   </button>
 
@@ -419,14 +419,14 @@ export default function Header({
                           <Settings className="w-5 h-5 text-gray-400" />
                           Settings
                         </button>
-                        <div className="border-t border-gray-100 my-2"></div>
+                        <div className="border-t border-gray-100 dark:border-gray-700 my-2"></div>
                         <button
                          
                           onClick={() => {
                             onNavigate('maintenance');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Wrench className="w-5 h-5 text-gray-400" />
                           Maintenance
@@ -437,7 +437,7 @@ export default function Header({
                             onNavigate('scheduler');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Calendar className="w-5 h-5 text-gray-400" />
                           Smart Scheduler
@@ -448,7 +448,7 @@ export default function Header({
                             onNavigate('referrals');
                             setIsProfileMenuOpen(false);
                           }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
+                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
                         >
                           <Users className="w-5 h-5 text-gray-400" />
                           Referrals
@@ -478,9 +478,9 @@ export default function Header({
                   className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
                     showTransparent
                       ? 'text-white hover:bg-white/10'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
-                 
+
                 >
                   Sign In
                 </button>
@@ -500,7 +500,7 @@ export default function Header({
 
             <button              aria-label="Toggle mobile menu"              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`lg:hidden p-2.5 rounded-full transition-colors ${
-                showTransparent ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
+                showTransparent ? 'text-white hover:bg-white/10' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -510,7 +510,7 @@ export default function Header({
       </div>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 shadow-xl">
+        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-xl">
           <div className="px-4 py-6 space-y-4">
             <button
              
@@ -518,7 +518,7 @@ export default function Header({
                 onSearchClick();
                 setIsMobileMenuOpen(false);
               }}
-              className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 rounded-xl text-gray-600"
+              className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-300"
             >
               <Search className="w-5 h-5" />
               <span>Search equipment...</span>
@@ -531,7 +531,7 @@ export default function Header({
                   onNavigate('browse');
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                className="block w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 Browse Equipment
               </button>
@@ -541,7 +541,7 @@ export default function Header({
                   onNavigate('home');
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                className="block w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 How It Works
               </button>
@@ -551,7 +551,7 @@ export default function Header({
                   onNavigate('home');
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                className="block w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 For Business
               </button>
@@ -561,16 +561,16 @@ export default function Header({
                   onNavigate('home');
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                className="block w-full text-left px-4 py-3 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 Support
               </button>
             </nav>
 
             {isAuthenticated ? (
-              <div className="pt-4 border-t border-gray-100 space-y-3">
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <button
-                 
+
                   onClick={() => {
                     onListEquipment();
                     setIsMobileMenuOpen(false);
@@ -585,7 +585,7 @@ export default function Header({
                     onNavigate('dashboard');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full py-3 rounded-xl text-gray-700 font-medium border border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="w-full py-3 rounded-xl text-gray-700 dark:text-gray-300 font-medium border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   Dashboard
                 </button>
@@ -596,7 +596,7 @@ export default function Header({
                       onNavigate('maintenance');
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
                   >
                     <Wrench className="w-4 h-4" />
                     Maintenance
@@ -607,7 +607,7 @@ export default function Header({
                       onNavigate('scheduler');
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
                   >
                     <Calendar className="w-4 h-4" />
                     Smart Scheduler
@@ -618,7 +618,7 @@ export default function Header({
                       onNavigate('referrals');
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    className="w-full py-2 px-3 rounded-lg text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
                   >
                     <Users className="w-4 h-4" />
                     Referrals
@@ -626,10 +626,10 @@ export default function Header({
                 </div>
               </div>
             ) : (
-              <div className="pt-4 border-t border-gray-100 space-y-3">
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <button
                   onClick={onAuthClick}
-                  className="w-full py-3 rounded-xl text-gray-700 font-medium border border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="w-full py-3 rounded-xl text-gray-700 dark:text-gray-300 font-medium border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                  >
                   Sign In
                 </button>
