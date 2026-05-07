@@ -13,31 +13,31 @@ const statusConfig: Record<Booking['status'], { label: string; color: string; bg
   pending: {
     label: 'Pending',
     color: 'text-amber-600',
-    bgColor: 'bg-amber-50 border border-amber-200',
+    bgColor: 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800',
     icon: <Clock className="w-4 h-4" />,
   },
   confirmed: {
     label: 'Confirmed',
     color: 'text-blue-600',
-    bgColor: 'bg-blue-50 border border-blue-200',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800',
     icon: <CheckCircle2 className="w-4 h-4" />,
   },
   active: {
     label: 'Active',
     color: 'text-green-600',
-    bgColor: 'bg-green-50 border border-green-200',
+    bgColor: 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800',
     icon: <Activity className="w-4 h-4 animate-pulse" />,
   },
   completed: {
     label: 'Completed',
-    color: 'text-gray-600',
-    bgColor: 'bg-gray-50 border border-gray-200',
+    color: 'text-gray-600 dark:text-gray-400',
+    bgColor: 'bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600',
     icon: <CheckCircle2 className="w-4 h-4" />,
   },
   cancelled: {
     label: 'Cancelled',
     color: 'text-red-600',
-    bgColor: 'bg-red-50 border border-red-200',
+    bgColor: 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800',
     icon: <AlertCircle className="w-4 h-4" />,
   },
 };
@@ -90,10 +90,10 @@ export default function BookingStatusTracker({
         {booking.payment_status && (
           <div className={`text-xs font-medium px-3 py-1.5 rounded-lg ${
             booking.payment_status === 'paid'
-              ? 'bg-green-50 text-green-700 border border-green-200'
+              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800'
               : booking.payment_status === 'refunded'
-                ? 'bg-gray-50 text-gray-700 border border-gray-200'
-                : 'bg-amber-50 text-amber-700 border border-amber-200'
+                ? 'bg-gray-50 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
           }`}>
             {booking.payment_status === 'paid' ? '💳 Paid' : booking.payment_status === 'refunded' ? '↩️ Refunded' : '⏳ Pending'}
           </div>
@@ -102,8 +102,8 @@ export default function BookingStatusTracker({
 
       {/* Progress bar */}
       <div className="space-y-1">
-        <div className="text-xs text-gray-500">Progress: {Math.round(progress)}%</div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="text-xs text-gray-500 dark:text-gray-400">Progress: {Math.round(progress)}%</div>
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all ${config.color.replace('text', 'bg')}`}
             style={{ width: `${progress}%` }}
@@ -127,12 +127,12 @@ export default function BookingStatusTracker({
                     ? 'bg-green-500 text-white'
                     : statusSequence.indexOf(status) === statusSequence.indexOf(booking.status)
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 text-gray-600'
+                      : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400'
                 }`}
               >
                 {statusSequence.indexOf(status) < statusSequence.indexOf(booking.status) ? '✓' : statusSequence.indexOf(status) + 1}
               </div>
-              <span className="capitalize text-gray-600">{status}</span>
+              <span className="capitalize text-gray-600 dark:text-gray-400">{status}</span>
             </div>
           ))}
         </div>
@@ -140,9 +140,9 @@ export default function BookingStatusTracker({
 
       {/* Timeline for cancelled bookings */}
       {booking.status === 'cancelled' && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-700 font-medium">❌ This booking was cancelled</p>
-          <p className="text-xs text-red-600 mt-1">Cancelled on {new Date(booking.updated_at).toLocaleDateString()}</p>
+        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-700 dark:text-red-300 font-medium">❌ This booking was cancelled</p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">Cancelled on {new Date(booking.updated_at).toLocaleDateString()}</p>
         </div>
       )}
     </div>

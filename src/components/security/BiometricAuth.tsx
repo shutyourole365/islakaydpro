@@ -78,7 +78,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
   const BiometricIcon = biometricType === 'face' ? Scan : Fingerprint;
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-white">
         <div className="flex items-center justify-between">
@@ -109,15 +109,15 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
         {isSupported === null ? (
           <div className="text-center py-8">
             <Loader2 className="w-12 h-12 text-teal-600 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Checking device compatibility...</p>
+            <p className="text-gray-600 dark:text-gray-400">Checking device compatibility...</p>
           </div>
         ) : !isSupported ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-8 h-8 text-amber-600" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Not Supported</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Not Supported</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               Biometric authentication is not available on this device. Please use your password to log in.
             </p>
             <button
@@ -134,7 +134,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
               <div className={`relative w-32 h-32 mx-auto mb-6 ${status === 'scanning' ? 'animate-pulse' : ''}`}>
                 {/* Outer ring */}
                 <div className={`absolute inset-0 rounded-full border-4 transition-colors duration-300 ${
-                  status === 'idle' ? 'border-gray-200' :
+                  status === 'idle' ? 'border-gray-200 dark:border-gray-600' :
                   status === 'scanning' ? 'border-teal-300 animate-ping' :
                   status === 'success' ? 'border-green-500' :
                   'border-red-500'
@@ -142,7 +142,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
                 
                 {/* Inner circle */}
                 <div className={`absolute inset-4 rounded-full flex items-center justify-center transition-colors duration-300 ${
-                  status === 'idle' ? 'bg-gray-100' :
+                  status === 'idle' ? 'bg-gray-100 dark:bg-gray-700' :
                   status === 'scanning' ? 'bg-teal-50' :
                   status === 'success' ? 'bg-green-50' :
                   'bg-red-50'
@@ -171,7 +171,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
               <h3 className={`text-lg font-semibold mb-2 ${
                 status === 'success' ? 'text-green-600' :
                 status === 'error' ? 'text-red-600' :
-                'text-gray-900'
+                'text-gray-900 dark:text-white'
               }`}>
                 {status === 'idle' && (biometricType === 'face' ? 'Face ID Ready' : 'Touch ID Ready')}
                 {status === 'scanning' && 'Scanning...'}
@@ -179,7 +179,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
                 {status === 'error' && 'Authentication Failed'}
               </h3>
 
-              <p className="text-gray-600 text-sm">
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
                 {status === 'idle' && `Tap the button below to authenticate with ${biometricType === 'face' ? 'Face ID' : 'Touch ID'}`}
                 {status === 'scanning' && `Place your ${biometricType === 'face' ? 'face' : 'finger'} on the sensor`}
                 {status === 'success' && 'You have been successfully authenticated'}
@@ -214,7 +214,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
 
                 <button
                   onClick={onCancel}
-                  className="w-full py-3 text-gray-600 hover:text-gray-900 font-medium flex items-center justify-center gap-2"
+                  className="w-full py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium flex items-center justify-center gap-2"
                  >
                   <Key className="w-4 h-4" />
                   Use Password Instead

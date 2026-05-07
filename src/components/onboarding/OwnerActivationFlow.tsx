@@ -140,23 +140,23 @@ export default function OwnerActivationFlow({
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-white rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all group"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 hover:shadow-2xl transition-all group"
       >
         <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-white" />
         </div>
         <div className="text-left">
-          <p className="text-sm font-semibold text-gray-900">Setup progress</p>
-          <p className="text-xs text-gray-500">{completedCount}/{steps.length} steps done</p>
+          <p className="text-sm font-semibold text-gray-900 dark:text-white">Setup progress</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{completedCount}/{steps.length} steps done</p>
         </div>
-        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600" />
+        <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
       </button>
     );
   }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 w-full max-w-sm">
-      <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-500 to-emerald-500 px-5 py-4">
           <div className="flex items-start justify-between">
@@ -196,7 +196,7 @@ export default function OwnerActivationFlow({
         </div>
 
         {/* Steps */}
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-gray-50 dark:divide-gray-700">
           {steps.map((step) => {
             const Icon = step.icon;
             const isComplete = step.status === 'complete';
@@ -206,13 +206,13 @@ export default function OwnerActivationFlow({
               <div
                 key={step.id}
                 className={`px-5 py-4 transition-colors ${
-                  isPending ? 'opacity-50' : 'hover:bg-gray-50/60'
+                  isPending ? 'opacity-50' : 'hover:bg-gray-50/60 dark:hover:bg-gray-700/40'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 mt-0.5">
                     {isComplete ? (
-                      <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                         <CheckCircle2 className="w-5 h-5 text-green-500" />
                       </div>
                     ) : (
@@ -223,14 +223,14 @@ export default function OwnerActivationFlow({
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-semibold leading-tight ${isComplete ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
+                    <p className={`text-sm font-semibold leading-tight ${isComplete ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-900 dark:text-white'}`}>
                       {step.title}
                     </p>
                     {isComplete ? (
                       <p className="text-xs text-green-600 mt-0.5">{step.completedText}</p>
                     ) : (
                       <>
-                        <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{step.subtitle}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">{step.subtitle}</p>
                         {!isPending && (
                           <button
                             onClick={step.actionFn}
@@ -250,7 +250,7 @@ export default function OwnerActivationFlow({
         </div>
 
         {/* Footer */}
-        <div className="px-5 py-3 bg-gray-50 flex items-center justify-between">
+        <div className="px-5 py-3 bg-gray-50 dark:bg-gray-700/50 flex items-center justify-between">
           {allDone ? (
             <button
               onClick={handleDismiss}
@@ -260,13 +260,13 @@ export default function OwnerActivationFlow({
             </button>
           ) : (
             <>
-              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+              <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
                 <DollarSign className="w-3.5 h-3.5" />
                 <span>Avg owner earns $340/mo</span>
               </div>
               <button
                 onClick={handleDismiss}
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
               >
                 Dismiss
               </button>
