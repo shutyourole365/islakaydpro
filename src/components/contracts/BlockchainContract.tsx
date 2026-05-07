@@ -188,25 +188,25 @@ export default function BlockchainContract({
         {/* Content */}
         <div className="p-6 max-h-[60vh] overflow-y-auto">
           {/* Contract Address */}
-          <div className="bg-gray-50 rounded-xl p-4 mb-6">
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-500">Contract Address</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Contract Address</span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => copyToClipboard(contractAddress)}
                   aria-label="Copy contract address"
-                  className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                 >
                   <Copy className="w-4 h-4 text-gray-400" />
                 </button>
-                <button aria-label="Open in explorer" className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors">
+                <button aria-label="Open in explorer" className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors">
                   <ExternalLink className="w-4 h-4 text-gray-400" />
                 </button>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Link className="w-4 h-4 text-purple-500" />
-              <code className="text-sm font-mono text-gray-900">
+              <code className="text-sm font-mono text-gray-900 dark:text-white">
                 {formatAddress(contractAddress)}
               </code>
             </div>
@@ -214,37 +214,37 @@ export default function BlockchainContract({
 
           {/* Booking Summary */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Rental Details</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Rental Details</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500 mb-1">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
                   <Calendar className="w-4 h-4" />
                   <span className="text-sm">Rental Period</span>
                 </div>
-                <p className="font-medium text-gray-900">
+                <p className="font-medium text-gray-900 dark:text-white">
                   {startDate.toLocaleDateString()} - {endDate.toLocaleDateString()}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500 mb-1">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
                   <DollarSign className="w-4 h-4" />
                   <span className="text-sm">Total Amount</span>
                 </div>
-                <p className="font-medium text-gray-900">${totalAmount.toFixed(2)}</p>
+                <p className="font-medium text-gray-900 dark:text-white">${totalAmount.toFixed(2)}</p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500 mb-1">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
                   <Shield className="w-4 h-4" />
                   <span className="text-sm">Security Deposit</span>
                 </div>
-                <p className="font-medium text-gray-900">${depositAmount.toFixed(2)}</p>
+                <p className="font-medium text-gray-900 dark:text-white">${depositAmount.toFixed(2)}</p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="flex items-center gap-2 text-gray-500 mb-1">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 mb-1">
                   <Users className="w-4 h-4" />
                   <span className="text-sm">Parties</span>
                 </div>
-                <p className="font-medium text-gray-900">2 signers required</p>
+                <p className="font-medium text-gray-900 dark:text-white">2 signers required</p>
               </div>
             </div>
           </div>

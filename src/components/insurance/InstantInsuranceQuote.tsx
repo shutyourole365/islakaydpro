@@ -299,8 +299,8 @@ export default function InstantInsuranceQuote({
                     onClick={() => handleSelect(plan)}
                     className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all ${
                       selectedPlan?.id === plan.id
-                        ? 'border-indigo-500 bg-indigo-50 shadow-lg'
-                        : 'border-gray-200 hover:border-indigo-200 hover:shadow'
+                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 shadow-lg'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-indigo-200 hover:shadow'
                     }`}
                   >
                     {plan.recommended && (
@@ -320,14 +320,14 @@ export default function InstantInsuranceQuote({
                         <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getTierColor(plan.tier)} text-white flex items-center justify-center mb-2`}>
                           {getTierIcon(plan.tier)}
                         </div>
-                        <h3 className="font-semibold text-gray-900">{plan.name}</h3>
-                        <p className="text-sm text-gray-500 capitalize">{plan.tier} tier</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{plan.tier} tier</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
                           ${plan.totalCost.toFixed(2)}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           ${plan.dailyRate}/day
                         </p>
                       </div>

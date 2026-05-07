@@ -447,27 +447,27 @@ export default function GroupBooking({
                   <button
                    
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50"
+                    className="w-12 h-12 rounded-xl border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     -
                   </button>
-                  <span className="text-2xl font-bold text-gray-900 w-16 text-center">
+                  <span className="text-2xl font-bold text-gray-900 dark:text-white w-16 text-center">
                     {quantity}
                   </span>
                   <button
-                   
+
                     onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
-                    className="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50"
+                    className="w-12 h-12 rounded-xl border border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     +
                   </button>
-                  <span className="text-sm text-gray-500">Max: {maxQuantity}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Max: {maxQuantity}</span>
                 </div>
               </div>
 
               {/* Notes */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Special Requests (Optional)
                 </label>
                 <textarea
@@ -475,7 +475,7 @@ export default function GroupBooking({
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any special requirements for your group..."
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 resize-none"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 resize-none"
                 />
               </div>
 

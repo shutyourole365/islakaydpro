@@ -293,7 +293,7 @@ export default function SmartScheduler({
           <div className="p-4">
             <div className="grid grid-cols-7 gap-1 mb-2">
               {dayNames.map((day) => (
-                <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+                <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2">
                   {day}
                 </div>
               ))}
@@ -321,7 +321,7 @@ export default function SmartScheduler({
                       ${!slot.available ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer'}
                       ${isStart || isEnd ? 'bg-indigo-600 text-white' : ''}
                       ${inRange && !isStart && !isEnd ? 'bg-indigo-100 text-indigo-700' : ''}
-                      ${!inRange && slot.available ? 'hover:bg-gray-100' : ''}
+                      ${!inRange && slot.available ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
                       ${slot.recommended && !inRange ? 'ring-2 ring-green-400 ring-offset-1' : ''}
                     `}
                   >
@@ -340,7 +340,7 @@ export default function SmartScheduler({
             </div>
 
             {/* Legend */}
-            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500">
+            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500 dark:text-gray-400">
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 bg-green-100 rounded border border-green-400" />
                 Low demand
@@ -363,7 +363,7 @@ export default function SmartScheduler({
       ) : (
         /* AI Recommendations */
         <div className="p-4 max-h-80 overflow-y-auto">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Based on demand patterns and pricing, here are the best times to book:
           </p>
           <div className="space-y-3">
@@ -382,14 +382,14 @@ export default function SmartScheduler({
                         Save ${rec.totalSavings}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{rec.reason}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{rec.reason}</p>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-1 text-green-600">
                       <Zap className="w-4 h-4" />
                       <span className="font-medium">{rec.confidence}%</span>
                     </div>
-                    <span className="text-xs text-gray-500">confidence</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">confidence</span>
                   </div>
                 </div>
                 <button

@@ -185,7 +185,7 @@ export default function AnalyticsDashboard({
           </button>
           <button
             onClick={onExport}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
            >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>
@@ -228,10 +228,10 @@ export default function AnalyticsDashboard({
       {/* Charts Section */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold text-gray-900">Revenue Overview</h3>
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <h3 className="font-semibold text-gray-900 dark:text-white">Revenue Overview</h3>
+            <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
               {[
                 { id: 'revenue', label: 'Revenue', icon: LineChart },
                 { id: 'bookings', label: 'Bookings', icon: BarChart3 },
@@ -242,8 +242,8 @@ export default function AnalyticsDashboard({
                   onClick={() => setActiveChart(chart.id as typeof activeChart)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-all ${
                     activeChart === chart.id
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                   }`}
                 >
                   <chart.icon className="w-4 h-4" />
