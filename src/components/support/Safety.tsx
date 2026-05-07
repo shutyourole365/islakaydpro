@@ -97,7 +97,7 @@ export default function Safety({ onBack }: SafetyProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -108,7 +108,7 @@ export default function Safety({ onBack }: SafetyProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-red-600 to-red-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -129,20 +129,20 @@ export default function Safety({ onBack }: SafetyProps) {
             <div className="max-w-4xl mx-auto">
               {/* Safety Principles */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Safety Principles</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Safety Principles</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   {safetyPrinciples.map((principle, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-6">
+                    <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
                       <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
+                        <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center mr-4">
                           {principle.icon}
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900">{principle.title}</h3>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{principle.title}</h3>
                       </div>
-                      <p className="text-gray-600 mb-4">{principle.description}</p>
+                      <p className="text-gray-600 dark:text-gray-400 mb-4">{principle.description}</p>
                       <ul className="space-y-2">
                         {principle.details.map((detail, idx) => (
-                          <li key={idx} className="text-sm text-gray-600 flex items-center">
+                          <li key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
                             <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
                             {detail}
                           </li>

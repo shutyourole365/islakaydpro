@@ -97,7 +97,7 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <X className="w-5 h-5 text-gray-600" />
           </button>
@@ -106,10 +106,10 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
 
       {/* Photo Previews */}
       {previewUrls.length > 0 && (
-        <div className="p-4 bg-gray-50 border-b border-gray-100">
+        <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-2">
-            <Image className="w-4 h-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">
+            <Image className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {previewUrls.length} photo{previewUrls.length > 1 ? 's' : ''} attached
             </span>
           </div>
@@ -150,14 +150,14 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
       )}
 
       {/* Quick Messages */}
-      <div className="p-4 bg-gray-50 border-b border-gray-100">
-        <p className="text-xs font-medium text-gray-500 mb-2">QUICK MESSAGES</p>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">QUICK MESSAGES</p>
         <div className="flex flex-wrap gap-2">
           {quickMessages.map((msg, idx) => (
             <button
               key={idx}
               onClick={() => setMessage(msg)}
-              className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-teal-400 hover:bg-teal-50 transition-colors"
+              className="px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
             >
               {msg}
             </button>

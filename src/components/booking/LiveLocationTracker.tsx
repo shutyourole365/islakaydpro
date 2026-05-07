@@ -190,24 +190,24 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
 
             {/* Travel Mode Options */}
             <div className="space-y-2">
-              <div className="text-sm font-medium text-gray-700">Travel Options</div>
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Travel Options</div>
               {travelEstimates.map((estimate) => (
                 <div
                   key={estimate.mode}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                   onClick={openNavigation}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center shadow-sm">
                       {getModeIcon(estimate.mode)}
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900 capitalize">{estimate.mode}</div>
-                      <div className="text-sm text-gray-500">{estimate.distance.toFixed(1)} miles</div>
+                      <div className="font-medium text-gray-900 dark:text-white capitalize">{estimate.mode}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">{estimate.distance.toFixed(1)} miles</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold text-gray-900">{formatDuration(estimate.duration)}</div>
+                    <div className="font-semibold text-gray-900 dark:text-white">{formatDuration(estimate.duration)}</div>
                   </div>
                 </div>
               ))}
@@ -215,10 +215,10 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
 
             {/* Pickup Time Warning */}
             {pickupTime && distance && (
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-amber-600" />
-                  <span className="text-sm text-amber-700">
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-sm text-amber-700 dark:text-amber-400">
                     Pickup scheduled for {pickupTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     {travelEstimates[0] && (
                       <span className="font-medium">

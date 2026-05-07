@@ -96,18 +96,18 @@ export default function InsuranceOptions({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-teal-500" />
-            <h3 className="font-semibold text-gray-900">Protection Plans</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Protection Plans</h3>
           </div>
           <button
             aria-label="Toggle protection plan information" onClick={() => setShowInfo(!showInfo)}
-            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <Info className="w-4 h-4 text-gray-400" />
           </button>
         </div>
 
         {showInfo && (
-          <div className="mt-3 p-3 bg-blue-50 rounded-xl text-sm text-blue-700">
+          <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-sm text-blue-700 dark:text-blue-300">
             <p>
               Protection plans cover accidental damage, theft, and more. Choose a plan
               that fits your needs for peace of mind during your rental.
@@ -122,8 +122,8 @@ export default function InsuranceOptions({
           className={`
             w-full p-4 rounded-xl border-2 transition-all text-left
             ${!selectedPlan
-              ? 'border-gray-300 bg-gray-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-gray-300 bg-gray-50 dark:bg-gray-700/50 dark:border-gray-500'
+              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
             }
           `}
         >
@@ -137,11 +137,11 @@ export default function InsuranceOptions({
               >
                 {!selectedPlan && <Check className="w-3 h-3 text-white" />}
               </div>
-              <span className="font-medium text-gray-700">No Protection</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300">No Protection</span>
             </div>
-            <span className="text-gray-500">$0</span>
+            <span className="text-gray-500 dark:text-gray-400">$0</span>
           </div>
-          <p className="ml-8 mt-1 text-sm text-gray-500">
+          <p className="ml-8 mt-1 text-sm text-gray-500 dark:text-gray-400">
             You will be responsible for any damage or loss
           </p>
         </button>
@@ -157,8 +157,8 @@ export default function InsuranceOptions({
               className={`
                 rounded-xl border-2 transition-all overflow-hidden
                 ${isSelected
-                  ? 'border-teal-500 bg-teal-50/50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-900/30'
+                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                 }
                 ${plan.recommended && !isSelected ? 'ring-2 ring-teal-200' : ''}
               `}

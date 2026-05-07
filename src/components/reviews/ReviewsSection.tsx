@@ -30,7 +30,7 @@ function StarRating({
         <Star
           key={s}
           className={`${sz} ${
-            s <= (hover || rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'
+            s <= (hover || rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-600'
           } ${onRate ? 'cursor-pointer' : ''} transition-colors`}
           onMouseEnter={() => onRate && setHover(s)}
           onMouseLeave={() => onRate && setHover(0)}
@@ -45,11 +45,11 @@ function RatingBar({ label, count, total }: { label: string; count: number; tota
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="w-6 text-gray-600 text-right">{label}</span>
-      <div className="flex-1 bg-gray-200 rounded-full h-2">
+      <span className="w-6 text-gray-600 dark:text-gray-400 text-right">{label}</span>
+      <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
         <div className="bg-yellow-400 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
       </div>
-      <span className="w-8 text-gray-500 text-xs">{pct}%</span>
+      <span className="w-8 text-gray-500 dark:text-gray-400 text-xs">{pct}%</span>
     </div>
   );
 }
@@ -148,9 +148,9 @@ export default function ReviewsSection({
   if (loading) {
     return (
       <div className={`animate-pulse space-y-4 ${className}`}>
-        <div className="h-6 bg-gray-200 rounded w-1/3" />
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-24 bg-gray-100 rounded-xl" />
+          <div key={i} className="h-24 bg-gray-100 dark:bg-gray-800 rounded-xl" />
         ))}
       </div>
     );
@@ -160,8 +160,8 @@ export default function ReviewsSection({
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">
-          Reviews {total > 0 && <span className="text-gray-500 font-normal text-base">({total})</span>}
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+          Reviews {total > 0 && <span className="text-gray-500 dark:text-gray-400 font-normal text-base">({total})</span>}
         </h2>
         {canReview && !alreadyReviewed && !success && (
           <button
@@ -181,11 +181,11 @@ export default function ReviewsSection({
 
       {/* Rating summary */}
       {total > 0 && (
-        <div className="bg-gray-50 rounded-2xl p-5 flex flex-col sm:flex-row gap-6">
+        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-2xl p-5 flex flex-col sm:flex-row gap-6">
           <div className="flex flex-col items-center justify-center min-w-[100px]">
-            <span className="text-5xl font-bold text-gray-900">{avg.toFixed(1)}</span>
+            <span className="text-5xl font-bold text-gray-900 dark:text-white">{avg.toFixed(1)}</span>
             <StarRating rating={Math.round(avg)} size="sm" />
-            <span className="text-gray-500 text-xs mt-1">{total} review{total !== 1 ? 's' : ''}</span>
+            <span className="text-gray-500 dark:text-gray-400 text-xs mt-1">{total} review{total !== 1 ? 's' : ''}</span>
           </div>
           <div className="flex-1 space-y-1.5">
             {[5, 4, 3, 2, 1].map((s) => (
@@ -197,11 +197,11 @@ export default function ReviewsSection({
 
       {/* Review form */}
       {showForm && (
-        <div className="border border-blue-200 rounded-2xl p-5 bg-blue-50/50 space-y-4">
-          <h3 className="font-semibold text-gray-900">Your Review</h3>
+        <div className="border border-blue-200 dark:border-blue-800 rounded-2xl p-5 bg-blue-50/50 dark:bg-blue-900/20 space-y-4">
+          <h3 className="font-semibold text-gray-900 dark:text-white">Your Review</h3>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Overall Rating *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Overall Rating *</label>
             <StarRating rating={formRating} onRate={setFormRating} size="lg" />
           </div>
 
@@ -212,31 +212,31 @@ export default function ReviewsSection({
               { label: 'Punctuality', val: formPunctuality, set: setFormPunctuality },
             ].map(({ label, val, set }) => (
               <div key={label}>
-                <label className="block text-xs text-gray-500 mb-1">{label}</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</label>
                 <StarRating rating={val} onRate={set} size="sm" />
               </div>
             ))}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title</label>
             <input
               type="text"
               value={formTitle}
               onChange={(e) => setFormTitle(e.target.value)}
               placeholder="Summarise your experience"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Review *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Review *</label>
             <textarea
               value={formComment}
               onChange={(e) => setFormComment(e.target.value)}
               placeholder="Tell others about your experience with this equipment..."
               rows={4}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:bg-gray-700 dark:text-white"
             />
           </div>
 
@@ -252,7 +252,7 @@ export default function ReviewsSection({
             </button>
             <button
               onClick={() => setShowForm(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               Cancel
             </button>
@@ -263,7 +263,7 @@ export default function ReviewsSection({
       {/* Sort controls */}
       {total > 0 && (
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">Sort by:</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Sort by:</span>
           {(['recent', 'rating'] as const).map((s) => (
             <button
               key={s}
@@ -271,7 +271,7 @@ export default function ReviewsSection({
               className={`text-sm px-3 py-1 rounded-full border transition-colors ${
                 sortBy === s
                   ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-300 text-gray-600 hover:border-blue-400'
+                  : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-blue-400'
               }`}
             >
               {s === 'recent' ? 'Most Recent' : 'Highest Rated'}
@@ -282,8 +282,8 @@ export default function ReviewsSection({
 
       {/* Review list */}
       {total === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          <Star className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+          <Star className="w-10 h-10 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
           <p className="font-medium">No reviews yet</p>
           <p className="text-sm mt-1">Be the first to review this equipment</p>
         </div>
@@ -295,7 +295,7 @@ export default function ReviewsSection({
           {visibleCount < total && (
             <button
               onClick={() => setVisibleCount((c) => c + 5)}
-              className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <ChevronDown className="w-4 h-4" />
               Show more reviews ({total - visibleCount} remaining)
@@ -318,7 +318,7 @@ function ReviewCard({ review }: { review: Review }) {
   });
 
   return (
-    <div className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
+    <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-5 shadow-sm">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
@@ -326,20 +326,20 @@ function ReviewCard({ review }: { review: Review }) {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-medium text-gray-900 text-sm">{reviewerName}</span>
+              <span className="font-medium text-gray-900 dark:text-white text-sm">{reviewerName}</span>
               {isVerified && <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />}
             </div>
-            <span className="text-xs text-gray-400">{date}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">{date}</span>
           </div>
         </div>
         <StarRating rating={review.rating} size="sm" />
       </div>
 
       {review.title && (
-        <p className="font-semibold text-gray-800 text-sm mb-1">{review.title}</p>
+        <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm mb-1">{review.title}</p>
       )}
       {review.comment && (
-        <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{review.comment}</p>
       )}
 
       {/* Aspect ratings */}
@@ -368,8 +368,8 @@ function ReviewCard({ review }: { review: Review }) {
             {showResponse ? 'Hide' : 'View'} owner response
           </button>
           {showResponse && (
-            <div className="mt-2 bg-blue-50 rounded-xl p-3 text-sm text-gray-700">
-              <p className="font-medium text-gray-800 mb-1 text-xs">Owner Response</p>
+            <div className="mt-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 text-sm text-gray-700 dark:text-gray-300">
+              <p className="font-medium text-gray-800 dark:text-gray-200 mb-1 text-xs">Owner Response</p>
               {review.response}
             </div>
           )}
@@ -381,17 +381,16 @@ function ReviewCard({ review }: { review: Review }) {
 
 function AspectBadge({ label, rating }: { label: string; rating: number }) {
   return (
-    <div className="flex items-center gap-1 bg-gray-50 rounded-lg px-2 py-1">
-      <span className="text-xs text-gray-500">{label}</span>
+    <div className="flex items-center gap-1 bg-gray-50 dark:bg-gray-700 rounded-lg px-2 py-1">
+      <span className="text-xs text-gray-500 dark:text-gray-400">{label}</span>
       <div className="flex">
         {[1, 2, 3, 4, 5].map((s) => (
           <Star
             key={s}
-            className={`w-3 h-3 ${s <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+            className={`w-3 h-3 ${s <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 dark:text-gray-600'}`}
           />
         ))}
       </div>
     </div>
   );
 }
-
