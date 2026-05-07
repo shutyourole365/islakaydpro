@@ -179,14 +179,14 @@ export default function InsuranceOptions({
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900">{plan.name}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{plan.name}</span>
                         {plan.recommended && (
-                          <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
+                          <span className="px-2 py-0.5 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-xs font-medium rounded-full">
                             Recommended
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Coverage up to {plan.coverage}
                       </p>
                     </div>

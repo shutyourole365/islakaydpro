@@ -171,7 +171,7 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message here... You can also add photos!"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all resize-none dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
           rows={4}
         />
         
@@ -198,27 +198,27 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
             <button
               aria-label="Attach photos"
               onClick={() => fileInputRef.current?.click()}
-              className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               title="Upload photos"
             >
-              <Paperclip className="w-5 h-5 text-gray-600" />
+              <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            
+
             <button
               aria-label="Take photo"
               onClick={() => cameraInputRef.current?.click()}
-              className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               title="Take photo"
             >
-              <Camera className="w-5 h-5 text-gray-600" />
+              <Camera className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            
+
             <button
               aria-label="Add emoji" onClick={() => setShowCamera(!showCamera)}
-              className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               title="Add emoji"
             >
-              <Smile className="w-5 h-5 text-gray-600" />
+              <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
 
             <span className="text-xs text-gray-500 ml-2">

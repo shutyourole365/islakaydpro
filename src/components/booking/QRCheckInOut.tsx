@@ -217,7 +217,7 @@ export default function QRCheckInOut({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-teal-500 to-emerald-500 text-white">
           <div className="flex items-center justify-between mb-4">
@@ -252,12 +252,12 @@ export default function QRCheckInOut({
           {mode === 'generate' ? (
             // Generate QR Code View
             <div className="text-center">
-              <div className="inline-block p-4 bg-white rounded-2xl shadow-lg border border-gray-100 mb-6">
+              <div className="inline-block p-4 bg-white dark:bg-gray-700 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-600 mb-6">
                 {generateQRCodeSVG(qrData)}
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <Clock className="w-4 h-4" />
                   <span>Valid for 24 hours</span>
                 </div>
