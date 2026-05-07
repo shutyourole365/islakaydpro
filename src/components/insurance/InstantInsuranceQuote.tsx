@@ -268,24 +268,24 @@ export default function InstantInsuranceQuote({
                 <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-4 mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-5 h-5 text-indigo-500" />
-                    <span className="font-medium text-indigo-900">AI Risk Analysis</span>
+                    <span className="font-medium text-indigo-900 dark:text-indigo-300">AI Risk Analysis</span>
                   </div>
                   <div className="grid grid-cols-4 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-500">Category</span>
-                      <p className="font-medium text-gray-900">{factors.equipmentCategory}</p>
+                      <span className="text-gray-500 dark:text-gray-400">Category</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{factors.equipmentCategory}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Risk Score</span>
-                      <p className="font-medium text-gray-900">{(factors.riskScore * 10).toFixed(1)}/10</p>
+                      <span className="text-gray-500 dark:text-gray-400">Risk Score</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{(factors.riskScore * 10).toFixed(1)}/10</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Market Rate</span>
-                      <p className="font-medium text-gray-900">{(factors.marketRate * 100).toFixed(1)}%</p>
+                      <span className="text-gray-500 dark:text-gray-400">Market Rate</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{(factors.marketRate * 100).toFixed(1)}%</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Seasonal Factor</span>
-                      <p className="font-medium text-gray-900">{factors.seasonalAdjustment}x</p>
+                      <span className="text-gray-500 dark:text-gray-400">Seasonal Factor</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{factors.seasonalAdjustment}x</p>
                     </div>
                   </div>
                 </div>

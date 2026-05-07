@@ -152,7 +152,7 @@ export default function BlockchainContract({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl my-8">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl my-8">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-3xl text-white">
           <div className="flex items-center justify-between mb-4">
