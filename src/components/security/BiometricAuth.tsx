@@ -223,12 +223,12 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
             )}
 
             {/* Security Info */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-              <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+            <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+              <h4 className="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                 <Lock className="w-4 h-4 text-teal-600" />
                 Security Information
               </h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span>Your biometric data never leaves your device</span>
@@ -249,7 +249,7 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
 
       {/* Device Support Note */}
       <div className="px-6 pb-6">
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <Smartphone className="w-4 h-4" />
           <span>Supported devices: iPhone (Face ID/Touch ID), iPad, Mac, Windows Hello, Android Fingerprint</span>
         </div>

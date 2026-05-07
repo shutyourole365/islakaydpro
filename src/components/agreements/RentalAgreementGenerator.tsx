@@ -41,10 +41,10 @@ interface Agreement {
 }
 
 const STATUS_CONFIG = {
-  pending: { label: 'Awaiting Signatures', bg: 'bg-amber-50', text: 'text-amber-700', icon: Clock },
-  owner_signed: { label: 'Owner Signed', bg: 'bg-blue-50', text: 'text-blue-700', icon: Pen },
-  fully_signed: { label: 'Fully Signed', bg: 'bg-green-50', text: 'text-green-700', icon: CheckCircle },
-  voided: { label: 'Voided', bg: 'bg-gray-50', text: 'text-gray-600', icon: XCircle },
+  pending: { label: 'Awaiting Signatures', bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-300', icon: Clock },
+  owner_signed: { label: 'Owner Signed', bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-700 dark:text-blue-300', icon: Pen },
+  fully_signed: { label: 'Fully Signed', bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-700 dark:text-green-300', icon: CheckCircle },
+  voided: { label: 'Voided', bg: 'bg-gray-50 dark:bg-gray-700', text: 'text-gray-600 dark:text-gray-400', icon: XCircle },
 };
 
 const STANDARD_TERMS = `
@@ -242,35 +242,35 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
     const renterName = selected.renter?.full_name || 'Renter';
 
     return (
-      <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
         <div className="max-w-3xl mx-auto px-4 py-8">
-          <button onClick={() => setSelected(null)} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors">
+          <button onClick={() => setSelected(null)} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors">
             <ArrowLeft className="w-5 h-5" /> Back to Agreements
           </button>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Rental Agreement</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Rental Agreement</h2>
               <span className={`flex items-center gap-1.5 px-3 py-1 ${cfg.bg} ${cfg.text} rounded-full text-sm font-medium`}>
                 <Icon className="w-4 h-4" /> {cfg.label}
               </span>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-4 font-mono text-xs text-gray-700 whitespace-pre-wrap overflow-auto max-h-96 mb-6">
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 font-mono text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap overflow-auto max-h-96 mb-6">
               {generateAgreementText(selected, ownerName, renterName)}
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-xs text-gray-500 mb-1">Owner ({ownerName})</p>
+              <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Owner ({ownerName})</p>
                 {selected.owner_signed_at ? (
                   <p className="text-sm text-green-600 font-medium flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Signed {new Date(selected.owner_signed_at).toLocaleDateString()}</p>
                 ) : (
                   <p className="text-sm text-amber-600 flex items-center gap-1"><Clock className="w-4 h-4" /> Pending</p>
                 )}
               </div>
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-xs text-gray-500 mb-1">Renter ({renterName})</p>
+              <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Renter ({renterName})</p>
                 {selected.renter_signed_at ? (
                   <p className="text-sm text-green-600 font-medium flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Signed {new Date(selected.renter_signed_at).toLocaleDateString()}</p>
                 ) : (
@@ -282,7 +282,7 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
             <div className="flex gap-3">
               <button
                 onClick={() => handleDownload(selected)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <Download className="w-4 h-4" /> Download
               </button>
@@ -305,36 +305,36 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-900 transition-colors">
+          <button onClick={onBack} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Rental Agreements</h1>
-            <p className="text-gray-500 text-sm">Digital contracts for your rentals</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Rental Agreements</h1>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Digital contracts for your rentals</p>
           </div>
         </div>
 
         {/* Generate new */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Generate Agreement from Booking</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Generate Agreement from Booking</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Booking ID</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Booking ID</label>
               <input
                 value={bookingIdInput}
                 onChange={e => setBookingIdInput(e.target.value)}
                 placeholder="Paste your booking ID"
-                className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             <div>

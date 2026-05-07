@@ -178,7 +178,7 @@ export default function GroupBooking({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl my-8">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-2xl my-8">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-t-3xl text-white">
           <div className="flex items-center justify-between mb-4">
@@ -231,7 +231,7 @@ export default function GroupBooking({
             <>
               {/* Team Name */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Team / Organization Name
                 </label>
                 <div className="relative">
@@ -241,7 +241,7 @@ export default function GroupBooking({
                     value={teamName}
                     onChange={(e) => setTeamName(e.target.value)}
                     placeholder="Enter team or company name"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                   />
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default function GroupBooking({
               {/* Team Members */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     Team Members ({members.length})
                   </label>
                   {members.length >= 3 && (
@@ -264,25 +264,25 @@ export default function GroupBooking({
                   {members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
+                      className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
                     >
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                         member.role === 'organizer'
                           ? 'bg-orange-100 text-orange-600'
-                          : 'bg-gray-200 text-gray-600'
+                          : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
                       }`}>
                         {member.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-gray-900 truncate">{member.name}</p>
+                          <p className="font-medium text-gray-900 dark:text-white truncate">{member.name}</p>
                           {member.role === 'organizer' && (
                             <span className="px-2 py-0.5 bg-orange-100 text-orange-600 text-xs rounded-full">
                               Organizer
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-500 truncate">{member.email}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{member.email}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {member.confirmed ? (

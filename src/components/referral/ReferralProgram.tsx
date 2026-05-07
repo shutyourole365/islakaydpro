@@ -117,7 +117,7 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
   const shareVia = (platform: string) => {
     const message = `Join Islakayd and get $25 off your first rental! Use my code: ${stats?.referralCode}`;
     const url = stats?.referralLink || '';
-    
+
     switch (platform) {
       case 'twitter':
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(url)}`);
@@ -145,18 +145,18 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
 
   const getStatusColor = (status: Referral['status']) => {
     switch (status) {
-      case 'pending': return 'bg-gray-100 text-gray-700';
-      case 'signed_up': return 'bg-blue-100 text-blue-700';
-      case 'first_rental': return 'bg-green-100 text-green-700';
-      case 'active': return 'bg-teal-100 text-teal-700';
+      case 'pending': return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
+      case 'signed_up': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400';
+      case 'first_rental': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
+      case 'active': return 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400';
     }
   };
 
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 text-center">
         <div className="w-16 h-16 border-4 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-600">Loading referral program...</p>
+        <p className="text-gray-600 dark:text-gray-400">Loading referral program...</p>
       </div>
     );
   }
@@ -164,7 +164,7 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
   if (!stats) return null;
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden">
       {/* Header */}
       <div className={`p-6 bg-gradient-to-r ${getTierColor(stats.tier)} text-white`}>
         <div className="flex items-center justify-between mb-4">
@@ -203,7 +203,7 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm mb-1">
             <span className="text-white/70">{stats.referralsToNextTier} more referrals to next tier</span>
-            <span className="capitalize">{stats.tier === 'platinum' ? 'Max Level' : 
+            <span className="capitalize">{stats.tier === 'platinum' ? 'Max Level' :
               stats.tier === 'gold' ? '→ Platinum' :
               stats.tier === 'silver' ? '→ Gold' : '→ Silver'}</span>
           </div>
@@ -217,8 +217,8 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
       </div>
 
       {/* Share Options */}
-      <div className="p-4 bg-gray-50 border-b border-gray-100">
-        <p className="text-sm text-gray-600 mb-3">Share your link</p>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Share your link</p>
         <div className="flex gap-2">
           <button
             aria-label="Share on Twitter" onClick={() => shareVia('twitter')}
@@ -246,7 +246,7 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
           </button>
           <button
             aria-label="Copy referral link" onClick={() => copyToClipboard(stats.referralLink)}
-            className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-300 transition-colors"
+            className="flex-1 py-3 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl flex items-center justify-center gap-2 hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
           >
             <Link2 className="w-5 h-5" />
           </button>
@@ -254,7 +254,7 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-100">
+      <div className="flex border-b border-gray-100 dark:border-gray-700">
         {(['overview', 'referrals', 'leaderboard'] as const).map((tab) => (
           <button
             key={tab}
@@ -262,7 +262,7 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
             className={`flex-1 py-4 text-sm font-medium transition-colors ${
               activeTab === tab
                 ? 'text-pink-600 border-b-2 border-pink-500'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -276,26 +276,26 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
           <div className="space-y-4">
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
                 <Users className="w-6 h-6 mx-auto mb-2 text-pink-500" />
-                <p className="text-2xl font-bold text-gray-900">{stats.totalReferrals}</p>
-                <p className="text-xs text-gray-500">Total Referrals</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalReferrals}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Total Referrals</p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
                 <CheckCircle2 className="w-6 h-6 mx-auto mb-2 text-green-500" />
-                <p className="text-2xl font-bold text-gray-900">{stats.successfulReferrals}</p>
-                <p className="text-xs text-gray-500">Successful</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.successfulReferrals}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Successful</p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4 text-center">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 text-center">
                 <DollarSign className="w-6 h-6 mx-auto mb-2 text-amber-500" />
-                <p className="text-2xl font-bold text-gray-900">${stats.totalEarnings}</p>
-                <p className="text-xs text-gray-500">Earned</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">${stats.totalEarnings}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Earned</p>
               </div>
             </div>
 
             {/* How it Works */}
-            <div className="bg-pink-50 rounded-xl p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">How It Works</h3>
+            <div className="bg-pink-50 dark:bg-pink-900/20 rounded-xl p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">How It Works</h3>
               <div className="space-y-3">
                 {[
                   { step: '1', text: 'Share your unique referral code or link', reward: '' },
@@ -308,7 +308,7 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
                       {item.step}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm text-gray-700">{item.text}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-300">{item.text}</p>
                     </div>
                     {item.reward && (
                       <span className="text-sm font-medium text-pink-600">{item.reward}</span>
@@ -320,14 +320,14 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
 
             {/* Invite by Email */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Invite by Email</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Invite by Email</h3>
               <div className="flex gap-2">
                 <input
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
                   placeholder="friend@email.com"
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-pink-500"
+                  className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-pink-500 dark:bg-gray-700 dark:text-white"
                 />
                 <button
                   onClick={sendInvite}
@@ -345,19 +345,19 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
           <div className="space-y-2">
             {referrals.length === 0 ? (
               <div className="text-center py-8">
-                <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">No referrals yet. Start sharing your code!</p>
+                <Users className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">No referrals yet. Start sharing your code!</p>
               </div>
             ) : (
               referrals.map((referral) => (
-                <div key={referral.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                <div key={referral.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
-                      <span className="text-pink-600 font-semibold">{referral.name.charAt(0)}</span>
+                    <div className="w-10 h-10 bg-pink-100 dark:bg-pink-900/30 rounded-full flex items-center justify-center">
+                      <span className="text-pink-600 dark:text-pink-400 font-semibold">{referral.name.charAt(0)}</span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{referral.name}</p>
-                      <p className="text-sm text-gray-500">{referral.date.toLocaleDateString()}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{referral.name}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{referral.date.toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -380,15 +380,15 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
               <div
                 key={entry.rank}
                 className={`flex items-center justify-between p-4 rounded-xl ${
-                  entry.isCurrentUser ? 'bg-pink-50 border-2 border-pink-200' : 'bg-gray-50'
+                  entry.isCurrentUser ? 'bg-pink-50 dark:bg-pink-900/20 border-2 border-pink-200 dark:border-pink-800' : 'bg-gray-50 dark:bg-gray-700'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     entry.rank === 1 ? 'bg-amber-400 text-white' :
-                    entry.rank === 2 ? 'bg-gray-300 text-white' :
+                    entry.rank === 2 ? 'bg-gray-300 dark:bg-gray-500 text-white' :
                     entry.rank === 3 ? 'bg-amber-600 text-white' :
-                    'bg-gray-200 text-gray-600'
+                    'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
                   }`}>
                     {entry.rank <= 3 ? (
                       <Trophy className="w-5 h-5" />
@@ -397,15 +397,15 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
                     )}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-gray-900 dark:text-white">
                       {entry.name} {entry.isCurrentUser && '(You)'}
                     </p>
-                    <p className="text-sm text-gray-500">{entry.referrals} referrals</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{entry.referrals} referrals</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-gray-900">${entry.earnings}</p>
-                  <p className="text-xs text-gray-500">earned</p>
+                  <p className="font-bold text-gray-900 dark:text-white">${entry.earnings}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">earned</p>
                 </div>
               </div>
             ))}

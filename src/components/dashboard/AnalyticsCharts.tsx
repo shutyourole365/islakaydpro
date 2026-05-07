@@ -116,20 +116,20 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
     const isPositive = trend > 0;
     
     return (
-      <div className="bg-white rounded-2xl p-5 border border-gray-200 hover:border-teal-300 transition-colors">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-200 dark:border-gray-700 hover:border-teal-300 transition-colors">
         <div className="flex items-center justify-between mb-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white">
             {icon}
           </div>
           <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
-            isPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+            isPositive ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300' : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
           }`}>
             {isPositive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
             {Math.abs(trend).toFixed(1)}%
           </div>
         </div>
-        <p className="text-sm text-gray-500 mb-1">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{label}</p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-white">
           {prefix}{current.toLocaleString()}{suffix}
         </p>
         <p className="text-xs text-gray-400 mt-1">
@@ -175,10 +175,10 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
       </div>
 
       {/* Chart Section */}
-      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Performance Overview</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Performance Overview</h3>
             <div className="flex items-center gap-2">
               {(['7d', '30d', '90d', '1y'] as const).map((range) => (
                 <button
