@@ -406,20 +406,20 @@ export default function SmartScheduler({
 
       {/* Selection Summary */}
       {totals && (
-        <div className="p-4 border-t border-gray-100 bg-gray-50">
+        <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {selectedStart?.toLocaleDateString()} - {selectedEnd?.toLocaleDateString()}
               </p>
-              <p className="text-lg font-bold text-gray-900">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
                 {totals.days} days • ${totals.total} total
               </p>
             </div>
             {totals.savings > 0 && (
               <div className="text-right">
                 <p className="text-green-600 font-semibold">You save ${totals.savings}</p>
-                <p className="text-xs text-gray-500">Avg {totals.avgDiscount}% off</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Avg {totals.avgDiscount}% off</p>
               </div>
             )}
           </div>

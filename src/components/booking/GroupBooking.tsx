@@ -481,14 +481,14 @@ export default function GroupBooking({
 
               {/* Pricing Preview */}
               {pricing && (
-                <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                  <h4 className="font-medium text-gray-900 mb-3">Pricing Summary</h4>
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-3">Pricing Summary</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 dark:text-gray-400">
                         ${dailyRate} × {quantity} unit{quantity > 1 ? 's' : ''} × {pricing.days} day{pricing.days > 1 ? 's' : ''}
                       </span>
-                      <span className="text-gray-900">${pricing.subtotal.toFixed(2)}</span>
+                      <span className="text-gray-900 dark:text-white">${pricing.subtotal.toFixed(2)}</span>
                     </div>
                     {pricing.discountPercent > 0 && (
                       <div className="flex justify-between text-green-600">
@@ -496,11 +496,11 @@ export default function GroupBooking({
                         <span>-${pricing.discount.toFixed(2)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between pt-2 border-t border-gray-200 text-lg font-semibold">
-                      <span className="text-gray-900">Total</span>
+                    <div className="flex justify-between pt-2 border-t border-gray-200 dark:border-gray-600 text-lg font-semibold">
+                      <span className="text-gray-900 dark:text-white">Total</span>
                       <span className="text-orange-600">${pricing.total.toFixed(2)}</span>
                     </div>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Split between {members.length} member{members.length > 1 ? 's' : ''}: ~${(pricing.total / members.length).toFixed(2)} each
                     </p>
                   </div>
@@ -510,7 +510,7 @@ export default function GroupBooking({
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep('team')}
-                  className="flex-1 py-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50"
+                  className="flex-1 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Back
                 </button>
@@ -530,44 +530,44 @@ export default function GroupBooking({
             <>
               {/* Booking Summary */}
               <div className="space-y-4 mb-6">
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     <Building2 className="w-5 h-5 text-gray-400" />
                     Team Details
                   </h4>
-                  <p className="text-gray-700">{teamName}</p>
-                  <p className="text-sm text-gray-500">{members.length} team member{members.length > 1 ? 's' : ''}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{teamName}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{members.length} team member{members.length > 1 ? 's' : ''}</p>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     <Package className="w-5 h-5 text-gray-400" />
                     Equipment
                   </h4>
-                  <p className="text-gray-700">{equipmentTitle}</p>
-                  <p className="text-sm text-gray-500">{quantity} unit{quantity > 1 ? 's' : ''}</p>
+                  <p className="text-gray-700 dark:text-gray-300">{equipmentTitle}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{quantity} unit{quantity > 1 ? 's' : ''}</p>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-gray-400" />
                     Schedule
                   </h4>
-                  <p className="text-gray-700">
+                  <p className="text-gray-700 dark:text-gray-300">
                     {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()}
                   </p>
-                  <p className="text-sm text-gray-500">{pricing.days} day{pricing.days > 1 ? 's' : ''}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{pricing.days} day{pricing.days > 1 ? 's' : ''}</p>
                 </div>
 
-                <div className="bg-orange-50 rounded-xl p-4">
-                  <h4 className="font-medium text-orange-900 mb-3 flex items-center gap-2">
+                <div className="bg-orange-50 dark:bg-orange-900/20 rounded-xl p-4">
+                  <h4 className="font-medium text-orange-900 dark:text-orange-300 mb-3 flex items-center gap-2">
                     <DollarSign className="w-5 h-5 text-orange-500" />
                     Payment Summary
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-orange-700">Subtotal</span>
-                      <span className="text-orange-900">${pricing.subtotal.toFixed(2)}</span>
+                      <span className="text-orange-700 dark:text-orange-400">Subtotal</span>
+                      <span className="text-orange-900 dark:text-orange-300">${pricing.subtotal.toFixed(2)}</span>
                     </div>
                     {pricing.discountPercent > 0 && (
                       <div className="flex justify-between text-sm text-green-600">
@@ -575,8 +575,8 @@ export default function GroupBooking({
                         <span>-${pricing.discount.toFixed(2)}</span>
                       </div>
                     )}
-                    <div className="flex justify-between pt-2 border-t border-orange-200 font-semibold">
-                      <span className="text-orange-900">Total</span>
+                    <div className="flex justify-between pt-2 border-t border-orange-200 dark:border-orange-800 font-semibold">
+                      <span className="text-orange-900 dark:text-orange-300">Total</span>
                       <span className="text-orange-600 text-lg">${pricing.total.toFixed(2)}</span>
                     </div>
                   </div>

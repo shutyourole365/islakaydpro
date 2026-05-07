@@ -265,7 +265,7 @@ export default function AnalyticsDashboard({
                     {formatCurrency(item.amount)}
                   </div>
                 </div>
-                <span className="text-xs text-gray-400 mt-2">
+                <span className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                   {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
               </div>
@@ -274,16 +274,16 @@ export default function AnalyticsDashboard({
         </div>
 
         {/* Bookings by Status */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-6">Bookings by Status</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Bookings by Status</h3>
           <div className="space-y-4">
             {data.bookingsByStatus.map((item) => (
               <div key={item.status}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600 capitalize">{item.status}</span>
-                  <span className="text-sm font-medium text-gray-900">{item.count}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400 capitalize">{item.status}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{item.count}</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{
@@ -324,8 +324,8 @@ export default function AnalyticsDashboard({
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{data.totalBookings}</div>
-                  <div className="text-xs text-gray-500">Total</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{data.totalBookings}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
                 </div>
               </div>
             </div>
@@ -336,8 +336,8 @@ export default function AnalyticsDashboard({
       {/* Performance Metrics & Top Categories */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Performance Metrics */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-6">Performance Metrics</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Performance Metrics</h3>
           <div className="grid grid-cols-2 gap-4">
             <PerformanceMetric
               icon={Star}
@@ -371,8 +371,8 @@ export default function AnalyticsDashboard({
         </div>
 
         {/* Top Categories */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-6">Top Performing Categories</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Top Performing Categories</h3>
           <div className="space-y-4">
             {data.topCategories.map((category, index) => (
               <div key={category.name} className="flex items-center gap-4">
@@ -386,8 +386,8 @@ export default function AnalyticsDashboard({
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">{category.name}</span>
-                    <span className="text-sm text-gray-500">{category.count} rentals</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{category.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{category.count} rentals</span>
                   </div>
                   <div className="text-sm text-green-600 font-medium">
                     {formatCurrency(category.revenue)} revenue
@@ -400,11 +400,11 @@ export default function AnalyticsDashboard({
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <h3 className="font-semibold text-gray-900 mb-6">Recent Activity</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Recent Activity</h3>
         <div className="space-y-4">
           {data.recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+            <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                 activity.type === 'booking' ? 'bg-blue-100 text-blue-600' :
                 activity.type === 'payment' ? 'bg-green-100 text-green-600' :

@@ -253,84 +253,84 @@ export default function BlockchainContract({
           <div className="space-y-3 mb-6">
             <button
               onClick={() => setExpandedSection(expandedSection === 'terms' ? null : 'terms')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <FileText className="w-5 h-5 text-gray-500" />
-                <span className="font-medium text-gray-900">Terms & Conditions</span>
+                <FileText className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <span className="font-medium text-gray-900 dark:text-white">Terms & Conditions</span>
               </div>
               <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${
                 expandedSection === 'terms' ? 'rotate-90' : ''
               }`} />
             </button>
             {expandedSection === 'terms' && (
-              <div className="bg-gray-50 rounded-xl p-4 space-y-4 text-sm">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 space-y-4 text-sm">
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Cancellation Policy</h4>
-                  <p className="text-gray-600">{terms.cancellationPolicy}</p>
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Cancellation Policy</h4>
+                  <p className="text-gray-600 dark:text-gray-400">{terms.cancellationPolicy}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Damage Policy</h4>
-                  <p className="text-gray-600">{terms.damagePolicy}</p>
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Damage Policy</h4>
+                  <p className="text-gray-600 dark:text-gray-400">{terms.damagePolicy}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Usage Rules</h4>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Usage Rules</h4>
+                  <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
                     {terms.usageRules.map((rule, index) => (
                       <li key={index}>{rule}</li>
                     ))}
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Insurance Coverage</h4>
-                  <p className="text-gray-600">{terms.insuranceCoverage}</p>
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Insurance Coverage</h4>
+                  <p className="text-gray-600 dark:text-gray-400">{terms.insuranceCoverage}</p>
                 </div>
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Dispute Resolution</h4>
-                  <p className="text-gray-600">{terms.disputeResolution}</p>
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Dispute Resolution</h4>
+                  <p className="text-gray-600 dark:text-gray-400">{terms.disputeResolution}</p>
                 </div>
               </div>
             )}
 
             <button
               onClick={() => setExpandedSection(expandedSection === 'security' ? null : 'security')}
-              className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Lock className="w-5 h-5 text-gray-500" />
-                <span className="font-medium text-gray-900">Security & Escrow</span>
+                <Lock className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <span className="font-medium text-gray-900 dark:text-white">Security & Escrow</span>
               </div>
               <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${
                 expandedSection === 'security' ? 'rotate-90' : ''
               }`} />
             </button>
             {expandedSection === 'security' && (
-              <div className="bg-gray-50 rounded-xl p-4 text-sm space-y-3">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 text-sm space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-4 h-4 text-green-600" />
+                  <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-4 h-4 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Funds Held in Escrow</p>
-                    <p className="text-gray-600">Your payment is held securely until the rental is complete.</p>
+                    <p className="font-medium text-gray-900 dark:text-white">Funds Held in Escrow</p>
+                    <p className="text-gray-600 dark:text-gray-400">Your payment is held securely until the rental is complete.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Fingerprint className="w-4 h-4 text-purple-600" />
+                  <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Fingerprint className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Immutable Record</p>
-                    <p className="text-gray-600">Contract terms cannot be altered once signed.</p>
+                    <p className="font-medium text-gray-900 dark:text-white">Immutable Record</p>
+                    <p className="text-gray-600 dark:text-gray-400">Contract terms cannot be altered once signed.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">Automatic Execution</p>
-                    <p className="text-gray-600">Deposit release and payments are automated based on conditions.</p>
+                    <p className="font-medium text-gray-900 dark:text-white">Automatic Execution</p>
+                    <p className="text-gray-600 dark:text-gray-400">Deposit release and payments are automated based on conditions.</p>
                   </div>
                 </div>
               </div>
@@ -339,18 +339,18 @@ export default function BlockchainContract({
 
           {/* Signature Section */}
           {!signed ? (
-            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-6 text-center">
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-xl p-6 text-center">
               <Fingerprint className="w-12 h-12 text-purple-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Sign with Your Digital Signature
               </h3>
-              <p className="text-gray-600 text-sm mb-6">
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
                 By signing, you agree to all terms and conditions of this rental contract.
                 This signature is legally binding and recorded on the blockchain.
               </p>
 
-              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-6">
-                <input type="checkbox" id="agree" className="rounded border-gray-300" />
+              <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-6">
+                <input type="checkbox" id="agree" className="rounded border-gray-300 dark:border-gray-600" />
                 <label htmlFor="agree">I have read and agree to the contract terms</label>
               </div>
 

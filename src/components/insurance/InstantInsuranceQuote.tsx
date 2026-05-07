@@ -335,25 +335,25 @@ export default function InstantInsuranceQuote({
 
                     <div className="space-y-3 mb-4">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">Coverage</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="text-gray-500 dark:text-gray-400">Coverage</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {plan.coveragePercentage}% (${plan.coverageAmount.toLocaleString()})
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">Deductible</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="text-gray-500 dark:text-gray-400">Deductible</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {plan.deductible === 0 ? 'None' : `$${plan.deductible.toLocaleString()}`}
                         </span>
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-100 pt-4">
+                    <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
                       <ul className="space-y-2">
                         {plan.features.slice(0, 3).map((feature, index) => (
                           <li key={index} className="flex items-start gap-2 text-sm">
                             <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-600">{feature}</span>
+                            <span className="text-gray-600 dark:text-gray-400">{feature}</span>
                           </li>
                         ))}
                         {plan.features.length > 3 && (
@@ -378,14 +378,14 @@ export default function InstantInsuranceQuote({
 
                     {/* Expanded Details */}
                     {showDetails === plan.id && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                         <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-900 mb-2">All Features</h4>
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">All Features</h4>
                           <ul className="space-y-1">
                             {plan.features.map((feature, index) => (
                               <li key={index} className="flex items-start gap-2 text-sm">
                                 <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                                <span className="text-gray-600">{feature}</span>
+                                <span className="text-gray-600 dark:text-gray-400">{feature}</span>
                               </li>
                             ))}
                           </ul>
@@ -393,12 +393,12 @@ export default function InstantInsuranceQuote({
 
                         {plan.exclusions.length > 0 && (
                           <div className="mb-4">
-                            <h4 className="text-sm font-medium text-gray-900 mb-2">Exclusions</h4>
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Exclusions</h4>
                             <ul className="space-y-1">
                               {plan.exclusions.map((exclusion, index) => (
                                 <li key={index} className="flex items-start gap-2 text-sm">
                                   <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                                  <span className="text-gray-500">{exclusion}</span>
+                                  <span className="text-gray-500 dark:text-gray-400">{exclusion}</span>
                                 </li>
                               ))}
                             </ul>
@@ -406,8 +406,8 @@ export default function InstantInsuranceQuote({
                         )}
 
                         <div>
-                          <h4 className="text-sm font-medium text-gray-900 mb-2">Claims Process</h4>
-                          <p className="text-sm text-gray-600">{plan.claimProcess}</p>
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Claims Process</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{plan.claimProcess}</p>
                         </div>
                       </div>
                     )}
