@@ -442,7 +442,7 @@ export default function SchedulingOptimizer({
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {slot.startTime.toLocaleDateString()} {slot.startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
                       Availability: {Math.round(slot.availability)}% | Demand: {slot.demand.toFixed(1)}
                     </div>
                   </div>
@@ -450,7 +450,7 @@ export default function SchedulingOptimizer({
                     <div className="text-sm font-semibold text-green-600">
                       ${Math.round(slot.price)}
                     </div>
-                    <div className="text-xs text-gray-600">optimal price</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">optimal price</div>
                   </div>
                 </div>
               ))}
@@ -461,28 +461,28 @@ export default function SchedulingOptimizer({
 
       {/* Detailed View */}
       {viewMode === 'detailed' && (
-        <div className="bg-white rounded-xl p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Equipment</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Utilization</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Demand</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue Potential</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Priority</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Equipment</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Utilization</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Demand</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Revenue Potential</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Priority</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {optimizations.map((opt) => (
-                  <tr key={opt.equipmentId} className="border-b border-gray-100">
+                  <tr key={opt.equipmentId} className="border-b border-gray-100 dark:border-gray-700">
                     <td className="py-3 px-4">
-                      <div className="font-medium text-gray-900">{opt.equipmentName}</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{opt.equipmentName}</div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 bg-gray-200 rounded-full h-2">
+                        <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
                             className="bg-blue-600 h-2 rounded-full"
                             style={{ width: `${opt.currentUtilization}%` }}
@@ -523,8 +523,8 @@ export default function SchedulingOptimizer({
 
       {/* Calendar View */}
       {viewMode === 'calendar' && (
-        <div className="bg-white rounded-xl p-6 border border-gray-100">
-          <div className="text-center text-gray-500">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
+          <div className="text-center text-gray-500 dark:text-gray-400">
             <Calendar className="w-12 h-12 mx-auto mb-4" />
             <p>Calendar view coming soon!</p>
             <p className="text-sm">View scheduling optimizations in calendar format.</p>

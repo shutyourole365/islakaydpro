@@ -357,31 +357,31 @@ export default function DisputeCenter({ onBack, bookingId }: DisputeCenterProps)
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title *</label>
                 <input
                   value={form.title}
                   onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                   placeholder="Brief summary of the issue"
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description *</label>
                 <textarea
                   value={form.description}
                   onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={4}
                   placeholder="Describe what happened in detail..."
-                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                  className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Evidence (photos)</label>
-                <label className="flex flex-col items-center gap-2 p-6 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-teal-400 transition-colors">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Evidence (photos)</label>
+                <label className="flex flex-col items-center gap-2 p-6 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl cursor-pointer hover:border-teal-400 transition-colors">
                   <Camera className="w-8 h-8 text-gray-400" />
-                  <span className="text-sm text-gray-500">Upload photos as evidence</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Upload photos as evidence</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -420,16 +420,16 @@ export default function DisputeCenter({ onBack, bookingId }: DisputeCenterProps)
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <button onClick={onBack} className="text-gray-600 hover:text-gray-900 transition-colors">
+            <button onClick={onBack} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Dispute Center</h1>
-              <p className="text-gray-500 text-sm">Resolve issues with rentals safely</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dispute Center</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Resolve issues with rentals safely</p>
             </div>
           </div>
           <button
@@ -440,23 +440,23 @@ export default function DisputeCenter({ onBack, bookingId }: DisputeCenterProps)
           </button>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8 text-teal-500" />
             <div>
-              <p className="font-medium text-gray-900">Protected by Islakayd</p>
-              <p className="text-sm text-gray-500">All disputes are reviewed by our team. Deposits are protected during the review period.</p>
+              <p className="font-medium text-gray-900 dark:text-white">Protected by Islakayd</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">All disputes are reviewed by our team. Deposits are protected during the review period.</p>
             </div>
           </div>
         </div>
 
         {disputes.length === 0 ? (
           <div className="text-center py-20">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No disputes</h3>
-            <p className="text-gray-500 mb-6">Any issues with your rentals can be resolved here.</p>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No disputes</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">Any issues with your rentals can be resolved here.</p>
             <button
               onClick={() => setShowNewForm(true)}
               className="px-6 py-2 bg-teal-500 text-white rounded-xl text-sm font-medium hover:bg-teal-600 transition-colors"
@@ -474,21 +474,21 @@ export default function DisputeCenter({ onBack, bookingId }: DisputeCenterProps)
                 <button
                   key={dispute.id}
                   onClick={() => setSelected(dispute)}
-                  className="w-full bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-left flex items-center gap-4"
+                  className="w-full bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow text-left flex items-center gap-4"
                 >
                   <div className={`w-10 h-10 rounded-full ${cfg.bg} flex items-center justify-center flex-shrink-0`}>
                     <Icon className={`w-5 h-5 ${cfg.text}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{dispute.title}</p>
-                    <p className="text-sm text-gray-500">{dispute.equipment_title} · {typeLabel}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{new Date(dispute.created_at).toLocaleDateString()}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white truncate">{dispute.title}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{dispute.equipment_title} · {typeLabel}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{new Date(dispute.created_at).toLocaleDateString()}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={`hidden sm:flex items-center gap-1 px-2.5 py-1 ${cfg.bg} ${cfg.text} rounded-full text-xs font-medium`}>
                       {cfg.label}
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                   </div>
                 </button>
               );

@@ -211,7 +211,7 @@ export default function InstantInsuranceQuote({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl my-8">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-4xl my-8">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-3xl text-white">
           <div className="flex items-center justify-between mb-4">
@@ -254,10 +254,10 @@ export default function InstantInsuranceQuote({
           {loading ? (
             <div className="py-16 text-center">
               <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Generating Your Quotes...
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Our AI is analyzing risk factors and market rates
               </p>
             </div>
@@ -265,7 +265,7 @@ export default function InstantInsuranceQuote({
             <>
               {/* Risk Analysis */}
               {factors && (
-                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 mb-6">
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-4 mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-5 h-5 text-indigo-500" />
                     <span className="font-medium text-indigo-900">AI Risk Analysis</span>

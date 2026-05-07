@@ -140,13 +140,13 @@ export default function AnalyticsDashboard({
   }, [data.revenueHistory]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
         {onBack && (
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
            >
             <ArrowUpRight className="w-5 h-5 rotate-[225deg]" />
             Back to Dashboard
@@ -157,8 +157,8 @@ export default function AnalyticsDashboard({
           {/* Header with Period Selector */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h2>
-              <p className="text-gray-500 text-sm">Track your rental performance</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Track your rental performance</p>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex bg-gray-100 rounded-lg p-1">

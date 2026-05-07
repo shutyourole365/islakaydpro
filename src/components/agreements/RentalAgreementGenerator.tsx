@@ -338,13 +338,13 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Special Terms (optional)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Special Terms (optional)</label>
               <textarea
                 value={specialTerms}
                 onChange={e => setSpecialTerms(e.target.value)}
                 rows={2}
                 placeholder="Any additional terms for this rental..."
-                className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
               />
             </div>
             <button
@@ -359,16 +359,16 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
         </div>
 
         {/* Protection note */}
-        <div className="flex items-center gap-3 p-4 bg-teal-50 rounded-xl border border-teal-100 mb-6">
-          <Shield className="w-5 h-5 text-teal-600 flex-shrink-0" />
-          <p className="text-sm text-teal-800">Signed agreements provide legal protection for both parties. Both owner and renter must sign before the rental begins.</p>
+        <div className="flex items-center gap-3 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-xl border border-teal-100 dark:border-teal-800/40 mb-6">
+          <Shield className="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+          <p className="text-sm text-teal-800 dark:text-teal-300">Signed agreements provide legal protection for both parties. Both owner and renter must sign before the rental begins.</p>
         </div>
 
         {/* Agreement list */}
         {agreements.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No agreements yet. Generate one from a booking above.</p>
+          <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+            <FileText className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-500 dark:text-gray-400">No agreements yet. Generate one from a booking above.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -376,13 +376,13 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
               const cfg = STATUS_CONFIG[a.status];
               const Icon = cfg.icon;
               return (
-                <button key={a.id} onClick={() => setSelected(a)} className="w-full bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-left flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <button key={a.id} onClick={() => setSelected(a)} className="w-full bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow text-left flex items-center gap-4">
+                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Package className="w-5 h-5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{a.equipment_title}</p>
-                    <p className="text-sm text-gray-500">{new Date(a.start_date).toLocaleDateString()} – {new Date(a.end_date).toLocaleDateString()} · ${a.total_amount.toFixed(2)}</p>
+                    <p className="font-semibold text-gray-900 dark:text-white truncate">{a.equipment_title}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(a.start_date).toLocaleDateString()} – {new Date(a.end_date).toLocaleDateString()} · ${a.total_amount.toFixed(2)}</p>
                   </div>
                   <span className={`flex items-center gap-1.5 px-3 py-1 ${cfg.bg} ${cfg.text} rounded-full text-xs font-medium flex-shrink-0`}>
                     <Icon className="w-3.5 h-3.5" /> {cfg.label}

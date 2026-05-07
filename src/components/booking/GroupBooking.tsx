@@ -304,22 +304,22 @@ export default function GroupBooking({
                 </div>
 
                 {showAddMember ? (
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <h4 className="font-medium text-gray-900 mb-3">Add Team Member</h4>
+                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-3">Add Team Member</h4>
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       <input
                         type="text"
                         value={newMember.name}
                         onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
                         placeholder="Name"
-                        className="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500"
+                        className="px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                       />
                       <input
                         type="email"
                         value={newMember.email}
                         onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
                         placeholder="Email"
-                        className="px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500"
+                        className="px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                       />
                     </div>
                     <input
@@ -327,12 +327,12 @@ export default function GroupBooking({
                       value={newMember.phone}
                       onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
                       placeholder="Phone (optional)"
-                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 mb-3"
+                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 mb-3"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={() => setShowAddMember(false)}
-                        className="flex-1 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100"
+                        className="flex-1 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         Cancel
                       </button>
@@ -348,14 +348,14 @@ export default function GroupBooking({
                   <div className="flex gap-3">
                     <button
                       onClick={() => setShowAddMember(true)}
-                      className="flex-1 py-3 border-2 border-dashed border-gray-200 text-gray-500 rounded-xl hover:border-orange-300 hover:text-orange-500 flex items-center justify-center gap-2"
+                      className="flex-1 py-3 border-2 border-dashed border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-xl hover:border-orange-300 hover:text-orange-500 flex items-center justify-center gap-2"
                     >
                       <UserPlus className="w-5 h-5" />
                       Add Member
                     </button>
                     <button
                       onClick={generateShareLink}
-                      className="flex-1 py-3 border-2 border-dashed border-gray-200 text-gray-500 rounded-xl hover:border-orange-300 hover:text-orange-500 flex items-center justify-center gap-2"
+                      className="flex-1 py-3 border-2 border-dashed border-gray-200 dark:border-gray-600 text-gray-500 dark:text-gray-400 rounded-xl hover:border-orange-300 hover:text-orange-500 flex items-center justify-center gap-2"
                      >
                       <Share2 className="w-5 h-5" />
                       Share Invite Link
@@ -365,12 +365,12 @@ export default function GroupBooking({
               </div>
 
               {/* Group Discount Info */}
-              <div className="bg-amber-50 rounded-xl p-4 mb-6">
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 mb-6">
                 <div className="flex items-start gap-3">
                   <Tag className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-medium text-amber-800">Group Discounts</p>
-                    <ul className="text-sm text-amber-700 mt-1 space-y-1">
+                    <p className="font-medium text-amber-800 dark:text-amber-300">Group Discounts</p>
+                    <ul className="text-sm text-amber-700 dark:text-amber-400 mt-1 space-y-1">
                       <li>• 3+ members: 5% off</li>
                       <li>• 5+ members: 10% off</li>
                       <li>• 10+ members: 15% off</li>
@@ -394,12 +394,12 @@ export default function GroupBooking({
           {step === 'schedule' && (
             <>
               {/* Equipment Info */}
-              <div className="bg-gray-50 rounded-xl p-4 mb-6">
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
                 <div className="flex items-center gap-3">
                   <Package className="w-5 h-5 text-gray-400" />
                   <div>
-                    <p className="font-medium text-gray-900">{equipmentTitle}</p>
-                    <p className="text-sm text-gray-500">${dailyRate}/day per unit</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{equipmentTitle}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">${dailyRate}/day per unit</p>
                   </div>
                 </div>
               </div>
@@ -407,7 +407,7 @@ export default function GroupBooking({
               {/* Date Selection */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Start Date
                   </label>
                   <div className="relative">
@@ -417,12 +417,12 @@ export default function GroupBooking({
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     End Date
                   </label>
                   <div className="relative">
@@ -432,7 +432,7 @@ export default function GroupBooking({
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       min={startDate || new Date().toISOString().split('T')[0]}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-orange-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                     />
                   </div>
                 </div>

@@ -216,15 +216,15 @@ export default function SmartScheduler({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 text-center">
         <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-600">Analyzing best times to book...</p>
+        <p className="text-gray-600 dark:text-gray-400">Analyzing best times to book...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden max-w-2xl w-full">
+    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden max-w-2xl w-full">
       {/* Header */}
       <div className="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
         <div className="flex items-center justify-between mb-4">

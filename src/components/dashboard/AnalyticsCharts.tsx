@@ -80,19 +80,19 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
       icon: <TrendingUp className="w-5 h-5" />,
       title: 'Peak Performance',
       description: 'Weekend bookings are 60% higher than weekdays',
-      color: 'text-emerald-600 bg-emerald-50',
+      color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400',
     },
     {
       icon: <Target className="w-5 h-5" />,
       title: 'Price Optimization',
       description: 'Increase daily rate by $25 to match market average',
-      color: 'text-amber-600 bg-amber-50',
+      color: 'text-amber-600 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400',
     },
     {
       icon: <Users className="w-5 h-5" />,
       title: 'Growing Demand',
       description: 'Your excavator has 3x more views this month',
-      color: 'text-blue-600 bg-blue-50',
+      color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400',
     },
   ];
 
@@ -187,7 +187,7 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     timeRange === range
                       ? 'bg-teal-500 text-white'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
                   {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === '90d' ? '90 Days' : '1 Year'}
@@ -208,7 +208,7 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
                   activeMetric === metric.id
                     ? `bg-gradient-to-r ${metric.color} text-white shadow-lg`
-                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    : 'bg-gray-50 dark:bg-gray-700/50 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
                 {metric.icon}
@@ -236,7 +236,7 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
                     style={{ height: `${(data.value / maxValue) * 100}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 font-medium">{data.label}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{data.label}</span>
               </div>
             ))}
           </div>
@@ -244,23 +244,23 @@ export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
       </div>
 
       {/* AI Insights */}
-      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-200">
+      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-2xl p-6 border border-purple-200 dark:border-purple-800">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
             <Activity className="w-5 h-5 text-white" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900">AI Insights</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">AI Insights</h3>
         </div>
         
         <div className="grid gap-3">
           {insights.map((insight, idx) => (
-            <div key={idx} className="flex items-start gap-3 p-4 bg-white rounded-xl">
+            <div key={idx} className="flex items-start gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${insight.color}`}>
                 {insight.icon}
               </div>
               <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 mb-1">{insight.title}</h4>
-                <p className="text-sm text-gray-600">{insight.description}</p>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-1">{insight.title}</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{insight.description}</p>
               </div>
             </div>
           ))}
