@@ -196,7 +196,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
       {/* Notification Bell */}
       <button
         aria-label="Toggle notifications panel" onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+        className="relative p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
       >
         {unreadCount > 0 ? (
           <BellRing className="w-6 h-6" />
@@ -212,11 +212,11 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50">
+        <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-50">
           {/* Header */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Notifications</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
@@ -241,8 +241,8 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                   onClick={() => setFilter(filterOption.key as typeof filter)}
                   className={`px-3 py-1 text-xs rounded-full font-medium transition-colors ${
                     filter === filterOption.key
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
                   {filterOption.label}
@@ -254,7 +254,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
           {/* Notifications List */}
           <div className="max-h-96 overflow-y-auto">
             {filteredNotifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                 <Bell className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                 <p className="text-sm">
                   {filter === 'unread' ? 'No unread notifications' :
@@ -263,7 +263,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filteredNotifications.map((notification) => {
                   const Icon = getNotificationIcon(notification.type);
                   const colorClass = getNotificationColor(notification.type);
@@ -271,8 +271,8 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                   return (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-gray-50 transition-colors ${
-                        !notification.is_read ? 'bg-blue-50/50' : ''
+                      className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                        !notification.is_read ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
                       }`}
                     >
                       <div className="flex gap-3">
@@ -283,15 +283,15 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-900">
+                              <p className="text-sm font-medium text-gray-900 dark:text-white">
                                 {notification.title}
                               </p>
-                              <p className="text-sm text-gray-600 mt-1">
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 {notification.message}
                               </p>
                               <div className="flex items-center gap-2 mt-2">
-                                <Clock className="w-3 h-3 text-gray-400" />
-                                <span className="text-xs text-gray-500">{notification.timeAgo}</span>
+                                <Clock className="w-3 h-3 text-gray-400 dark:text-gray-500" />
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{notification.timeAgo}</span>
                                 {notification.isNew && (
                                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                     New
@@ -303,7 +303,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                             {!notification.is_read && (
                               <button
                                 aria-label="Mark as read" onClick={() => handleMarkAsRead(notification.id)}
-                                className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                                 title="Mark as read"
                               >
                                 <Check className="w-4 h-4" />
@@ -317,7 +317,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                               <button className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
                                 View Booking
                               </button>
-                              <button className="px-3 py-1 text-xs border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
+                              <button className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                 Contact Owner
                               </button>
                             </div>
@@ -340,8 +340,8 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-gray-200">
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors">
               <Settings className="w-4 h-4" />
               Notification Settings
             </button>

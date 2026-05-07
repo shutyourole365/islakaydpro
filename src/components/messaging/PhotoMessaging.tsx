@@ -221,7 +221,7 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
               <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
 
-            <span className="text-xs text-gray-500 ml-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
               {selectedPhotos.length}/5 photos
             </span>
           </div>

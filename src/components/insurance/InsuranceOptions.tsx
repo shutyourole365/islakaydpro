@@ -192,10 +192,10 @@ export default function InsuranceOptions({
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-gray-900 dark:text-white">
                       ${planPrice.toLocaleString()}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {plan.price}% of rental
                     </p>
                   </div>
@@ -204,7 +204,7 @@ export default function InsuranceOptions({
 
               <button
                 onClick={() => toggleExpand(plan.id)}
-                className="w-full px-4 py-2 border-t border-gray-100 flex items-center justify-center gap-1 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
+                className="w-full px-4 py-2 border-t border-gray-100 dark:border-gray-700 flex items-center justify-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 {isExpanded ? 'Hide details' : 'Show details'}
                 {isExpanded ? (
@@ -215,19 +215,19 @@ export default function InsuranceOptions({
               </button>
 
               {isExpanded && (
-                <div className="px-4 pb-4 border-t border-gray-100">
+                <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-700">
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Deductible</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="text-gray-500 dark:text-gray-400">Deductible</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
                         {plan.deductible === 0 ? 'None' : `$${plan.deductible}`}
                       </span>
                     </div>
-                    <div className="pt-2 border-t border-gray-100">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Includes:</p>
+                    <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Includes:</p>
                       <ul className="space-y-1.5">
                         {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                          <li key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                             <Check className="w-4 h-4 text-teal-500 mt-0.5 flex-shrink-0" />
                             {feature}
                           </li>
@@ -242,10 +242,10 @@ export default function InsuranceOptions({
         })}
       </div>
 
-      <div className="p-4 bg-amber-50 border-t border-amber-100">
+      <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-100 dark:border-amber-800/30">
         <div className="flex items-start gap-2">
           <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-700">
+          <p className="text-sm text-amber-700 dark:text-amber-400">
             Protection plans are optional but recommended. Without protection, you may be
             liable for repair or replacement costs up to the full value of the equipment.
           </p>

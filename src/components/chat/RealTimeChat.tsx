@@ -225,20 +225,20 @@ export default function RealTimeChat({
   const emojis = ['😊', '👍', '🎉', '❤️', '🙌', '👋', '✅', '🔥', '💯', '🙏'];
 
   return (
-    <div className={`fixed inset-0 z-[100] bg-white flex ${className}`}>
+    <div className={`fixed inset-0 z-[100] bg-white dark:bg-gray-900 flex ${className}`}>
       {/* Conversation List - Left Panel */}
-      <div className={`w-full md:w-96 border-r border-gray-200 flex flex-col ${
+      <div className={`w-full md:w-96 border-r border-gray-200 dark:border-gray-700 flex flex-col ${
         selectedConversation ? 'hidden md:flex' : 'flex'
       }`}>
         {/* Header */}
-        <div className="px-4 py-4 border-b border-gray-100">
+        <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900">Messages</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Messages</h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
           </div>
           
@@ -250,7 +250,7 @@ export default function RealTimeChat({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search conversations..."
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-100 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-100 dark:bg-gray-700 rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
         </div>
@@ -262,8 +262,8 @@ export default function RealTimeChat({
               <button
                 key={conversation.id}
                 onClick={() => setSelectedConversation(conversation)}
-                className={`w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50 transition-colors text-left ${
-                  selectedConversation?.id === conversation.id ? 'bg-teal-50' : ''
+                className={`w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-left ${
+                  selectedConversation?.id === conversation.id ? 'bg-teal-50 dark:bg-teal-900/20' : ''
                 }`}
               >
                 {/* Avatar */}
@@ -290,20 +290,20 @@ export default function RealTimeChat({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-semibold text-gray-900 truncate">
+                      <span className="font-semibold text-gray-900 dark:text-white truncate">
                         {conversation.participant.name}
                       </span>
                       {conversation.participant.isVerified && (
                         <Shield className="w-4 h-4 text-teal-500" />
                       )}
                     </div>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
                       {conversation.lastMessage && formatTime(conversation.lastMessage.timestamp)}
                     </span>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-500 truncate">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {conversation.lastMessage?.content || 'No messages yet'}
                     </p>
                     {conversation.unreadCount > 0 && (
@@ -324,8 +324,8 @@ export default function RealTimeChat({
           ) : (
             <div className="text-center py-12 px-4">
               <MessageSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No conversations</h3>
-              <p className="text-gray-500">Start a conversation with an equipment owner</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No conversations</h3>
+              <p className="text-gray-500 dark:text-gray-400">Start a conversation with an equipment owner</p>
             </div>
           )}
         </div>
@@ -335,11 +335,11 @@ export default function RealTimeChat({
       {selectedConversation ? (
         <div className="flex-1 flex flex-col">
           {/* Chat Header */}
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-900">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSelectedConversation(null)}
-                className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100"
+                className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <ChevronLeft className="w-5 h-5 text-gray-600" />
               </button>

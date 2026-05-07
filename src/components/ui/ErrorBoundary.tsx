@@ -60,19 +60,19 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white rounded-3xl shadow-xl p-8">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 text-center mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-4">
               Oops! Something went wrong
             </h1>
 
-            <p className="text-gray-600 text-center mb-8">
+            <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
               We're sorry for the inconvenience. An unexpected error occurred while loading this page.
             </p>
 
