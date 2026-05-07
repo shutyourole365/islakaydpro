@@ -76,9 +76,9 @@ export default function Hero({ onSearch, onPlanProject }: HeroProps) {
         </p>
 
         {/* Search bar */}
-        <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)] p-2 mb-5">
+        <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)] p-2 mb-5">
           <div className="flex flex-col sm:flex-row items-stretch gap-2">
-            <div className="flex-1 flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
+            <div className="flex-1 flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
               <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
@@ -86,10 +86,10 @@ export default function Hero({ onSearch, onPlanProject }: HeroProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKey}
-                className="w-full bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-sm"
+                className="w-full bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none text-sm"
               />
             </div>
-            <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl sm:w-44">
+            <div className="flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl sm:w-44">
               <MapPin className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
@@ -97,7 +97,7 @@ export default function Hero({ onSearch, onPlanProject }: HeroProps) {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 onKeyDown={handleKey}
-                className="w-full bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none text-sm"
+                className="w-full bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none text-sm"
               />
             </div>
             <button

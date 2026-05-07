@@ -111,7 +111,7 @@ export default function EquipmentRecommendations({
   };
 
   const RecommendationCard = ({ equipment, reason }: { equipment: Equipment; reason: string }) => (
-    <div className="flex-shrink-0 w-72 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden group cursor-pointer">
+    <div className="flex-shrink-0 w-72 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden group cursor-pointer">
       <div className="relative h-48 overflow-hidden" onClick={() => onEquipmentClick(equipment)}>
         <img
           src={equipment.images[0]}
@@ -138,14 +138,14 @@ export default function EquipmentRecommendations({
       </div>
       
       <div className="p-4" onClick={() => onEquipmentClick(equipment)}>
-        <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
+        <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 mb-2">
           {equipment.title}
         </h3>
-        
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-            <span className="font-medium text-gray-900">{equipment.rating.toFixed(1)}</span>
+            <span className="font-medium text-gray-900 dark:text-white">{equipment.rating.toFixed(1)}</span>
             <span>({equipment.total_reviews})</span>
           </div>
           <span>•</span>
@@ -157,10 +157,10 @@ export default function EquipmentRecommendations({
 
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-2xl font-bold text-gray-900 dark:text-white">
               ${equipment.daily_rate}
             </span>
-            <span className="text-sm text-gray-500">/day</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">/day</span>
           </div>
           <button
             aria-label="View equipment"
