@@ -584,16 +584,16 @@ export default function GroupBooking({
               </div>
 
               {notes && (
-                <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                  <h4 className="font-medium text-gray-900 mb-2">Special Requests</h4>
-                  <p className="text-gray-600 text-sm">{notes}</p>
+                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
+                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">Special Requests</h4>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">{notes}</p>
                 </div>
               )}
 
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep('schedule')}
-                  className="flex-1 py-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50"
+                  className="flex-1 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   Back
                 </button>

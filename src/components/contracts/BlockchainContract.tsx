@@ -134,7 +134,7 @@ export default function BlockchainContract({
       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
         isComplete ? 'bg-green-500 text-white' :
         isActive ? 'bg-teal-500 text-white' :
-        'bg-gray-200 text-gray-400'
+        'bg-gray-200 dark:bg-gray-700 text-gray-400'
       }`}>
         {isComplete ? <CheckCircle2 className="w-5 h-5" /> :
          isActive ? <Loader2 className="w-5 h-5 animate-spin" /> :
@@ -373,33 +373,33 @@ export default function BlockchainContract({
               </button>
             </div>
           ) : (
-            <div className="bg-green-50 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-6 text-center">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <CheckCircle2 className="w-8 h-8 text-green-500" />
               </div>
-              <h3 className="text-lg font-semibold text-green-800 mb-2">
+              <h3 className="text-lg font-semibold text-green-800 dark:text-green-300 mb-2">
                 Contract Signed Successfully!
               </h3>
-              <p className="text-green-600 text-sm mb-4">
+              <p className="text-green-600 dark:text-green-400 text-sm mb-4">
                 Your signature has been recorded on the blockchain.
               </p>
 
-              <div className="bg-white rounded-lg p-4 text-left">
+              <div className="bg-white dark:bg-gray-700 rounded-lg p-4 text-left">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-500">Transaction Hash</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Transaction Hash</span>
                   <button
                     onClick={() => copyToClipboard(transactionHash)}
-                    className="p-1 hover:bg-gray-100 rounded"
+                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded"
                   >
                     <Copy className="w-4 h-4 text-gray-400" />
                   </button>
                 </div>
-                <code className="text-xs font-mono text-gray-700 break-all">
+                <code className="text-xs font-mono text-gray-700 dark:text-gray-300 break-all">
                   {transactionHash}
                 </code>
               </div>
 
-              <p className="text-sm text-gray-500 mt-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
                 Waiting for owner to sign...
               </p>
             </div>
@@ -408,7 +408,7 @@ export default function BlockchainContract({
 
         {/* Footer */}
         <div className="px-6 pb-6">
-          <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
+          <div className="flex items-center justify-center gap-4 text-xs text-gray-400 dark:text-gray-500">
             <span className="flex items-center gap-1">
               <Shield className="w-3 h-3" />
               Secured by Ethereum

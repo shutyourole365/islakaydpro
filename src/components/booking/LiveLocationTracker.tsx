@@ -124,7 +124,7 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 text-white">
         <div className="flex items-center justify-between">
@@ -153,19 +153,19 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
 
       <div className="p-4 space-y-4">
         {/* Equipment Location */}
-        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-          <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
-            <MapPin className="w-5 h-5 text-teal-600" />
+        <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+          <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+            <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-300" />
           </div>
           <div>
-            <div className="text-sm text-gray-500">Pickup Location</div>
-            <div className="font-medium text-gray-900">{equipmentLocation.address}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Pickup Location</div>
+            <div className="font-medium text-gray-900 dark:text-white">{equipmentLocation.address}</div>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl">
+          <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl">
             <AlertCircle className="w-5 h-5" />
             <span className="text-sm">{error}</span>
           </div>
@@ -176,15 +176,15 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
           <>
             {/* Distance & ETA Summary */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-blue-50 rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold text-blue-600">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-center">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                   {distance ? distance.toFixed(1) : '--'}
                 </div>
-                <div className="text-sm text-blue-500">miles away</div>
+                <div className="text-sm text-blue-500 dark:text-blue-400">miles away</div>
               </div>
-              <div className="bg-green-50 rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold text-green-600">{eta || '--:--'}</div>
-                <div className="text-sm text-green-500">ETA (driving)</div>
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 text-center">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400">{eta || '--:--'}</div>
+                <div className="text-sm text-green-500 dark:text-green-400">ETA (driving)</div>
               </div>
             </div>
 

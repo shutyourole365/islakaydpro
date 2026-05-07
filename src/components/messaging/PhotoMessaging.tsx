@@ -87,12 +87,12 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-teal-50 to-emerald-50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20">
         <div className="flex items-center gap-2">
           <Camera className="w-5 h-5 text-teal-600" />
-          <h3 className="font-semibold text-gray-900">Send Message with Photos</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">Send Message with Photos</h3>
         </div>
         {onClose && (
           <button

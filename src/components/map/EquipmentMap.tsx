@@ -212,30 +212,30 @@ export default function EquipmentMap({
         <button
           onClick={handleZoomIn}
           aria-label="Zoom in"
-          className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+          className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
-          <Plus className="w-5 h-5 text-gray-700" />
+          <Plus className="w-5 h-5 text-gray-700 dark:text-gray-300" />
         </button>
         <button
           onClick={handleZoomOut}
           aria-label="Zoom out"
-          className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+          className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
-          <Minus className="w-5 h-5 text-gray-700" />
+          <Minus className="w-5 h-5 text-gray-700 dark:text-gray-300" />
         </button>
-        <div className="w-10 h-px bg-gray-200 my-1" />
+        <div className="w-10 h-px bg-gray-200 dark:bg-gray-700 my-1" />
         <button
           onClick={handleLocate}
           aria-label="Find my location"
-          className="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+          className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg shadow-lg flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
         >
-          <Navigation className="w-5 h-5 text-gray-700" />
+          <Navigation className="w-5 h-5 text-gray-700 dark:text-gray-300" />
         </button>
       </div>
 
       {hoveredEquipment && (
         <div className="absolute bottom-4 left-4 right-4 z-[1000] pointer-events-none">
-          <div className="bg-white rounded-xl shadow-xl p-4 max-w-sm pointer-events-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-4 max-w-sm pointer-events-auto">
             <div className="flex gap-3">
               <img
                 src={hoveredEquipment.images[0]}
@@ -243,10 +243,10 @@ export default function EquipmentMap({
                 className="w-20 h-20 rounded-lg object-cover"
               />
               <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-gray-900 truncate">
+                <h4 className="font-semibold text-gray-900 dark:text-white truncate">
                   {hoveredEquipment.title}
                 </h4>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                   <MapPin className="w-3 h-3" />
                   {hoveredEquipment.location}
                 </p>

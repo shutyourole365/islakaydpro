@@ -406,10 +406,10 @@ export default function AnalyticsDashboard({
           {data.recentActivity.map((activity, index) => (
             <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                activity.type === 'booking' ? 'bg-blue-100 text-blue-600' :
-                activity.type === 'payment' ? 'bg-green-100 text-green-600' :
-                activity.type === 'review' ? 'bg-amber-100 text-amber-600' :
-                'bg-gray-100 text-gray-600'
+                activity.type === 'booking' ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' :
+                activity.type === 'payment' ? 'bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400' :
+                activity.type === 'review' ? 'bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400' :
+                'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
               }`}>
                 {activity.type === 'booking' && <Calendar className="w-5 h-5" />}
                 {activity.type === 'payment' && <DollarSign className="w-5 h-5" />}
@@ -417,8 +417,8 @@ export default function AnalyticsDashboard({
                 {activity.type === 'view' && <Eye className="w-5 h-5" />}
               </div>
               <div className="flex-1">
-                <p className="text-gray-900">{activity.description}</p>
-                <p className="text-sm text-gray-500">{formatTimeAgo(activity.time)}</p>
+                <p className="text-gray-900 dark:text-white">{activity.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{formatTimeAgo(activity.time)}</p>
               </div>
               {activity.amount && (
                 <span className="text-green-600 font-semibold">
@@ -451,7 +451,7 @@ function MetricCard({
   const isPositive = change >= 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
       <div className="flex items-start justify-between mb-4">
         <div className={`p-2.5 rounded-xl ${color}`}>
           <Icon className="w-5 h-5 text-white" />
@@ -463,8 +463,8 @@ function MetricCard({
           {Math.abs(change)}%
         </div>
       </div>
-      <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-sm text-gray-500">{label}</div>
+      <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{value}</div>
+      <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
     </div>
   );
 }
@@ -483,13 +483,13 @@ function PerformanceMetric({
   color: string;
 }) {
   return (
-    <div className="p-4 bg-gray-50 rounded-xl">
+    <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
       <div className="flex items-center gap-2 mb-2">
         <Icon className={`w-4 h-4 ${color}`} />
-        <span className="text-sm text-gray-600">{label}</span>
+        <span className="text-sm text-gray-600 dark:text-gray-400">{label}</span>
       </div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
-      <div className="text-xs text-gray-500">{subtext}</div>
+      <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400">{subtext}</div>
     </div>
   );
 }
