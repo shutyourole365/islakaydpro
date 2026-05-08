@@ -109,7 +109,7 @@ export default function IDVerificationFlow({ onBack }: IDVerificationFlowProps) 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
       </div>
     );
@@ -117,13 +117,13 @@ export default function IDVerificationFlow({ onBack }: IDVerificationFlowProps) 
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-          <div className="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-teal-500" />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 flex items-center justify-center px-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 text-center">
+          <div className="w-16 h-16 bg-teal-50 dark:bg-teal-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-teal-500 dark:text-teal-300" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Documents Submitted!</h2>
-          <p className="text-gray-500 mb-6">Our team will review your ID within 24 hours. You'll be notified once verified.</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Documents Submitted!</h2>
+          <p className="text-gray-500 dark:text-gray-400 mb-6">Our team will review your ID within 24 hours. You'll be notified once verified.</p>
           <button onClick={() => { setSubmitted(false); setStep('overview'); setDocFile(null); setSelfieFile(null); }} className="px-6 py-2.5 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 transition-colors">
             Back to Verification
           </button>

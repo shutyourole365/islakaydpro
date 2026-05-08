@@ -341,7 +341,7 @@ export default function RealTimeChat({
                 onClick={() => setSelectedConversation(null)}
                 className="md:hidden p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
+                <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
               
               <div className="relative">
@@ -365,7 +365,7 @@ export default function RealTimeChat({
 
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
                     {selectedConversation.participant.name}
                   </h3>
                   {selectedConversation.participant.isVerified && (
@@ -376,7 +376,7 @@ export default function RealTimeChat({
                     {selectedConversation.participant.rating.toFixed(1)}
                   </div>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {selectedConversation.participant.isOnline
                     ? 'Online'
                     : `Last seen ${formatLastSeen(selectedConversation.participant.lastSeen)}`}
@@ -385,14 +385,14 @@ export default function RealTimeChat({
             </div>
 
             <div className="flex items-center gap-2">
-              <button aria-label="Start phone call" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <Phone className="w-5 h-5 text-gray-600" />
+              <button aria-label="Start phone call" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <Phone className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
-              <button aria-label="Start video call" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <Video className="w-5 h-5 text-gray-600" />
+              <button aria-label="Start video call" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <Video className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
-              <button aria-label="More options" className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <MoreVertical className="w-5 h-5 text-gray-600" />
+              <button aria-label="More options" className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
             </div>
           </div>
