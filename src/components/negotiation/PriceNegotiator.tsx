@@ -193,14 +193,14 @@ export default function PriceNegotiator({
 
   const getLikelihoodColor = (likelihood: NegotiationSuggestion['likelihood']) => {
     switch (likelihood) {
-      case 'high': return 'bg-green-100 text-green-700';
-      case 'medium': return 'bg-amber-100 text-amber-700';
-      case 'low': return 'bg-red-100 text-red-700';
+      case 'high': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+      case 'medium': return 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300';
+      case 'low': return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300';
     }
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden max-w-lg w-full">
+    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden max-w-lg w-full">
       {/* Header */}
       <div className="p-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white">
         <div className="flex items-center justify-between">
@@ -242,8 +242,8 @@ export default function PriceNegotiator({
 
       {/* AI Suggestions */}
       {status === 'active' && suggestions.length > 0 && (
-        <div className="p-4 bg-violet-50 border-b border-violet-100">
-          <div className="flex items-center gap-2 mb-2 text-sm text-violet-700">
+        <div className="p-4 bg-violet-50 dark:bg-violet-900/20 border-b border-violet-100 dark:border-violet-800">
+          <div className="flex items-center gap-2 mb-2 text-sm text-violet-700 dark:text-violet-300">
             <Sparkles className="w-4 h-4" />
             <span className="font-medium">AI Negotiation Tips</span>
           </div>
@@ -277,8 +277,8 @@ export default function PriceNegotiator({
                 msg.sender === 'renter'
                   ? 'bg-violet-600 text-white rounded-tr-sm'
                   : msg.sender === 'owner'
-                  ? 'bg-gray-100 text-gray-800 rounded-tl-sm'
-                  : 'bg-amber-50 text-amber-800 text-center w-full text-sm'
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tl-sm'
+                  : 'bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-center w-full text-sm'
               }`}
             >
               <p className="text-sm">{msg.message}</p>
@@ -293,7 +293,7 @@ export default function PriceNegotiator({
         
         {isOwnerTyping && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 px-4 py-2 rounded-2xl rounded-tl-sm">
+            <div className="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl rounded-tl-sm">
               <div className="flex gap-1">
                 <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                 <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -305,7 +305,7 @@ export default function PriceNegotiator({
       </div>
 
       {/* Actions */}
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-4 border-t border-gray-100 dark:border-gray-700">
         {status === 'active' && (
           <>
             <div className="flex gap-2 mb-3">
@@ -316,7 +316,7 @@ export default function PriceNegotiator({
                   value={customOffer}
                   onChange={(e) => setCustomOffer(e.target.value)}
                   placeholder="Your offer..."
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-violet-500"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-violet-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
               <button
@@ -342,21 +342,21 @@ export default function PriceNegotiator({
 
         {status === 'accepted' && (
           <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
-            <p className="font-semibold text-gray-900 text-lg">Deal Confirmed!</p>
-            <p className="text-gray-500">You saved ${(originalTotal - currentOffer).toLocaleString()}</p>
+            <p className="font-semibold text-gray-900 dark:text-white text-lg">Deal Confirmed!</p>
+            <p className="text-gray-500 dark:text-gray-400">You saved ${(originalTotal - currentOffer).toLocaleString()}</p>
           </div>
         )}
 
         {status === 'rejected' && (
           <div className="text-center">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
               <XCircle className="w-8 h-8 text-red-600" />
             </div>
-            <p className="font-semibold text-gray-900 text-lg">Negotiation Ended</p>
-            <p className="text-gray-500">Try again with a different offer</p>
+            <p className="font-semibold text-gray-900 dark:text-white text-lg">Negotiation Ended</p>
+            <p className="text-gray-500 dark:text-gray-400">Try again with a different offer</p>
           </div>
         )}
       </div>
