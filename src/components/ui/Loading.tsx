@@ -115,7 +115,7 @@ export function LoadingOverlay({ message = 'Loading...', transparent = false }: 
       }`}
     >
       <LoadingSpinner size="xl" />
-      {message && <p className="mt-4 text-gray-600 font-medium">{message}</p>}
+      {message && <p className="mt-4 text-gray-600 dark:text-gray-300 font-medium">{message}</p>}
     </div>
   );
 }

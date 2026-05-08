@@ -9,35 +9,40 @@ interface BookingStatusTrackerProps {
   compact?: boolean;
 }
 
-const statusConfig: Record<Booking['status'], { label: string; color: string; bgColor: string; icon: JSX.Element }> = {
+const statusConfig: Record<Booking['status'], { label: string; color: string; bgColor: string; barColor: string; icon: JSX.Element }> = {
   pending: {
     label: 'Pending',
     color: 'text-amber-600',
     bgColor: 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800',
+    barColor: 'bg-amber-500 dark:bg-amber-400',
     icon: <Clock className="w-4 h-4" />,
   },
   confirmed: {
     label: 'Confirmed',
     color: 'text-blue-600',
     bgColor: 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800',
+    barColor: 'bg-blue-500 dark:bg-blue-400',
     icon: <CheckCircle2 className="w-4 h-4" />,
   },
   active: {
     label: 'Active',
     color: 'text-green-600',
     bgColor: 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800',
+    barColor: 'bg-green-500 dark:bg-green-400',
     icon: <Activity className="w-4 h-4 animate-pulse" />,
   },
   completed: {
     label: 'Completed',
     color: 'text-gray-600 dark:text-gray-400',
     bgColor: 'bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600',
+    barColor: 'bg-gray-500 dark:bg-gray-400',
     icon: <CheckCircle2 className="w-4 h-4" />,
   },
   cancelled: {
     label: 'Cancelled',
     color: 'text-red-600',
     bgColor: 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800',
+    barColor: 'bg-red-500 dark:bg-red-400',
     icon: <AlertCircle className="w-4 h-4" />,
   },
 };
@@ -105,7 +110,7 @@ export default function BookingStatusTracker({
         <div className="text-xs text-gray-500 dark:text-gray-400">Progress: {Math.round(progress)}%</div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${config.color.replace('text', 'bg')}`}
+            className={`h-2 rounded-full transition-all ${config.barColor}`}
             style={{ width: `${progress}%` }}
           />
         </div>

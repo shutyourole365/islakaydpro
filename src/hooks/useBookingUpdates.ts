@@ -8,13 +8,19 @@ interface UseBookingUpdatesOptions {
 }
 
 export function useBookingUpdates(userId: string | null, options: UseBookingUpdatesOptions = {}) {
-  const { onUpdate, onStatusChange } = options;
   const bookingStatusCache = useRef<Record<string, string>>({});
+  const onUpdateRef = useRef(options.onUpdate);
+  const onStatusChangeRef = useRef(options.onStatusChange);
+
+  // Keep refs current on every render without triggering resubscription
+  useEffect(() => {
+    onUpdateRef.current = options.onUpdate;
+    onStatusChangeRef.current = options.onStatusChange;
+  });
 
   useEffect(() => {
     if (!userId) return;
 
-    // Subscribe to booking updates for this user's bookings
     const channel = supabase
       .channel(`booking-updates-${userId}`)
       .on(
@@ -28,17 +34,13 @@ export function useBookingUpdates(userId: string | null, options: UseBookingUpda
         (payload) => {
           const booking = payload.new as Booking;
 
-          // Detect status changes
           const oldStatus = bookingStatusCache.current[booking.id];
           if (oldStatus && oldStatus !== booking.status) {
-            onStatusChange?.(booking.id, oldStatus, booking.status);
+            onStatusChangeRef.current?.(booking.id, oldStatus, booking.status);
           }
 
-          // Cache the current status
           bookingStatusCache.current[booking.id] = booking.status;
-
-          // Notify about the update
-          onUpdate?.(booking);
+          onUpdateRef.current?.(booking);
         }
       )
       .subscribe();
@@ -46,17 +48,22 @@ export function useBookingUpdates(userId: string | null, options: UseBookingUpda
     return () => {
       channel.unsubscribe();
     };
-  }, [userId, onUpdate, onStatusChange]);
+  }, [userId]);
 }
 
 export function useOwnerBookingUpdates(userId: string | null, options: UseBookingUpdatesOptions = {}) {
-  const { onUpdate, onStatusChange } = options;
   const bookingStatusCache = useRef<Record<string, string>>({});
+  const onUpdateRef = useRef(options.onUpdate);
+  const onStatusChangeRef = useRef(options.onStatusChange);
+
+  useEffect(() => {
+    onUpdateRef.current = options.onUpdate;
+    onStatusChangeRef.current = options.onStatusChange;
+  });
 
   useEffect(() => {
     if (!userId) return;
 
-    // Subscribe to booking updates where this user is the owner
     const channel = supabase
       .channel(`owner-booking-updates-${userId}`)
       .on(
@@ -70,17 +77,13 @@ export function useOwnerBookingUpdates(userId: string | null, options: UseBookin
         (payload) => {
           const booking = payload.new as Booking;
 
-          // Detect status changes
           const oldStatus = bookingStatusCache.current[booking.id];
           if (oldStatus && oldStatus !== booking.status) {
-            onStatusChange?.(booking.id, oldStatus, booking.status);
+            onStatusChangeRef.current?.(booking.id, oldStatus, booking.status);
           }
 
-          // Cache the current status
           bookingStatusCache.current[booking.id] = booking.status;
-
-          // Notify about the update
-          onUpdate?.(booking);
+          onUpdateRef.current?.(booking);
         }
       )
       .subscribe();
@@ -88,5 +91,5 @@ export function useOwnerBookingUpdates(userId: string | null, options: UseBookin
     return () => {
       channel.unsubscribe();
     };
-  }, [userId, onUpdate, onStatusChange]);
+  }, [userId]);
 }

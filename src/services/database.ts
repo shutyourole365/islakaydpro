@@ -252,29 +252,16 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
 
   if (error) throw error;
 
-  // Send notification for booking status changes
-  if (status === 'confirmed' || status === 'cancelled' || status === 'completed') {
-    let notificationType: 'booking_confirmed' | 'booking_cancelled' | 'booking_completed';
-    let title: string;
-    let message: string;
-    let pushType: 'confirmed' | 'cancelled' | 'completed';
-
-    if (status === 'confirmed') {
-      notificationType = 'booking_confirmed';
-      title = '✅ Booking Confirmed!';
-      message = `Your booking for ${data.equipment?.title} is confirmed`;
-      pushType = 'confirmed';
-    } else if (status === 'cancelled') {
-      notificationType = 'booking_cancelled';
-      title = '❌ Booking Cancelled';
-      message = `Your booking for ${data.equipment?.title} has been cancelled`;
-      pushType = 'cancelled';
-    } else {
-      notificationType = 'booking_completed';
-      title = '🎉 Rental Completed!';
-      message = `Your rental of ${data.equipment?.title} is complete. Leave a review!`;
-      pushType = 'completed';
-    }
+  // Send notification for booking status changes.
+  // booking_confirmed is handled by the DB trigger (on_booking_confirmed), so we only
+  // manage cancelled and completed here to avoid duplicates.
+  if (status === 'cancelled' || status === 'completed') {
+    const notificationType = status === 'cancelled' ? 'booking_cancelled' : 'booking_completed';
+    const title = status === 'cancelled' ? '❌ Booking Cancelled' : '🎉 Rental Completed!';
+    const message = status === 'cancelled'
+      ? `Your booking for ${data.equipment?.title} has been cancelled`
+      : `Your rental of ${data.equipment?.title} is complete. Leave a review!`;
+    const pushType = status as 'cancelled' | 'completed';
 
     const notification = {
       user_id: data.renter_id,
@@ -289,12 +276,11 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
     void (async () => {
       try {
         await supabase.from('notifications').insert(notification);
-        // Fire-and-forget push notification
         const { sendBookingNotification } = await import('./pushNotifications');
         sendBookingNotification(data.renter_id, pushType, {
           equipmentName: data.equipment?.title || 'Equipment',
           dates: `${data.start_date} to ${data.end_date}`,
-          ownerName: data.owner?.full_name,
+          ownerName: data.equipment?.owner?.full_name,
         }).catch(() => {});
       } catch { /* fire-and-forget */ }
     })();

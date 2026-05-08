@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 interface LogoProps {
   variant?: 'full' | 'icon' | 'wordmark';
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -13,6 +15,9 @@ const sizeMap = {
 };
 
 function LogoMark({ className = '' }: { className?: string }) {
+  const uid = useId().replace(/:/g, '');
+  const gradId = `ik-grad-${uid}`;
+  const shineId = `ik-shine-${uid}`;
   return (
     <svg
       viewBox="0 0 48 48"
@@ -21,21 +26,21 @@ function LogoMark({ className = '' }: { className?: string }) {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="ik-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#14b8a6" />
           <stop offset="60%" stopColor="#0d9488" />
           <stop offset="100%" stopColor="#059669" />
         </linearGradient>
-        <linearGradient id="ik-shine" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={shineId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
           <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
         </linearGradient>
       </defs>
 
       {/* Rounded squircle base */}
-      <rect width="48" height="48" rx="13" fill="url(#ik-mark-grad)" />
+      <rect width="48" height="48" rx="13" fill={`url(#${gradId})`} />
       {/* Gloss highlight */}
-      <rect width="48" height="24" rx="13" fill="url(#ik-shine)" />
+      <rect width="48" height="24" rx="13" fill={`url(#${shineId})`} />
 
       {/* Stylised "IK" monogram with key/spark accent */}
       <g fill="white">
