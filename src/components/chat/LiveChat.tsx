@@ -35,8 +35,7 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
         // Look for an existing conversation between these two users for this equipment
         const convos = await getConversations(user.id);
         const existing = convos.find(c =>
-          c.equipment_id === (equipmentId ?? null) &&
-          c.participants?.some(p => p.user_id === recipientId)
+          c.participants?.includes(recipientId)
         );
 
         let convId: string;
