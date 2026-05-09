@@ -197,7 +197,7 @@ export default function Dashboard({
     const conversation = conversations.find(c => c.id === selectedConversation);
     if (!conversation) return;
 
-    const receiverId = conversation.participants?.find(p => p.user_id !== user.id)?.user_id;
+    const receiverId = conversation.participants?.find((p: string) => p !== user.id);
     if (!receiverId) return;
 
     const message = await sendMessage({
@@ -965,10 +965,10 @@ export default function Dashboard({
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-gray-900 truncate">
-                                  {conv.equipment?.title || 'Conversation'}
+                                  {'Conversation'}
                                 </p>
                                 <p className="text-sm text-gray-500 truncate">
-                                  {conv.last_message?.content || 'No messages'}
+                                  {conv.last_message || 'No messages'}
                                 </p>
                               </div>
                               {conv.unread_count && conv.unread_count > 0 && (
