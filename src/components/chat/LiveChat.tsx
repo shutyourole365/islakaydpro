@@ -178,7 +178,7 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
                       <span className="text-xs text-gray-500">{formatTime(message.created_at)}</span>
                       {isMe && (
                         <span className="text-teal-600">
-                          {message.is_read ? <CheckCheck className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
+                          {message.read ? <CheckCheck className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
                         </span>
                       )}
                     </div>
