@@ -561,10 +561,12 @@ export default function BrowsePage({
                         {(item.rating ?? 0).toFixed(1)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
-                      <Shield className="w-4 h-4 text-teal-500" />
-                      <span className="text-xs font-medium text-gray-700">Verified</span>
-                    </div>
+                    {item.is_verified && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
+                        <Shield className="w-4 h-4 text-teal-500" />
+                        <span className="text-xs font-medium text-gray-700">Verified</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
