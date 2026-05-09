@@ -7,27 +7,45 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Test supabase db query --linked
+      - name: Run migration via node-postgres
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          # First link the project
-          supabase link --project-ref purmabjcvznntttvtseb
-
-          # Try db query with --linked flag (uses Management API, no direct DB)
-          echo "Testing with --linked..."
-          supabase db query --linked "SELECT 1 as test" 2>&1 || true
+          npm install pg --save-dev --silent 2>/dev/null
+          node << 'NODEOF'
+          const { Client } = require('pg');
+          const fs = require('fs');
+          const path = require('path');
           
-          echo "---"
-          # Try with --project-ref instead
-          echo "Testing with --project-ref..."
-          supabase db query --project-ref purmabjcvznntttvtseb "SELECT 1 as test" 2>&1 || true
+          const migFile = 'supabase/migrations/20260426000000_fix_conversations_participants.sql';
+          if (!fs.existsSync(migFile)) {
+            console.log('Migration file not found:', migFile);
+            process.exit(1);
+          }
+          const sql = fs.readFileSync(migFile, 'utf8');
           
-          echo "---"
-          # Check available db subcommands
-          supabase db --help 2>&1 | head -20
+          const client = new Client({
+            host: 'aws-0-ap-southeast-2.pooler.supabase.com',
+            port: 6543,
+            database: 'postgres',
+            user: 'postgres.purmabjcvznntttvtseb',
+            password: process.env.DB_PASSWORD,
+            ssl: { rejectUnauthorized: false }
+          });
+          
+          async function run() {
+            await client.connect();
+            console.log('Connected to database');
+            try {
+              await client.query(sql);
+              console.log('Migration applied successfully');
+            } catch (e) {
+              console.error('Migration error:', e.message);
+              await client.end();
+              process.exit(1);
+            }
+            await client.end();
+          }
+          
+          run().catch(e => { console.error(e); process.exit(1); });
+          NODEOF
