@@ -11,41 +11,52 @@ jobs:
         env:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
-          npm install pg --save-dev --silent 2>/dev/null
-          node << 'NODEOF'
+          npm install pg --save-dev --silent
+          node -e "
           const { Client } = require('pg');
           const fs = require('fs');
-          const path = require('path');
+          const sql = fs.readFileSync('supabase/migrations/20260426000000_fix_conversations_participants.sql', 'utf8');
           
-          const migFile = 'supabase/migrations/20260426000000_fix_conversations_participants.sql';
-          if (!fs.existsSync(migFile)) {
-            console.log('Migration file not found:', migFile);
-            process.exit(1);
-          }
-          const sql = fs.readFileSync(migFile, 'utf8');
-          
-          const client = new Client({
-            host: 'aws-0-ap-southeast-2.pooler.supabase.com',
-            port: 6543,
-            database: 'postgres',
-            user: 'postgres.purmabjcvznntttvtseb',
-            password: process.env.DB_PASSWORD,
-            ssl: { rejectUnauthorized: false }
-          });
-          
-          async function run() {
-            await client.connect();
-            console.log('Connected to database');
-            try {
-              await client.query(sql);
-              console.log('Migration applied successfully');
-            } catch (e) {
-              console.error('Migration error:', e.message);
-              await client.end();
-              process.exit(1);
+          // Try direct connection first, fall back to pooler
+          const configs = [
+            {
+              host: 'db.purmabjcvznntttvtseb.supabase.co',
+              port: 5432,
+              database: 'postgres',
+              user: 'postgres',
+              password: process.env.DB_PASSWORD,
+              ssl: { rejectUnauthorized: false }
+            },
+            {
+              host: 'aws-0-ap-southeast-2.pooler.supabase.com',
+              port: 5432,
+              database: 'postgres',
+              user: 'postgres.purmabjcvznntttvtseb',
+              password: process.env.DB_PASSWORD,
+              ssl: { rejectUnauthorized: false }
             }
+          ];
+          
+          async function tryConnect(config) {
+            const client = new Client(config);
+            await client.connect();
+            console.log('Connected via', config.host + ':' + config.port);
+            await client.query(sql);
+            console.log('Migration applied successfully!');
             await client.end();
           }
           
+          async function run() {
+            for (const config of configs) {
+              try {
+                await tryConnect(config);
+                return;
+              } catch(e) {
+                console.log('Failed:', config.host + ':' + config.port, e.message);
+              }
+            }
+            process.exit(1);
+          }
+          
           run().catch(e => { console.error(e); process.exit(1); });
-          NODEOF
+          "
