@@ -193,7 +193,8 @@ export interface Notification {
   title: string;
   message: string;
   data: Record<string, unknown>;
-  is_read: boolean;
+  read: boolean;
+  is_read?: boolean; // alias for backwards compat
   created_at: string;
 }
 
