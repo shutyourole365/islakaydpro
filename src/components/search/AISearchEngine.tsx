@@ -311,7 +311,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
               <h3 className="text-sm font-semibold text-gray-500 mb-3">TRY ASKING...</h3>
               <div className="space-y-2">
                 {[
-                  { icon: <MapPin className="w-4 h-4" />, text: 'Find excavators near Los Angeles under $300/day' },
+                  { icon: <MapPin className="w-4 h-4" />, text: 'Find excavators near Perth under $300/day' },
                   { icon: <Calendar className="w-4 h-4" />, text: 'Camera equipment for weekend wedding shoot' },
                   { icon: <DollarSign className="w-4 h-4" />, text: 'Cheapest power tools for home renovation' },
                   { icon: <Sparkles className="w-4 h-4" />, text: 'Professional DJ equipment for party on Saturday' },
