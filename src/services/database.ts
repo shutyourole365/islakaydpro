@@ -469,7 +469,7 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .eq('is_read', false);
+    .eq('read', false);
 
   if (error) throw error;
   return count || 0;
