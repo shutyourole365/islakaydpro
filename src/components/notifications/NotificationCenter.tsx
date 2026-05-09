@@ -77,7 +77,6 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
     return () => {
       if (channelRef.current) supabase.removeChannel(channelRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const getIcon = (type: Notification['type']) => {
