@@ -429,10 +429,12 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
   let query = supabase
     .from('notifications')
     .select('*')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(50);
 
   if (unreadOnly) {
-    query = query.eq('is_read', false);
+    query = query.eq('read', false);
   }
 
   query = query.order('created_at', { ascending: false }).limit(50);
@@ -446,7 +448,7 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
 export async function markNotificationRead(id: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ is_read: true })
+    .update({ read: true })
     .eq('id', id);
 
   if (error) throw error;
@@ -455,9 +457,9 @@ export async function markNotificationRead(id: string): Promise<void> {
 export async function markAllNotificationsRead(userId: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ is_read: true })
+    .update({ read: true })
     .eq('user_id', userId)
-    .eq('is_read', false);
+    .eq('read', false);
 
   if (error) throw error;
 }
