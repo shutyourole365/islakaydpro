@@ -490,7 +490,6 @@ export default function Dashboard({
                 }>
                   <AnalyticsCharts
                     userId={user?.id || ''}
-                    analytics={undefined}
                   />
                 </Suspense>
 
