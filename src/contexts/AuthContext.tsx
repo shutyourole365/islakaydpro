@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadUserData = useCallback(async (userId: string) => {
     try {
-      const [profile, analytics, unreadCount] = await Promise.all([
+      const [profile, analytics, unreadCount, unreadMsgCount] = await Promise.all([
         getProfile(userId),
         getUserAnalytics(userId),
         getUnreadNotificationCount(userId),
