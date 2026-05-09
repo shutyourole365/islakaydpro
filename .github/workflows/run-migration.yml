@@ -7,9 +7,57 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Run migration via node-postgres
+      - name: Run migration via Supabase REST API
         env:
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          # Use Supabase REST API with service role key to run SQL via RPC
+          # Read migration file
+          SQL=$(cat supabase/migrations/20260426000000_fix_conversations_participants.sql)
+          
+          # Use Supabase's pg_dump or query via service role
+          node -e "
+          const https = require('https');
+          const fs = require('fs');
+          
+          const serviceKey = process.env.SUPABASE_SERVICE_KEY;
+          const projectRef = 'purmabjcvznntttvtseb';
+          const sql = fs.readFileSync('supabase/migrations/20260426000000_fix_conversations_participants.sql', 'utf8');
+          
+          const postData = JSON.stringify({ query: sql });
+          
+          const options = {
+            hostname: 'api.supabase.com',
+            path: '/v1/projects/' + projectRef + '/database/query',
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + serviceKey,
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(postData)
+            }
+          };
+          
+          const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => { data += chunk; });
+            res.on('end', () => {
+              console.log('Status:', res.statusCode);
+              console.log('Response:', data.substring(0, 500));
+              if (res.statusCode >= 400) {
+                process.exit(1);
+              }
+            });
+          });
+          
+          req.on('error', (e) => { console.error(e); process.exit(1); });
+          req.write(postData);
+          req.end();
+          "
+
+      - name: Run migration via node-postgres (fallback)
+        if: failure()
+        env:
+          SUPABASE_DB_PASS: ${{ secrets.SUPABASE_DB_PASS }}
         run: |
           npm install pg --save-dev --silent
           node -e "
@@ -17,46 +65,13 @@ jobs:
           const fs = require('fs');
           const sql = fs.readFileSync('supabase/migrations/20260426000000_fix_conversations_participants.sql', 'utf8');
           
-          // Try direct connection first, fall back to pooler
-          const configs = [
-            {
-              host: 'db.purmabjcvznntttvtseb.supabase.co',
-              port: 5432,
-              database: 'postgres',
-              user: 'postgres',
-              password: process.env.DB_PASSWORD,
-              ssl: { rejectUnauthorized: false }
-            },
-            {
-              host: 'aws-0-ap-southeast-2.pooler.supabase.com',
-              port: 5432,
-              database: 'postgres',
-              user: 'postgres.purmabjcvznntttvtseb',
-              password: process.env.DB_PASSWORD,
-              ssl: { rejectUnauthorized: false }
-            }
-          ];
+          const client = new Client({
+            connectionString: 'postgresql://postgres.purmabjcvznntttvtseb:' + encodeURIComponent(process.env.SUPABASE_DB_PASS) + '@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres',
+            ssl: { rejectUnauthorized: false }
+          });
           
-          async function tryConnect(config) {
-            const client = new Client(config);
-            await client.connect();
-            console.log('Connected via', config.host + ':' + config.port);
-            await client.query(sql);
-            console.log('Migration applied successfully!');
-            await client.end();
-          }
-          
-          async function run() {
-            for (const config of configs) {
-              try {
-                await tryConnect(config);
-                return;
-              } catch(e) {
-                console.log('Failed:', config.host + ':' + config.port, e.message);
-              }
-            }
-            process.exit(1);
-          }
-          
-          run().catch(e => { console.error(e); process.exit(1); });
+          client.connect()
+            .then(() => { console.log('Connected'); return client.query(sql); })
+            .then(() => { console.log('Migration done!'); return client.end(); })
+            .catch(e => { console.error('Error:', e.message); process.exit(1); });
           "
