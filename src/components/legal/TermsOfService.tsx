@@ -190,7 +190,7 @@ export default function TermsOfService() {
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">12. Governing Law</h2>
           <p className="text-gray-700 dark:text-gray-300">
-            These Terms are governed by the laws of [Your Jurisdiction], without regard to conflict of laws principles.
+            These Terms are governed by the laws of the State of California, United States, without regard to conflict of laws principles.
           </p>
         </section>
 

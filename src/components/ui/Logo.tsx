@@ -63,7 +63,8 @@ function Wordmark({
 }) {
   return (
     <span
-      className={`font-display font-bold tracking-tight leading-none ${className}`}
+      className={`leading-none ${className}`}
+      style={{ fontFamily: "'Brush Script MT', 'Lucida Handwriting', cursive" }}
     >
       <span
         className={
@@ -71,11 +72,9 @@ function Wordmark({
             ? 'text-white'
             : 'bg-gradient-to-r from-cyan-600 via-cyan-500 to-teal-600 bg-clip-text text-transparent dark:from-cyan-300 dark:via-cyan-200 dark:to-teal-300'
         }
+        style={{ fontStyle: 'italic', fontWeight: '500', letterSpacing: '-0.02em' }}
       >
-        Isla
-      </span>
-      <span className={inverse ? 'text-white' : 'text-slate-900 dark:text-slate-50'}>
-        Kayd
+        IslaKayd
       </span>
     </span>
   );

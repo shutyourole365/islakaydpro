@@ -6,6 +6,8 @@ interface SocialAuthProps {
   onError: (error: string) => void;
   onLoading: (loading: boolean) => void;
   mode: 'signin' | 'signup';
+  isAge18Plus?: boolean;
+  agreeToTerms?: boolean;
 }
 
 interface SocialProvider {
@@ -16,9 +18,24 @@ interface SocialProvider {
   hoverColor: string;
 }
 
-export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps) {
+export default function SocialAuth({ onError, onLoading, mode, isAge18Plus = false, agreeToTerms = false }: SocialAuthProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const { signInWithGoogle } = useAuth();
+
+  // Validate age/terms for signup paths
+  const validateSignupRequirements = (): boolean => {
+    if (mode === 'signup') {
+      if (!isAge18Plus) {
+        onError('You must be 18 years or older to use IslaKayd.');
+        return false;
+      }
+      if (!agreeToTerms) {
+        onError('You must agree to the Terms of Service and Privacy Policy.');
+        return false;
+      }
+    }
+    return true;
+  };
 
   // TEMPORARILY DISABLED: Google OAuth needs to be configured in Supabase
   // To enable: Follow instructions in API_INTEGRATION_GUIDE.md
@@ -40,6 +57,8 @@ export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps
   ];
 
   const handleSocialLogin = async (providerId: SocialProvider['id']) => {
+    if (!validateSignupRequirements()) return;
+
     setLoadingProvider(providerId);
     onLoading(true);
     onError('');
@@ -99,6 +118,8 @@ export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps
       {/* Magic Link Option */}
       <button
         onClick={async () => {
+          if (!validateSignupRequirements()) return;
+
           const email = prompt('Enter your email for passwordless login:');
           if (!email) return;
           onLoading(true);

@@ -28,6 +28,14 @@ export async function exportUserData(userId: string): Promise<ExportData | null>
       supabase.from('notifications').select('*').eq('user_id', userId),
     ]);
 
+    // Check for errors in any query
+    const queries = [profile, equipment, bookings, payments, reviews, messages, favorites, notifications];
+    const errors = queries.filter(q => q.error);
+    if (errors.length > 0) {
+      console.error('Errors during data export:', errors);
+      throw new Error('Failed to export complete user data');
+    }
+
     return {
       profile: profile.data,
       equipment: equipment.data || [],
@@ -50,8 +58,14 @@ export async function generateDataExportFile(userData: ExportData): Promise<Blob
   return blob;
 }
 
-export async function downloadDataExport(userId: string): Promise<void> {
-  const userData = await exportUserData(userId);
+export async function downloadDataExport(): Promise<void> {
+  // Use authenticated user from Supabase Auth, not arbitrary userId
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Not authenticated');
+  }
+
+  const userData = await exportUserData(user.id);
   if (!userData) {
     throw new Error('Failed to export user data');
   }
@@ -60,13 +74,13 @@ export async function downloadDataExport(userId: string): Promise<void> {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `islakayd-data-export-${userId}-${new Date().toISOString().split('T')[0]}.json`;
+  link.download = `islakayd-data-export-${user.id}-${new Date().toISOString().split('T')[0]}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 
-  await logSecurityEvent(userId, 'profile_updated', 'success', { action: 'data_exported' });
+  await logSecurityEvent(user.id, 'profile_updated', { action: 'data_exported' });
 }
 
 export async function deleteUserAccount(userId: string): Promise<boolean> {
@@ -90,8 +104,8 @@ export async function deleteUserAccount(userId: string): Promise<boolean> {
       // Delete payments
       supabase.from('payments').delete().eq('user_id', userId),
 
-      // Delete bookings (user can cancel/delete their bookings)
-      supabase.from('bookings').delete().eq('renter_id', userId),
+      // Delete bookings (both as renter and as owner to avoid orphaned records)
+      supabase.from('bookings').delete().or(`renter_id.eq.${userId},owner_id.eq.${userId}`),
 
       // Delete equipment listings
       supabase.from('equipment').delete().eq('owner_id', userId),
@@ -100,18 +114,24 @@ export async function deleteUserAccount(userId: string): Promise<boolean> {
       supabase.from('profiles').delete().eq('id', userId),
     ];
 
-    // Execute all operations
+    // Execute all operations and track failures
+    let hasErrors = false;
     for (const operation of operations) {
       const { error } = await operation;
       if (error) {
         console.error('Error deleting user data:', error);
-        // Continue with next operation even if one fails
+        hasErrors = true;
       }
+    }
+
+    // If any operation failed, return false to indicate incomplete deletion
+    if (hasErrors) {
+      return false;
     }
 
     // Delete auth user account (this requires admin access in real implementation)
     // For now, we just mark account as deleted
-    await logSecurityEvent(userId, 'account_suspended', 'success', { action: 'account_deleted_by_user' });
+    await logSecurityEvent(userId, 'account_suspended', { action: 'account_deleted_by_user' });
 
     return true;
   } catch (error) {
@@ -130,7 +150,6 @@ export async function anonymizeUserData(userId: string): Promise<boolean> {
         avatar_url: null,
         bio: null,
         phone: null,
-        email: null,
         location: null,
         updated_at: new Date().toISOString(),
       })
@@ -153,7 +172,7 @@ export async function anonymizeUserData(userId: string): Promise<boolean> {
       .update({ content: '[Review deleted]' })
       .eq('reviewer_id', userId);
 
-    await logSecurityEvent(userId, 'profile_updated', 'success', { action: 'account_anonymized' });
+    await logSecurityEvent(userId, 'profile_updated', { action: 'account_anonymized' });
 
     return true;
   } catch (error) {
@@ -169,7 +188,7 @@ export async function getDataDeletionStatus(userId: string): Promise<{ isPending
       .from('audit_logs')
       .select('created_at')
       .eq('user_id', userId)
-      .eq('event_type', 'account_suspended')
+      .eq('action', 'account_suspended')
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
@@ -190,11 +209,9 @@ export async function requestDataDeletion(userId: string): Promise<boolean> {
       .from('audit_logs')
       .insert([
         {
-          event_type: 'account_suspended',
+          action: 'account_suspended',
           user_id: userId,
-          status: 'success',
-          action_details: { deletion_requested: true, grace_period_days: 30 },
-          created_at: new Date().toISOString(),
+          metadata: { deletion_requested: true, grace_period_days: 30 },
         },
       ]);
 
