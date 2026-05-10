@@ -22,8 +22,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: https://purmabjcvznntttvtseb.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1cm1hYmpjdnpubnR0dHZ0c2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA0NzY0NTMsImV4cCI6MjA3NjA1MjQ1M30.caFfzlDTmFf61Jf4EGI-i1WwBSzIjb6GMXzZ7OQuaQc
           VITE_STRIPE_PUBLIC_KEY: ${{ secrets.VITE_STRIPE_PUBLIC_KEY }}
           VITE_ENABLE_AI: 'true'
           VITE_ENABLE_PWA: 'true'
