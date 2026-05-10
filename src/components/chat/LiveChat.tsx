@@ -35,8 +35,7 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
         // Look for an existing conversation between these two users for this equipment
         const convos = await getConversations(user.id);
         const existing = convos.find(c =>
-          c.equipment_id === (equipmentId ?? null) &&
-          c.participants?.some(p => p.user_id === recipientId)
+          c.participants?.includes(recipientId)
         );
 
         let convId: string;
@@ -179,7 +178,7 @@ export default function LiveChat({ recipientId, recipientName, equipmentId, onCl
                       <span className="text-xs text-gray-500">{formatTime(message.created_at)}</span>
                       {isMe && (
                         <span className="text-teal-600">
-                          {message.is_read ? <CheckCheck className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
+                          {message.read ? <CheckCheck className="w-3.5 h-3.5" /> : <Check className="w-3.5 h-3.5" />}
                         </span>
                       )}
                     </div>

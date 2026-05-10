@@ -564,10 +564,12 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
   let query = supabase
     .from('notifications')
     .select('*')
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(50);
 
   if (unreadOnly) {
-    query = query.eq('is_read', false);
+    query = query.eq('read', false);
   }
 
   query = query.order('created_at', { ascending: false }).limit(50);
@@ -581,7 +583,7 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
 export async function markNotificationRead(id: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ is_read: true })
+    .update({ read: true })
     .eq('id', id);
 
   if (error) throw error;
@@ -590,9 +592,9 @@ export async function markNotificationRead(id: string): Promise<void> {
 export async function markAllNotificationsRead(userId: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ is_read: true })
+    .update({ read: true })
     .eq('user_id', userId)
-    .eq('is_read', false);
+    .eq('read', false);
 
   if (error) throw error;
 }
@@ -602,7 +604,7 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .eq('is_read', false);
+    .eq('read', false);
 
   if (error) throw error;
   return count || 0;
@@ -633,20 +635,13 @@ export async function getUnreadMessageCount(userId: string): Promise<number> {
 
 export async function getConversations(userId: string): Promise<Conversation[]> {
   const { data, error } = await supabase
-    .from('conversation_participants')
-    .select(`
-      conversation:conversations(
-        *,
-        equipment:equipment(*),
-        messages(*, sender:profiles!messages_sender_id_fkey(*))
-      )
-    `)
-    .eq('user_id', userId)
-    .order('conversation(updated_at)', { ascending: false });
+    .from('conversations')
+    .select('*')
+    .contains('participants', [userId])
+    .order('last_message_at', { ascending: false, nullsFirst: false });
 
   if (error) throw error;
-
-  return (data || []).map(d => d.conversation).filter(Boolean) as unknown as Conversation[];
+  return (data || []) as unknown as Conversation[];
 }
 
 export async function getMessages(conversationId: string): Promise<Message[]> {
@@ -672,44 +667,34 @@ export async function sendMessage(message: {
     .insert({
       conversation_id: message.conversationId,
       sender_id: message.senderId,
-      receiver_id: message.receiverId,
       content: message.content,
-      equipment_id: message.equipmentId,
     })
     .select('*, sender:profiles!messages_sender_id_fkey(*)')
     .single();
 
   if (error) throw error;
 
+  // Update conversation's last_message and last_message_at
   await supabase
     .from('conversations')
-    .update({ updated_at: new Date().toISOString() })
+    .update({
+      last_message: message.content,
+      last_message_at: new Date().toISOString(),
+    })
     .eq('id', message.conversationId);
 
   return data;
 }
 
-export async function createConversation(participants: string[], equipmentId?: string): Promise<Conversation> {
+export async function createConversation(participants: string[], _equipmentId?: string): Promise<Conversation> {
   const { data: conversation, error: convError } = await supabase
     .from('conversations')
-    .insert({ equipment_id: equipmentId })
+    .insert({ participants })
     .select()
     .single();
 
   if (convError) throw convError;
-
-  const participantInserts = participants.map(userId => ({
-    conversation_id: conversation.id,
-    user_id: userId,
-  }));
-
-  const { error: partError } = await supabase
-    .from('conversation_participants')
-    .insert(participantInserts);
-
-  if (partError) throw partError;
-
-  return conversation;
+  return conversation as unknown as Conversation;
 }
 
 export async function getUserAnalytics(userId: string): Promise<UserAnalytics | null> {

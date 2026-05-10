@@ -46,12 +46,12 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
         const now = new Date();
         const processedNotifications = notificationsData.map((notification: Notification) => ({
           ...notification,
-          isNew: !notification.is_read && (now.getTime() - new Date(notification.created_at).getTime()) < 300000, // 5 minutes
+          isNew: !notification.read && (now.getTime() - new Date(notification.created_at).getTime()) < 300000, // 5 minutes
           timeAgo: getTimeAgo(new Date(notification.created_at)),
         }));
 
         setNotifications(processedNotifications);
-        setUnreadCount(processedNotifications.filter(n => !n.is_read).length);
+        setUnreadCount(processedNotifications.filter(n => !n.read).length);
       } catch (error) {
         console.error('Failed to load notifications:', error);
       } finally {
@@ -171,7 +171,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
   const filteredNotifications = notifications.filter(notification => {
     switch (filter) {
       case 'unread':
-        return !notification.is_read;
+        return !notification.read;
       case 'booking':
         return notification.type.includes('booking');
       case 'payment':
@@ -271,8 +271,8 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                   return (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
-                        !notification.is_read ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
+                      className={`p-4 hover:bg-gray-50 transition-colors ${
+                        !notification.read ? 'bg-blue-50/50' : ''
                       }`}
                     >
                       <div className="flex gap-3">
@@ -300,7 +300,7 @@ export default function RealTimeNotifications({ className = '' }: RealTimeNotifi
                               </div>
                             </div>
 
-                            {!notification.is_read && (
+                            {!notification.read && (
                               <button
                                 aria-label="Mark as read" onClick={() => handleMarkAsRead(notification.id)}
                                 className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"

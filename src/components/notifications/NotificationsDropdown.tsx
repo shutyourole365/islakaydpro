@@ -35,7 +35,7 @@ export default function NotificationsDropdown({
     }
   }, [isOpen, user]);
 
-  const unreadCount = notifications.filter((n) => !n.is_read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   const handleMarkRead = async (id: string) => {
     await markNotificationRead(id).catch(() => null);
@@ -119,9 +119,9 @@ export default function NotificationsDropdown({
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                onClick={() => !notification.is_read && handleMarkRead(notification.id)}
-                className={`px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer ${
-                  !notification.is_read ? 'bg-teal-50/50 dark:bg-teal-900/20' : ''
+                onClick={() => !notification.read && handleMarkRead(notification.id)}
+                className={`px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer ${
+                  !notification.read ? 'bg-teal-50/50' : ''
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -133,7 +133,7 @@ export default function NotificationsDropdown({
                       <p className="font-medium text-gray-900 dark:text-white truncate">
                         {notification.title}
                       </p>
-                      {!notification.is_read && (
+                      {!notification.read && (
                         <span className="w-2 h-2 bg-teal-500 rounded-full flex-shrink-0" />
                       )}
                     </div>

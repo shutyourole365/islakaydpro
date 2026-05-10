@@ -77,6 +77,7 @@ export interface Equipment {
   total_bookings: number;
   is_featured: boolean;
   is_active: boolean;
+  is_verified?: boolean;
   created_at: string;
   updated_at: string;
   owner?: Profile;
@@ -153,34 +154,28 @@ export interface Message {
   id: string;
   conversation_id: string | null;
   sender_id: string;
-  receiver_id: string;
-  equipment_id: string | null;
   content: string;
-  is_read: boolean;
+  read: boolean;
+  type?: string;
+  metadata?: Record<string, unknown>;
   created_at: string;
   sender?: Profile;
-  receiver?: Profile;
 }
 
 export interface Conversation {
   id: string;
-  equipment_id: string | null;
-  booking_id: string | null;
+  participants: string[];
+  last_message?: string | null;
+  last_message_at?: string | null;
   created_at: string;
-  updated_at: string;
-  participants?: ConversationParticipant[];
-  messages?: Message[];
-  equipment?: Equipment;
-  last_message?: Message;
   unread_count?: number;
 }
 
+// ConversationParticipant: participants are stored as uuid[] on conversations table
 export interface ConversationParticipant {
   id: string;
   conversation_id: string;
   user_id: string;
-  last_read_at: string;
-  joined_at: string;
   user?: Profile;
 }
 
@@ -199,7 +194,8 @@ export interface Notification {
   title: string;
   message: string;
   data: Record<string, unknown>;
-  is_read: boolean;
+  read: boolean;
+  is_read?: boolean; // alias for backwards compat
   created_at: string;
 }
 

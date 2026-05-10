@@ -542,7 +542,7 @@ export default function BrowsePage({
                 >
                   <div className="w-32 h-28 flex-shrink-0 relative overflow-hidden">
                     <img
-                      src={item.images[0]}
+                      src={item.images?.[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg'}
                       alt={item.title}
                       className="w-full h-full object-cover"
                     />
@@ -579,7 +579,7 @@ export default function BrowsePage({
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
-                    src={item.images[0]}
+                    src={item.images?.[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg'}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -613,13 +613,15 @@ export default function BrowsePage({
                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                       <span className="text-sm font-semibold text-gray-900">
-                        {item.rating.toFixed(1)}
+                        {(item.rating ?? 0).toFixed(1)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
-                      <Shield className="w-4 h-4 text-teal-500" />
-                      <span className="text-xs font-medium text-gray-700">Verified</span>
-                    </div>
+                    {item.is_verified && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
+                        <Shield className="w-4 h-4 text-teal-500" />
+                        <span className="text-xs font-medium text-gray-700">Verified</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -675,7 +677,7 @@ export default function BrowsePage({
               >
                 <div className="w-64 h-48 flex-shrink-0 relative overflow-hidden">
                   <img
-                    src={item.images[0]}
+                    src={item.images?.[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg'}
                     alt={item.title}
                     className="w-full h-full object-cover"
                   />
@@ -717,7 +719,7 @@ export default function BrowsePage({
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                      {item.rating.toFixed(1)} ({item.total_reviews} reviews)
+                      {(item.rating ?? 0).toFixed(1)} ({item.total_reviews} reviews)
                     </div>
                     <span className="capitalize px-2 py-0.5 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded">
                       {item.condition}
