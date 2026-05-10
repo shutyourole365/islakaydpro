@@ -531,9 +531,16 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       return;
     }
 
-    const demoEquipment = equipment[0] || featuredEquipment[0];
-    if (!demoEquipment) return;
-    setBookingEquipment(demoEquipment);
+    // Only guard features that require equipment data
+    const needsEquipment = ['smart-pricing', 'group-booking', 'enhanced-reviews', 'live-chat', 'real-time-chat', 'comparison', 'quick-book'];
+    if (needsEquipment.includes(featureId)) {
+      const demoEquipment = equipment[0] || featuredEquipment[0];
+      if (!demoEquipment) {
+        addToast({ type: 'info', title: 'No listings available', message: 'Please add some equipment listings first to try this feature.' });
+        return;
+      }
+      setBookingEquipment(demoEquipment);
+    }
 
     switch (featureId) {
       case 'price-negotiator':

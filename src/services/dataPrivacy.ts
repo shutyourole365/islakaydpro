@@ -58,8 +58,14 @@ export async function generateDataExportFile(userData: ExportData): Promise<Blob
   return blob;
 }
 
-export async function downloadDataExport(userId: string): Promise<void> {
-  const userData = await exportUserData(userId);
+export async function downloadDataExport(): Promise<void> {
+  // Use authenticated user from Supabase Auth, not arbitrary userId
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    throw new Error('Not authenticated');
+  }
+
+  const userData = await exportUserData(user.id);
   if (!userData) {
     throw new Error('Failed to export user data');
   }
@@ -68,13 +74,13 @@ export async function downloadDataExport(userId: string): Promise<void> {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `islakayd-data-export-${userId}-${new Date().toISOString().split('T')[0]}.json`;
+  link.download = `islakayd-data-export-${user.id}-${new Date().toISOString().split('T')[0]}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 
-  await logSecurityEvent(userId, 'profile_updated', { action: 'data_exported' });
+  await logSecurityEvent(user.id, 'profile_updated', { action: 'data_exported' });
 }
 
 export async function deleteUserAccount(userId: string): Promise<boolean> {
@@ -108,13 +114,19 @@ export async function deleteUserAccount(userId: string): Promise<boolean> {
       supabase.from('profiles').delete().eq('id', userId),
     ];
 
-    // Execute all operations
+    // Execute all operations and track failures
+    let hasErrors = false;
     for (const operation of operations) {
       const { error } = await operation;
       if (error) {
         console.error('Error deleting user data:', error);
-        // Continue with next operation even if one fails
+        hasErrors = true;
       }
+    }
+
+    // If any operation failed, return false to indicate incomplete deletion
+    if (hasErrors) {
+      return false;
     }
 
     // Delete auth user account (this requires admin access in real implementation)
