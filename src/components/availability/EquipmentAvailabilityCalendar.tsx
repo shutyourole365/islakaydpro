@@ -66,10 +66,10 @@ const sampleEquipment: CalendarEquipment[] = [
 ];
 
 const statusStyles = {
-  available: { bg: 'bg-green-100 hover:bg-green-200', text: 'text-green-700', dot: 'bg-green-500' },
-  booked: { bg: 'bg-red-100', text: 'text-red-700', dot: 'bg-red-500' },
-  maintenance: { bg: 'bg-yellow-100', text: 'text-yellow-700', dot: 'bg-yellow-500' },
-  blocked: { bg: 'bg-gray-100', text: 'text-gray-500', dot: 'bg-gray-400' },
+  available: { bg: 'bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50', text: 'text-green-700 dark:text-green-300', dot: 'bg-green-500' },
+  booked: { bg: 'bg-red-100 dark:bg-red-900/30', text: 'text-red-700 dark:text-red-300', dot: 'bg-red-500' },
+  maintenance: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-700 dark:text-yellow-300', dot: 'bg-yellow-500' },
+  blocked: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-500 dark:text-gray-400', dot: 'bg-gray-400' },
 };
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -228,16 +228,16 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
   }, [slotMap, daysInMonth, year, month]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <button onClick={onBack} className="p-2 hover:bg-gray-200 rounded-full transition-colors" aria-label="Go back">
+          <button onClick={onBack} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors" aria-label="Go back">
             <ArrowLeft className="w-6 h-6" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Availability Calendar</h1>
-            <p className="text-gray-500 mt-1">Check equipment availability and plan your rentals</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Availability Calendar</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">Check equipment availability and plan your rentals</p>
           </div>
         </div>
 
@@ -248,13 +248,13 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
               key={eq.id}
               onClick={() => { setSelected(eq); setSelectionStart(null); setSelectionEnd(null); }}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all whitespace-nowrap flex-shrink-0 ${
-                selected.id === eq.id ? 'border-teal-500 bg-teal-50 shadow-md' : 'border-gray-200 bg-white hover:border-gray-300'
+                selected.id === eq.id ? 'border-teal-500 bg-teal-50 shadow-md' : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:hover:border-gray-500'
               }`}
             >
               <img src={eq.image} alt={eq.name} className="w-10 h-10 rounded-lg object-cover" />
               <div className="text-left">
                 <p className="font-semibold text-sm">{eq.name}</p>
-                <p className="text-xs text-gray-500">${eq.dailyRate}/day</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">${eq.dailyRate}/day</p>
               </div>
             </button>
           ))}
@@ -263,14 +263,14 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               {/* Month Navigation */}
               <div className="flex items-center justify-between mb-6">
-                <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Previous month">
+                <button onClick={prevMonth} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Previous month">
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                <h2 className="text-xl font-bold">{MONTHS[month]} {year}</h2>
-                <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Next month">
+                <h2 className="text-xl font-bold dark:text-white">{MONTHS[month]} {year}</h2>
+                <button onClick={nextMonth} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Next month">
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
@@ -278,7 +278,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
               {/* Day Headers */}
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {DAYS.map((day) => (
-                  <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">{day}</div>
+                  <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2">{day}</div>
                 ))}
               </div>
 
@@ -317,9 +317,9 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
               </div>
 
               {/* Legend */}
-              <div className="flex flex-wrap gap-4 mt-6 pt-4 border-t border-gray-100">
+              <div className="flex flex-wrap gap-4 mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
                 {Object.entries(statusStyles).map(([key, val]) => (
-                  <div key={key} className="flex items-center gap-2 text-xs text-gray-600">
+                  <div key={key} className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                     <div className={`w-3 h-3 rounded-full ${val.dot}`} />
                     {key.charAt(0).toUpperCase() + key.slice(1)}
                   </div>
@@ -331,28 +331,28 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Month Stats */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-900 mb-4">Month Overview</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4">Month Overview</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Check className="w-4 h-4 text-green-500" /> Available
                   </span>
                   <span className="font-bold text-green-600">{monthStats.available} days</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <X className="w-4 h-4 text-red-500" /> Booked
                   </span>
                   <span className="font-bold text-red-600">{monthStats.booked} days</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <AlertCircle className="w-4 h-4 text-yellow-500" /> Maintenance
                   </span>
                   <span className="font-bold text-yellow-600">{monthStats.maintenance} days</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
                   <div
                     className="bg-green-500 h-2 rounded-full"
                     style={{ width: `${(monthStats.available / daysInMonth) * 100}%` }}
@@ -364,8 +364,8 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
 
             {/* Selected Date Info */}
             {selectedSlot && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h3 className="font-bold text-gray-900 mb-3">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-3">
                   {new Date(selectedDate! + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                 </h3>
                 <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${statusStyles[selectedSlot.status].bg} ${statusStyles[selectedSlot.status].text}`}>
@@ -373,7 +373,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
                   {selectedSlot.status.charAt(0).toUpperCase() + selectedSlot.status.slice(1)}
                 </div>
                 {selectedSlot.bookedBy && (
-                  <p className="text-sm text-gray-500 mt-2">Booked by: {selectedSlot.bookedBy}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Booked by: {selectedSlot.bookedBy}</p>
                 )}
                 {selectedSlot.status === 'blocked' && (
                   <button
@@ -391,7 +391,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
                   </button>
                 )}
                 {selectedSlot.price && selectedSlot.status === 'available' && (
-                  <p className="text-sm text-gray-500 mt-2 flex items-center gap-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
                     <DollarSign className="w-4 h-4" /> Rate: ${selectedSlot.price}/day
                   </p>
                 )}
@@ -401,22 +401,22 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
             {/* Selection Summary */}
             {selectionStart && selectionEnd && (
               <div className={`rounded-2xl shadow-sm border p-6 ${rangeAvailable ? 'bg-teal-50 border-teal-200' : 'bg-red-50 border-red-200'}`}>
-                <h3 className="font-bold text-gray-900 mb-3">Booking Selection</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-3">Booking Selection</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Start</span>
-                    <span className="font-medium">{new Date(selectionStart + 'T12:00:00').toLocaleDateString()}</span>
+                    <span className="text-gray-500 dark:text-gray-400">Start</span>
+                    <span className="font-medium dark:text-white">{new Date(selectionStart + 'T12:00:00').toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">End</span>
-                    <span className="font-medium">{new Date(selectionEnd + 'T12:00:00').toLocaleDateString()}</span>
+                    <span className="text-gray-500 dark:text-gray-400">End</span>
+                    <span className="font-medium dark:text-white">{new Date(selectionEnd + 'T12:00:00').toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Duration</span>
-                    <span className="font-medium">{rangeDays} day{rangeDays !== 1 ? 's' : ''}</span>
+                    <span className="text-gray-500 dark:text-gray-400">Duration</span>
+                    <span className="font-medium dark:text-white">{rangeDays} day{rangeDays !== 1 ? 's' : ''}</span>
                   </div>
-                  <div className="flex justify-between border-t border-gray-200 pt-2">
-                    <span className="text-gray-500">Est. Total</span>
+                  <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-2">
+                    <span className="text-gray-500 dark:text-gray-400">Est. Total</span>
                     <span className="font-bold text-teal-600">${(rangeDays * selected.dailyRate).toLocaleString()}</span>
                   </div>
                 </div>
@@ -435,7 +435,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
                     Block {rangeDays} Days
                   </button>
                 ) : (
-                  <div className="mt-3 p-2 bg-red-100 rounded-lg text-xs text-red-700 text-center">
+                  <div className="mt-3 p-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-xs text-red-700 dark:text-red-300 text-center">
                     Some dates in this range are unavailable
                   </div>
                 )}
@@ -443,17 +443,17 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
             )}
 
             {/* Equipment Info */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
               <img src={selected.image} alt={selected.name} className="w-full h-32 object-cover" />
               <div className="p-4">
-                <h3 className="font-bold text-gray-900">{selected.name}</h3>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                <h3 className="font-bold text-gray-900 dark:text-white">{selected.name}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                   <MapPin className="w-3 h-3" /> {selected.location}
                 </p>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                   <DollarSign className="w-3 h-3" /> {selected.dailyRate}/day
                 </p>
-                <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-1">
                   <Clock className="w-3 h-3" /> Min 1 day rental
                 </p>
               </div>

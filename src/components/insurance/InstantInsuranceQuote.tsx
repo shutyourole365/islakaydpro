@@ -211,7 +211,7 @@ export default function InstantInsuranceQuote({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl my-8">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-4xl my-8">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-t-3xl text-white">
           <div className="flex items-center justify-between mb-4">
@@ -254,10 +254,10 @@ export default function InstantInsuranceQuote({
           {loading ? (
             <div className="py-16 text-center">
               <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Generating Your Quotes...
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Our AI is analyzing risk factors and market rates
               </p>
             </div>
@@ -265,27 +265,27 @@ export default function InstantInsuranceQuote({
             <>
               {/* Risk Analysis */}
               {factors && (
-                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 mb-6">
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-4 mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="w-5 h-5 text-indigo-500" />
-                    <span className="font-medium text-indigo-900">AI Risk Analysis</span>
+                    <span className="font-medium text-indigo-900 dark:text-indigo-300">AI Risk Analysis</span>
                   </div>
                   <div className="grid grid-cols-4 gap-4 text-sm">
                     <div>
-                      <span className="text-gray-500">Category</span>
-                      <p className="font-medium text-gray-900">{factors.equipmentCategory}</p>
+                      <span className="text-gray-500 dark:text-gray-400">Category</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{factors.equipmentCategory}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Risk Score</span>
-                      <p className="font-medium text-gray-900">{(factors.riskScore * 10).toFixed(1)}/10</p>
+                      <span className="text-gray-500 dark:text-gray-400">Risk Score</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{(factors.riskScore * 10).toFixed(1)}/10</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Market Rate</span>
-                      <p className="font-medium text-gray-900">{(factors.marketRate * 100).toFixed(1)}%</p>
+                      <span className="text-gray-500 dark:text-gray-400">Market Rate</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{(factors.marketRate * 100).toFixed(1)}%</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Seasonal Factor</span>
-                      <p className="font-medium text-gray-900">{factors.seasonalAdjustment}x</p>
+                      <span className="text-gray-500 dark:text-gray-400">Seasonal Factor</span>
+                      <p className="font-medium text-gray-900 dark:text-white">{factors.seasonalAdjustment}x</p>
                     </div>
                   </div>
                 </div>
@@ -299,8 +299,8 @@ export default function InstantInsuranceQuote({
                     onClick={() => handleSelect(plan)}
                     className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all ${
                       selectedPlan?.id === plan.id
-                        ? 'border-indigo-500 bg-indigo-50 shadow-lg'
-                        : 'border-gray-200 hover:border-indigo-200 hover:shadow'
+                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 shadow-lg'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-indigo-200 hover:shadow'
                     }`}
                   >
                     {plan.recommended && (
@@ -320,14 +320,14 @@ export default function InstantInsuranceQuote({
                         <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getTierColor(plan.tier)} text-white flex items-center justify-center mb-2`}>
                           {getTierIcon(plan.tier)}
                         </div>
-                        <h3 className="font-semibold text-gray-900">{plan.name}</h3>
-                        <p className="text-sm text-gray-500 capitalize">{plan.tier} tier</p>
+                        <h3 className="font-semibold text-gray-900 dark:text-white">{plan.name}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{plan.tier} tier</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-gray-900">
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
                           ${plan.totalCost.toFixed(2)}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
                           ${plan.dailyRate}/day
                         </p>
                       </div>
@@ -335,25 +335,25 @@ export default function InstantInsuranceQuote({
 
                     <div className="space-y-3 mb-4">
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">Coverage</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="text-gray-500 dark:text-gray-400">Coverage</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {plan.coveragePercentage}% (${plan.coverageAmount.toLocaleString()})
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">Deductible</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="text-gray-500 dark:text-gray-400">Deductible</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
                           {plan.deductible === 0 ? 'None' : `$${plan.deductible.toLocaleString()}`}
                         </span>
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-100 pt-4">
+                    <div className="border-t border-gray-100 dark:border-gray-700 pt-4">
                       <ul className="space-y-2">
                         {plan.features.slice(0, 3).map((feature, index) => (
                           <li key={index} className="flex items-start gap-2 text-sm">
                             <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-600">{feature}</span>
+                            <span className="text-gray-600 dark:text-gray-400">{feature}</span>
                           </li>
                         ))}
                         {plan.features.length > 3 && (
@@ -378,14 +378,14 @@ export default function InstantInsuranceQuote({
 
                     {/* Expanded Details */}
                     {showDetails === plan.id && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                         <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-900 mb-2">All Features</h4>
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">All Features</h4>
                           <ul className="space-y-1">
                             {plan.features.map((feature, index) => (
                               <li key={index} className="flex items-start gap-2 text-sm">
                                 <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                                <span className="text-gray-600">{feature}</span>
+                                <span className="text-gray-600 dark:text-gray-400">{feature}</span>
                               </li>
                             ))}
                           </ul>
@@ -393,12 +393,12 @@ export default function InstantInsuranceQuote({
 
                         {plan.exclusions.length > 0 && (
                           <div className="mb-4">
-                            <h4 className="text-sm font-medium text-gray-900 mb-2">Exclusions</h4>
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Exclusions</h4>
                             <ul className="space-y-1">
                               {plan.exclusions.map((exclusion, index) => (
                                 <li key={index} className="flex items-start gap-2 text-sm">
                                   <XCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                                  <span className="text-gray-500">{exclusion}</span>
+                                  <span className="text-gray-500 dark:text-gray-400">{exclusion}</span>
                                 </li>
                               ))}
                             </ul>
@@ -406,8 +406,8 @@ export default function InstantInsuranceQuote({
                         )}
 
                         <div>
-                          <h4 className="text-sm font-medium text-gray-900 mb-2">Claims Process</h4>
-                          <p className="text-sm text-gray-600">{plan.claimProcess}</p>
+                          <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Claims Process</h4>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{plan.claimProcess}</p>
                         </div>
                       </div>
                     )}
@@ -424,32 +424,32 @@ export default function InstantInsuranceQuote({
               </div>
 
               {/* Benefits */}
-              <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                <h4 className="font-medium text-gray-900 mb-3">Why Get Insurance?</h4>
+              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-3">Why Get Insurance?</h4>
                 <div className="grid grid-cols-4 gap-4">
                   <div className="text-center">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                      <Shield className="w-5 h-5 text-green-600" />
+                    <div className="w-10 h-10 bg-green-100 dark:bg-green-900/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                      <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
                     </div>
-                    <p className="text-xs text-gray-600">Financial Protection</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Financial Protection</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <p className="text-xs text-gray-600">Fast Claims</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Fast Claims</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                      <Heart className="w-5 h-5 text-purple-600" />
+                    <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     </div>
-                    <p className="text-xs text-gray-600">Peace of Mind</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Peace of Mind</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-10 h-10 bg-amber-100 rounded-lg mx-auto mb-2 flex items-center justify-center">
-                      <Wrench className="w-5 h-5 text-amber-600" />
+                    <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/20 rounded-lg mx-auto mb-2 flex items-center justify-center">
+                      <Wrench className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                     </div>
-                    <p className="text-xs text-gray-600">Breakdown Coverage</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">Breakdown Coverage</p>
                   </div>
                 </div>
               </div>
@@ -458,7 +458,7 @@ export default function InstantInsuranceQuote({
               <div className="flex gap-3">
                 <button
                   onClick={onClose}
-                  className="flex-1 py-4 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-4 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                  >
                   Skip Insurance
                 </button>

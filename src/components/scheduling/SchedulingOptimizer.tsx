@@ -255,16 +255,16 @@ export default function SchedulingOptimizer({
   if (loading) {
     return (
       <div className={`animate-pulse ${className}`}>
-        <div className="bg-white rounded-xl p-6 border border-gray-100">
-          <div className="h-8 bg-gray-200 rounded w-64 mb-6"></div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-6"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+              <div key={i} className="h-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ))}
           </div>
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+              <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ))}
           </div>
         </div>
@@ -275,18 +275,18 @@ export default function SchedulingOptimizer({
   return (
     <div className={className}>
       {/* Header */}
-      <div className="bg-white rounded-xl p-6 border border-gray-100 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Smart Scheduler</h2>
-            <p className="text-gray-600">AI-powered scheduling optimization</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Smart Scheduler</h2>
+            <p className="text-gray-600 dark:text-gray-400">AI-powered scheduling optimization</p>
           </div>
           <div className="flex items-center gap-3">
             <select
               value={selectedTimeframe}
               aria-label="Select timeframe"
               onChange={(e) => setSelectedTimeframe(e.target.value as typeof selectedTimeframe)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="week">This Week</option>
               <option value="month">This Month</option>
@@ -299,14 +299,14 @@ export default function SchedulingOptimizer({
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                 autoOptimize
                   ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               <Zap className="w-4 h-4" />
               {autoOptimize ? 'Auto-Optimizing' : 'Auto Optimize'}
             </button>
 
-            <button aria-label="Settings" className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
+            <button aria-label="Settings" className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
               <Settings className="w-5 h-5" />
             </button>
           </div>
@@ -349,7 +349,7 @@ export default function SchedulingOptimizer({
       </div>
 
       {/* View Toggle */}
-      <div className="bg-white rounded-xl p-4 border border-gray-100 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-100 dark:border-gray-700 mb-6">
         <div className="flex items-center gap-2">
           {(['overview', 'detailed', 'calendar'] as const).map((mode) => (
             <button
@@ -357,8 +357,8 @@ export default function SchedulingOptimizer({
               onClick={() => setViewMode(mode)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 viewMode === mode
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
             >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
@@ -373,10 +373,10 @@ export default function SchedulingOptimizer({
           {/* Optimization Cards */}
           <div className="space-y-4">
             {optimizations.slice(0, 5).map((opt) => (
-              <div key={opt.equipmentId} className="bg-white rounded-xl p-6 border border-gray-100">
+              <div key={opt.equipmentId} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{opt.equipmentName}</h3>
+                    <h3 className="font-semibold text-gray-900 dark:text-white">{opt.equipmentName}</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         opt.priority === 'high' ? 'bg-red-100 text-red-700' :
@@ -391,16 +391,16 @@ export default function SchedulingOptimizer({
                     <div className="text-lg font-bold text-green-600">
                       +${opt.revenuePotential}
                     </div>
-                    <div className="text-sm text-gray-600">potential</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">potential</div>
                   </div>
                 </div>
 
                 <div className="space-y-3 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Current Utilization</span>
+                    <span className="text-gray-600 dark:text-gray-400">Current Utilization</span>
                     <span className="font-medium">{Math.round(opt.currentUtilization)}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
                       style={{ width: `${opt.currentUtilization}%` }}
@@ -408,10 +408,10 @@ export default function SchedulingOptimizer({
                   </div>
 
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Demand Score</span>
+                    <span className="text-gray-600 dark:text-gray-400">Demand Score</span>
                     <span className="font-medium">{opt.demandScore.toFixed(1)}/10</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div
                       className="bg-green-600 h-2 rounded-full"
                       style={{ width: `${(opt.demandScore / 10) * 100}%` }}
@@ -420,9 +420,9 @@ export default function SchedulingOptimizer({
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-gray-900">Recommendations:</h4>
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white">Recommendations:</h4>
                   {opt.recommendations.slice(0, 2).map((rec, index) => (
-                    <div key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                    <div key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                       <span>{rec}</span>
                     </div>
@@ -433,16 +433,16 @@ export default function SchedulingOptimizer({
           </div>
 
           {/* Time Slot Optimization */}
-          <div className="bg-white rounded-xl p-6 border border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Optimal Time Slots</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Optimal Time Slots</h3>
             <div className="space-y-3">
               {timeSlots.slice(0, 10).map((slot, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {slot.startTime.toLocaleDateString()} {slot.startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
                       Availability: {Math.round(slot.availability)}% | Demand: {slot.demand.toFixed(1)}
                     </div>
                   </div>
@@ -450,7 +450,7 @@ export default function SchedulingOptimizer({
                     <div className="text-sm font-semibold text-green-600">
                       ${Math.round(slot.price)}
                     </div>
-                    <div className="text-xs text-gray-600">optimal price</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">optimal price</div>
                   </div>
                 </div>
               ))}
@@ -461,28 +461,28 @@ export default function SchedulingOptimizer({
 
       {/* Detailed View */}
       {viewMode === 'detailed' && (
-        <div className="bg-white rounded-xl p-6 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Equipment</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Utilization</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Demand</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Revenue Potential</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Priority</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900">Actions</th>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Equipment</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Utilization</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Demand</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Revenue Potential</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Priority</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {optimizations.map((opt) => (
-                  <tr key={opt.equipmentId} className="border-b border-gray-100">
+                  <tr key={opt.equipmentId} className="border-b border-gray-100 dark:border-gray-700">
                     <td className="py-3 px-4">
-                      <div className="font-medium text-gray-900">{opt.equipmentName}</div>
+                      <div className="font-medium text-gray-900 dark:text-white">{opt.equipmentName}</div>
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 bg-gray-200 rounded-full h-2">
+                        <div className="w-16 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
                             className="bg-blue-600 h-2 rounded-full"
                             style={{ width: `${opt.currentUtilization}%` }}
@@ -523,8 +523,8 @@ export default function SchedulingOptimizer({
 
       {/* Calendar View */}
       {viewMode === 'calendar' && (
-        <div className="bg-white rounded-xl p-6 border border-gray-100">
-          <div className="text-center text-gray-500">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
+          <div className="text-center text-gray-500 dark:text-gray-400">
             <Calendar className="w-12 h-12 mx-auto mb-4" />
             <p>Calendar view coming soon!</p>
             <p className="text-sm">View scheduling optimizations in calendar format.</p>

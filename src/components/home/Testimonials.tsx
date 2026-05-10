@@ -61,18 +61,20 @@ const Testimonials = memo(function Testimonials() {
 
   return (
     <section className="py-24 bg-gray-900 relative overflow-hidden">
-      <div className="absolute inset-0">
+      {/* Glow blobs */}
+      <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-spark-400/5 rounded-full blur-[100px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-teal-500/10 text-teal-400 rounded-full text-sm font-medium mb-4">
-            <Star className="w-4 h-4 fill-teal-400" />
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-900/40 text-primary-300 rounded-full text-sm font-semibold mb-4 border border-primary-800">
+            <Star className="w-4 h-4 fill-primary-400" />
             Trusted by Thousands
           </span>
-          <h2 className="text-4xl font-bold text-white mb-4">What Our Users Say</h2>
+          <h2 className="font-display text-4xl font-bold text-white mb-4">What Our Users Say</h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Join over 120,000 satisfied renters and owners who trust Islakayd for their
             equipment needs.
@@ -89,7 +91,7 @@ const Testimonials = memo(function Testimonials() {
                 <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
                   <div className="max-w-4xl mx-auto">
                     <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 md:p-12 border border-white/10">
-                      <Quote className="w-12 h-12 text-teal-500 mb-6 opacity-50" />
+                      <Quote className="w-12 h-12 text-teal-400 mb-6 opacity-50" />
 
                       <p className="text-xl md:text-2xl text-white leading-relaxed mb-8">
                         "{testimonial.content}"
@@ -114,10 +116,7 @@ const Testimonials = memo(function Testimonials() {
                         <div className="flex flex-col items-start md:items-end gap-2">
                           <div className="flex items-center gap-1">
                             {[...Array(testimonial.rating)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className="w-5 h-5 text-amber-400 fill-amber-400"
-                              />
+                              <Star key={i} className="w-5 h-5 text-spark-400 fill-spark-400" />
                             ))}
                           </div>
                           <p className="text-teal-400 font-semibold">
@@ -149,7 +148,7 @@ const Testimonials = memo(function Testimonials() {
                   aria-label={`Go to testimonial ${index + 1}`}
                   className={`w-2 h-2 rounded-full transition-all ${
                     index === currentIndex
-                      ? 'bg-teal-500 w-8'
+                      ? 'bg-teal-400 w-8'
                       : 'bg-white/30 hover:bg-white/50'
                   }`}
                 />
@@ -160,7 +159,7 @@ const Testimonials = memo(function Testimonials() {
               onClick={nextTestimonial}
               aria-label="Next testimonial"
               className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
-             >
+            >
               <ChevronRight className="w-6 h-6" />
             </button>
           </div>

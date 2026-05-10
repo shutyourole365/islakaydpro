@@ -33,8 +33,8 @@ export function Button({
   const variants = {
     primary: 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 focus:ring-teal-500/25 shadow-lg shadow-teal-500/25 hover:shadow-xl hover:shadow-teal-500/30',
     secondary: 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-900/25',
-    outline: 'border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 focus:ring-gray-200/50',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-200/50',
+    outline: 'border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-gray-200/50',
+    ghost: 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-gray-200/50',
     danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500/25',
   };
 
@@ -93,9 +93,9 @@ export function IconButton({
 
   const variants = {
     primary: 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 focus:ring-teal-500/25',
-    secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-200/50',
-    outline: 'border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 focus:ring-gray-200/50',
-    ghost: 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:ring-gray-200/50',
+    secondary: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-gray-200/50',
+    outline: 'border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-gray-200/50',
+    ghost: 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-gray-200/50',
   };
 
   const sizes = {

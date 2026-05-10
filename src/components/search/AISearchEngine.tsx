@@ -36,7 +36,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
     }
 
     setIsAnalyzing(true);
-    
+
     // Simulate AI processing (in production, this would call your AI service)
     await new Promise(resolve => setTimeout(resolve, 800));
 
@@ -110,7 +110,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
     }
 
     if (lowerQuery.includes('weekend') || lowerQuery.includes('week') || lowerQuery.includes('month')) {
-      const duration = lowerQuery.includes('weekend') ? '2 days' : 
+      const duration = lowerQuery.includes('weekend') ? '2 days' :
                       lowerQuery.includes('week') ? '7 days' : '30 days';
       insights.push(`📅 Rental duration: ${duration} - weekly/monthly discounts available`);
     }
@@ -175,7 +175,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="relative z-10 w-full max-w-3xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 px-6 py-5 text-white">
           <div className="flex items-center justify-between mb-4">
@@ -232,10 +232,10 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
         <div className="max-h-[500px] overflow-y-auto">
           {/* AI Insights */}
           {aiInsights.length > 0 && (
-            <div className="px-6 py-4 bg-blue-50 border-b border-blue-100">
+            <div className="px-6 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-100 dark:border-blue-800">
               <div className="space-y-2">
                 {aiInsights.map((insight, idx) => (
-                  <div key={idx} className="flex items-start gap-2 text-sm text-blue-800">
+                  <div key={idx} className="flex items-start gap-2 text-sm text-blue-800 dark:text-blue-300">
                     <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span>{insight}</span>
                   </div>
@@ -246,34 +246,34 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
 
           {/* AI Suggestions */}
           {suggestions.length > 0 && (
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-500 mb-3">AI SUGGESTIONS</h3>
+            <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">AI SUGGESTIONS</h3>
               <div className="space-y-2">
                 {suggestions.map((suggestion, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors text-left group"
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left group"
                   >
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900 group-hover:text-teal-600 transition-colors">
+                      <p className="font-medium text-gray-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         {suggestion.text}
                       </p>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-gray-500 capitalize">{suggestion.intent.replace('_', ' ')}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">{suggestion.intent.replace('_', ' ')}</span>
                         <div className="flex items-center gap-1">
-                          <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
+                          <div className="w-16 h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+                            <div
                               className="h-full bg-teal-500 rounded-full"
                               style={{ width: `${suggestion.confidence * 100}%` }}
                             />
                           </div>
-                          <span className="text-xs text-gray-500">{Math.round(suggestion.confidence * 100)}%</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">{Math.round(suggestion.confidence * 100)}%</span>
                         </div>
                       </div>
                     </div>
-                    <div className="ml-4 w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center group-hover:bg-teal-100 transition-colors">
-                      <Search className="w-4 h-4 text-teal-600" />
+                    <div className="ml-4 w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center group-hover:bg-teal-100 dark:group-hover:bg-teal-900/50 transition-colors">
+                      <Search className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                     </div>
                   </button>
                 ))}
@@ -284,7 +284,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
           {/* Trending Searches */}
           {!query && (
             <div className="p-6">
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
                 <TrendingUp className="w-4 h-4" />
                 Trending Searches
               </div>
@@ -293,11 +293,11 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
                   <button
                     key={idx}
                     onClick={() => { setQuery(trend.query); analyzeQuery(trend.query); }}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-left"
                   >
                     <span className="text-2xl">{trend.icon}</span>
                     <div>
-                      <p className="font-medium text-gray-900 text-sm">{trend.text}</p>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm">{trend.text}</p>
                     </div>
                   </button>
                 ))}
@@ -308,7 +308,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
           {/* Examples */}
           {!query && (
             <div className="px-6 pb-6">
-              <h3 className="text-sm font-semibold text-gray-500 mb-3">TRY ASKING...</h3>
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-3">TRY ASKING...</h3>
               <div className="space-y-2">
                 {[
                   { icon: <MapPin className="w-4 h-4" />, text: 'Find excavators near Perth under $300/day' },
@@ -319,7 +319,7 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
                   <button
                     key={idx}
                     onClick={() => { setQuery(example.text); analyzeQuery(example.text); }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition-colors text-left text-sm text-gray-600"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left text-sm text-gray-600 dark:text-gray-400"
                   >
                     <div className="text-teal-500">{example.icon}</div>
                     <span>"{example.text}"</span>
@@ -331,15 +331,15 @@ export default function AISearchEngine({ onSearch, onClose }: AISearchEngineProp
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-          <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
-                <kbd className="px-2 py-1 bg-white rounded border border-gray-200 text-xs">Enter</kbd>
+                <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-xs">Enter</kbd>
                 to search
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-2 py-1 bg-white rounded border border-gray-200 text-xs">Esc</kbd>
+                <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-xs">Esc</kbd>
                 to close
               </span>
             </div>

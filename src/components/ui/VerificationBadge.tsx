@@ -19,43 +19,43 @@ const badgeConfig: Record<BadgeType, {
   verified: {
     icon: Shield,
     label: 'Verified',
-    bgColor: 'bg-blue-50',
-    textColor: 'text-blue-700',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/30',
+    textColor: 'text-blue-700 dark:text-blue-300',
     iconColor: 'text-blue-500',
   },
   trusted: {
     icon: CheckCircle2,
     label: 'Trusted',
-    bgColor: 'bg-teal-50',
-    textColor: 'text-teal-700',
+    bgColor: 'bg-teal-50 dark:bg-teal-900/30',
+    textColor: 'text-teal-700 dark:text-teal-300',
     iconColor: 'text-teal-500',
   },
   'top-rated': {
     icon: Star,
     label: 'Top Rated',
-    bgColor: 'bg-amber-50',
-    textColor: 'text-amber-700',
+    bgColor: 'bg-amber-50 dark:bg-amber-900/30',
+    textColor: 'text-amber-700 dark:text-amber-300',
     iconColor: 'text-amber-500',
   },
   'fast-response': {
     icon: Zap,
     label: 'Fast Response',
-    bgColor: 'bg-emerald-50',
-    textColor: 'text-emerald-700',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-900/30',
+    textColor: 'text-emerald-700 dark:text-emerald-300',
     iconColor: 'text-emerald-500',
   },
   superhost: {
     icon: Award,
     label: 'Superhost',
-    bgColor: 'bg-rose-50',
-    textColor: 'text-rose-700',
+    bgColor: 'bg-rose-50 dark:bg-rose-900/30',
+    textColor: 'text-rose-700 dark:text-rose-300',
     iconColor: 'text-rose-500',
   },
   new: {
     icon: Clock,
     label: 'New',
-    bgColor: 'bg-gray-100',
-    textColor: 'text-gray-700',
+    bgColor: 'bg-gray-100 dark:bg-gray-700',
+    textColor: 'text-gray-700 dark:text-gray-300',
     iconColor: 'text-gray-500',
   },
 };
@@ -138,7 +138,7 @@ export function TrustScore({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div className={`${currentSize.container} ${currentSize.height} bg-gray-200 rounded-full overflow-hidden`}>
+      <div className={`${currentSize.container} ${currentSize.height} bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden`}>
         <div
           className={`h-full ${colors.bg} rounded-full transition-all duration-500`}
           style={{ width: `${percentage}%` }}

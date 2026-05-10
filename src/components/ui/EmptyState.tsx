@@ -67,12 +67,12 @@ export function EmptyState({
 
   return (
     <div className={`flex flex-col items-center justify-center text-center ${s.padding}`}>
-      <div className={`${s.iconWrapper} bg-gray-100 rounded-full flex items-center justify-center mb-6`}>
-        <Icon className={`${s.icon} text-gray-400`} />
+      <div className={`${s.iconWrapper} bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6`}>
+        <Icon className={`${s.icon} text-gray-400 dark:text-gray-500`} />
       </div>
-      <h3 className={`font-semibold text-gray-900 mb-2 ${s.title}`}>{title}</h3>
+      <h3 className={`font-semibold text-gray-900 dark:text-white mb-2 ${s.title}`}>{title}</h3>
       {description && (
-        <p className={`text-gray-600 mb-6 max-w-md ${s.description}`}>{description}</p>
+        <p className={`text-gray-600 dark:text-gray-400 mb-6 max-w-md ${s.description}`}>{description}</p>
       )}
       {children && <div className="mb-6">{children}</div>}
       {(action || secondaryAction) && (

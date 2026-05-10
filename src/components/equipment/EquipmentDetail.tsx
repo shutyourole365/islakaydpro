@@ -73,16 +73,20 @@ export default function EquipmentDetail({
 
   const pricing = calculateTotal();
 
+  const dateInputClass =
+    'w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500 dark:focus:border-teal-400';
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-           >
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
             <ChevronLeft className="w-5 h-5" />
             Back to results
           </button>
@@ -92,24 +96,23 @@ export default function EquipmentDetail({
               aria-label="Toggle favorite"
               className={`p-2.5 rounded-full transition-colors ${
                 isFavorite
-                  ? 'bg-red-50 text-red-500'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-red-50 dark:bg-red-900/30 text-red-500'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
-             
-              >
+            >
               <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500' : ''}`} />
             </button>
             <button
               onClick={() => setShowShareModal(true)}
               aria-label="Share equipment"
-              className="p-2.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
               <Share2 className="w-5 h-5" />
             </button>
             <button
               onClick={onClose}
               aria-label="Close"
-              className="p-2.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -117,7 +120,9 @@ export default function EquipmentDetail({
         </div>
 
         <div className="grid lg:grid-cols-5 overflow-y-auto max-h-[calc(90vh-70px)]">
+          {/* Left: Images + Details */}
           <div className="lg:col-span-3 p-6">
+            {/* Image gallery */}
             <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4">
               <img
                 src={equipment.images[currentImageIndex]}
@@ -137,7 +142,7 @@ export default function EquipmentDetail({
                     onClick={nextImage}
                     aria-label="Next image"
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-gray-800 hover:bg-white transition-colors shadow-lg"
-                   >
+                  >
                     <ChevronRight className="w-6 h-6" />
                   </button>
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
@@ -181,23 +186,24 @@ export default function EquipmentDetail({
               </div>
             )}
 
+            {/* Title + Meta */}
             <div className="mt-6">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     {equipment.title}
                   </h1>
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-1">
                       <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                      <span className="font-semibold text-gray-900">
+                      <span className="font-semibold text-gray-900 dark:text-white">
                         {equipment.rating.toFixed(1)}
                       </span>
-                      <span className="text-gray-500">
+                      <span className="text-gray-500 dark:text-gray-400">
                         ({equipment.total_reviews} reviews)
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-gray-500">
+                    <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                       <MapPin className="w-4 h-4" />
                       {equipment.location}
                     </div>
@@ -205,41 +211,41 @@ export default function EquipmentDetail({
                 </div>
               </div>
 
+              {/* Badges */}
               <div className="flex flex-wrap gap-2 mb-6">
                 {equipment.is_featured && (
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full text-sm font-medium">
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded-full text-sm font-medium">
                     <Award className="w-4 h-4" />
                     Featured
                   </span>
                 )}
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full text-sm font-medium">
                   <Shield className="w-4 h-4" />
                   Verified Owner
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium capitalize">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-medium capitalize">
                   <CheckCircle2 className="w-4 h-4" />
                   {equipment.condition} Condition
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-medium">
                   <Truck className="w-4 h-4" />
                   Delivery Available
                 </span>
               </div>
 
-              <div className="border-t border-gray-100 pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">Description</h2>
-                <p className="text-gray-600 leading-relaxed">{equipment.description}</p>
+              {/* Description */}
+              <div className="border-t border-gray-100 dark:border-gray-700 pt-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Description</h2>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{equipment.description}</p>
               </div>
 
+              {/* Features */}
               {equipment.features.length > 0 && (
-                <div className="border-t border-gray-100 pt-6 mt-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">Features</h2>
+                <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Features</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {equipment.features.map((feature, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2 text-gray-600"
-                      >
+                      <div key={index} className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <CheckCircle2 className="w-5 h-5 text-teal-500 flex-shrink-0" />
                         {feature}
                       </div>
@@ -248,39 +254,39 @@ export default function EquipmentDetail({
                 </div>
               )}
 
+              {/* Specifications */}
               {Object.keys(equipment.specifications).length > 0 && (
-                <div className="border-t border-gray-100 pt-6 mt-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                     Specifications
                   </h2>
                   <div className="grid grid-cols-2 gap-4">
                     {Object.entries(equipment.specifications).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-2 border-b border-gray-50">
-                        <span className="text-gray-500 capitalize">{key}</span>
-                        <span className="font-medium text-gray-900">{value}</span>
+                      <div key={key} className="flex justify-between py-2 border-b border-gray-50 dark:border-gray-700">
+                        <span className="text-gray-500 dark:text-gray-400 capitalize">{key}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{value}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div className="border-t border-gray-100 pt-6 mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Maintenance Status
-                  </h2>
-                </div>
-                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl">
-                  <CheckCircle2 className="w-6 h-6 text-green-600" />
+              {/* Maintenance */}
+              <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                  Maintenance Status
+                </h2>
+                <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
+                  <CheckCircle2 className="w-6 h-6 text-green-600 dark:text-green-400" />
                   <div>
-                    <p className="font-medium text-green-800">Equipment is in good condition</p>
-                    <p className="text-sm text-green-600">Last maintenance: 2 weeks ago</p>
+                    <p className="font-medium text-green-800 dark:text-green-300">Equipment is in good condition</p>
+                    <p className="text-sm text-green-600 dark:text-green-400">Last maintenance: 2 weeks ago</p>
                   </div>
                 </div>
               </div>
 
-              {/* Reviews Section */}
-              <div className="border-t border-gray-100 pt-6 mt-6">
+              {/* Reviews */}
+              <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
                 <ReviewsSection
                   equipmentId={equipment.id}
                   canReview={false}
@@ -289,17 +295,19 @@ export default function EquipmentDetail({
             </div>
           </div>
 
-          <div className="lg:col-span-2 bg-gray-50 p-6">
+          {/* Right: Booking panel */}
+          <div className="lg:col-span-2 bg-gray-50 dark:bg-gray-800 p-6">
             <div className="sticky top-6">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                {/* Pricing header */}
                 <div className="flex items-end justify-between mb-6">
                   <div>
-                    <span className="text-3xl font-bold text-gray-900">
+                    <span className="text-3xl font-bold text-gray-900 dark:text-white">
                       ${equipment.daily_rate}
                     </span>
-                    <span className="text-gray-500">/day</span>
+                    <span className="text-gray-500 dark:text-gray-400">/day</span>
                   </div>
-                  <div className="text-right text-sm text-gray-500">
+                  <div className="text-right text-sm text-gray-500 dark:text-gray-400">
                     {equipment.weekly_rate && (
                       <p>${equipment.weekly_rate}/week</p>
                     )}
@@ -309,10 +317,11 @@ export default function EquipmentDetail({
                   </div>
                 </div>
 
+                {/* Date pickers */}
                 <div className="space-y-4 mb-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         Start Date
                       </label>
                       <div className="relative">
@@ -321,12 +330,12 @@ export default function EquipmentDetail({
                           type="date"
                           value={startDate}
                           onChange={(e) => setStartDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                          className={dateInputClass}
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         End Date
                       </label>
                       <div className="relative">
@@ -335,13 +344,13 @@ export default function EquipmentDetail({
                           type="date"
                           value={endDate}
                           onChange={(e) => setEndDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                          className={dateInputClass}
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 px-4 py-3 bg-blue-50 rounded-xl text-sm text-blue-700">
+                  <div className="flex items-center gap-2 px-4 py-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-sm text-blue-700 dark:text-blue-400">
                     <Info className="w-5 h-5 flex-shrink-0" />
                     <span>
                       Min {equipment.min_rental_days} days, max {equipment.max_rental_days} days rental
@@ -349,40 +358,40 @@ export default function EquipmentDetail({
                   </div>
                 </div>
 
+                {/* Price breakdown */}
                 {pricing && (
-                  <div className="border-t border-gray-100 pt-4 mb-6 space-y-3">
-                    <div className="flex justify-between text-gray-600">
-                      <span>
-                        ${equipment.daily_rate} x {pricing.days} days
-                      </span>
+                  <div className="border-t border-gray-100 dark:border-gray-700 pt-4 mb-6 space-y-3">
+                    <div className="flex justify-between text-gray-600 dark:text-gray-400">
+                      <span>${equipment.daily_rate} x {pricing.days} days</span>
                       <span>${pricing.subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-gray-600 dark:text-gray-400">
                       <span>Service fee (12%)</span>
                       <span>${pricing.serviceFee.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-gray-600 dark:text-gray-400">
                       <span>Refundable deposit</span>
                       <span>${equipment.deposit_amount.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-lg font-semibold text-gray-900 pt-3 border-t border-gray-100">
+                    <div className="flex justify-between text-lg font-semibold text-gray-900 dark:text-white pt-3 border-t border-gray-100 dark:border-gray-700">
                       <span>Total</span>
                       <span>${pricing.total.toFixed(2)}</span>
                     </div>
                   </div>
                 )}
 
+                {/* CTA buttons */}
                 <button
                   onClick={() => onBook(equipment, { start: startDate, end: endDate })}
                   disabled={!pricing}
-                  className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+                  className="w-full py-4 bg-brand-gradient text-white font-semibold rounded-xl hover:opacity-90 shadow-pop transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-3"
                 >
                   {pricing ? 'Reserve Now' : 'Select Dates to Book'}
                 </button>
 
                 <button
                   onClick={() => onMessage(equipment)}
-                  className="w-full py-4 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 mb-3"
                 >
                   <MessageSquare className="w-5 h-5" />
                   Message Owner
@@ -390,22 +399,23 @@ export default function EquipmentDetail({
 
                 <button
                   onClick={() => setShowNegotiator(true)}
-                  className="w-full py-4 border border-orange-200 text-orange-700 font-semibold rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-400 font-semibold rounded-xl hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center justify-center gap-2"
                 >
                   <DollarSign className="w-5 h-5" />
                   Negotiate Price
                 </button>
 
-                <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+                {/* Owner card */}
+                <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                   <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold">
+                    <div className="w-12 h-12 rounded-full bg-brand-gradient flex items-center justify-center text-white font-bold">
                       {equipment.owner?.full_name?.charAt(0) || 'O'}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {equipment.owner?.full_name || 'Owner'}
                       </p>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                         <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                         <span>
                           {equipment.owner?.rating?.toFixed(1) || '5.0'} (
@@ -413,7 +423,7 @@ export default function EquipmentDetail({
                         </span>
                       </div>
                       {equipment.owner?.is_verified && (
-                        <span className="inline-flex items-center gap-1 text-sm text-teal-600 mt-1">
+                        <span className="inline-flex items-center gap-1 text-sm text-teal-600 dark:text-teal-400 mt-1">
                           <Shield className="w-4 h-4" />
                           Verified
                         </span>
@@ -422,8 +432,9 @@ export default function EquipmentDetail({
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0 text-gray-400" />
+                {/* Cancellation notice */}
+                <div className="mt-4 flex items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 text-gray-400 dark:text-gray-500" />
                   <p>
                     Free cancellation up to 48 hours before pickup. Deposit fully
                     refundable upon return.
@@ -435,7 +446,6 @@ export default function EquipmentDetail({
         </div>
       </div>
 
-      {/* Share Equipment Modal */}
       <ShareEquipment
         equipmentId={equipment.id}
         equipmentTitle={equipment.title}
@@ -453,18 +463,12 @@ export default function EquipmentDetail({
           ownerName={equipment.owner?.full_name || 'Owner'}
           rentalDays={pricing.days}
           onAccepted={() => {
-            // Handle accepted negotiation
             setShowNegotiator(false);
-            // Could update the booking with negotiated price
           }}
-
           onRejected={() => setShowNegotiator(false)}
           onClose={() => setShowNegotiator(false)}
         />
       )}
-
     </div>
   );
 }
-
-

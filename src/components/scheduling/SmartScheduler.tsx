@@ -216,15 +216,15 @@ export default function SmartScheduler({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 text-center">
         <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-600">Analyzing best times to book...</p>
+        <p className="text-gray-600 dark:text-gray-400">Analyzing best times to book...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden max-w-2xl w-full">
+    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden max-w-2xl w-full">
       {/* Header */}
       <div className="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
         <div className="flex items-center justify-between mb-4">
@@ -269,23 +269,23 @@ export default function SmartScheduler({
       {viewMode === 'calendar' ? (
         <>
           {/* Calendar Navigation */}
-          <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
             <button
               onClick={prevMonth}
               aria-label="Previous month"
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
+              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            <h3 className="font-semibold text-gray-900">
+            <h3 className="font-semibold text-gray-900 dark:text-white">
               {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </h3>
             <button
               onClick={nextMonth}
               aria-label="Next month"
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
-              <ChevronRight className="w-5 h-5 text-gray-600" />
+              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
           </div>
 
@@ -293,7 +293,7 @@ export default function SmartScheduler({
           <div className="p-4">
             <div className="grid grid-cols-7 gap-1 mb-2">
               {dayNames.map((day) => (
-                <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+                <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2">
                   {day}
                 </div>
               ))}
@@ -321,7 +321,7 @@ export default function SmartScheduler({
                       ${!slot.available ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer'}
                       ${isStart || isEnd ? 'bg-indigo-600 text-white' : ''}
                       ${inRange && !isStart && !isEnd ? 'bg-indigo-100 text-indigo-700' : ''}
-                      ${!inRange && slot.available ? 'hover:bg-gray-100' : ''}
+                      ${!inRange && slot.available ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
                       ${slot.recommended && !inRange ? 'ring-2 ring-green-400 ring-offset-1' : ''}
                     `}
                   >
@@ -340,7 +340,7 @@ export default function SmartScheduler({
             </div>
 
             {/* Legend */}
-            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500">
+            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500 dark:text-gray-400">
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 bg-green-100 rounded border border-green-400" />
                 Low demand
@@ -363,7 +363,7 @@ export default function SmartScheduler({
       ) : (
         /* AI Recommendations */
         <div className="p-4 max-h-80 overflow-y-auto">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Based on demand patterns and pricing, here are the best times to book:
           </p>
           <div className="space-y-3">
@@ -382,14 +382,14 @@ export default function SmartScheduler({
                         Save ${rec.totalSavings}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{rec.reason}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{rec.reason}</p>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-1 text-green-600">
                       <Zap className="w-4 h-4" />
                       <span className="font-medium">{rec.confidence}%</span>
                     </div>
-                    <span className="text-xs text-gray-500">confidence</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">confidence</span>
                   </div>
                 </div>
                 <button
@@ -406,20 +406,20 @@ export default function SmartScheduler({
 
       {/* Selection Summary */}
       {totals && (
-        <div className="p-4 border-t border-gray-100 bg-gray-50">
+        <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {selectedStart?.toLocaleDateString()} - {selectedEnd?.toLocaleDateString()}
               </p>
-              <p className="text-lg font-bold text-gray-900">
+              <p className="text-lg font-bold text-gray-900 dark:text-white">
                 {totals.days} days • ${totals.total} total
               </p>
             </div>
             {totals.savings > 0 && (
               <div className="text-right">
                 <p className="text-green-600 font-semibold">You save ${totals.savings}</p>
-                <p className="text-xs text-gray-500">Avg {totals.avgDiscount}% off</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Avg {totals.avgDiscount}% off</p>
               </div>
             )}
           </div>

@@ -87,17 +87,17 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
   ];
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-teal-50 to-emerald-50">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20">
         <div className="flex items-center gap-2">
           <Camera className="w-5 h-5 text-teal-600" />
-          <h3 className="font-semibold text-gray-900">Send Message with Photos</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">Send Message with Photos</h3>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <X className="w-5 h-5 text-gray-600" />
           </button>
@@ -106,10 +106,10 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
 
       {/* Photo Previews */}
       {previewUrls.length > 0 && (
-        <div className="p-4 bg-gray-50 border-b border-gray-100">
+        <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-2">
-            <Image className="w-4 h-4 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">
+            <Image className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {previewUrls.length} photo{previewUrls.length > 1 ? 's' : ''} attached
             </span>
           </div>
@@ -150,14 +150,14 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
       )}
 
       {/* Quick Messages */}
-      <div className="p-4 bg-gray-50 border-b border-gray-100">
-        <p className="text-xs font-medium text-gray-500 mb-2">QUICK MESSAGES</p>
+      <div className="p-4 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">QUICK MESSAGES</p>
         <div className="flex flex-wrap gap-2">
           {quickMessages.map((msg, idx) => (
             <button
               key={idx}
               onClick={() => setMessage(msg)}
-              className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-teal-400 hover:bg-teal-50 transition-colors"
+              className="px-3 py-1.5 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-full text-sm text-gray-700 dark:text-gray-300 hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
             >
               {msg}
             </button>
@@ -171,7 +171,7 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message here... You can also add photos!"
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all resize-none"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 transition-all resize-none dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
           rows={4}
         />
         
@@ -198,30 +198,30 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
             <button
               aria-label="Attach photos"
               onClick={() => fileInputRef.current?.click()}
-              className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               title="Upload photos"
             >
-              <Paperclip className="w-5 h-5 text-gray-600" />
+              <Paperclip className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            
+
             <button
               aria-label="Take photo"
               onClick={() => cameraInputRef.current?.click()}
-              className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
+              className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               title="Take photo"
             >
-              <Camera className="w-5 h-5 text-gray-600" />
-            </button>
-            
-            <button
-              aria-label="Add emoji" onClick={() => setShowCamera(!showCamera)}
-              className="p-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-              title="Add emoji"
-            >
-              <Smile className="w-5 h-5 text-gray-600" />
+              <Camera className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
 
-            <span className="text-xs text-gray-500 ml-2">
+            <button
+              aria-label="Add emoji" onClick={() => setShowCamera(!showCamera)}
+              className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              title="Add emoji"
+            >
+              <Smile className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            </button>
+
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
               {selectedPhotos.length}/5 photos
             </span>
           </div>

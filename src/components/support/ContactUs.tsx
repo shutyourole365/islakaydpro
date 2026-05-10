@@ -88,7 +88,7 @@ export default function ContactUs({ onBack }: ContactUsProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -99,7 +99,7 @@ export default function ContactUs({ onBack }: ContactUsProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -130,17 +130,17 @@ export default function ContactUs({ onBack }: ContactUsProps) {
             <div className="max-w-4xl mx-auto">
               {/* Contact Methods */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How Can We Help?</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">How Can We Help?</h2>
                 <div className="grid md:grid-cols-3 gap-6">
                   {contactMethods.map((method, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
                         {method.icon}
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{method.title}</h3>
-                      <p className="text-gray-600 mb-3">{method.description}</p>
-                      <p className="text-sm text-green-600 mb-2">{method.availability}</p>
-                      <p className="text-sm text-gray-500 mb-4">Response: {method.response}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{method.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-400 mb-3">{method.description}</p>
+                      <p className="text-sm text-green-600 dark:text-green-400 mb-2">{method.availability}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Response: {method.response}</p>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700">
                         {method.action}
                       </Button>
@@ -151,46 +151,46 @@ export default function ContactUs({ onBack }: ContactUsProps) {
 
               {/* Contact Form */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Send Us a Message</h2>
-                <div className="bg-gray-50 rounded-lg p-8">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Send Us a Message</h2>
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8">
                   <form className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           First Name *
                         </label>
                         <input
                           type="text"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Last Name *
                         </label>
                         <input
                           type="text"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                           required
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Email Address *
                       </label>
                       <input
                         type="email"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Subject *
                       </label>
-                      <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                      <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white">
                         <option>General Inquiry</option>
                         <option>Technical Support</option>
                         <option>Billing Question</option>
@@ -201,12 +201,12 @@ export default function ContactUs({ onBack }: ContactUsProps) {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Message *
                       </label>
                       <textarea
                         rows={6}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                         placeholder="Please describe your question or issue in detail..."
                         required
                       ></textarea>
@@ -215,9 +215,9 @@ export default function ContactUs({ onBack }: ContactUsProps) {
                       <input
                         type="checkbox"
                         id="newsletter"
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700"
                       />
-                      <label htmlFor="newsletter" className="ml-2 text-sm text-gray-600">
+                      <label htmlFor="newsletter" className="ml-2 text-sm text-gray-600 dark:text-gray-400">
                         Subscribe to our newsletter for updates and tips
                       </label>
                     </div>
@@ -231,13 +231,13 @@ export default function ContactUs({ onBack }: ContactUsProps) {
 
               {/* Department Contacts */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Department Contacts</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Department Contacts</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   {departments.map((dept, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{dept.name}</h3>
-                      <p className="text-blue-600 font-medium mb-1">{dept.email}</p>
-                      <p className="text-gray-600 text-sm">{dept.description}</p>
+                    <div key={index} className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{dept.name}</h3>
+                      <p className="text-blue-600 dark:text-blue-400 font-medium mb-1">{dept.email}</p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">{dept.description}</p>
                     </div>
                   ))}
                 </div>
@@ -245,17 +245,17 @@ export default function ContactUs({ onBack }: ContactUsProps) {
 
               {/* Office Locations */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Offices</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Offices</h2>
                 <div className="grid md:grid-cols-3 gap-6">
                   {offices.map((office, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-6">
+                    <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
                       <div className="flex items-center mb-3">
-                        <MapPin className="w-5 h-5 text-blue-600 mr-2" />
-                        <h3 className="text-lg font-semibold text-gray-900">{office.city}</h3>
+                        <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" />
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{office.city}</h3>
                       </div>
-                      <p className="text-sm text-blue-600 font-medium mb-2">{office.type}</p>
-                      <p className="text-gray-600 text-sm mb-3 whitespace-pre-line">{office.address}</p>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-2">{office.type}</p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 whitespace-pre-line">{office.address}</p>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
                         <Phone className="w-4 h-4 inline mr-1" />
                         {office.phone}
                       </p>
@@ -265,30 +265,30 @@ export default function ContactUs({ onBack }: ContactUsProps) {
               </div>
 
               {/* Support Hours */}
-              <div className="bg-blue-50 rounded-lg p-8">
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-8">
                 <div className="text-center mb-6">
-                  <Clock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Support Hours</h2>
+                  <Clock className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Support Hours</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6 text-center">
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Live Chat</h3>
-                    <p className="text-gray-600">24 hours a day, 7 days a week</p>
-                    <p className="text-sm text-green-600">Always available</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Live Chat</h3>
+                    <p className="text-gray-600 dark:text-gray-400">24 hours a day, 7 days a week</p>
+                    <p className="text-sm text-green-600 dark:text-green-400">Always available</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Email & Phone</h3>
-                    <p className="text-gray-600">Monday - Friday</p>
-                    <p className="text-gray-600">9:00 AM - 6:00 PM EST</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Email & Phone</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Monday - Friday</p>
+                    <p className="text-gray-600 dark:text-gray-400">9:00 AM - 6:00 PM EST</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Emergency Support</h3>
-                    <p className="text-gray-600">Critical issues only</p>
-                    <p className="text-sm text-red-600">24/7 for safety concerns</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Emergency Support</h3>
+                    <p className="text-gray-600 dark:text-gray-400">Critical issues only</p>
+                    <p className="text-sm text-red-600 dark:text-red-400">24/7 for safety concerns</p>
                   </div>
                 </div>
                 <div className="mt-6 text-center">
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">
                     Need urgent help? Our emergency line is available 24/7 for safety and security issues.
                   </p>
                   <Button className="bg-blue-600 hover:bg-blue-700">

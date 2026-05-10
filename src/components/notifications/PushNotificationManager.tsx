@@ -142,8 +142,8 @@ export default function PushNotificationManager({ className = '', compact = fals
         }
         className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition-colors ${
           isSubscribed
-            ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100'
-            : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+            ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-700 dark:bg-green-900/20 dark:text-green-400'
+            : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
         } disabled:opacity-50 ${className}`}
       >
         {isLoading ? (
@@ -159,10 +159,10 @@ export default function PushNotificationManager({ className = '', compact = fals
   }
 
   return (
-    <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 ${className}`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 ${className}`}>
       <div className="flex items-start gap-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-          isSubscribed ? 'bg-green-100' : 'bg-gray-100'
+          isSubscribed ? 'bg-green-100 dark:bg-green-900/30' : 'bg-gray-100 dark:bg-gray-700'
         }`}>
           {isSubscribed ? (
             <Bell className="w-6 h-6 text-green-600" />
@@ -172,8 +172,8 @@ export default function PushNotificationManager({ className = '', compact = fals
         </div>
 
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900">Push Notifications</h3>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h3 className="font-semibold text-gray-900 dark:text-white">Push Notifications</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {isSubscribed
               ? "You'll get notified for bookings, messages, and more."
               : 'Stay on top of booking requests, messages, and updates.'}
@@ -205,7 +205,7 @@ export default function PushNotificationManager({ className = '', compact = fals
           disabled={isLoading || permission === 'denied'}
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
             isSubscribed
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               : 'bg-blue-600 text-white hover:bg-blue-700'
           }`}
         >

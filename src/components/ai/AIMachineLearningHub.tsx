@@ -131,7 +131,7 @@ export default function AIMachineLearningHub() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 dark:border-gray-700">
         {[
           { id: 'predictions', label: 'AI Predictions', icon: Target },
           { id: 'insights', label: 'ML Insights', icon: BarChart3 },
@@ -144,7 +144,7 @@ export default function AIMachineLearningHub() {
             className={`flex items-center gap-2 px-6 py-3 border-b-2 font-medium text-sm ${
               activeTab === id
                 ? 'border-teal-500 text-teal-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
             <Icon className="w-4 h-4" />
@@ -157,15 +157,15 @@ export default function AIMachineLearningHub() {
       {activeTab === 'predictions' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {predictions.map((prediction) => (
-            <div key={prediction.equipmentId} className="bg-white rounded-lg shadow-sm border p-6">
+            <div key={prediction.equipmentId} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-teal-500" />
-                  <span className="font-semibold text-gray-900">AI Prediction</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">AI Prediction</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-500">
+                  <Eye className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {Math.round(prediction.confidence * 100)}% confidence
                   </span>
                 </div>
@@ -173,23 +173,23 @@ export default function AIMachineLearningHub() {
 
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Predicted Demand</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Predicted Demand</span>
                   <div className="flex items-center gap-2">
                     <Activity className="w-4 h-4 text-blue-500" />
-                    <span className="font-semibold">{prediction.predictedDemand.toFixed(1)}/10</span>
+                    <span className="font-semibold dark:text-white">{prediction.predictedDemand.toFixed(1)}/10</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Optimal Price</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Optimal Price</span>
                   <div className="flex items-center gap-2">
                     <Zap className="w-4 h-4 text-green-500" />
-                    <span className="font-semibold">${prediction.optimalPrice}/day</span>
+                    <span className="font-semibold dark:text-white">${prediction.optimalPrice}/day</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Maintenance Risk</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Maintenance Risk</span>
                   <div className="flex items-center gap-2">
                     <Activity className="w-4 h-4 text-red-500" />
                     <span className="font-semibold">{prediction.maintenanceRisk.toFixed(1)}%</span>

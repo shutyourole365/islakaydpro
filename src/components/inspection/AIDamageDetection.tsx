@@ -221,7 +221,7 @@ export default function AIDamageDetection({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl my-8">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-4xl my-8">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-t-3xl text-white">
           <div className="flex items-center justify-between">
@@ -252,7 +252,7 @@ export default function AIDamageDetection({
             <>
               {/* Photo Capture Section */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Capture Equipment Photos
                 </h3>
                 
@@ -285,20 +285,20 @@ export default function AIDamageDetection({
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <button
                       onClick={startCamera}
-                      className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors"
+                      className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-700 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-600 hover:border-orange-300 hover:bg-orange-50 dark:hover:bg-gray-600 transition-colors"
                      >
                       <Camera className="w-12 h-12 text-gray-400 mb-3" />
-                      <span className="font-medium text-gray-700">Take Photo</span>
-                      <span className="text-sm text-gray-500">Use camera</span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Take Photo</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">Use camera</span>
                     </button>
                     <button
-                     
+
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors"
+                      className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-700 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-600 hover:border-orange-300 hover:bg-orange-50 dark:hover:bg-gray-600 transition-colors"
                     >
                       <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                      <span className="font-medium text-gray-700">Upload Photos</span>
-                      <span className="text-sm text-gray-500">From device</span>
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Upload Photos</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">From device</span>
                     </button>
                     <input
                       ref={fileInputRef}
@@ -336,7 +336,7 @@ export default function AIDamageDetection({
                     <button
                       aria-label="Add photos"
                       onClick={() => fileInputRef.current?.click()}
-                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-orange-300 hover:text-orange-500 transition-colors"
+                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:border-orange-300 hover:text-orange-500 transition-colors"
                       title="Add photos"
                     >
                       <ImageIcon className="w-8 h-8" aria-hidden="true" />

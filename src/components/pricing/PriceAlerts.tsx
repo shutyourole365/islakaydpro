@@ -137,7 +137,7 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-amber-500 p-6 text-white">
         <div className="flex items-center justify-between">
@@ -205,7 +205,7 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
         {(activeTab === 'active' || activeTab === 'triggered') && !isCreating && (
           <button
             onClick={() => setIsCreating(true)}
-            className="w-full mb-4 p-4 border-2 border-dashed border-orange-200 rounded-xl text-orange-600 hover:border-orange-400 hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
+            className="w-full mb-4 p-4 border-2 border-dashed border-orange-200 dark:border-orange-800 rounded-xl text-orange-600 hover:border-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center justify-center gap-2"
           >
             <Plus className="w-5 h-5" />
             Create New Price Alert
@@ -214,8 +214,8 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
 
         {/* Create Alert Form */}
         {isCreating && (
-          <div className="mb-6 p-4 bg-orange-50 rounded-xl border border-orange-200">
-            <h3 className="font-semibold text-orange-900 mb-4 flex items-center gap-2">
+          <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-800">
+            <h3 className="font-semibold text-orange-900 dark:text-orange-200 mb-4 flex items-center gap-2">
               <Plus className="w-5 h-5" />
               Create Price Alert
             </h3>
@@ -226,14 +226,14 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
                 aria-label="Equipment name or search term"
                 value={newAlert.equipmentTitle}
                 onChange={(e) => setNewAlert(prev => ({ ...prev, equipmentTitle: e.target.value }))}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
               />
               <div className="grid grid-cols-2 gap-3">
                 <select
                   value={newAlert.category}
                   aria-label="Equipment category"
                   onChange={(e) => setNewAlert(prev => ({ ...prev, category: e.target.value }))}
-                  className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
                   <option value="">Any Category</option>
                   <option value="Construction">Construction</option>
@@ -271,7 +271,7 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
                 </button>
                 <button
                   onClick={() => setIsCreating(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                 >
                   Cancel
                 </button>
@@ -293,11 +293,11 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
               activeAlerts.map(alert => {
                 const priceStatus = getPriceStatus(alert.currentPrice, alert.targetPrice);
                 return (
-                  <div key={alert.id} className="p-4 border rounded-xl hover:shadow-md transition-shadow">
+                  <div key={alert.id} className="p-4 border dark:border-gray-700 rounded-xl hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">{alert.equipmentTitle}</h4>
-                        <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
+                        <h4 className="font-semibold text-gray-900 dark:text-white">{alert.equipmentTitle}</h4>
+                        <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-1">
                           <span className="flex items-center gap-1">
                             <Tag className="w-3 h-3" />
                             {alert.category}
@@ -311,7 +311,7 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
                       <div className="flex items-center gap-2">
                         <button
                           aria-label="Edit alert" onClick={() => toggleAlert(alert.id)}
-                          className="p-2 hover:bg-gray-100 rounded-lg"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                         >
                           <Edit2 className="w-4 h-4 text-gray-400" />
                         </button>
@@ -326,12 +326,12 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
                     <div className="mt-3 flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div>
-                          <div className="text-xs text-gray-500">Target</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Target</div>
                           <div className="font-bold text-orange-600">${alert.targetPrice}/day</div>
                         </div>
                         <TrendingDown className="w-5 h-5 text-gray-300" />
                         <div>
-                          <div className="text-xs text-gray-500">Current</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">Current</div>
                           <div className={`font-bold ${priceStatus.color}`}>${alert.currentPrice}/day</div>
                         </div>
                       </div>
@@ -357,13 +357,13 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
               </div>
             ) : (
               triggeredAlerts.map(alert => (
-                <div key={alert.id} className="p-4 border-2 border-green-200 bg-green-50 rounded-xl">
+                <div key={alert.id} className="p-4 border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20 rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="p-2 bg-green-500 rounded-lg">
                       <CheckCircle className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-green-900">{alert.equipmentTitle}</h4>
+                      <h4 className="font-semibold text-green-900 dark:text-green-200">{alert.equipmentTitle}</h4>
                       <p className="text-sm text-green-700">Price target reached!</p>
                     </div>
                   </div>
@@ -371,7 +371,7 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
                     <div className="flex items-center gap-4">
                       <div>
                         <div className="text-xs text-green-600">Your Target</div>
-                        <div className="font-bold text-gray-900">${alert.targetPrice}/day</div>
+                        <div className="font-bold text-gray-900 dark:text-white">${alert.targetPrice}/day</div>
                       </div>
                       <TrendingDown className="w-5 h-5 text-green-500" />
                       <div>
@@ -399,21 +399,21 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
         {activeTab === 'settings' && (
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Notification Preferences</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Notification Preferences</h3>
               <div className="space-y-3">
                 {[
                   { id: 'email', label: 'Email Notifications', icon: Mail, description: 'Get alerts via email' },
                   { id: 'push', label: 'Push Notifications', icon: Bell, description: 'Browser and mobile notifications' },
                   { id: 'sms', label: 'SMS Notifications', icon: Smartphone, description: 'Text message alerts' },
                 ].map(pref => (
-                  <div key={pref.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  <div key={pref.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white rounded-lg">
+                      <div className="p-2 bg-white dark:bg-gray-700 rounded-lg">
                         <pref.icon className="w-5 h-5 text-orange-600" />
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900">{pref.label}</div>
-                        <div className="text-sm text-gray-500">{pref.description}</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{pref.label}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{pref.description}</div>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -426,17 +426,17 @@ export default function PriceAlerts({ userId, onClose }: PriceAlertsProps) {
             </div>
 
             <div>
-              <h3 className="font-semibold text-gray-900 mb-4">Alert Frequency</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Alert Frequency</h3>
               <div className="space-y-2">
                 {['Instant', 'Daily digest', 'Weekly summary'].map(freq => (
-                  <label key={freq} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100">
+                  <label key={freq} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
                     <input
                       type="radio"
                       name="frequency"
                       defaultChecked={freq === 'Instant'}
                       className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                     />
-                    <span className="text-gray-700">{freq}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{freq}</span>
                   </label>
                 ))}
               </div>

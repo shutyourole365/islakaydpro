@@ -82,7 +82,7 @@ export function LoadingBar({
   };
 
   return (
-    <div className={`w-full bg-gray-200 rounded-full overflow-hidden ${sizes[size]}`}>
+    <div className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${sizes[size]}`}>
       {indeterminate ? (
         <div
           className={`h-full ${colors[color]} rounded-full animate-pulse`}
@@ -111,11 +111,11 @@ export function LoadingOverlay({ message = 'Loading...', transparent = false }: 
   return (
     <div
       className={`absolute inset-0 flex flex-col items-center justify-center z-50 ${
-        transparent ? 'bg-white/50' : 'bg-white'
+        transparent ? 'bg-white/50 dark:bg-gray-900/50' : 'bg-white dark:bg-gray-900'
       }`}
     >
       <LoadingSpinner size="xl" />
-      {message && <p className="mt-4 text-gray-600 font-medium">{message}</p>}
+      {message && <p className="mt-4 text-gray-600 dark:text-gray-300 font-medium">{message}</p>}
     </div>
   );
 }
@@ -126,9 +126,9 @@ interface LoadingPageProps {
 
 export function LoadingPage({ message = 'Loading...' }: LoadingPageProps) {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center">
       <LoadingSpinner size="xl" />
-      <p className="mt-4 text-gray-600 font-medium">{message}</p>
+      <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">{message}</p>
     </div>
   );
 }
@@ -169,12 +169,12 @@ interface LoadingCardProps {
 
 export function LoadingCard({ rows = 3 }: LoadingCardProps) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-3/4 mb-4" />
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 animate-pulse">
+      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4" />
       {Array.from({ length: rows }).map((_, i) => (
         <div
           key={i}
-          className={`h-3 bg-gray-200 rounded ${i === rows - 1 ? 'w-1/2' : 'w-full'} ${
+          className={`h-3 bg-gray-200 dark:bg-gray-700 rounded ${i === rows - 1 ? 'w-1/2' : 'w-full'} ${
             i < rows - 1 ? 'mb-3' : ''
           }`}
         />
@@ -208,15 +208,15 @@ export function LoadingImage({ aspectRatio = 'video', rounded = true }: LoadingI
 // Skeleton variants for specific use cases
 export function LoadingEquipmentCard() {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
-      <div className="aspect-[4/3] bg-gray-200" />
+    <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 animate-pulse">
+      <div className="aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
       <div className="p-5 space-y-3">
-        <div className="h-5 bg-gray-200 rounded w-3/4" />
-        <div className="h-4 bg-gray-200 rounded w-1/2" />
-        <div className="h-4 bg-gray-200 rounded w-2/3" />
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="h-6 bg-gray-200 rounded w-20" />
-          <div className="h-4 bg-gray-200 rounded w-16" />
+        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16" />
         </div>
       </div>
     </div>
@@ -236,7 +236,7 @@ export function LoadingEquipmentGrid({ count = 6 }: { count?: number }) {
 export function LoadingListItem() {
   return (
     <div className="flex items-center gap-4 p-4 animate-pulse">
-      <div className="w-12 h-12 bg-gray-200 rounded-full" />
+      <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full" />
       <div className="flex-1 space-y-2">
         <div className="h-4 bg-gray-200 rounded w-1/2" />
         <div className="h-3 bg-gray-200 rounded w-3/4" />
@@ -247,7 +247,7 @@ export function LoadingListItem() {
 
 export function LoadingList({ count = 5 }: { count?: number }) {
   return (
-    <div className="divide-y divide-gray-100">
+    <div className="divide-y divide-gray-100 dark:divide-gray-700">
       {Array.from({ length: count }).map((_, i) => (
         <LoadingListItem key={i} />
       ))}

@@ -165,8 +165,8 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
 
   const renderMethodSelection = () => (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Payment Method</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Payment Method</h3>
+
       {paymentMethods.map((method) => (
         <button
           key={method.id}
@@ -174,41 +174,41 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
           disabled={!method.isAvailable}
           className={`w-full p-4 rounded-xl border-2 transition-all ${
             selectedMethod === method.id
-              ? 'border-teal-500 bg-teal-50'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30'
+              : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
           } ${!method.isAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                 method.type === 'apple_pay' ? 'bg-black text-white' :
-                method.type === 'google_pay' ? 'bg-white border border-gray-200' :
+                method.type === 'google_pay' ? 'bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600' :
                 method.type === 'crypto' ? 'bg-gradient-to-br from-orange-400 to-amber-500 text-white' :
                 method.type === 'paypal' ? 'bg-blue-600 text-white' :
-                'bg-gray-100 text-gray-600'
+                'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
               }`}>
                 {method.icon}
               </div>
               <div className="text-left">
-                <p className="font-semibold text-gray-900">{method.name}</p>
-                <p className="text-sm text-gray-500">{method.description}</p>
+                <p className="font-semibold text-gray-900 dark:text-white">{method.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{method.description}</p>
               </div>
             </div>
             <div className="text-right">
               {method.fee === 0 ? (
                 <span className="text-sm text-green-600 font-medium">No fee</span>
               ) : (
-                <span className="text-sm text-gray-500">{method.fee}% fee</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{method.fee}% fee</span>
               )}
-              <p className="text-xs text-gray-400">{method.processingTime}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500">{method.processingTime}</p>
             </div>
           </div>
         </button>
       ))}
 
-      <div className="flex items-center gap-2 mt-6 p-3 bg-green-50 rounded-xl">
-        <Shield className="w-5 h-5 text-green-600" />
-        <span className="text-sm text-green-700">
+      <div className="flex items-center gap-2 mt-6 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
+        <Shield className="w-5 h-5 text-green-600 dark:text-green-400" />
+        <span className="text-sm text-green-700 dark:text-green-300">
           All payments are secured with 256-bit encryption
         </span>
       </div>
@@ -217,13 +217,13 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
 
   const renderCryptoDetails = () => (
     <div className="space-y-4">
-      <button onClick={() => setStep('select')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+      <button onClick={() => setStep('select')} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
         <ChevronRight className="w-4 h-4 rotate-180" />
         Back
       </button>
 
-      <h3 className="text-lg font-semibold text-gray-900">Select Cryptocurrency</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Select Cryptocurrency</h3>
+
       <div className="space-y-2">
         {cryptoWallets.map((crypto) => (
           <button
@@ -235,8 +235,8 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
             }}
             className={`w-full p-4 rounded-xl border-2 transition-all ${
               selectedCrypto === crypto.symbol
-                ? 'border-teal-500 bg-teal-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30'
+                : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -245,25 +245,25 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
                   {crypto.icon}
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold text-gray-900">{crypto.name}</p>
-                  <p className="text-sm text-gray-500">{crypto.symbol}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">{crypto.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{crypto.symbol}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-medium text-gray-900">{crypto.balance} {crypto.symbol}</p>
-                <p className="text-xs text-gray-400">Available balance</p>
+                <p className="font-medium text-gray-900 dark:text-white">{crypto.balance} {crypto.symbol}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">Available balance</p>
               </div>
             </div>
           </button>
         ))}
       </div>
 
-      <div className="p-4 bg-amber-50 rounded-xl">
+      <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
         <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+          <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5" />
           <div>
-            <p className="font-medium text-amber-800">Network Fees Apply</p>
-            <p className="text-sm text-amber-700">
+            <p className="font-medium text-amber-800 dark:text-amber-300">Network Fees Apply</p>
+            <p className="text-sm text-amber-700 dark:text-amber-400">
               Crypto payments include network transaction fees. Final amount may vary slightly.
             </p>
           </div>
@@ -274,60 +274,60 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
 
   const renderCardDetails = () => (
     <div className="space-y-4">
-      <button onClick={() => setStep('select')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+      <button onClick={() => setStep('select')} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
         <ChevronRight className="w-4 h-4 rotate-180" />
         Back
       </button>
 
-      <h3 className="text-lg font-semibold text-gray-900">Card Details</h3>
-      
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Card Details</h3>
+
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Card Number</label>
           <div className="relative">
             <input
               type="text"
               placeholder="1234 5678 9012 3456"
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             />
-            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiry Date</label>
             <input
               type="text"
               placeholder="MM/YY"
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CVV</label>
             <div className="relative">
               <input
                 type="text"
                 placeholder="123"
-                className="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                className="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
               />
-              <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
             </div>
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cardholder Name</label>
           <input
             type="text"
             placeholder="John Doe"
-            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
           />
         </div>
 
         <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-teal-500" />
-          <span className="text-sm text-gray-600">Save card for future payments</span>
+          <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-teal-500" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">Save card for future payments</span>
         </label>
       </div>
 
@@ -346,47 +346,47 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
 
     return (
       <div className="space-y-4">
-        <button onClick={() => setStep(selectedMethod === 'crypto' ? 'details' : 'select')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900">
+        <button onClick={() => setStep(selectedMethod === 'crypto' ? 'details' : 'select')} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
           <ChevronRight className="w-4 h-4 rotate-180" />
           Back
         </button>
 
-        <h3 className="text-lg font-semibold text-gray-900">Confirm Payment</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Confirm Payment</h3>
 
-        <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+        <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Payment Method</span>
+            <span className="text-gray-600 dark:text-gray-400">Payment Method</span>
             <div className="flex items-center gap-2">
               {method.icon}
-              <span className="font-medium">{method.name}</span>
-              {selectedCrypto && <span className="text-sm text-gray-500">({selectedCrypto})</span>}
+              <span className="font-medium dark:text-white">{method.name}</span>
+              {selectedCrypto && <span className="text-sm text-gray-500 dark:text-gray-400">({selectedCrypto})</span>}
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Subtotal</span>
-            <span className="font-medium">${amount.toFixed(2)}</span>
+            <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+            <span className="font-medium dark:text-white">${amount.toFixed(2)}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-600">Processing Fee ({method.fee || 0}%)</span>
-            <span className="font-medium">${calculateFee(method).toFixed(2)}</span>
+            <span className="text-gray-600 dark:text-gray-400">Processing Fee ({method.fee || 0}%)</span>
+            <span className="font-medium dark:text-white">${calculateFee(method).toFixed(2)}</span>
           </div>
-          <div className="border-t border-gray-200 pt-3 flex items-center justify-between">
-            <span className="text-lg font-semibold text-gray-900">Total</span>
-            <span className="text-lg font-bold text-teal-600">${getTotalAmount(method).toFixed(2)}</span>
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex items-center justify-between">
+            <span className="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
+            <span className="text-lg font-bold text-teal-600 dark:text-teal-400">${getTotalAmount(method).toFixed(2)}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-xl">
-          <Zap className="w-5 h-5 text-blue-600" />
-          <span className="text-sm text-blue-700">
+        <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+          <Zap className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <span className="text-sm text-blue-700 dark:text-blue-300">
             Processing time: {method.processingTime}
           </span>
         </div>
 
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 rounded-xl">
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <span className="text-sm text-red-700">{error}</span>
+          <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-xl">
+            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+            <span className="text-sm text-red-700 dark:text-red-300">{error}</span>
           </div>
         )}
 
@@ -408,7 +408,7 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
           )}
         </button>
 
-        <p className="text-xs text-center text-gray-500">
+        <p className="text-xs text-center text-gray-500 dark:text-gray-400">
           By confirming, you agree to our Terms of Service and authorize this payment
         </p>
       </div>
@@ -417,14 +417,14 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
 
   const renderSuccess = () => (
     <div className="text-center py-8 space-y-4">
-      <div className="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center">
-        <CheckCircle2 className="w-10 h-10 text-green-600" />
+      <div className="w-20 h-20 mx-auto bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+        <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-400" />
       </div>
-      <h3 className="text-2xl font-bold text-gray-900">Payment Successful!</h3>
-      <p className="text-gray-600">
+      <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Payment Successful!</h3>
+      <p className="text-gray-600 dark:text-gray-400">
         Your payment of ${amount.toFixed(2)} has been processed successfully.
       </p>
-      <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
         <Check className="w-4 h-4 text-green-500" />
         Confirmation email sent
       </div>
@@ -435,7 +435,7 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onCancel} />
       
-      <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
         <div className="p-6 bg-gradient-to-r from-teal-500 to-emerald-500">
           <div className="flex items-center justify-between">
             <div>
@@ -458,17 +458,17 @@ export default function AdvancedPayments({ amount, onPaymentComplete, onCancel }
         </div>
 
         {step !== 'success' && (
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border-t border-gray-100 dark:border-gray-700">
             <button
               onClick={onCancel}
-              className="w-full py-3 text-gray-600 font-medium hover:bg-gray-50 rounded-xl transition-colors"
+              className="w-full py-3 text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl transition-colors"
              >
               Cancel
             </button>
           </div>
         )}
 
-        <div className="px-6 pb-6 pt-2 flex items-center justify-center gap-4 text-xs text-gray-400">
+        <div className="px-6 pb-6 pt-2 flex items-center justify-center gap-4 text-xs text-gray-400 dark:text-gray-500">
           <span className="flex items-center gap-1">
             <Shield className="w-3 h-3" /> PCI Compliant
           </span>

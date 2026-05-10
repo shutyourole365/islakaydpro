@@ -105,7 +105,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
             {/* Welcome animation */}
             <div className="relative w-32 h-32 mx-auto">
               <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full animate-pulse" />
-              <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+              <div className="absolute inset-2 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center">
                 <Sparkles className="w-16 h-16 text-teal-500 animate-bounce" />
               </div>
               {/* Orbiting particles */}
@@ -125,10 +125,10 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
             </div>
             
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500">Islakayd</span>
               </h2>
-              <p className="text-xl text-gray-600 max-w-md mx-auto">
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-md mx-auto">
                 The world's most intelligent equipment rental marketplace. Let's personalize your experience.
               </p>
             </div>
@@ -142,7 +142,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
               ].map((feature, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-full text-sm text-gray-600"
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-full text-sm text-gray-600 dark:text-gray-300"
                   style={{
                     animation: 'fadeInUp 0.5s ease-out forwards',
                     animationDelay: `${0.5 + i * 0.1}s`,
@@ -161,8 +161,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
         return (
           <div className="space-y-8">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">How will you use Islakayd?</h2>
-              <p className="text-gray-600">This helps us show you the right features</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">How will you use Islakayd?</h2>
+              <p className="text-gray-600 dark:text-gray-400">This helps us show you the right features</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
@@ -195,8 +195,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                   onClick={() => setPreferences(prev => ({ ...prev, rentalType: option.id as 'renter' | 'owner' | 'both' }))}
                   className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
                     preferences.rentalType === option.id
-                      ? 'border-teal-500 bg-teal-50 shadow-lg scale-105'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 shadow-lg scale-105'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md dark:bg-gray-800'
                   }`}
                 >
                   {preferences.rentalType === option.id && (
@@ -205,8 +205,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${option.color} flex items-center justify-center mb-4`}>
                     <option.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{option.title}</h3>
-                  <p className="text-sm text-gray-500">{option.description}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{option.title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{option.description}</p>
                 </button>
               ))}
             </div>
@@ -217,8 +217,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
         return (
           <div className="space-y-8">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">What are you interested in?</h2>
-              <p className="text-gray-600">Select all that apply</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">What are you interested in?</h2>
+              <p className="text-gray-600 dark:text-gray-400">Select all that apply</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
@@ -229,8 +229,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                   onClick={() => toggleInterest(category.id)}
                   className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${
                     preferences.interests.includes(category.id)
-                      ? 'border-teal-500 bg-teal-50 shadow-lg scale-105'
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                      ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/20 shadow-lg scale-105'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md dark:bg-gray-800'
                   }`}
                 >
                   {preferences.interests.includes(category.id) && (
@@ -239,7 +239,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${category.color} flex items-center justify-center mb-4`}>
                     <category.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{category.name}</h3>
                 </button>
               ))}
             </div>
@@ -250,8 +250,8 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
         return (
           <div className="space-y-8">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Where are you located?</h2>
-              <p className="text-gray-600">We'll show you equipment nearby</p>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Where are you located?</h2>
+              <p className="text-gray-600 dark:text-gray-400">We'll show you equipment nearby</p>
             </div>
 
             <div className="max-w-md mx-auto space-y-4">
@@ -262,7 +262,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                   value={preferences.location}
                   onChange={(e) => setPreferences(prev => ({ ...prev, location: e.target.value }))}
                   placeholder="Enter your city or zip code"
-                  className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 focus:border-teal-500 focus:outline-none text-lg"
+                  className="w-full pl-12 pr-4 py-4 rounded-xl border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 focus:border-teal-500 focus:outline-none text-lg"
                 />
               </div>
 
@@ -280,13 +280,13 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                     );
                   }
                 }}
-                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-4 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
                 <MapPin className="w-5 h-5" />
                 Use my current location
               </button>
 
-              <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl text-blue-700">
+              <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-700 dark:text-blue-300">
                 <Shield className="w-6 h-6 flex-shrink-0" />
                 <p className="text-sm">Your location is only used to show nearby equipment and is never shared publicly.</p>
               </div>
@@ -299,34 +299,34 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
           <div className="space-y-8 text-center">
             <div className="relative w-32 h-32 mx-auto">
               <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full" />
-              <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+              <div className="absolute inset-2 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center">
                 <CheckCircle2 className="w-16 h-16 text-green-500" />
               </div>
             </div>
 
             <div>
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">You're all set!</h2>
-              <p className="text-xl text-gray-600 max-w-md mx-auto">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">You're all set!</h2>
+              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-md mx-auto">
                 Your personalized experience is ready. Let's start exploring!
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-2xl p-6 max-w-md mx-auto">
-              <h3 className="font-semibold text-gray-900 mb-4">Your preferences:</h3>
+            <div className="bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/20 dark:to-emerald-900/20 rounded-2xl p-6 max-w-md mx-auto">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Your preferences:</h3>
               <div className="space-y-3 text-left">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center">
                     <Zap className="w-4 h-4 text-teal-600" />
                   </div>
-                  <span className="text-gray-700">
+                  <span className="text-gray-700 dark:text-gray-300">
                     {preferences.rentalType === 'both' ? 'Renter & Owner' : preferences.rentalType === 'owner' ? 'Equipment Owner' : 'Equipment Renter'}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center">
                     <Star className="w-4 h-4 text-teal-600" />
                   </div>
-                  <span className="text-gray-700">
+                  <span className="text-gray-700 dark:text-gray-300">
                     {preferences.interests.length > 0
                       ? preferences.interests.map(i => categories.find(c => c.id === i)?.name).join(', ')
                       : 'All categories'}
@@ -334,10 +334,10 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                 </div>
                 {preferences.location && (
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center">
                       <MapPin className="w-4 h-4 text-teal-600" />
                     </div>
-                    <span className="text-gray-700">{preferences.location}</span>
+                    <span className="text-gray-700 dark:text-gray-300">{preferences.location}</span>
                   </div>
                 )}
               </div>
@@ -360,19 +360,19 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
   };
 
   return (
-    <div className="fixed inset-0 z-[200] bg-white flex flex-col">
+    <div className="fixed inset-0 z-[200] bg-white dark:bg-gray-900 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 flex items-center justify-center">
             <span className="text-white font-bold text-lg">I</span>
           </div>
-          <span className="font-bold text-xl text-gray-900">islakayd</span>
+          <span className="font-bold text-xl text-gray-900 dark:text-white">islakayd</span>
         </div>
-        
+
         <button
           onClick={onSkip}
-          className="flex items-center gap-1 px-4 py-2 text-gray-500 hover:text-gray-700 transition-colors"
+          className="flex items-center gap-1 px-4 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
         >
           Skip
           <X className="w-4 h-4" />
@@ -386,12 +386,12 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
             <div
               key={i}
               className={`flex-1 h-2 rounded-full transition-all duration-500 ${
-                i <= currentStep ? 'bg-gradient-to-r from-teal-500 to-emerald-500' : 'bg-gray-200'
+                i <= currentStep ? 'bg-gradient-to-r from-teal-500 to-emerald-500' : 'bg-gray-200 dark:bg-gray-700'
               }`}
             />
           ))}
         </div>
-        <p className="text-center text-sm text-gray-500 mt-2">
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
           Step {currentStep + 1} of {totalSteps}
         </p>
       </div>
@@ -408,15 +408,15 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
       </div>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-gray-100">
+      <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
         <div className="flex items-center justify-between max-w-3xl mx-auto">
           <button
             onClick={goToPrev}
             disabled={currentStep === 0}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl transition-all ${
               currentStep === 0
-                ? 'text-gray-300 cursor-not-allowed'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
             }`}
           >
             <ChevronLeft className="w-5 h-5" />

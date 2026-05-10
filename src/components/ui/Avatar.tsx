@@ -60,11 +60,11 @@ export function Avatar({
         <img
           src={src}
           alt={alt}
-          className={`${sizes[size]} rounded-full object-cover ring-2 ring-white`}
+          className={`${sizes[size]} rounded-full object-cover ring-2 ring-white dark:ring-gray-800`}
         />
       ) : (
         <div
-          className={`${sizes[size]} rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-semibold ring-2 ring-white`}
+          className={`${sizes[size]} rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-semibold ring-2 ring-white dark:ring-gray-800`}
         >
           {name ? getInitials(name) : <User className="w-1/2 h-1/2" />}
         </div>
@@ -72,7 +72,7 @@ export function Avatar({
 
       {showStatus && (
         <span
-          className={`absolute bottom-0 right-0 ${statusSizes[size]} ${statusColors[status]} rounded-full ring-2 ring-white`}
+          className={`absolute bottom-0 right-0 ${statusSizes[size]} ${statusColors[status]} rounded-full ring-2 ring-white dark:ring-gray-800`}
         />
       )}
 
@@ -121,7 +121,7 @@ export function AvatarGroup({ avatars, max = 4, size = 'md', className = '' }: A
       ))}
       {remaining > 0 && (
         <div
-          className={`${sizes[size]} rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium ring-2 ring-white`}
+          className={`${sizes[size]} rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-300 font-medium ring-2 ring-white dark:ring-gray-800`}
           style={{ zIndex: 0 }}
         >
           +{remaining}

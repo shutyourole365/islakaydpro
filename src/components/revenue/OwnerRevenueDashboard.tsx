@@ -87,26 +87,26 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 py-8 pt-24">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <button onClick={onBack} className="p-2 hover:bg-gray-200 rounded-full transition-colors" aria-label="Go back">
+            <button onClick={onBack} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full transition-colors" aria-label="Go back">
               <ArrowLeft className="w-6 h-6" />
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Revenue Dashboard</h1>
-              <p className="text-gray-500 mt-1">Track your equipment rental earnings and performance</p>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Revenue Dashboard</h1>
+              <p className="text-gray-500 dark:text-gray-400 mt-1">Track your equipment rental earnings and performance</p>
             </div>
           </div>
-          <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+          <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
             {(['week', 'month', 'quarter', 'year'] as const).map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                  period === p ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  period === p ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                 }`}
               >
                 {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -117,72 +117,72 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">This Month Revenue</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">This Month Revenue</span>
               <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
                 <DollarSign className="w-5 h-5 text-green-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">${currentMonth.revenue.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">${currentMonth.revenue.toLocaleString()}</p>
             <p className={`text-sm mt-1 flex items-center gap-1 ${revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {revenueChange >= 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
               {Math.abs(revenueChange).toFixed(1)}% vs last month
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Total Bookings</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Total Bookings</span>
               <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-blue-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{currentMonth.bookings}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{currentMonth.bookings}</p>
             <p className={`text-sm mt-1 flex items-center gap-1 ${bookingsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {bookingsChange >= 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
               {Math.abs(bookingsChange).toFixed(1)}% vs last month
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Avg Utilization</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Avg Utilization</span>
               <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
                 <PieChart className="w-5 h-5 text-purple-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{avgUtilization.toFixed(0)}%</p>
-            <p className="text-sm text-gray-500 mt-1">Across {equipmentEarnings.length} items</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{avgUtilization.toFixed(0)}%</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Across {equipmentEarnings.length} items</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-5">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Total Earnings (6mo)</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Total Earnings (6mo)</span>
               <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center">
                 <TrendingUp className="w-5 h-5 text-teal-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">${totalRevenue.toLocaleString()}</p>
-            <p className="text-sm text-gray-500 mt-1">{totalBookings} total bookings</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">${totalRevenue.toLocaleString()}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{totalBookings} total bookings</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Revenue Chart */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold flex items-center gap-2">
+                <h3 className="text-lg font-bold dark:text-white flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-teal-600" /> Monthly Revenue
                 </h3>
               </div>
               <div className="space-y-3">
                 {monthlyData.map((m) => (
                   <div key={m.month} className="flex items-center gap-4">
-                    <span className="text-sm text-gray-500 w-20 flex-shrink-0">{m.month.split(' ')[0]}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 w-20 flex-shrink-0">{m.month.split(' ')[0]}</span>
                     <div className="flex-1 relative">
-                      <div className="w-full bg-gray-100 rounded-full h-8">
+                      <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-8">
                         <div
                           className="h-8 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500 flex items-center justify-end pr-3 transition-all duration-500"
                           style={{ width: `${(m.revenue / maxRevenue) * 100}%` }}
@@ -200,18 +200,18 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
 
           {/* Equipment Performance */}
           <div>
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <h3 className="text-lg font-bold dark:text-white mb-4 flex items-center gap-2">
                 <Package className="w-5 h-5 text-teal-600" /> Top Equipment
               </h3>
               <div className="space-y-4">
                 {equipmentEarnings.map((eq, i) => (
                   <div key={eq.name} className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                    <span className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400">
                       {i + 1}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{eq.name}</p>
+                      <p className="text-sm font-medium dark:text-white truncate">{eq.name}</p>
                       <div className="flex items-center gap-2 text-xs text-gray-400">
                         <span>${eq.revenue.toLocaleString()}</span>
                         <span className="flex items-center gap-0.5">
@@ -236,14 +236,14 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mt-6">
-          <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mt-6">
+          <h3 className="text-lg font-bold dark:text-white mb-4 flex items-center gap-2">
             <Users className="w-5 h-5 text-teal-600" /> Recent Transactions
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-left text-xs text-gray-500 border-b border-gray-100">
+                <tr className="text-left text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                   <th className="pb-3 font-medium">Date</th>
                   <th className="pb-3 font-medium">Renter</th>
                   <th className="pb-3 font-medium">Equipment</th>
@@ -254,12 +254,12 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
               </thead>
               <tbody>
                 {recentTransactions.map((tx) => (
-                  <tr key={tx.id} className="border-b border-gray-50 last:border-0">
-                    <td className="py-3 text-sm text-gray-600">{new Date(tx.date).toLocaleDateString()}</td>
-                    <td className="py-3 text-sm font-medium text-gray-900">{tx.renter}</td>
-                    <td className="py-3 text-sm text-gray-600">{tx.equipment}</td>
+                  <tr key={tx.id} className="border-b border-gray-50 dark:border-gray-700 last:border-0">
+                    <td className="py-3 text-sm text-gray-600 dark:text-gray-300">{new Date(tx.date).toLocaleDateString()}</td>
+                    <td className="py-3 text-sm font-medium text-gray-900 dark:text-white">{tx.renter}</td>
+                    <td className="py-3 text-sm text-gray-600 dark:text-gray-300">{tx.equipment}</td>
                     <td className="py-3">
-                      <span className="text-xs text-gray-500">{typeLabels[tx.type]}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{typeLabels[tx.type]}</span>
                     </td>
                     <td className="py-3">
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusStyles[tx.status].bg} ${statusStyles[tx.status].text}`}>

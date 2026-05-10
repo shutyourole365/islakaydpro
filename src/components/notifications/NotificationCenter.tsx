@@ -39,6 +39,35 @@ function getTimeAgo(dateStr: string): string {
   return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 }
 
+function formatRelativeTime(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return `${days} days ago`;
+  return new Date(dateStr).toLocaleDateString([], { day: 'numeric', month: 'short' });
+}
+
+interface PrefRow {
+  push_booking_requests: boolean;
+  push_booking_updates: boolean;
+  push_messages: boolean;
+  push_reviews: boolean;
+  push_promotions: boolean;
+}
+
+const DEFAULT_PREFS: PrefRow = {
+  push_booking_requests: true,
+  push_booking_updates: true,
+  push_messages: true,
+  push_reviews: true,
+  push_promotions: false,
+};
+
 export default function NotificationCenter({ onBack }: NotificationCenterProps) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'bookings' | 'messages'>('all');
@@ -125,6 +154,15 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
     }
   };
 
+  const togglePref = async (key: keyof PrefRow) => {
+    if (!user) return;
+    const updated = { ...prefs, [key]: !prefs[key] };
+    setPrefs(updated);
+    await supabase
+      .from('notification_preferences')
+      .upsert({ user_id: user.id, ...updated, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+  };
+
   const filteredNotifications = notifications.filter(n => {
     if (activeTab === 'unread') return !n.read;
     if (activeTab === 'bookings') return n.type.startsWith('booking');
@@ -132,7 +170,29 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
     return true;
   });
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  const getIcon = (type: NotificationType) => {
+    switch (toDisplayType(type)) {
+      case 'booking': return <Calendar className="w-5 h-5" />;
+      case 'message': return <MessageSquare className="w-5 h-5" />;
+      case 'payment': return <DollarSign className="w-5 h-5" />;
+      case 'review': return <Star className="w-5 h-5" />;
+      case 'security': return <Shield className="w-5 h-5" />;
+      case 'system': return <Package className="w-5 h-5" />;
+    }
+  };
+
+  const getIconColor = (type: NotificationType) => {
+    switch (toDisplayType(type)) {
+      case 'booking': return 'bg-blue-100 text-blue-600';
+      case 'message': return 'bg-purple-100 text-purple-600';
+      case 'payment': return 'bg-green-100 text-green-600';
+      case 'review': return 'bg-amber-100 text-amber-600';
+      case 'security': return 'bg-red-100 text-red-600';
+      case 'system': return 'bg-gray-100 text-gray-600';
+    }
+  };
 
   const tabs = [
     { id: 'all', label: 'All' },
@@ -269,26 +329,20 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
             <h2 className="text-lg font-semibold text-gray-900">Notification Preferences</h2>
           </div>
           <div className="space-y-4">
-            {[
-              { label: 'Booking updates', description: 'New bookings, confirmations, cancellations' },
-              { label: 'Messages', description: 'New messages from renters and owners' },
-              { label: 'Payments', description: 'Payment received, refunds, payouts' },
-              { label: 'Reviews', description: 'New reviews on your equipment' },
-              { label: 'Security alerts', description: 'Sign-in from new devices, password changes' },
-              { label: 'Marketing', description: 'Tips, promotions, and platform updates' },
-            ].map((pref, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+            {prefItems.map(({ key, label, description }) => (
+              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
                 <div>
-                  <p className="font-medium text-gray-900">{pref.label}</p>
-                  <p className="text-sm text-gray-500">{pref.description}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{label}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    defaultChecked={index < 5}
+                    checked={prefs[key]}
+                    onChange={() => togglePref(key)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-checked:bg-teal-500 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
+                  <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-checked:bg-teal-500 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
                 </label>
               </div>
             ))}

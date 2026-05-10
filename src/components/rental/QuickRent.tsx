@@ -177,7 +177,7 @@ export default function QuickRent({
             {/* Requirements */}
             <div className="text-left space-y-3 mb-6">
               <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                userTrustScore >= 80 ? 'bg-green-50' : 'bg-gray-50'
+                userTrustScore >= 80 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'
               }`}>
                 {userTrustScore >= 80 ? (
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -187,7 +187,7 @@ export default function QuickRent({
                 <span className="text-sm">Trust Score 80+ (yours: {userTrustScore})</span>
               </div>
               <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                savedPaymentMethods.length > 0 ? 'bg-green-50' : 'bg-gray-50'
+                savedPaymentMethods.length > 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'
               }`}>
                 {savedPaymentMethods.length > 0 ? (
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -197,7 +197,7 @@ export default function QuickRent({
                 <span className="text-sm">Saved payment method</span>
               </div>
               <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                equipment.instant_book ? 'bg-green-50' : 'bg-gray-50'
+                equipment.instant_book ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'
               }`}>
                 {equipment.instant_book ? (
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -313,7 +313,7 @@ export default function QuickRent({
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  <MapPin className="w-5 h-5 text-gray-600" />
+                  <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   <div className="text-left">
                     <span className="block font-medium text-gray-900 dark:text-white">Pickup</span>
                     <span className="text-xs text-gray-500">Free</span>
@@ -327,7 +327,7 @@ export default function QuickRent({
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  <Truck className="w-5 h-5 text-gray-600" />
+                  <Truck className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                   <div className="text-left">
                     <span className="block font-medium text-gray-900 dark:text-white">Delivery</span>
                     <span className="text-xs text-gray-500">+$49</span>

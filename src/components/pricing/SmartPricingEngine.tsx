@@ -129,23 +129,23 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
 
   const getDemandColor = (level: string): string => {
     return {
-      'low': 'text-gray-500 bg-gray-100',
-      'medium': 'text-yellow-600 bg-yellow-100',
-      'high': 'text-orange-600 bg-orange-100',
-      'very-high': 'text-red-600 bg-red-100',
-    }[level] || 'text-gray-500 bg-gray-100';
+      'low': 'text-gray-500 bg-gray-100 dark:text-gray-400 dark:bg-gray-700',
+      'medium': 'text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-900/30',
+      'high': 'text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30',
+      'very-high': 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30',
+    }[level] || 'text-gray-500 bg-gray-100 dark:text-gray-400 dark:bg-gray-700';
   };
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
+    <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl p-6 border border-purple-100 dark:border-gray-700">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">AI Smart Pricing</h3>
-            <p className="text-sm text-gray-500">Optimize your rental rates</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white">AI Smart Pricing</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Optimize your rental rates</p>
           </div>
         </div>
         
@@ -172,10 +172,10 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
         <div className="space-y-4">
           {/* Price Suggestions */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-xl p-4 border border-purple-100">
-              <div className="text-sm text-gray-500 mb-1">Daily Rate</div>
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-purple-100 dark:border-gray-600">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Daily Rate</div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-gray-900">${suggestion.dailyRate}</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">${suggestion.dailyRate}</span>
                 <span className="text-sm text-gray-400">/day</span>
               </div>
               {suggestion.dailyRate !== equipment.daily_rate && (
@@ -185,19 +185,19 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
               )}
             </div>
             
-            <div className="bg-white rounded-xl p-4 border border-purple-100">
-              <div className="text-sm text-gray-500 mb-1">Weekly Rate</div>
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-purple-100 dark:border-gray-600">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Weekly Rate</div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-gray-900">${suggestion.weeklyRate}</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">${suggestion.weeklyRate}</span>
                 <span className="text-sm text-gray-400">/week</span>
               </div>
               <div className="text-xs text-green-600 mt-1">15% discount applied</div>
             </div>
             
-            <div className="bg-white rounded-xl p-4 border border-purple-100">
-              <div className="text-sm text-gray-500 mb-1">Monthly Rate</div>
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-purple-100 dark:border-gray-600">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Monthly Rate</div>
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-gray-900">${suggestion.monthlyRate}</span>
+                <span className="text-2xl font-bold text-gray-900 dark:text-white">${suggestion.monthlyRate}</span>
                 <span className="text-sm text-gray-400">/mo</span>
               </div>
               <div className="text-xs text-green-600 mt-1">27% discount applied</div>
@@ -208,7 +208,7 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-400">
                 {Math.round(suggestion.confidence * 100)}% confidence
               </span>
             </div>
@@ -234,9 +234,9 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
           </button>
           
           {showDetails && (
-            <div className="bg-white rounded-xl p-4 border border-purple-100 space-y-2">
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-purple-100 dark:border-gray-600 space-y-2">
               {suggestion.reasoning.map((reason, i) => (
-                <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                <div key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                   <span className="text-purple-500">•</span>
                   {reason}
                 </div>
@@ -246,9 +246,9 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
 
           {/* Market Comparison */}
           {marketData && (
-            <div className="bg-white rounded-xl p-4 border border-purple-100">
-              <div className="text-sm font-medium text-gray-700 mb-3">Market Comparison</div>
-              <div className="relative h-2 bg-gray-200 rounded-full">
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border border-purple-100 dark:border-gray-600">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Market Comparison</div>
+              <div className="relative h-2 bg-gray-200 dark:bg-gray-600 rounded-full">
                 <div 
                   className="absolute h-full bg-gradient-to-r from-green-400 to-teal-500 rounded-full"
                   style={{ 
@@ -261,7 +261,7 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
                   style={{ left: `${(suggestion.dailyRate / marketData.maxPrice) * 100}%` }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
                 <span>${marketData.minPrice}</span>
                 <span>Avg: ${marketData.averagePrice}</span>
                 <span>${marketData.maxPrice}</span>
@@ -272,8 +272,8 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
       )}
 
       {!suggestion && !isAnalyzing && (
-        <div className="text-center py-8 text-gray-500">
-          <TrendingUp className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <TrendingUp className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
           <p>Click "Analyze Market" to get AI-powered pricing suggestions</p>
         </div>
       )}

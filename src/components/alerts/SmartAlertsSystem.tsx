@@ -385,7 +385,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-teal-600 to-teal-700 p-4">
         <div className="flex items-center justify-between">
@@ -424,7 +424,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
       {activeView === 'alerts' ? (
         <>
           {/* Search & Filters */}
-          <div className="p-4 border-b">
+          <div className="p-4 border-b dark:border-gray-700">
             <div className="flex items-center gap-2">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -433,14 +433,14 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                   placeholder="Search alerts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                 />
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 aria-label={showFilters ? 'Hide filters' : 'Show filters'}
-                className={`p-2 border rounded-lg hover:bg-gray-50 transition-colors ${
-                  showFilters ? 'bg-teal-50 border-teal-200' : ''
+                className={`p-2 border dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                  showFilters ? 'bg-teal-50 dark:bg-teal-900/20 border-teal-200' : ''
                 }`}
               >
                 <Filter className="w-5 h-5 text-gray-600" />
@@ -461,7 +461,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as AlertType | 'all')}
                   aria-label="Filter by alert type"
-                  className="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-teal-500"
+                  className="px-3 py-1.5 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-teal-500"
                 >
                   <option value="all">All Types</option>
                   <option value="price_drop">Price Drops</option>
@@ -476,7 +476,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                   value={filterPriority}
                   onChange={(e) => setFilterPriority(e.target.value as AlertPriority | 'all')}
                   aria-label="Filter by priority"
-                  className="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-teal-500"
+                  className="px-3 py-1.5 border dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-teal-500"
                 >
                   <option value="all">All Priorities</option>
                   <option value="high">High Priority</option>
@@ -496,12 +496,12 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                 <p className="text-sm text-gray-400">We'll notify you when something important happens</p>
               </div>
             ) : (
-              <div className="divide-y">
+              <div className="divide-y dark:divide-gray-700">
                 {filteredAlerts.map((alert) => (
                   <div
                     key={alert.id}
-                    className={`p-4 hover:bg-gray-50 transition-colors ${
-                      alert.status === 'unread' ? 'bg-teal-50/30' : ''
+                    className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                      alert.status === 'unread' ? 'bg-teal-50/30 dark:bg-teal-900/20' : ''
                     }`}
                     onClick={() => markAsRead(alert.id)}
                   >
@@ -512,7 +512,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <h4 className={`font-medium ${alert.status === 'unread' ? 'text-gray-900' : 'text-gray-700'}`}>
+                            <h4 className={`font-medium ${alert.status === 'unread' ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-gray-300'}`}>
                               {alert.title}
                             </h4>
                             {alert.equipment_name && (
@@ -528,7 +528,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                             )}
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{alert.message}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{alert.message}</p>
                         <div className="flex items-center justify-between mt-3">
                           {alert.action_url && (
                             <button
@@ -546,14 +546,14 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                                 e.stopPropagation();
                                 dismissAlert(alert.id);
                               }}
-                              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                               title="Dismiss"
                             >
                               <X className="w-4 h-4" />
                             </button>
                             <button
                               aria-label="More options"
-                              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                               title="More options"
                             >
                               <MoreVertical className="w-4 h-4" />
@@ -571,13 +571,13 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
       ) : (
         /* Settings View */
         <div className="overflow-y-auto max-h-[600px]">
-          <div className="p-4 border-b bg-gray-50">
-            <h3 className="font-medium text-gray-900">Notification Preferences</h3>
-            <p className="text-sm text-gray-500">Choose how you want to be notified</p>
+          <div className="p-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+            <h3 className="font-medium text-gray-900 dark:text-white">Notification Preferences</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Choose how you want to be notified</p>
           </div>
 
           {/* Channel Legend */}
-          <div className="p-4 border-b flex items-center gap-4 text-sm text-gray-500">
+          <div className="p-4 border-b dark:border-gray-700 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
               <Smartphone className="w-4 h-4" /> Push
             </span>
@@ -589,13 +589,13 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
             </span>
           </div>
 
-          <div className="divide-y">
+          <div className="divide-y dark:divide-gray-700">
             {preferences.map((pref) => (
               <div key={pref.type} className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-gray-900">{pref.label}</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-white">{pref.label}</h4>
                       <button
                         onClick={() => togglePreference(pref.type)}
                         aria-label={`Toggle ${pref.label} notifications`}
@@ -610,7 +610,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                         />
                       </button>
                     </div>
-                    <p className="text-sm text-gray-500 mt-0.5">{pref.description}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{pref.description}</p>
                   </div>
                 </div>
 
@@ -621,7 +621,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                         pref.channels.push
                           ? 'bg-teal-100 text-teal-700'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
                       }`}
                     >
                       <Smartphone className="w-4 h-4" />
@@ -632,7 +632,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                         pref.channels.email
                           ? 'bg-teal-100 text-teal-700'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
                       }`}
                     >
                       <Mail className="w-4 h-4" />
@@ -643,7 +643,7 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                         pref.channels.sms
                           ? 'bg-teal-100 text-teal-700'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
                       }`}
                     >
                       <MessageSquare className="w-4 h-4" />
@@ -656,9 +656,9 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
           </div>
 
           {/* Quick Actions */}
-          <div className="p-4 border-t bg-gray-50">
+          <div className="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
             <div className="flex gap-3">
-              <button className="flex-1 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <button className="flex-1 py-2 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                 Turn all off
               </button>
               <button className="flex-1 py-2 text-sm text-teal-600 hover:bg-teal-50 rounded-lg transition-colors">
@@ -670,8 +670,8 @@ export default function SmartAlertsSystem({ userId, onClose }: SmartAlertsSystem
       )}
 
       {/* Footer */}
-      <div className="border-t p-4 bg-gray-50">
-        <div className="flex items-center justify-between text-sm text-gray-500">
+      <div className="border-t dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
           <span>{filteredAlerts.length} alerts</span>
           <span>{unreadCount} unread</span>
         </div>

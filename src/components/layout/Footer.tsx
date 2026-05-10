@@ -1,4 +1,5 @@
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import Logo from '../ui/Logo';
 
 const socialLinks = [
   { Icon: Facebook, url: import.meta.env.VITE_FACEBOOK_URL, label: 'Facebook' },
@@ -52,7 +53,7 @@ export default function Footer({ onNavigate }: FooterProps) {
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
             <a href="/" className="inline-block mb-6">
-              <span className="font-bold text-xl text-teal-600">IslaKayd</span>
+              <Logo size="md" inverse />
             </a>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               The world's most advanced equipment rental marketplace. Rent anything, anywhere, powered by AI.

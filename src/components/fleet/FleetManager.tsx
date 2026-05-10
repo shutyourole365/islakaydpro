@@ -229,10 +229,10 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
 
   const getStatusColor = (status: FleetEquipment['status']) => {
     switch (status) {
-      case 'available': return 'bg-green-100 text-green-700';
-      case 'rented': return 'bg-blue-100 text-blue-700';
-      case 'maintenance': return 'bg-amber-100 text-amber-700';
-      case 'inactive': return 'bg-gray-100 text-gray-700';
+      case 'available': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
+      case 'rented': return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
+      case 'maintenance': return 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300';
+      case 'inactive': return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
     }
   };
 
@@ -267,9 +267,9 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
 
   if (loading) {
     return (
-      <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 text-center">
         <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-600">Loading fleet data...</p>
+        <p className="text-gray-600 dark:text-gray-400">Loading fleet data...</p>
       </div>
     );
   }
@@ -277,7 +277,7 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
   if (!stats) return null;
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden">
       {/* Header */}
       <div className="p-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white">
         <div className="flex items-center justify-between mb-6">
@@ -328,19 +328,19 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
 
       {/* Alerts */}
       {stats.alerts.length > 0 && (
-        <div className="p-4 bg-amber-50 border-b border-amber-100">
+        <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-100 dark:border-amber-800">
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-5 h-5 text-amber-600" />
-            <span className="font-medium text-amber-800">{stats.alerts.length} Alerts</span>
+            <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+            <span className="font-medium text-amber-800 dark:text-amber-300">{stats.alerts.length} Alerts</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2">
             {stats.alerts.map(alert => (
               <div
                 key={alert.id}
-                className="flex-shrink-0 px-3 py-2 bg-white rounded-lg border border-amber-200 text-sm"
+                className="flex-shrink-0 px-3 py-2 bg-white dark:bg-gray-700 rounded-lg border border-amber-200 dark:border-amber-700 text-sm"
               >
-                <span className="font-medium text-gray-900">{alert.equipmentTitle}</span>
-                <span className="text-gray-500 ml-2">{alert.message}</span>
+                <span className="font-medium text-gray-900 dark:text-white">{alert.equipmentTitle}</span>
+                <span className="text-gray-500 dark:text-gray-400 ml-2">{alert.message}</span>
               </div>
             ))}
           </div>
@@ -348,7 +348,7 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
       )}
 
       {/* Filters */}
-      <div className="p-4 border-b border-gray-100">
+      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -357,18 +357,18 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search equipment..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
             />
           </div>
-          <div className="flex items-center gap-2 bg-gray-100 rounded-xl p-1">
+          <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
             {(['all', 'available', 'rented', 'maintenance'] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filter === f
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -388,29 +388,29 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
           {filteredEquipment.map((item) => (
             <div
               key={item.id}
-              className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <img
                 src={item.imageUrl}
                 alt={item.title}
                 className="w-20 h-20 rounded-xl object-cover"
               />
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-gray-900 truncate">{item.title}</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-white truncate">{item.title}</h4>
                   <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
                     {item.status}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500 flex items-center gap-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                   <MapPin className="w-3 h-3" />
                   {item.location}
-                  <span className="text-gray-300">•</span>
+                  <span className="text-gray-300 dark:text-gray-600">•</span>
                   {item.category}
                 </p>
                 <div className="flex items-center gap-4 mt-2 text-sm">
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-gray-300">
                     <DollarSign className="w-4 h-4 inline" />
                     ${item.dailyRate}/day
                   </span>
@@ -421,18 +421,18 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
               </div>
 
               <div className="text-right">
-                <div className="text-lg font-bold text-gray-900">
+                <div className="text-lg font-bold text-gray-900 dark:text-white">
                   ${item.totalEarnings.toLocaleString()}
                 </div>
-                <div className="text-sm text-gray-500">total earnings</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">total earnings</div>
                 <div className="flex items-center justify-end gap-1 mt-1">
-                  <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="w-16 h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-indigo-500 rounded-full"
                       style={{ width: `${item.utilizationRate}%` }}
                     />
                   </div>
-                  <span className="text-xs text-gray-500">{item.utilizationRate}%</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{item.utilizationRate}%</span>
                 </div>
               </div>
 
@@ -440,33 +440,33 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
                 <button
                   onClick={() => setShowActions(showActions === item.id ? null : item.id)}
                   aria-label="More options"
-                  className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
                 >
-                  <MoreVertical className="w-5 h-5 text-gray-500" />
+                  <MoreVertical className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
 
                 {showActions === item.id && (
-                  <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-10">
-                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                  <div className="absolute right-0 top-full mt-1 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-10">
+                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <Eye className="w-4 h-4" />
                       View Details
                     </button>
-                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <Edit3 className="w-4 h-4" />
                       Edit Listing
                     </button>
-                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <BarChart3 className="w-4 h-4" />
                       View Analytics
                     </button>
-                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <Wrench className="w-4 h-4" />
                       Schedule Maintenance
                     </button>
-                    <hr className="my-2" />
+                    <hr className="my-2 border-gray-100 dark:border-gray-700" />
                     <button
                       onClick={() => toggleEquipmentStatus(item.id)}
-                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-amber-600 hover:bg-amber-50"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                     >
                       {item.status === 'inactive' ? (
                         <>
@@ -480,7 +480,7 @@ export default function FleetManager({ ownerId, onClose: _onClose }: FleetManage
                         </>
                       )}
                     </button>
-                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                    <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
                       <Trash2 className="w-4 h-4" />
                       Delete Listing
                     </button>
