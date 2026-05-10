@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
-import type { Category, Equipment, SearchFilters, EquipmentId, UserId } from './types';
+import type { Category, Equipment, SearchFilters } from './types';
 import { useToast } from './components/ui/Toast';
 import { createEquipment } from './services/database';
 import Header from './components/layout/Header';
