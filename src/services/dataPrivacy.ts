@@ -1,15 +1,17 @@
 import { supabase } from '../lib/supabase';
 import { logSecurityEvent } from './auditLog';
 
+type DatabaseRecord = Record<string, string | number | boolean | null | unknown>;
+
 interface ExportData {
-  profile: any;
-  equipment: any[];
-  bookings: any[];
-  payments: any[];
-  reviews: any[];
-  messages: any[];
-  favorites: any[];
-  notifications: any[];
+  profile: DatabaseRecord | null;
+  equipment: DatabaseRecord[];
+  bookings: DatabaseRecord[];
+  payments: DatabaseRecord[];
+  reviews: DatabaseRecord[];
+  messages: DatabaseRecord[];
+  favorites: DatabaseRecord[];
+  notifications: DatabaseRecord[];
 }
 
 export async function exportUserData(userId: string): Promise<ExportData | null> {

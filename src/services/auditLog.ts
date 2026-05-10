@@ -19,13 +19,15 @@ export type AuditEventType =
   | 'review_removed'
   | 'bulk_action';
 
+type ActionDetails = Record<string, string | number | boolean | null>;
+
 interface AuditLogEntry {
   event_type: AuditEventType;
   user_id: string;
   target_user_id?: string;
   target_entity_type?: string;
   target_entity_id?: string;
-  action_details?: Record<string, any>;
+  action_details?: ActionDetails;
   ip_address?: string;
   user_agent?: string;
   status: 'success' | 'failed';
@@ -79,11 +81,16 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
   }
 }
 
+interface AuditLog extends AuditLogEntry {
+  id: string;
+  created_at: string;
+}
+
 export async function getAuditLogs(
   userId?: string,
   eventType?: AuditEventType,
   limit: number = 50
-): Promise<any[]> {
+): Promise<AuditLog[]> {
   try {
     let query = supabase
       .from('audit_logs')
@@ -192,7 +199,7 @@ export async function logSecurityEvent(
   userId: string,
   eventType: 'password_changed' | 'verification_completed' | 'account_suspended',
   status: 'success' | 'failed',
-  details?: Record<string, any>
+  details?: ActionDetails
 ): Promise<void> {
   await logAuditEvent({
     event_type: eventType,
