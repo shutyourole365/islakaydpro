@@ -30,9 +30,7 @@ jobs:
           VITE_ENABLE_AI_ASSISTANT: 'true'
 
       - name: Deploy to Netlify
-        uses: netlify/actions/cli@master
-        with:
-          args: deploy --dir=dist --prod
+        run: npx netlify-cli@latest deploy --dir=dist --prod
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: 0b410351-0cf3-4111-9836-7953f8eea633

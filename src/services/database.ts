@@ -253,34 +253,40 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
   if (error) throw error;
 
   // Send notification for booking status changes.
-  // booking_confirmed is handled by the DB trigger (on_booking_confirmed), so we only
-  // manage cancelled and completed here to avoid duplicates.
-  if (status === 'cancelled' || status === 'completed') {
-    const notificationType = status === 'cancelled' ? 'booking_cancelled' : 'booking_completed';
-    const title = status === 'cancelled' ? '❌ Booking Cancelled' : '🎉 Rental Completed!';
-    const message = status === 'cancelled'
-      ? `Your booking for ${data.equipment?.title} has been cancelled`
-      : `Your rental of ${data.equipment?.title} is complete. Leave a review!`;
-    const pushType = status as 'cancelled' | 'completed';
-
-    const notification = {
-      user_id: data.renter_id,
-      type: notificationType,
-      title,
-      message,
-      data: { booking_id: data.id },
-      is_read: false,
-      created_at: new Date().toISOString(),
-    };
+  // For confirmed: the DB trigger (on_booking_confirmed) handles the in-app notification row,
+  // so we only fire the push notification here to avoid a duplicate in-app insert.
+  // For cancelled/completed: we insert the in-app notification AND send a push.
+  if (status === 'confirmed' || status === 'cancelled' || status === 'completed') {
+    const pushType = status as 'confirmed' | 'cancelled' | 'completed';
+    const equipmentName = data.equipment?.title || 'Equipment';
+    const dates = `${data.start_date} to ${data.end_date}`;
+    const ownerName = data.equipment?.owner?.full_name;
 
     void (async () => {
       try {
-        await supabase.from('notifications').insert(notification);
+        if (status === 'cancelled' || status === 'completed') {
+          const notificationType = status === 'cancelled' ? 'booking_cancelled' : 'booking_completed';
+          const title = status === 'cancelled' ? '❌ Booking Cancelled' : '🎉 Rental Completed!';
+          const message = status === 'cancelled'
+            ? `Your booking for ${equipmentName} has been cancelled`
+            : `Your rental of ${equipmentName} is complete. Leave a review!`;
+
+          await supabase.from('notifications').insert({
+            user_id: data.renter_id,
+            type: notificationType,
+            title,
+            message,
+            data: { booking_id: data.id },
+            is_read: false,
+            created_at: new Date().toISOString(),
+          });
+        }
+
         const { sendBookingNotification } = await import('./pushNotifications');
         sendBookingNotification(data.renter_id, pushType, {
-          equipmentName: data.equipment?.title || 'Equipment',
-          dates: `${data.start_date} to ${data.end_date}`,
-          ownerName: data.equipment?.owner?.full_name,
+          equipmentName,
+          dates,
+          ownerName,
         }).catch(() => {});
       } catch { /* fire-and-forget */ }
     })();
