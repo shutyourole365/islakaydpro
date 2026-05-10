@@ -27,31 +27,6 @@ interface NotificationItem extends Notification {
   timeAgo: string;
 }
 
-function getTimeAgo(dateStr: string): string {
-  const now = new Date();
-  const date = new Date(dateStr);
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (diffInSeconds < 60) return 'just now';
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hour${Math.floor(diffInSeconds / 3600) > 1 ? 's' : ''} ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} day${Math.floor(diffInSeconds / 86400) > 1 ? 's' : ''} ago`;
-  return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-}
-
-function formatRelativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins} min ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-  const days = Math.floor(hours / 24);
-  if (days === 1) return 'Yesterday';
-  if (days < 7) return `${days} days ago`;
-  return new Date(dateStr).toLocaleDateString([], { day: 'numeric', month: 'short' });
-}
-
 interface PrefRow {
   push_booking_requests: boolean;
   push_booking_updates: boolean;
@@ -68,11 +43,32 @@ const DEFAULT_PREFS: PrefRow = {
   push_promotions: false,
 };
 
+const prefItems: { key: keyof PrefRow; label: string; description: string }[] = [
+  { key: 'push_booking_requests', label: 'Booking Requests', description: 'New rental requests for your equipment' },
+  { key: 'push_booking_updates', label: 'Booking Updates', description: 'Status changes to your bookings' },
+  { key: 'push_messages', label: 'Messages', description: 'New messages from renters or owners' },
+  { key: 'push_reviews', label: 'Reviews', description: 'New reviews on your equipment or profile' },
+  { key: 'push_promotions', label: 'Promotions', description: 'Tips, offers and platform updates' },
+];
+
+function getTimeAgo(dateStr: string): string {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return 'just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hour${Math.floor(diffInSeconds / 3600) > 1 ? 's' : ''} ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} day${Math.floor(diffInSeconds / 86400) > 1 ? 's' : ''} ago`;
+  return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+}
+
 export default function NotificationCenter({ onBack }: NotificationCenterProps) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'bookings' | 'messages'>('all');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [prefs, setPrefs] = useState<PrefRow>(DEFAULT_PREFS);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   const loadNotifications = async () => {
@@ -90,7 +86,6 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
   useEffect(() => {
     loadNotifications();
 
-    // Real-time subscription for new notifications
     if (user) {
       channelRef.current = supabase
         .channel(`notification-center:${user.id}`)
@@ -101,6 +96,13 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
           filter: `user_id=eq.${user.id}`,
         }, () => loadNotifications())
         .subscribe();
+
+      supabase
+        .from('notification_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => { if (data) setPrefs(data as PrefRow); });
     }
 
     return () => {
@@ -170,29 +172,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
     return true;
   });
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
-
-  const getIcon = (type: NotificationType) => {
-    switch (toDisplayType(type)) {
-      case 'booking': return <Calendar className="w-5 h-5" />;
-      case 'message': return <MessageSquare className="w-5 h-5" />;
-      case 'payment': return <DollarSign className="w-5 h-5" />;
-      case 'review': return <Star className="w-5 h-5" />;
-      case 'security': return <Shield className="w-5 h-5" />;
-      case 'system': return <Package className="w-5 h-5" />;
-    }
-  };
-
-  const getIconColor = (type: NotificationType) => {
-    switch (toDisplayType(type)) {
-      case 'booking': return 'bg-blue-100 text-blue-600';
-      case 'message': return 'bg-purple-100 text-purple-600';
-      case 'payment': return 'bg-green-100 text-green-600';
-      case 'review': return 'bg-amber-100 text-amber-600';
-      case 'security': return 'bg-red-100 text-red-600';
-      case 'system': return 'bg-gray-100 text-gray-600';
-    }
-  };
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const tabs = [
     { id: 'all', label: 'All' },
@@ -330,10 +310,10 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
           </div>
           <div className="space-y-4">
             {prefItems.map(({ key, label, description }) => (
-              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+              <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{label}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
+                  <p className="font-medium text-gray-900">{label}</p>
+                  <p className="text-sm text-gray-500">{description}</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -342,7 +322,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                     onChange={() => togglePref(key)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-checked:bg-teal-500 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
+                  <div className="w-11 h-6 bg-gray-200 peer-checked:bg-teal-500 rounded-full peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all" />
                 </label>
               </div>
             ))}
