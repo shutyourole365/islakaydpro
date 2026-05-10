@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 
-export type AuditEventType =
+export type AuditAction =
   | 'payment_created'
   | 'payment_failed'
   | 'refund_issued'
@@ -19,57 +19,42 @@ export type AuditEventType =
   | 'review_removed'
   | 'bulk_action';
 
-type ActionDetails = Record<string, string | number | boolean | null>;
+type Metadata = Record<string, string | number | boolean | null>;
 
 interface AuditLogEntry {
-  event_type: AuditEventType;
+  action: AuditAction;
   user_id: string;
-  target_user_id?: string;
-  target_entity_type?: string;
-  target_entity_id?: string;
-  action_details?: ActionDetails;
+  entity_type?: string;
+  entity_id?: string;
+  metadata?: Metadata;
   ip_address?: string;
   user_agent?: string;
-  status: 'success' | 'failed';
-  error_message?: string;
 }
 
 export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
   try {
-    // Get IP address if available (browser environment)
-    let ipAddress = 'unknown';
+    // Get user agent if available (browser environment)
     let userAgent = 'unknown';
 
     if (typeof navigator !== 'undefined') {
       userAgent = navigator.userAgent;
     }
 
-    // Fetch IP from API if available
-    try {
-      const ipResponse = await fetch('https://api.ipify.org?format=json');
-      if (ipResponse.ok) {
-        const ipData = await ipResponse.json() as { ip?: string };
-        if (ipData.ip) ipAddress = ipData.ip;
-      }
-    } catch {
-      // IP fetch failed, continue with 'unknown'
-    }
+    // IP address should be captured server-side via Supabase Edge Functions
+    // Client-side IP fetching introduces latency and privacy concerns
+    const ipAddress = 'unknown';
 
     const { error } = await supabase
       .from('audit_logs')
       .insert([
         {
-          event_type: entry.event_type,
+          action: entry.action,
           user_id: entry.user_id,
-          target_user_id: entry.target_user_id,
-          target_entity_type: entry.target_entity_type,
-          target_entity_id: entry.target_entity_id,
-          action_details: entry.action_details,
+          entity_type: entry.entity_type,
+          entity_id: entry.entity_id,
+          metadata: entry.metadata || {},
           ip_address: ipAddress,
           user_agent: userAgent,
-          status: entry.status,
-          error_message: entry.error_message,
-          created_at: new Date().toISOString(),
         },
       ]);
 
@@ -81,14 +66,21 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
   }
 }
 
-interface AuditLog extends AuditLogEntry {
+interface AuditLog {
   id: string;
+  user_id: string;
+  action: AuditAction;
+  entity_type?: string;
+  entity_id?: string;
+  metadata: Metadata;
+  ip_address: string;
+  user_agent: string;
   created_at: string;
 }
 
 export async function getAuditLogs(
   userId?: string,
-  eventType?: AuditEventType,
+  action?: AuditAction,
   limit: number = 50
 ): Promise<AuditLog[]> {
   try {
@@ -102,8 +94,8 @@ export async function getAuditLogs(
       query = query.eq('user_id', userId);
     }
 
-    if (eventType) {
-      query = query.eq('event_type', eventType);
+    if (action) {
+      query = query.eq('action', action);
     }
 
     const { data, error } = await query;
@@ -126,56 +118,45 @@ export async function logPayment(
   userId: string,
   amount: number,
   currency: string,
-  status: 'success' | 'failed',
-  stripePaymentIntentId?: string,
-  errorMessage?: string
+  stripePaymentIntentId?: string
 ): Promise<void> {
   await logAuditEvent({
-    event_type: 'payment_created',
+    action: 'payment_created',
     user_id: userId,
-    action_details: {
+    metadata: {
       amount,
       currency,
       stripe_payment_intent_id: stripePaymentIntentId,
     },
-    status,
-    error_message: errorMessage,
   });
 }
 
 export async function logRefund(
   userId: string,
-  targetUserId: string,
   amount: number,
   bookingId?: string,
   reason?: string
 ): Promise<void> {
   await logAuditEvent({
-    event_type: 'refund_issued',
+    action: 'refund_issued',
     user_id: userId,
-    target_user_id: targetUserId,
-    target_entity_type: 'booking',
-    target_entity_id: bookingId,
-    action_details: { amount, reason },
-    status: 'success',
+    entity_type: 'booking',
+    entity_id: bookingId,
+    metadata: { amount, reason },
   });
 }
 
 export async function logDispute(
   userId: string,
   disputeId: string,
-  targetUserId: string,
-  type: string,
-  status: 'success' | 'failed'
+  type: string
 ): Promise<void> {
   await logAuditEvent({
-    event_type: 'dispute_opened',
+    action: 'dispute_opened',
     user_id: userId,
-    target_user_id: targetUserId,
-    target_entity_type: 'dispute',
-    target_entity_id: disputeId,
-    action_details: { dispute_type: type },
-    status,
+    entity_type: 'dispute',
+    entity_id: disputeId,
+    metadata: { dispute_type: type },
   });
 }
 
@@ -186,25 +167,22 @@ export async function logBookingConfirmation(
   amount: number
 ): Promise<void> {
   await logAuditEvent({
-    event_type: 'booking_confirmed',
+    action: 'booking_confirmed',
     user_id: userId,
-    target_entity_type: 'booking',
-    target_entity_id: bookingId,
-    action_details: { equipment_id: equipmentId, amount },
-    status: 'success',
+    entity_type: 'booking',
+    entity_id: bookingId,
+    metadata: { equipment_id: equipmentId, amount },
   });
 }
 
 export async function logSecurityEvent(
   userId: string,
-  eventType: 'password_changed' | 'verification_completed' | 'account_suspended',
-  status: 'success' | 'failed',
-  details?: ActionDetails
+  action: 'password_changed' | 'verification_completed' | 'account_suspended' | 'profile_updated',
+  details?: Metadata
 ): Promise<void> {
   await logAuditEvent({
-    event_type: eventType,
+    action,
     user_id: userId,
-    action_details: details,
-    status,
+    metadata: details,
   });
 }

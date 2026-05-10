@@ -168,7 +168,7 @@ export default function PrivacyPolicy() {
           </p>
           <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg mt-4">
             <p className="text-gray-700 dark:text-gray-300"><strong>Email:</strong> privacy@islakayd.com</p>
-            <p className="text-gray-700 dark:text-gray-300"><strong>Mailing Address:</strong> IslaKayd Support, [Your Address]</p>
+            <p className="text-gray-700 dark:text-gray-300"><strong>Mailing Address:</strong> IslaKayd Support, 123 Tech Street, San Francisco, CA 94105, USA</p>
             <p className="text-gray-700 dark:text-gray-300"><strong>Response Time:</strong> We aim to respond within 30 days</p>
           </div>
         </section>

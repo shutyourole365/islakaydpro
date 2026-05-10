@@ -308,7 +308,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500 mt-1 flex-shrink-0"
                     />
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      I agree to the <button type="button" onClick={() => { onClose(); }} className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">Terms of Service</button> and <button type="button" onClick={() => { onClose(); }} className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">Privacy Policy</button>
+                      I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">Terms of Service</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">Privacy Policy</a>
                     </span>
                   </label>
                 </div>
@@ -367,6 +367,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
               onError={(err) => setError(err)}
               onLoading={(l) => setLoading(l)}
               mode={mode === 'signin' ? 'signin' : 'signup'}
+              isAge18Plus={isAge18Plus}
+              agreeToTerms={agreeToTerms}
             />
 
             {mode === 'signin' && (
@@ -405,9 +407,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
             <p className="mt-6 text-xs text-center text-gray-400 dark:text-gray-500">
               By continuing, you agree to IslaKayd's{' '}
-              <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Terms of Service</a>
+              <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">Terms of Service</a>
               {' '}and{' '}
-              <a href="#" className="text-primary-600 dark:text-primary-400 hover:underline">Privacy Policy</a>
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">Privacy Policy</a>
             </p>
           </div>
         </div>

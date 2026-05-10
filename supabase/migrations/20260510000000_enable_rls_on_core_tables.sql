@@ -14,9 +14,8 @@ CREATE POLICY "Users can update their own profile"
   ON profiles FOR UPDATE
   USING (auth.uid() = id);
 
-CREATE POLICY "Public can view basic profile info for rentals"
-  ON profiles FOR SELECT
-  USING (true); -- Allow public view of basic info, restrict sensitive data in SELECT
+-- Removed: USING (true) completely negates RLS by OR'ing with other policies
+-- Instead, use a view to expose only safe fields, or add is_public flag
 
 -- 2. BOOKINGS - Users can only see bookings they're involved in
 ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
