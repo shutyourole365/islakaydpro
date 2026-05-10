@@ -17,7 +17,7 @@ const sizeMap = {
 function LogoMark({ className = '' }: { className?: string }) {
   const uid = useId().replace(/:/g, '');
   const gradId = `ik-grad-${uid}`;
-  const shineId = `ik-shine-${uid}`;
+  const accentId = `ik-accent-${uid}`;
   return (
     <svg
       viewBox="0 0 48 48"
@@ -26,36 +26,30 @@ function LogoMark({ className = '' }: { className?: string }) {
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#14b8a6" />
-          <stop offset="60%" stopColor="#0d9488" />
-          <stop offset="100%" stopColor="#059669" />
+        <linearGradient id={gradId} x1="0%" y1="0%" x2="120%" y2="120%">
+          <stop offset="0%" stopColor="#06b6d4" />
+          <stop offset="50%" stopColor="#0891b2" />
+          <stop offset="100%" stopColor="#0e7490" />
         </linearGradient>
-        <linearGradient id={shineId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        <linearGradient id={accentId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
         </linearGradient>
       </defs>
 
-      {/* Rounded squircle base */}
-      <rect width="48" height="48" rx="13" fill={`url(#${gradId})`} />
-      {/* Gloss highlight */}
-      <rect width="48" height="24" rx="13" fill={`url(#${shineId})`} />
+      {/* Modern rounded background */}
+      <rect width="48" height="48" rx="11" fill={`url(#${gradId})`} />
 
-      {/* Stylised "IK" monogram with key/spark accent */}
+      {/* Island silhouette - modern, geometric */}
       <g fill="white">
-        {/* I bar */}
-        <rect x="11" y="12" width="4" height="24" rx="1.5" />
-        {/* K stem */}
-        <rect x="22" y="12" width="4" height="24" rx="1.5" />
-        {/* K upper diagonal */}
-        <path d="M26 22 L34 12 L37.5 12 L29 22.5 Z" />
-        {/* K lower diagonal */}
-        <path d="M26 25 L37.5 36 L34 36 L26 28.5 Z" />
+        {/* Main island shape - smooth organic curves */}
+        <path d="M 12 28 Q 10 24 12 20 Q 14 16 18 16 Q 22 15 24 14 Q 26 15 28 16 Q 32 16 34 20 Q 36 24 34 28 Q 32 32 28 33 Q 24 34 20 34 Q 16 32 14 30 Z" />
+        {/* Water reflection accent */}
+        <ellipse cx="24" cy="35.5" rx="14" ry="2.5" fill="white" opacity="0.25" />
       </g>
 
-      {/* Spark accent dot */}
-      <circle cx="38.5" cy="11.5" r="2.2" fill="#fde68a" />
+      {/* Accent highlight */}
+      <ellipse cx="22" cy="22" rx="6" ry="5" fill={`url(#${accentId})`} />
     </svg>
   );
 }
@@ -75,12 +69,12 @@ function Wordmark({
         className={
           inverse
             ? 'text-white'
-            : 'bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 bg-clip-text text-transparent dark:from-teal-300 dark:via-teal-200 dark:to-emerald-300'
+            : 'bg-gradient-to-r from-cyan-600 via-cyan-500 to-teal-600 bg-clip-text text-transparent dark:from-cyan-300 dark:via-cyan-200 dark:to-teal-300'
         }
       >
         Isla
       </span>
-      <span className={inverse ? 'text-white/90' : 'text-gray-900 dark:text-white'}>
+      <span className={inverse ? 'text-white' : 'text-slate-900 dark:text-slate-50'}>
         Kayd
       </span>
     </span>

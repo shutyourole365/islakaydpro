@@ -102,6 +102,8 @@ const BiometricAuth = lazy(() => import('./components/security/BiometricAuth'));
 const SmartRecommendations = lazy(() => import('./components/recommendations/SmartRecommendations'));
 
 // Legal Pages
+const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
 
 // Company Pages
 
@@ -546,7 +548,7 @@ const sampleEquipment: Equipment[] = [
 ];
 
 function AppContent() {
-type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | '404';
+type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | 'privacy' | 'terms' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications, unreadMessages } = useAuth();
   const [showOwnerActivation, setShowOwnerActivation] = useState(false);
   const { addToast } = useToast();
@@ -794,7 +796,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
   };
 
   const handleNavigate = (page: string) => {
-    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', 'messaging', '404'];
+    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', 'messaging', 'privacy', 'terms', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
   };
 
@@ -1252,6 +1254,20 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
         <>
           <HelpCenter onBack={() => setCurrentPage('home')} />
         </>
+      )}
+
+      {currentPage === 'privacy' && (
+        <Suspense fallback={<PageLoader />}>
+          <PrivacyPolicy />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'terms' && (
+        <Suspense fallback={<PageLoader />}>
+          <TermsOfService />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
       )}
 
       {currentPage === 'browse' && (

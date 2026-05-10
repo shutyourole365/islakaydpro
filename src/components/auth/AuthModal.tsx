@@ -23,6 +23,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isAge18Plus, setIsAge18Plus] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const emailId = useId();
   const passwordId = useId();
@@ -51,6 +53,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAge18Plus) {
+      setError('You must be 18 years or older to use IslaKayd.');
+      return;
+    }
+    if (!agreeToTerms) {
+      setError('You must agree to the Terms of Service and Privacy Policy.');
+      return;
+    }
     setLoading(true);
     setError('');
     setSuccess('');
@@ -277,6 +287,33 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                 </div>
               )}
 
+              {mode === 'signup' && (
+                <div className="space-y-4">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isAge18Plus}
+                      onChange={(e) => setIsAge18Plus(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500 mt-1 flex-shrink-0"
+                    />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      I confirm that I am 18 years of age or older
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreeToTerms}
+                      onChange={(e) => setAgreeToTerms(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-500 focus:ring-primary-500 mt-1 flex-shrink-0"
+                    />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      I agree to the <button type="button" onClick={() => { onClose(); }} className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">Terms of Service</button> and <button type="button" onClick={() => { onClose(); }} className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">Privacy Policy</button>
+                    </span>
+                  </label>
+                </div>
+              )}
+
               {mode === 'signin' && (
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -346,7 +383,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                 <p className="text-gray-600 dark:text-gray-400">
                   Don't have an account?{' '}
                   <button
-                    onClick={() => { setMode('signup'); setError(''); }}
+                    onClick={() => { setMode('signup'); setError(''); setIsAge18Plus(false); setAgreeToTerms(false); }}
                     className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-semibold"
                   >
                     Sign up
@@ -357,7 +394,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                 <p className="text-gray-600 dark:text-gray-400">
                   Already have an account?{' '}
                   <button
-                    onClick={() => { setMode('signin'); setError(''); setSuccess(''); }}
+                    onClick={() => { setMode('signin'); setError(''); setSuccess(''); setIsAge18Plus(false); setAgreeToTerms(false); }}
                     className="text-primary-600 hover:text-primary-700 dark:text-primary-400 font-semibold"
                   >
                     Sign in
