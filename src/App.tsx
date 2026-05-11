@@ -532,6 +532,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
     }
 
     // Only guard features that require equipment data
+    const demoEquipment = equipment[0] || featuredEquipment[0];
     const needsEquipment = ['smart-pricing', 'group-booking', 'enhanced-reviews', 'live-chat', 'real-time-chat', 'comparison', 'quick-book'];
     const demoEquipment = equipment[0] || featuredEquipment[0];
     if (needsEquipment.includes(featureId)) {
