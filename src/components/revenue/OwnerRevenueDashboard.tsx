@@ -120,7 +120,7 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
         ).slice(0, 10);
 
         const renterIds = [...new Set(recentBk.map(b => b.renter_id).filter(Boolean))];
-        let renterMap: Record<string, string> = {};
+        const renterMap: Record<string, string> = {};
         if (renterIds.length > 0) {
           const { data: renters } = await supabase
             .from('profiles')
@@ -131,7 +131,7 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
 
         // Get equipment titles for transactions
         const txEqIds = [...new Set(recentBk.map(b => b.equipment_id))];
-        let txEqMap: Record<string, string> = {};
+        const txEqMap: Record<string, string> = {};
         if (txEqIds.length > 0) {
           const { data: txEq } = await supabase
             .from('equipment')
