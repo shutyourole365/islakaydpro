@@ -141,8 +141,8 @@ export async function logRefund(
     action: 'refund_issued',
     user_id: userId,
     entity_type: 'booking',
-    entity_id: bookingId ?? null,
-    metadata: { amount, reason: reason ?? null },
+    entity_id: bookingId,
+    metadata: { amount, reason },
   });
 }
 
