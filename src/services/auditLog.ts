@@ -126,7 +126,7 @@ export async function logPayment(
     metadata: {
       amount,
       currency,
-      stripe_payment_intent_id: stripePaymentIntentId,
+      stripe_payment_intent_id: stripePaymentIntentId ?? null,
     },
   });
 }
@@ -142,7 +142,7 @@ export async function logRefund(
     user_id: userId,
     entity_type: 'booking',
     entity_id: bookingId,
-    metadata: { amount, reason },
+    metadata: { amount, reason: reason ?? null },
   });
 }
 
