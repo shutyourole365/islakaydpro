@@ -31,12 +31,14 @@ interface MessagingPageProps {
   initialConversationId?: string;
   initialRecipientId?: string;
   initialEquipmentTitle?: string;
+  onBack?: () => void;
 }
 
 export default function MessagingPage({
   initialConversationId,
-  initialRecipientId: _initialRecipientId,
+  initialRecipientId,
   initialEquipmentTitle,
+  onBack,
 }: MessagingPageProps) {
   const { user, profile } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -224,6 +226,58 @@ export default function MessagingPage({
     };
   }, [user, loadConversations, selectedConv]);
 
+  // Start or find an existing conversation with a recipient
+  const startOrOpenConversation = useCallback(async (recipientId: string) => {
+    if (!user) return;
+
+    // Check if conversation already exists
+    const existing = conversations.find(c => c.participants?.includes(recipientId));
+    if (existing) {
+      setSelectedConv(existing);
+      return;
+    }
+
+    // Create new conversation
+    const { data, error } = await supabase
+      .from('conversations')
+      .insert({
+        participants: [user.id, recipientId],
+        last_message: null,
+        last_message_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Failed to create conversation:', error);
+      return;
+    }
+
+    // Fetch recipient profile
+    const { data: recipientProfile } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url')
+      .eq('id', recipientId)
+      .single();
+
+    const newConv: Conversation = {
+      ...data,
+      otherUser: recipientProfile ?? undefined,
+      unread_count: 0,
+    };
+
+    setConversations(prev => [newConv, ...prev]);
+    setSelectedConv(newConv);
+  }, [user, conversations]);
+
+  // Auto-start conversation when initialRecipientId is provided
+  useEffect(() => {
+    if (initialRecipientId && user && !loading) {
+      startOrOpenConversation(initialRecipientId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialRecipientId, user, loading]);
+
   useEffect(() => {
     if (user) loadConversations();
   }, [user, loadConversations]);
@@ -347,7 +401,7 @@ export default function MessagingPage({
                 <MessageSquare className="w-10 h-10 text-gray-200 dark:text-gray-700 mb-3" />
                 <p className="text-gray-400 dark:text-gray-500 text-sm">No conversations yet</p>
                 <p className="text-gray-300 dark:text-gray-600 text-xs mt-1">
-                  Message an owner from any equipment listing
+                  {initialEquipmentTitle ? `Starting conversation about: ${initialEquipmentTitle}` : 'Message an owner from any equipment listing'}
                 </p>
               </div>
             ) : (
