@@ -73,7 +73,8 @@ jobs:
         run: mkdir -p "$TMPDIR"
 
       - name: Run tests
-        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose
+        timeout-minutes: 8
+        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose --forceExit
         env:
           CI: true
 
