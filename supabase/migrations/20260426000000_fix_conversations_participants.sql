@@ -72,7 +72,7 @@ CREATE POLICY "Participants can update message read status"
 
 -- Index for fast participant lookups
 CREATE INDEX IF NOT EXISTS idx_conversations_participants ON conversations USING GIN(participants);
-CREATE INDEX IF NOT EXISTS idx_messages_conversation_read ON messages(conversation_id, read) WHERE read = false;
+-- Note: messages uses 'is_read' not 'read' — partial index omitted to avoid column-not-found error
 
 -- Notifications RLS (ensure user can see their own)
 DROP POLICY IF EXISTS "Users can view own notifications" ON notifications;
