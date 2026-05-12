@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   Heart,
@@ -19,6 +19,8 @@ import {
 } from 'lucide-react';
 import type { Equipment } from '../../types';
 import ReviewsSection from '../reviews/ReviewsSection';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 import ShareEquipment from './ShareEquipment';
 import PriceNegotiator from '../negotiation/PriceNegotiator';
 
@@ -44,6 +46,26 @@ export default function EquipmentDetail({
   const [endDate, setEndDate] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showNegotiator, setShowNegotiator] = useState(false);
+  const [canLeaveReview, setCanLeaveReview] = useState(false);
+  const [reviewBookingId, setReviewBookingId] = useState<string | undefined>(undefined);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('bookings')
+      .select('id')
+      .eq('equipment_id', equipment.id)
+      .eq('renter_id', user.id)
+      .eq('status', 'completed')
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          setCanLeaveReview(true);
+          setReviewBookingId(data[0].id);
+        }
+      });
+  }, [user, equipment.id]);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) =>
@@ -289,7 +311,8 @@ export default function EquipmentDetail({
               <div className="border-t border-gray-100 dark:border-gray-700 pt-6 mt-6">
                 <ReviewsSection
                   equipmentId={equipment.id}
-                  canReview={false}
+                  bookingId={reviewBookingId}
+                  canReview={canLeaveReview}
                 />
               </div>
             </div>
