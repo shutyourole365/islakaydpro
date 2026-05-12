@@ -275,7 +275,6 @@ export default function MessagingPage({
     if (initialRecipientId && user && !loading) {
       startOrOpenConversation(initialRecipientId);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialRecipientId, user, loading]);
 
   useEffect(() => {
