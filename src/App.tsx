@@ -158,6 +158,8 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
   const [searchCategory, setSearchCategory] = useState('');
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingEquipment, setBookingEquipment] = useState<Equipment | null>(null);
+  const [messagingRecipientId, setMessagingRecipientId] = useState<string | undefined>(undefined);
+  const [messagingEquipmentTitle, setMessagingEquipmentTitle] = useState<string | undefined>(undefined);
   const [personalizedRecs, setPersonalizedRecs] = useState<{ recommendations: string[]; basedOn: string } | null>(null);
   const [comparisonItems, setComparisonItems] = useState<Equipment[]>([]);
   const [isComparisonOpen, setIsComparisonOpen] = useState(false);
@@ -513,14 +515,16 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
     setComparisonItems(prev => prev.filter(item => item.id !== equipmentId));
   };
 
-  const handleMessage = async (_equipment: Equipment) => {
+  const handleMessage = async (eq: Equipment) => {
     if (!isAuthenticated || !user) {
       setSelectedEquipment(null);
       setIsAuthOpen(true);
       return;
     }
     
-    // Navigate to messaging page
+    // Navigate to messaging page with owner pre-selected
+    setMessagingRecipientId(eq.owner_id || eq.owner?.id);
+    setMessagingEquipmentTitle(eq.title);
     setSelectedEquipment(null);
     setCurrentPage('messaging');
   };
@@ -1954,7 +1958,15 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       )}
       {currentPage === 'messaging' && (
         <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-2 border-teal-500 border-t-transparent" /></div>}>
-          <MessagingPage />
+          <MessagingPage
+            initialRecipientId={messagingRecipientId}
+            initialEquipmentTitle={messagingEquipmentTitle}
+            onBack={() => {
+              setMessagingRecipientId(undefined);
+              setMessagingEquipmentTitle(undefined);
+              setCurrentPage('home');
+            }}
+          />
         </Suspense>
       )}
 
