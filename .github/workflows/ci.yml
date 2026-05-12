@@ -53,6 +53,7 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       TMPDIR: ${{ github.workspace }}/.vitest_tmp
     steps:
@@ -72,7 +73,7 @@ jobs:
         run: mkdir -p "$TMPDIR"
 
       - name: Run tests
-        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose --coverage
+        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose
         env:
           CI: true
 
