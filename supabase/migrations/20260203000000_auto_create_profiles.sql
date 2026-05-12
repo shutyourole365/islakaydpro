@@ -52,4 +52,3 @@ CREATE POLICY "Users can insert their own profile"
   WITH CHECK (id = (select auth.uid()));
 
 COMMENT ON FUNCTION public.handle_new_user IS 'Automatically creates a profile when a new user signs up';
-COMMENT ON TRIGGER on_auth_user_created ON auth.users IS 'Triggers profile creation for new users';
