@@ -363,15 +363,27 @@ export default function MessagingPage({
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-          <MessageSquare className="w-6 h-6 text-teal-500" />
-          Messages
-          {totalUnread > 0 && (
-            <span className="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-teal-500 text-white text-xs font-bold">
-              {totalUnread > 99 ? '99+' : totalUnread}
-            </span>
+        <div className="flex items-center gap-3 mb-6">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1.5 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+              aria-label="Back"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              <span className="text-sm font-medium">Back</span>
+            </button>
           )}
-        </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <MessageSquare className="w-6 h-6 text-teal-500" />
+            Messages
+            {totalUnread > 0 && (
+              <span className="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-teal-500 text-white text-xs font-bold">
+                {totalUnread > 99 ? '99+' : totalUnread}
+              </span>
+            )}
+          </h1>
+        </div>
 
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex h-[calc(100vh-180px)]">
           {/* Conversation List */}
