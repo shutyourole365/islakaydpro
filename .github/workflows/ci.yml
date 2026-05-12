@@ -74,13 +74,14 @@ jobs:
 
       - name: Run tests
         timeout-minutes: 8
-        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose --forceExit
+        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose
         env:
           CI: true
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
         if: always()
+        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
