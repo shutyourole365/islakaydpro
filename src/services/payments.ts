@@ -80,8 +80,8 @@ export async function createCheckoutSession(params: CheckoutParams): Promise<Che
       endDate: booking.end_date,
       insurancePlanId,
       insuranceAmount,
-      successUrl: params.successUrl || `${window.location.origin}/booking/success`,
-      cancelUrl: params.cancelUrl || `${window.location.origin}/booking/cancel`,
+      successUrl: params.successUrl || `${window.location.origin}/?booking=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: params.cancelUrl || `${window.location.origin}/?booking=cancelled`,
     }),
   });
 
