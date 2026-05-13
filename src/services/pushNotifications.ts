@@ -41,14 +41,13 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   return permission;
 }
 
-// Get VAPID public key from server
-async function getVapidPublicKey(): Promise<string> {
-  const { data, error } = await supabase.functions.invoke('push-notification', {
-    body: { action: 'get-vapid-key' },
-  });
-
-  if (error) throw error;
-  return data.publicKey;
+// Get VAPID public key — use env var directly (no edge function round-trip needed)
+function getVapidPublicKey(): string {
+  const key = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
+  if (!key) {
+    throw new Error('VITE_VAPID_PUBLIC_KEY is not set. Run: npx web-push generate-vapid-keys');
+  }
+  return key;
 }
 
 // Convert base64 string to Uint8Array (for VAPID key)
@@ -108,7 +107,7 @@ export async function subscribeToPush(userId: string): Promise<boolean> {
     }
 
     // Get VAPID public key
-    const vapidPublicKey = await getVapidPublicKey();
+    const vapidPublicKey = getVapidPublicKey();
     if (!vapidPublicKey) {
       console.error('VAPID public key not configured');
       return false;
