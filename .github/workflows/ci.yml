@@ -79,13 +79,15 @@ jobs:
           CI: true
 
       - name: Upload coverage reports
+        if: always() && env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v4
-        if: always()
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   # E2E Tests
   e2e:
