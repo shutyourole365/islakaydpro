@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  MessageSquare, Send, ChevronLeft, User, Clock, CheckCheck, Check,
-  Search, X, Image as ImageIcon,
+  MessageSquare, Send, ChevronLeft, CheckCheck, Check,
+  Search, X,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -276,8 +276,6 @@ export default function MessagingPage({
     c.last_message?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const showList = !selectedConv || !isMobile;
   const showThread = !!selectedConv;
 
   return (
