@@ -28,6 +28,7 @@ jobs:
           VITE_ENABLE_AI: 'true'
           VITE_ENABLE_PWA: 'true'
           VITE_ENABLE_AI_ASSISTANT: 'true'
+          VITE_VAPID_PUBLIC_KEY: BNhbaBf4-27CKT0CoRG7w-EM3zSlqUxQC3pmlpS6rWRcEWRc_CjHFkR34cm7iRgzuA0RCAwi-t6K_d2GZLynzCQ
 
       - name: Deploy to Netlify
         run: npx --yes netlify-cli@26.0.1 deploy --dir=dist --prod
