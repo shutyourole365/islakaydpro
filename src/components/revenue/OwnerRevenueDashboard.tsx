@@ -155,7 +155,7 @@ export default function OwnerRevenueDashboard({ onBack }: OwnerRevenueDashboardP
       }
     };
     load();
-  }, [user, period]);
+  }, [user?.id, period]);
 
   const totalRevenue = monthlyData.reduce((s, m) => s + m.revenue, 0);
   const totalBookings = monthlyData.reduce((s, m) => s + m.bookings, 0);
