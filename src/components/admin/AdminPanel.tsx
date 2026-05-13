@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  ArrowLeft, Users, Package, DollarSign, Flag, Shield, Settings,
+  ArrowLeft, Users, Package, DollarSign, Shield, Settings,
   Search, CheckCircle2, XCircle, Eye, Ban, Mail, Activity, RefreshCw,
   AlertTriangle, TrendingUp,
 } from 'lucide-react';
