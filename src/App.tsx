@@ -285,6 +285,21 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, '', cleanUrl);
     }
+
+    // Handle return from Stripe Connect onboarding
+    const connectStatus = params.get('connect');
+    const tab = params.get('tab');
+    if (tab === 'payments' && (connectStatus === 'success' || connectStatus === 'refresh')) {
+      setCurrentPage('payments');
+      if (connectStatus === 'success') {
+        addToast({
+          type: 'success',
+          title: 'Stripe account connected',
+          message: 'Your payout account is set up. You can now receive payments for rentals.',
+        });
+      }
+      window.history.replaceState({}, '', window.location.pathname);
+    }
   }, []);
 
   useEffect(() => {

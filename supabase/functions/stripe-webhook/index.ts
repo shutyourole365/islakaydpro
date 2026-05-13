@@ -57,6 +57,11 @@ serve(async (req) => {
         await handleRefund(charge);
         break;
       }
+      case 'account.updated': {
+        const account = event.data.object as Stripe.Account;
+        await handleConnectAccountUpdated(account);
+        break;
+      }
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }
@@ -309,4 +314,22 @@ async function handleRefund(charge: Stripe.Charge) {
   });
 
   console.log(`Refund processed for payment ${payment.id} — AUD ${refundAmount}`);
+}
+
+async function handleConnectAccountUpdated(account: Stripe.Account) {
+  if (!account.charges_enabled || !account.payouts_enabled) return;
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      stripe_connect_onboarding_complete: true,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('stripe_connect_account_id', account.id);
+
+  if (error) {
+    console.error('Error updating connect onboarding status:', error);
+  } else {
+    console.log(`Connect account ${account.id} marked as onboarding complete`);
+  }
 }

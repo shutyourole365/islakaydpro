@@ -32,21 +32,25 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_reviews_unique_booking_reviewer
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
 -- Anyone can read reviews
+DROP POLICY IF EXISTS "Reviews are viewable by everyone" ON reviews;
 CREATE POLICY "Reviews are viewable by everyone" ON reviews
   FOR SELECT USING (true);
 
 -- Authenticated users can create reviews
+DROP POLICY IF EXISTS "Authenticated users can create reviews" ON reviews;
 CREATE POLICY "Authenticated users can create reviews" ON reviews
   FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
 
 -- Reviewers can update their own reviews (within 48 hours)
+DROP POLICY IF EXISTS "Reviewers can update own reviews" ON reviews;
 CREATE POLICY "Reviewers can update own reviews" ON reviews
   FOR UPDATE USING (
-    auth.uid() = reviewer_id 
+    auth.uid() = reviewer_id
     AND created_at > NOW() - INTERVAL '48 hours'
   );
 
 -- Equipment owners can add a response (update response field only)
+DROP POLICY IF EXISTS "Equipment owners can respond to reviews" ON reviews;
 CREATE POLICY "Equipment owners can respond to reviews" ON reviews
   FOR UPDATE USING (
     auth.uid() IN (
