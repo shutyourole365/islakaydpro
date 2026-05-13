@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  Calendar,
   TrendingUp,
   DollarSign,
   AlertCircle,
@@ -12,6 +11,7 @@ import {
 import type { Equipment, Booking } from '../../types';
 import { getEquipment, getBookings } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
+import CalendarMonthGrid, { type CalendarEvent, type CalendarEventColor } from '../ui/CalendarMonthGrid';
 
 interface SchedulingOptimizerProps {
   equipment?: Equipment[];
@@ -46,6 +46,7 @@ export default function SchedulingOptimizer({
 }: SchedulingOptimizerProps) {
   const { user } = useAuth();
   const [optimizations, setOptimizations] = useState<ScheduleOptimization[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'week' | 'month' | 'quarter'>('week');
   const [viewMode, setViewMode] = useState<'overview' | 'detailed' | 'calendar'>('overview');
@@ -189,6 +190,7 @@ export default function SchedulingOptimizer({
         const bookingsList = Array.isArray(bookingsData) ? bookingsData : (bookingsData as { data?: Booking[] })?.data || [];
         const opts = generateOptimizations(equipmentList, bookingsList);
         setOptimizations(opts);
+        setBookings(bookingsList);
       } catch (error) {
         console.error('Failed to load scheduling data:', error);
       } finally {
@@ -251,6 +253,38 @@ export default function SchedulingOptimizer({
     setAutoOptimize(!autoOptimize);
     // In a real app, this would trigger automatic price adjustments and scheduling
   };
+
+  const calendarEvents = useMemo<CalendarEvent[]>(() => {
+    const priorityById = new Map<string, ScheduleOptimization['priority']>();
+    for (const opt of optimizations) priorityById.set(opt.equipmentId, opt.priority);
+
+    const colorFor = (booking: Booking): CalendarEventColor => {
+      if (booking.status === 'cancelled') return 'gray';
+      if (booking.status === 'completed') return 'green';
+      const priority = priorityById.get(booking.equipment_id);
+      if (priority === 'high') return 'red';
+      if (priority === 'medium') return 'amber';
+      return 'blue';
+    };
+
+    return bookings
+      .filter((b) => b.status !== 'cancelled')
+      .map((booking) => {
+        const start = new Date(booking.start_date);
+        const end = new Date(booking.end_date);
+        const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+        const eqName = booking.equipment?.title
+          ?? optimizations.find((o) => o.equipmentId === booking.equipment_id)?.equipmentName
+          ?? 'Equipment';
+        return {
+          id: booking.id,
+          date: start,
+          label: `${eqName} · ${days}d`,
+          color: colorFor(booking),
+          meta: `${booking.status} · $${booking.total_amount?.toFixed?.(0) ?? booking.total_amount}`,
+        };
+      });
+  }, [bookings, optimizations]);
 
   if (loading) {
     return (
@@ -523,13 +557,10 @@ export default function SchedulingOptimizer({
 
       {/* Calendar View */}
       {viewMode === 'calendar' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            <Calendar className="w-12 h-12 mx-auto mb-4" />
-            <p>Calendar view coming soon!</p>
-            <p className="text-sm">View scheduling optimizations in calendar format.</p>
-          </div>
-        </div>
+        <CalendarMonthGrid
+          events={calendarEvents}
+          emptyMessage="No bookings scheduled this month."
+        />
       )}
     </div>
   );
