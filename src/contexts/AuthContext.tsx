@@ -4,12 +4,13 @@ import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
 import { getProfile, getUserAnalytics, getUnreadNotificationCount, getUnreadMessageCount, subscribeToNotifications, logAuditEvent } from '../services/database';
 import { errorMonitoring } from '../services/errorMonitoring';
-import { 
-  signInWithRetry, 
+import {
+  signInWithRetry,
   signUpWithRetry,
   getAuthErrorMessage,
   isEmailConfirmationRequired,
 } from '../services/authHelpers';
+import { captureReferralFromUrl, consumePendingReferralCode } from '../services/referrals';
 
 interface AuthState {
   user: User | null;
@@ -115,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.user]);
 
   useEffect(() => {
+    captureReferralFromUrl();
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState(prev => ({
         ...prev,
@@ -195,10 +197,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
+      const referralCode = consumePendingReferralCode();
+      const metadata: Record<string, unknown> = { full_name: fullName };
+      if (referralCode) metadata.referral_code = referralCode;
+
       const data = await signUpWithRetry(
-        email, 
-        password, 
-        { full_name: fullName },
+        email,
+        password,
+        metadata,
         { maxAttempts: 3, delayMs: 1000 }
       );
 

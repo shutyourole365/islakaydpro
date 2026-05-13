@@ -11,23 +11,13 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getMyReferralCode, listMyReferrals, type ReferralRecord } from '../../services/referrals';
 
 interface ReferralSystemProps {
   className?: string;
 }
 
-interface Referral {
-  id: string;
-  referredUser: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-  status: 'pending' | 'completed' | 'rewarded';
-  joinedDate: Date;
-  rewardEarned: number;
-  rewardType: 'credit' | 'discount' | 'premium';
-}
+type Referral = ReferralRecord;
 
 interface ReferralStats {
   totalReferrals: number;
@@ -88,49 +78,32 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     const loadReferralData = async () => {
       if (!user) return;
-
+      setLoading(true);
       try {
-        // Mock data - in real app, this would come from API
-        const mockReferrals: Referral[] = [
-          {
-            id: '1',
-            referredUser: { name: 'John Smith', email: 'john@example.com' },
-            status: 'completed',
-            joinedDate: new Date('2024-01-15'),
-            rewardEarned: 50,
-            rewardType: 'credit',
-          },
-          {
-            id: '2',
-            referredUser: { name: 'Sarah Johnson', email: 'sarah@example.com' },
-            status: 'rewarded',
-            joinedDate: new Date('2024-01-20'),
-            rewardEarned: 75,
-            rewardType: 'discount',
-          },
-          {
-            id: '3',
-            referredUser: { name: 'Mike Wilson', email: 'mike@example.com' },
-            status: 'pending',
-            joinedDate: new Date('2024-02-01'),
-            rewardEarned: 0,
-            rewardType: 'credit',
-          },
-        ];
-
-        setReferrals(mockReferrals);
-        setReferralCode(`ISLAKAYD-${user.id.slice(0, 8).toUpperCase()}`);
+        const [code, rows] = await Promise.all([
+          getMyReferralCode(user.id),
+          listMyReferrals(user.id),
+        ]);
+        if (cancelled) return;
+        setReferralCode(code ?? `ISLAKAYD-${user.id.slice(0, 8).toUpperCase()}`);
+        setReferrals(rows);
       } catch (error) {
-        console.error('Failed to load referral data:', error);
+        if (!cancelled) console.error('Failed to load referral data:', error);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     loadReferralData();
-  }, [user]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const stats: ReferralStats = useMemo(() => {
     const totalReferrals = referrals.length;

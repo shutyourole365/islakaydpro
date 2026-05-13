@@ -709,7 +709,11 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
         setCurrentPage('revenue-dashboard');
         break;      case 'agreement-generator':
         setCurrentPage('agreement-generator');
-        break;      default:
+        break;
+      case 'referrals':
+        setCurrentPage('referrals');
+        break;
+      default:
         addToast({ type: 'info', title: 'Coming soon!', message: `${featureId} feature is coming soon.` });
     }
     setIsFeatureShowcaseOpen(false);
@@ -1368,24 +1372,6 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
               />
             </div>
           </div>
-        </Suspense>
-      )}
-
-      {/* Referrals Page */}
-      {currentPage === 'referrals' && (
-        <Suspense fallback={<PageLoader />}>
-          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100">
-            <div className="max-w-4xl mx-auto px-4">
-              <button
-                onClick={() => setCurrentPage('dashboard')}
-                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900"
-              >
-                ← Back to Dashboard
-              </button>
-              <div className="p-8 text-center text-gray-500">Referral program coming soon.</div>
-            </div>
-          </div>
-          <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
 
