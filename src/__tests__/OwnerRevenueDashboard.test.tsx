@@ -3,26 +3,31 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import OwnerRevenueDashboard from '../components/revenue/OwnerRevenueDashboard';
 
-// Stable resolved value — avoids infinite re-render from changing mock references
+// Stable resolved values — must not be recreated per-render
 const EMPTY_RESULT = { data: [], error: null };
 
-vi.mock('../lib/supabase', () => {
-  const makeBuilder = () => ({
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    gte: vi.fn().mockReturnThis(),
-    order: vi.fn().mockResolvedValue(EMPTY_RESULT),
-    in: vi.fn().mockResolvedValue(EMPTY_RESULT),
-  });
-  return {
-    supabase: {
-      from: vi.fn(() => makeBuilder()),
-    },
-  };
-});
+// Stable builder factory — new instance per from() call but always resolves empty
+const makeBuilder = () => {
+  const b: Record<string, unknown> = {};
+  b.select = vi.fn().mockReturnValue(b);
+  b.eq = vi.fn().mockReturnValue(b);
+  b.gte = vi.fn().mockReturnValue(b);
+  b.order = vi.fn().mockResolvedValue(EMPTY_RESULT);
+  b.in = vi.fn().mockResolvedValue(EMPTY_RESULT);
+  return b;
+};
+
+vi.mock('../lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => makeBuilder()),
+  },
+}));
+
+// Stable user object — same reference every render
+const STABLE_USER = { id: 'test-user-id' };
 
 vi.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'test-user-id' } }),
+  useAuth: () => ({ user: STABLE_USER }),
 }));
 
 describe('OwnerRevenueDashboard', () => {
