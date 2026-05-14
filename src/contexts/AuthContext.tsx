@@ -209,7 +209,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         metadata,
         { maxAttempts: 3, delayMs: 1000 }
       );
-      if (data?.user && referralCode) clearPendingReferralCode();
+      // Supabase returns a user with an empty identities array when the
+      // email is already registered (anti-enumeration). Only clear the
+      // pending referral code if a new account was actually created.
+      const isNewSignup = (data?.user?.identities?.length ?? 0) > 0;
+      if (isNewSignup && referralCode) clearPendingReferralCode();
 
       if (data.user) {
         // Create profile (may fail if email confirmation required)

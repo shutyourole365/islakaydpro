@@ -99,7 +99,14 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-  IF current_setting('request.jwt.claims', true)::jsonb ->> 'role' = 'service_role' THEN
+  -- Allow trusted server-side contexts:
+  --   * supabase service_role JWTs (admin client / edge functions)
+  --   * supabase_auth_admin (the role Supabase Auth uses to fire the
+  --     on_auth_user_created trigger that calls handle_new_user)
+  --   * postgres / no-JWT contexts (migrations, scripts)
+  -- End-user requests come in as `authenticated` and skip the bypass.
+  IF current_setting('request.jwt.claims', true)::jsonb ->> 'role' = 'service_role'
+     OR session_user IN ('supabase_auth_admin', 'postgres', 'supabase_admin') THEN
     RETURN NEW;
   END IF;
 

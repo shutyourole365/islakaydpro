@@ -73,7 +73,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     try {
       const data = await signUpWithRetry(email, password, metadata, { maxAttempts: 3, delayMs: 1000 });
       if (data.user) {
-        if (referralCode) clearPendingReferralCode();
+        // Supabase returns a fake user with an empty identities array when
+        // the email is already registered (anti-enumeration). Only clear
+        // the pending referral code if a new account was actually created.
+        const isNewSignup = (data.user.identities?.length ?? 0) > 0;
+        if (referralCode && isNewSignup) clearPendingReferralCode();
         if (!data.session) {
           sendWelcomeEmail(email, fullName).catch(() => {});
           setSuccess('✅ Account created! Please check your email to confirm your account.');
