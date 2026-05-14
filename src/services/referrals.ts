@@ -8,7 +8,9 @@ export interface ReferralRecord {
   referredUser: {
     id: string;
     name: string;
-    email: string;
+    // profiles does not store email; left optional so the UI can hide
+    // the field when an authorized email source isn't wired in yet.
+    email?: string;
     avatar?: string;
   };
   status: ReferralStatus;
@@ -34,11 +36,18 @@ export function applyReferralCodeOnSignup(code: string): void {
   window.localStorage.setItem(PENDING_REFERRAL_KEY, trimmed);
 }
 
-export function consumePendingReferralCode(): string | null {
+// Read the pending code WITHOUT removing it from localStorage. Callers
+// should clear it via clearPendingReferralCode() only after the signup
+// (or signup-with-retry chain) actually succeeds — otherwise a failed
+// attempt permanently loses the referrer attribution.
+export function peekPendingReferralCode(): string | null {
   if (typeof window === 'undefined') return null;
-  const code = window.localStorage.getItem(PENDING_REFERRAL_KEY);
-  if (code) window.localStorage.removeItem(PENDING_REFERRAL_KEY);
-  return code;
+  return window.localStorage.getItem(PENDING_REFERRAL_KEY);
+}
+
+export function clearPendingReferralCode(): void {
+  if (typeof window === 'undefined') return;
+  window.localStorage.removeItem(PENDING_REFERRAL_KEY);
 }
 
 export function captureReferralFromUrl(): void {
@@ -101,7 +110,6 @@ export async function listMyReferrals(userId: string): Promise<ReferralRecord[]>
       referredUser: {
         id: r.referred?.id ?? r.referred_user_id,
         name: r.referred?.full_name ?? 'Islakayd user',
-        email: '',
         avatar: r.referred?.avatar_url ?? undefined,
       },
       status: r.status,

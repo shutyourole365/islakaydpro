@@ -10,7 +10,7 @@ import {
   getAuthErrorMessage,
   isEmailConfirmationRequired,
 } from '../services/authHelpers';
-import { captureReferralFromUrl, consumePendingReferralCode } from '../services/referrals';
+import { captureReferralFromUrl, peekPendingReferralCode, clearPendingReferralCode } from '../services/referrals';
 
 interface AuthState {
   user: User | null;
@@ -196,8 +196,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    // Peek (don't consume) so a failed signup retry can still attribute
+    // the referral. Cleared only on success below.
+    const referralCode = peekPendingReferralCode();
     try {
-      const referralCode = consumePendingReferralCode();
       const metadata: Record<string, unknown> = { full_name: fullName };
       if (referralCode) metadata.referral_code = referralCode;
 
@@ -207,6 +209,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         metadata,
         { maxAttempts: 3, delayMs: 1000 }
       );
+      if (data?.user && referralCode) clearPendingReferralCode();
 
       if (data.user) {
         // Create profile (may fail if email confirmation required)

@@ -83,19 +83,28 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
     const loadReferralData = async () => {
       if (!user) return;
       setLoading(true);
-      try {
-        const [code, rows] = await Promise.all([
-          getMyReferralCode(user.id),
-          listMyReferrals(user.id),
-        ]);
-        if (cancelled) return;
-        setReferralCode(code ?? `ISLAKAYD-${user.id.slice(0, 8).toUpperCase()}`);
-        setReferrals(rows);
-      } catch (error) {
-        if (!cancelled) console.error('Failed to load referral data:', error);
-      } finally {
-        if (!cancelled) setLoading(false);
+      // Settle independently so an error in one branch doesn't skip the
+      // fallback for the other (Promise.all would short-circuit and leave
+      // the referral code blank if listMyReferrals failed first).
+      const fallbackCode = `ISLAKAYD-${user.id.slice(0, 8).toUpperCase()}`;
+      const [codeResult, rowsResult] = await Promise.allSettled([
+        getMyReferralCode(user.id),
+        listMyReferrals(user.id),
+      ]);
+      if (cancelled) return;
+      if (codeResult.status === 'fulfilled') {
+        setReferralCode(codeResult.value ?? fallbackCode);
+      } else {
+        console.error('Failed to load referral code:', codeResult.reason);
+        setReferralCode(fallbackCode);
       }
+      if (rowsResult.status === 'fulfilled') {
+        setReferrals(rowsResult.value);
+      } else {
+        console.error('Failed to load referrals list:', rowsResult.reason);
+        setReferrals([]);
+      }
+      setLoading(false);
     };
 
     loadReferralData();
@@ -393,7 +402,9 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
                     </div>
                     <div>
                       <div className="font-medium text-gray-900 dark:text-white">{referral.referredUser.name}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{referral.referredUser.email}</div>
+                      {referral.referredUser.email && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{referral.referredUser.email}</div>
+                      )}
                       <div className="text-xs text-gray-500 dark:text-gray-500">
                         Joined {referral.joinedDate.toLocaleDateString()}
                       </div>
