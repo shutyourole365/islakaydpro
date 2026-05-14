@@ -155,12 +155,10 @@ class Analytics {
   }
 }
 
-// Singleton instance
+// Singleton instance. Initialization is gated by main.tsx on
+// VITE_ENABLE_ANALYTICS so that setting only VITE_GA_MEASUREMENT_ID
+// (e.g. preparing env for a future enable) does NOT silently load
+// the GA script bundle.
 export const analytics = new Analytics();
-
-// Initialize analytics if measurement ID is available
-if (typeof window !== 'undefined' && import.meta.env.VITE_GA_MEASUREMENT_ID) {
-  analytics.initialize();
-}
 
 export default analytics;
