@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import { scrubPiiFromEvent, type MinimalSentryEvent } from './sentryScrub';
 
 class ErrorMonitoring {
   private initialized = false;
@@ -52,7 +53,13 @@ class ErrorMonitoring {
             console.error('Sentry would send:', event, hint);
             return null;
           }
-          return event;
+          // Strip PII before the event leaves the browser. Sentry's own
+          // EventHint isn't a Sentry.Event 1:1 but the fields we care
+          // about overlap exactly with MinimalSentryEvent.
+          const scrubbed = scrubPiiFromEvent(
+            event as unknown as MinimalSentryEvent
+          );
+          return scrubbed as unknown as typeof event;
         },
       });
 
