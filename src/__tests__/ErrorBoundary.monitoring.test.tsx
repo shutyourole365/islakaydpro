@@ -54,10 +54,14 @@ describe('ErrorBoundary -> errorMonitoring wiring', () => {
     const [err, context] = captureExceptionMock.mock.calls[0];
     expect(err).toBeInstanceOf(Error);
     expect((err as Error).message).toBe('boundary-regression');
+    // Context must be nested under a single key so Sentry.setContext(key, value)
+    // receives an object value — the API rejects primitive values.
     expect(context).toEqual(
       expect.objectContaining({
-        source: 'ErrorBoundary',
-        componentStack: expect.any(String),
+        errorBoundary: expect.objectContaining({
+          source: 'ErrorBoundary',
+          componentStack: expect.any(String),
+        }),
       })
     );
   });

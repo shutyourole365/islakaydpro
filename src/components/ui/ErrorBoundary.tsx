@@ -35,9 +35,14 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
+    // Nest under a single key — errorMonitoring.captureException iterates
+    // Object.entries(context) and calls Sentry.setContext(key, value), which
+    // expects each value to be an object, not a primitive string.
     errorMonitoring.captureException(error, {
-      source: 'ErrorBoundary',
-      componentStack: errorInfo.componentStack ?? '',
+      errorBoundary: {
+        source: 'ErrorBoundary',
+        componentStack: errorInfo.componentStack ?? '',
+      },
     });
   }
 
