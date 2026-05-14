@@ -493,12 +493,12 @@ export default function MaintenanceScheduler({ equipment: propEquipment, classNa
 
       {/* Calendar View */}
       {viewMode === 'calendar' && (
+        // No onEventClick: the surrounding component currently discards
+        // selectedTask state (line 55) and doesn't render an editor, so a
+        // calendar click would lead to a dead end. Wire this up when the
+        // task editor drawer is added (tracked separately).
         <CalendarMonthGrid
           events={calendarEvents}
-          onEventClick={(id) => {
-            const task = maintenanceTasks.find(t => t.id === id);
-            if (task) setSelectedTask(task);
-          }}
           emptyMessage="No maintenance scheduled this month. Adjust filters or add a task."
         />
       )}

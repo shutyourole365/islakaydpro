@@ -256,7 +256,11 @@ export default function SchedulingOptimizer({
 
   const calendarEvents = useMemo<CalendarEvent[]>(() => {
     const priorityById = new Map<string, ScheduleOptimization['priority']>();
-    for (const opt of optimizations) priorityById.set(opt.equipmentId, opt.priority);
+    const nameById = new Map<string, string>();
+    for (const opt of optimizations) {
+      priorityById.set(opt.equipmentId, opt.priority);
+      nameById.set(opt.equipmentId, opt.equipmentName);
+    }
 
     const colorFor = (booking: Booking): CalendarEventColor => {
       if (booking.status === 'cancelled') return 'gray';
@@ -267,15 +271,23 @@ export default function SchedulingOptimizer({
       return 'blue';
     };
 
+    // booking.start_date / end_date are YYYY-MM-DD strings. new Date(str)
+    // interprets them as UTC midnight, which shifts the local day for
+    // non-UTC timezones (e.g. AEST renders a 2026-06-01 booking on May 31).
+    // Parse as local-date so the calendar lands on the correct cell.
+    const parseLocalDate = (iso: string): Date => {
+      const [y, m, d] = iso.split('-').map(Number);
+      return new Date(y, (m ?? 1) - 1, d ?? 1);
+    };
+
     return bookings
       .filter((b) => b.status !== 'cancelled')
       .map((booking) => {
-        const start = new Date(booking.start_date);
-        const end = new Date(booking.end_date);
-        const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-        const eqName = booking.equipment?.title
-          ?? optimizations.find((o) => o.equipmentId === booking.equipment_id)?.equipmentName
-          ?? 'Equipment';
+        const start = parseLocalDate(booking.start_date);
+        // Prefer the persisted total_days; treat the date range as inclusive.
+        const days = Math.max(1, booking.total_days ?? 1);
+        const eqName =
+          booking.equipment?.title ?? nameById.get(booking.equipment_id) ?? 'Equipment';
         return {
           id: booking.id,
           date: start,
