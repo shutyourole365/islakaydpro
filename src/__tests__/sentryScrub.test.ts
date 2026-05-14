@@ -177,4 +177,40 @@ describe('scrubPiiFromEvent', () => {
   it('returns a usable object even when given an empty event', () => {
     expect(scrubPiiFromEvent({} as MinimalSentryEvent)).toEqual({});
   });
+
+  it('handles cyclic structures without leaking the unsanitized original', () => {
+    // Build a context where an inner object both contains PII and points
+    // back at itself, simulating something a caller might attach via
+    // captureException(err, { context: <object-with-self-reference> }).
+    type Cyclic = { note: string; self?: Cyclic };
+    const inner: Cyclic = { note: 'reach me at alice@example.com' };
+    inner.self = inner;
+    const event: MinimalSentryEvent = {
+      contexts: { weird: inner as unknown as Record<string, unknown> },
+    };
+
+    const cleaned = scrubPiiFromEvent(event);
+    const out = cleaned.contexts?.weird as { note: string; self?: unknown };
+    expect(out.note).toContain('[REDACTED_EMAIL]');
+    expect(out.note).not.toContain('alice@example.com');
+    // The cycle is preserved by pointing at the SAME cleaned output, not
+    // the original (which still holds the PII string).
+    expect(out.self).toBe(out);
+    expect(out.self).not.toBe(inner);
+  });
+
+  it('preserves shared references as the same cleaned reference', () => {
+    const shared = { email: 'alice@example.com' };
+    const event: MinimalSentryEvent = {
+      contexts: {
+        a: { user: shared as unknown as Record<string, unknown> },
+        b: { user: shared as unknown as Record<string, unknown> },
+      },
+    };
+    const cleaned = scrubPiiFromEvent(event);
+    const a = (cleaned.contexts?.a as { user: { email: string } }).user;
+    const b = (cleaned.contexts?.b as { user: { email: string } }).user;
+    expect(a).toBe(b);
+    expect(a.email).toContain('[REDACTED_EMAIL]');
+  });
 });

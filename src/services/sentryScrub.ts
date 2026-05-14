@@ -4,7 +4,9 @@
 //
 // What gets scrubbed:
 //   - user.email and user.username are dropped (keeping user.id for triage)
-//   - Authorization / Cookie request headers are dropped
+//   - request.cookies is dropped entirely
+//   - Authorization / Cookie / Set-Cookie / X-Api-Key request header VALUES
+//     are redacted to "[REDACTED]" (header keys themselves are preserved)
 //   - URL query-string values for sensitive param names are redacted
 //   - All string values anywhere in the event are passed through a regex
 //     replacer that masks JWT-shaped tokens and email-shaped substrings.
@@ -84,11 +86,14 @@ function scrubHeaders(
 
 // Recursively walks a value, scrubbing strings. URL-typed keys go through
 // scrubUrl; headers-typed parents go through scrubHeaders. Caller must
-// supply a fresh visited set to short-circuit cycles.
+// supply a fresh WeakMap so each input object resolves to the same cleaned
+// output across the traversal — this preserves shared references and
+// breaks cycles WITHOUT leaking the original (unsanitized) sub-object
+// back into the returned event.
 function scrubValue(
   value: unknown,
   keyHint: string | null,
-  visited: WeakSet<object>
+  seen: WeakMap<object, unknown>
 ): unknown {
   if (value == null) return value;
   if (typeof value === 'string') {
@@ -98,22 +103,27 @@ function scrubValue(
     return scrubString(value);
   }
   if (typeof value !== 'object') return value;
-  if (visited.has(value as object)) return value;
-  visited.add(value as object);
+
+  const cached = seen.get(value as object);
+  if (cached !== undefined) return cached;
 
   if (Array.isArray(value)) {
-    return value.map((item) => scrubValue(item, keyHint, visited));
+    const arrOut: unknown[] = [];
+    seen.set(value, arrOut);
+    for (const item of value) arrOut.push(scrubValue(item, keyHint, seen));
+    return arrOut;
   }
 
   const obj = value as Record<string, unknown>;
   const out: Record<string, unknown> = {};
+  seen.set(obj, out);
   for (const [k, v] of Object.entries(obj)) {
     const lower = k.toLowerCase();
     if (lower === 'headers' && v && typeof v === 'object') {
       out[k] = scrubHeaders(v as Record<string, string | string[] | undefined>);
       continue;
     }
-    out[k] = scrubValue(v, lower, visited);
+    out[k] = scrubValue(v, lower, seen);
   }
   return out;
 }
@@ -147,8 +157,8 @@ export interface MinimalSentryEvent {
 
 export function scrubPiiFromEvent<T extends MinimalSentryEvent>(event: T): T {
   if (!event || typeof event !== 'object') return event;
-  const visited = new WeakSet<object>();
-  const cleaned = scrubValue(event, null, visited) as T;
+  const seen = new WeakMap<object, unknown>();
+  const cleaned = scrubValue(event, null, seen) as T;
 
   // Force-drop user identifiers Sentry doesn't need for triage.
   if (cleaned.user) {
