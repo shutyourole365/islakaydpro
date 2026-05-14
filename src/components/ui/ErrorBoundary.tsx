@@ -1,5 +1,6 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { errorMonitoring } from '../../services/errorMonitoring';
 
 interface Props {
   children: ReactNode;
@@ -34,10 +35,10 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Log to error tracking service (e.g., Sentry)
-    // if (window.Sentry) {
-    //   window.Sentry.captureException(error, { extra: errorInfo });
-    // }
+    errorMonitoring.captureException(error, {
+      source: 'ErrorBoundary',
+      componentStack: errorInfo.componentStack ?? '',
+    });
   }
 
   handleReset = () => {
