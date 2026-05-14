@@ -76,9 +76,14 @@ describe('ErrorBoundary', () => {
   });
 
   it('navigates to homepage when Go to Homepage is clicked', () => {
+    // Capture the full original descriptor (incl. configurability/getters)
+    // so we can restore it exactly — preserves window.location semantics
+    // for subsequent tests under vitest singleFork.
+    const originalDescriptor = Object.getOwnPropertyDescriptor(window, 'location');
     const originalLocation = window.location;
     const setHrefMock = vi.fn();
     Object.defineProperty(window, 'location', {
+      configurable: true,
       writable: true,
       value: {
         ...originalLocation,
@@ -91,19 +96,27 @@ describe('ErrorBoundary', () => {
       },
     });
 
-    render(
-      <ErrorBoundary>
-        <Bomb />
-      </ErrorBoundary>
-    );
+    try {
+      render(
+        <ErrorBoundary>
+          <Bomb />
+        </ErrorBoundary>
+      );
 
-    fireEvent.click(screen.getByRole('button', { name: /go to homepage/i }));
-    expect(setHrefMock).toHaveBeenCalledWith('/');
-
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: originalLocation,
-    });
+      fireEvent.click(screen.getByRole('button', { name: /go to homepage/i }));
+      expect(setHrefMock).toHaveBeenCalledWith('/');
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(window, 'location', originalDescriptor);
+      } else {
+        // Fallback: at least put the original object back.
+        Object.defineProperty(window, 'location', {
+          configurable: true,
+          writable: true,
+          value: originalLocation,
+        });
+      }
+    }
   });
 
   it('exposes a contact support mailto link', () => {

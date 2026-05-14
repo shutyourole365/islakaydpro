@@ -9,13 +9,41 @@ import {
 
 const VALID_ANON_KEY = 'a'.repeat(120);
 
+// Keys this suite stubs — only these are reset in afterEach, so global
+// baseline stubs from src/__tests__/setup.ts survive (matters under
+// vitest singleFork pool where modules persist across files).
+const STUBBED_KEYS = [
+  'VITE_SUPABASE_URL',
+  'VITE_SUPABASE_ANON_KEY',
+  'VITE_STRIPE_PUBLIC_KEY',
+  'VITE_ENABLE_ANALYTICS',
+  'VITE_GA_MEASUREMENT_ID',
+  'VITE_SENTRY_DSN',
+] as const;
+
+function snapshotEnv(): Record<string, string | undefined> {
+  const env = import.meta.env as unknown as Record<string, string | undefined>;
+  const snap: Record<string, string | undefined> = {};
+  for (const key of STUBBED_KEYS) snap[key] = env[key];
+  return snap;
+}
+
+function restoreEnv(snap: Record<string, string | undefined>) {
+  for (const key of STUBBED_KEYS) {
+    const v = snap[key];
+    vi.stubEnv(key, v ?? '');
+  }
+}
+
 describe('envValidation', () => {
+  let baseline: Record<string, string | undefined>;
+
   beforeEach(() => {
-    vi.unstubAllEnvs();
+    baseline = snapshotEnv();
   });
 
   afterEach(() => {
-    vi.unstubAllEnvs();
+    restoreEnv(baseline);
   });
 
   describe('validateEnvironment', () => {
