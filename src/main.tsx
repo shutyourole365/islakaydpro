@@ -9,6 +9,7 @@ import { analytics } from './services/analytics';
 import { errorMonitoring } from './services/errorMonitoring';
 import { PerformanceMonitor } from './utils/performance';
 import { validateEnvironment, logValidationResults } from './utils/envValidation';
+import { hasAnalyticsConsent } from './utils/consent';
 import './index.css';
 
 // Dev-only: hide Vite error overlay from accessibility scans
@@ -76,8 +77,12 @@ if (!envValidation.isValid && import.meta.env.PROD) {
   throw new Error('Environment validation failed. Check console for details.');
 }
 
-// Initialize analytics if enabled
-if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+// Initialize analytics only when (a) the feature flag is on AND (b) the
+// user has explicitly opted in via the cookie-consent banner. First-time
+// visitors see the banner before any analytics SDK is loaded; runtime
+// acceptance is handled in useCookieConsent which calls analytics.initialize()
+// after persisting the consent settings.
+if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true' && hasAnalyticsConsent()) {
   analytics.initialize();
 }
 
