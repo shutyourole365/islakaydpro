@@ -25,7 +25,7 @@ interface PerformanceMemory {
   jsHeapSizeLimit: number;
 }
 
-// Google's "poor" thresholds — anything worse warrants a Sentry breadcrumb.
+// Google's "poor" thresholds — anything worse fires a Sentry warning.
 // Sources:
 //   LCP > 4000ms  https://web.dev/lcp/
 //   FID > 300ms   https://web.dev/fid/
@@ -33,11 +33,29 @@ interface PerformanceMemory {
 const POOR = { LCP: 4000, FID: 300, CLS: 0.25 } as const;
 const SLOW_OP_MS = 1000;
 
-function reportWebVital(name: 'LCP' | 'FID' | 'CLS', value: number): void {
+// CLS is a running total: once it crosses 0.25, every subsequent
+// layout-shift would re-fire reportWebVital. Track per-vital reporting
+// so each metric only emits ONE Sentry warning per page lifetime.
+// Exposed for tests via __resetWebVitalReported.
+const reportedVitals: Record<'LCP' | 'FID' | 'CLS', boolean> = {
+  LCP: false,
+  FID: false,
+  CLS: false,
+};
+
+/** @internal — test-only helper to reset the per-page dedupe state. */
+export function __resetWebVitalReported(): void {
+  reportedVitals.LCP = false;
+  reportedVitals.FID = false;
+  reportedVitals.CLS = false;
+}
+
+export function reportWebVital(name: 'LCP' | 'FID' | 'CLS', value: number): void {
   if (import.meta.env.DEV) {
     console.log(`${name}:`, value);
   }
-  if (value > POOR[name]) {
+  if (value > POOR[name] && !reportedVitals[name]) {
+    reportedVitals[name] = true;
     errorMonitoring.captureMessage(
       `Poor web vital ${name}=${value.toFixed(2)}`,
       'warning'

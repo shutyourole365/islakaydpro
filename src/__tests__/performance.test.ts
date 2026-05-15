@@ -20,7 +20,7 @@ vi.mock('../services/errorMonitoring', () => ({
   },
 }));
 
-import { PerformanceMonitor } from '../utils/performance';
+import { PerformanceMonitor, reportWebVital, __resetWebVitalReported } from '../utils/performance';
 
 // A controllable clock for mark()/measure(). Using mockImplementation
 // (not mockReturnValueOnce) keeps the spy active across multiple calls,
@@ -109,6 +109,75 @@ describe('PerformanceMonitor → errorMonitoring wiring', () => {
       const second = monitor.measure('once');
       expect(second).toBe(0);
       expect(captureMessageMock).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('reportWebVital() poor-threshold reporting', () => {
+    beforeEach(() => {
+      __resetWebVitalReported();
+    });
+
+    it('does NOT fire for LCP at the boundary (4000ms exact)', () => {
+      reportWebVital('LCP', 4000);
+      expect(captureMessageMock).not.toHaveBeenCalled();
+    });
+
+    it('does NOT fire for LCP below the boundary', () => {
+      reportWebVital('LCP', 3999.99);
+      expect(captureMessageMock).not.toHaveBeenCalled();
+    });
+
+    it('fires for LCP above the threshold', () => {
+      reportWebVital('LCP', 4500);
+      expect(captureMessageMock).toHaveBeenCalledTimes(1);
+      const [message, level] = captureMessageMock.mock.calls[0];
+      expect(message).toBe('Poor web vital LCP=4500.00');
+      expect(level).toBe('warning');
+    });
+
+    it('fires for FID above 300ms', () => {
+      reportWebVital('FID', 350);
+      expect(captureMessageMock).toHaveBeenCalledWith(
+        'Poor web vital FID=350.00',
+        'warning'
+      );
+    });
+
+    it('fires for CLS above 0.25', () => {
+      reportWebVital('CLS', 0.3);
+      expect(captureMessageMock).toHaveBeenCalledWith(
+        'Poor web vital CLS=0.30',
+        'warning'
+      );
+    });
+
+    it('dedupes: CLS only fires ONCE even when called repeatedly above threshold', () => {
+      // The CLS observer fires per layout-shift event — without dedupe
+      // a single bad page would emit dozens of Sentry warnings.
+      reportWebVital('CLS', 0.3);
+      reportWebVital('CLS', 0.4);
+      reportWebVital('CLS', 0.5);
+      reportWebVital('CLS', 0.9);
+      expect(captureMessageMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('dedupe is independent per vital — LCP and CLS each get one report', () => {
+      reportWebVital('LCP', 5000);
+      reportWebVital('CLS', 0.3);
+      reportWebVital('LCP', 6000);
+      reportWebVital('CLS', 0.5);
+      expect(captureMessageMock).toHaveBeenCalledTimes(2);
+      const messages = captureMessageMock.mock.calls.map((c) => c[0]);
+      expect(messages).toContain('Poor web vital LCP=5000.00');
+      expect(messages).toContain('Poor web vital CLS=0.30');
+    });
+
+    it('__resetWebVitalReported re-arms the dedupe state', () => {
+      reportWebVital('CLS', 0.3);
+      expect(captureMessageMock).toHaveBeenCalledTimes(1);
+      __resetWebVitalReported();
+      reportWebVital('CLS', 0.4);
+      expect(captureMessageMock).toHaveBeenCalledTimes(2);
     });
   });
 });
