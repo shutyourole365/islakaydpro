@@ -1,5 +1,22 @@
 // Service Worker Registration and Utilities
 
+import { errorMonitoring } from '../services/errorMonitoring';
+
+// Forwards a caught error to Sentry without altering the return-shape of
+// the calling function — keeps console.error for local dev visibility.
+// Context is nested under a single key so Sentry.setContext gets an
+// object value (the API rejects primitives — same convention as the
+// ErrorBoundary wiring fix).
+function reportServiceWorkerError(
+  scope: 'register' | 'unregister' | 'push_subscribe' | 'push_unsubscribe',
+  error: unknown
+): void {
+  errorMonitoring.captureException(
+    error instanceof Error ? error : new Error(String(error)),
+    { serviceWorker: { scope } }
+  );
+}
+
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) {
     console.log('Service Worker not supported');
@@ -34,6 +51,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
     return registration;
   } catch (error) {
     console.error('Service Worker registration failed:', error);
+    reportServiceWorkerError('register', error);
     return null;
   }
 }
@@ -48,6 +66,7 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     return await registration.unregister();
   } catch (error) {
     console.error('Service Worker unregistration failed:', error);
+    reportServiceWorkerError('unregister', error);
     return false;
   }
 }
@@ -85,6 +104,7 @@ export async function subscribeToPushNotifications(
     return subscription;
   } catch (error) {
     console.error('Push subscription failed:', error);
+    reportServiceWorkerError('push_subscribe', error);
     return null;
   }
 }
@@ -100,6 +120,7 @@ export async function unsubscribeFromPushNotifications(
     return true;
   } catch (error) {
     console.error('Push unsubscription failed:', error);
+    reportServiceWorkerError('push_unsubscribe', error);
     return false;
   }
 }
