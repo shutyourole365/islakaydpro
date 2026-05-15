@@ -3,10 +3,13 @@
 import { errorMonitoring } from '../services/errorMonitoring';
 
 // Forwards a caught error to Sentry without altering the return-shape of
-// the calling function — keeps console.error for local dev visibility.
-// Context is nested under a single key so Sentry.setContext gets an
-// object value (the API rejects primitives — same convention as the
-// ErrorBoundary wiring fix).
+// the calling function. errorMonitoring.captureException is the single
+// source of console logging: in PROD it ships to Sentry; in DEV it
+// prints "Error (not sent to Sentry):" with the same payload. We do NOT
+// also call console.error from each catch site — that would double-log
+// in DEV / misconfigured environments. Context is nested under a single
+// key so Sentry.setContext gets an object value (the API rejects
+// primitives — same convention as the ErrorBoundary wiring fix).
 function reportServiceWorkerError(
   scope: 'register' | 'unregister' | 'push_subscribe' | 'push_unsubscribe',
   error: unknown
@@ -50,7 +53,6 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 
     return registration;
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
     reportServiceWorkerError('register', error);
     return null;
   }
@@ -65,7 +67,6 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     const registration = await navigator.serviceWorker.ready;
     return await registration.unregister();
   } catch (error) {
-    console.error('Service Worker unregistration failed:', error);
     reportServiceWorkerError('unregister', error);
     return false;
   }
@@ -103,7 +104,6 @@ export async function subscribeToPushNotifications(
     console.log('Push subscription:', subscription);
     return subscription;
   } catch (error) {
-    console.error('Push subscription failed:', error);
     reportServiceWorkerError('push_subscribe', error);
     return null;
   }
@@ -119,7 +119,6 @@ export async function unsubscribeFromPushNotifications(
     }
     return true;
   } catch (error) {
-    console.error('Push unsubscription failed:', error);
     reportServiceWorkerError('push_unsubscribe', error);
     return false;
   }

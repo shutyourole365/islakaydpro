@@ -125,19 +125,28 @@ describe('serviceWorker → errorMonitoring wiring', () => {
   });
 
   it('does NOT call errorMonitoring when there is no error', async () => {
-    Object.defineProperty(navigator, 'serviceWorker', {
-      configurable: true,
-      value: {
-        register: vi.fn().mockResolvedValue({
-          scope: '/',
-          installing: null,
-          addEventListener: vi.fn(),
-          update: vi.fn(),
-        }),
-      },
-    });
+    // Happy-path register sets a 1-hour setInterval inside the SDK to
+    // poll for SW updates. Use fake timers so the interval doesn't leak
+    // and keep Vitest's process alive between files.
+    vi.useFakeTimers();
+    try {
+      Object.defineProperty(navigator, 'serviceWorker', {
+        configurable: true,
+        value: {
+          register: vi.fn().mockResolvedValue({
+            scope: '/',
+            installing: null,
+            addEventListener: vi.fn(),
+            update: vi.fn(),
+          }),
+        },
+      });
 
-    await registerServiceWorker();
-    expect(captureExceptionMock).not.toHaveBeenCalled();
+      await registerServiceWorker();
+      expect(captureExceptionMock).not.toHaveBeenCalled();
+    } finally {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+    }
   });
 });
