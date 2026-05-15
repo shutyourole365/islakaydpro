@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { sanitizeInput } from '../utils/validation';
+import { errorMonitoring } from './errorMonitoring';
 import type {
   Profile,
   Equipment,
@@ -16,6 +17,23 @@ import type {
   SavedSearch,
   VerificationRequest,
 } from '../types';
+
+// Forward a swallowed background failure (fire-and-forget notifications,
+// audit-log writes, view-count increments) to Sentry. We deliberately
+// don't rethrow — these are intentionally non-blocking — but they
+// shouldn't be invisible either. Context is nested under a single key
+// so Sentry.setContext gets an object value (rejects primitives — same
+// convention as the ErrorBoundary / serviceWorker / AuthContext wiring).
+function reportDatabaseError(
+  source: string,
+  error: unknown,
+  extra?: Record<string, unknown>
+): void {
+  errorMonitoring.captureException(
+    error instanceof Error ? error : new Error(String(error)),
+    { database: { source, ...extra } }
+  );
+}
 
 export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
@@ -159,9 +177,13 @@ export async function updateEquipment(id: string, updates: Partial<Equipment>): 
 
   if (error) throw error;
 
-  // Notify favoriting users if price dropped
+  // Notify favoriting users if price dropped. Background, non-blocking,
+  // but forward failures to Sentry so price-drop notifications going
+  // silently dark gets noticed.
   if (previousDailyRate !== undefined && updates.daily_rate !== undefined && updates.daily_rate < previousDailyRate) {
-    trackPriceChange(id, previousDailyRate, updates.daily_rate).catch(() => {});
+    trackPriceChange(id, previousDailyRate, updates.daily_rate).catch((e) => {
+      reportDatabaseError('updateEquipment.trackPriceChange', e, { equipmentId: id });
+    });
   }
 
   return data;
@@ -179,8 +201,10 @@ export async function deleteEquipment(id: string): Promise<void> {
 async function incrementEquipmentViews(equipmentId: string): Promise<void> {
   try {
     await supabase.rpc('increment_view_count', { equipment_id: equipmentId });
-  } catch {
-    // Silently ignore view count errors
+  } catch (e) {
+    // Non-blocking — view-count is best-effort — but Sentry should see it
+    // if the RPC starts failing in production so we know analytics is off.
+    reportDatabaseError('incrementEquipmentViews', e, { equipmentId });
   }
 }
 
@@ -287,8 +311,17 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
           equipmentName,
           dates,
           ownerName,
-        }).catch(() => {});
-      } catch { /* fire-and-forget */ }
+        }).catch((e) => {
+          reportDatabaseError('booking.sendBookingNotification', e, {
+            bookingId: data.id,
+            pushType,
+          });
+        });
+      } catch (e) {
+        // Fire-and-forget outer wrap — Sentry will see fan-out
+        // failures (notifications table insert, dynamic import).
+        reportDatabaseError('booking.notify.outer', e, { bookingId: data.id });
+      }
     })();
   }
 
@@ -480,8 +513,14 @@ export async function handlePaymentStatusUpdate(
         body: message,
         tag: `payment-${booking.id}`,
         url: '/dashboard?tab=bookings',
-      }).catch(() => {});
-    } catch { /* fire-and-forget */ }
+      }).catch((e) => {
+        reportDatabaseError('payment.sendPushNotification', e, {
+          bookingId: booking.id,
+        });
+      });
+    } catch (e) {
+      reportDatabaseError('payment.notify.outer', e, { bookingId: booking.id });
+    }
   })();
 }
 
@@ -797,8 +836,13 @@ export async function logAuditEvent(event: {
         entity_id: event.entityId,
         metadata: event.metadata || {},
       });
-  } catch {
-    // Silently ignore audit log errors
+  } catch (e) {
+    // Audit log writes are non-blocking, but a long-running outage
+    // would mean we're losing compliance evidence — Sentry should see it.
+    reportDatabaseError('logAuditEvent', e, {
+      action: event.action,
+      userId: event.userId,
+    });
   }
 }
 
