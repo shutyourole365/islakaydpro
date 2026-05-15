@@ -24,6 +24,8 @@ import type {
 // shouldn't be invisible either. Context is nested under a single key
 // so Sentry.setContext gets an object value (rejects primitives — same
 // convention as the ErrorBoundary / serviceWorker / AuthContext wiring).
+// `extra` is spread BEFORE `source` so a call site can never clobber the
+// source tag by accident.
 function reportDatabaseError(
   source: string,
   error: unknown,
@@ -31,7 +33,7 @@ function reportDatabaseError(
 ): void {
   errorMonitoring.captureException(
     error instanceof Error ? error : new Error(String(error)),
-    { database: { source, ...extra } }
+    { database: { ...extra, source } }
   );
 }
 
@@ -199,11 +201,17 @@ export async function deleteEquipment(id: string): Promise<void> {
 }
 
 async function incrementEquipmentViews(equipmentId: string): Promise<void> {
+  // Non-blocking — view-count is best-effort — but Sentry should see it
+  // if the RPC starts failing in production so we know analytics is off.
+  // supabase.rpc resolves with { error } on PostgREST failures rather
+  // than rejecting, so we need to check BOTH shapes: the resolved
+  // error AND any actually-thrown exception (network, runtime).
   try {
-    await supabase.rpc('increment_view_count', { equipment_id: equipmentId });
+    const { error } = await supabase.rpc('increment_view_count', { equipment_id: equipmentId });
+    if (error) {
+      reportDatabaseError('incrementEquipmentViews', error, { equipmentId });
+    }
   } catch (e) {
-    // Non-blocking — view-count is best-effort — but Sentry should see it
-    // if the RPC starts failing in production so we know analytics is off.
     reportDatabaseError('incrementEquipmentViews', e, { equipmentId });
   }
 }
@@ -295,7 +303,10 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
             ? `Your booking for ${equipmentName} has been cancelled`
             : `Your rental of ${equipmentName} is complete. Leave a review!`;
 
-          await supabase.from('notifications').insert({
+          // supabase.from(...).insert resolves with { error } on
+          // PostgREST failures (RLS, table missing, etc.) instead of
+          // rejecting — explicitly check it.
+          const { error: insertError } = await supabase.from('notifications').insert({
             user_id: data.renter_id,
             type: notificationType,
             title,
@@ -304,22 +315,32 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
             is_read: false,
             created_at: new Date().toISOString(),
           });
+          if (insertError) {
+            reportDatabaseError('booking.notification.insert', insertError, {
+              bookingId: data.id,
+              notificationType,
+            });
+          }
         }
 
+        // sendBookingNotification catches internally and resolves a
+        // success boolean — it never rejects. Await and check.
         const { sendBookingNotification } = await import('./pushNotifications');
-        sendBookingNotification(data.renter_id, pushType, {
+        const pushed = await sendBookingNotification(data.renter_id, pushType, {
           equipmentName,
           dates,
           ownerName,
-        }).catch((e) => {
-          reportDatabaseError('booking.sendBookingNotification', e, {
-            bookingId: data.id,
-            pushType,
-          });
         });
+        if (!pushed) {
+          errorMonitoring.captureMessage(
+            `Push notification failed for booking ${data.id} (${pushType})`,
+            'warning'
+          );
+        }
       } catch (e) {
-        // Fire-and-forget outer wrap — Sentry will see fan-out
-        // failures (notifications table insert, dynamic import).
+        // Catches actually-thrown exceptions (dynamic-import failure,
+        // runtime errors). Most PostgREST failures land in the
+        // explicit { error } checks above.
         reportDatabaseError('booking.notify.outer', e, { bookingId: data.id });
       }
     })();
@@ -505,19 +526,29 @@ export async function handlePaymentStatusUpdate(
 
   void (async () => {
     try {
-      await supabase.from('notifications').insert(notification);
-      // Fire-and-forget push notification
+      // PostgREST failures resolve with { error } — check explicitly.
+      const { error: insertError } = await supabase.from('notifications').insert(notification);
+      if (insertError) {
+        reportDatabaseError('payment.notification.insert', insertError, {
+          bookingId: booking.id,
+          notificationType,
+        });
+      }
+      // sendPushNotification catches internally and resolves { success }
+      // — never rejects. Await and check the boolean.
       const { sendPushNotification } = await import('./pushNotifications');
-      sendPushNotification(notificationUser, {
+      const result = await sendPushNotification(notificationUser, {
         title,
         body: message,
         tag: `payment-${booking.id}`,
         url: '/dashboard?tab=bookings',
-      }).catch((e) => {
-        reportDatabaseError('payment.sendPushNotification', e, {
-          bookingId: booking.id,
-        });
       });
+      if (!result.success) {
+        errorMonitoring.captureMessage(
+          `Push notification failed for payment ${booking.id} (${notificationType})`,
+          'warning'
+        );
+      }
     } catch (e) {
       reportDatabaseError('payment.notify.outer', e, { bookingId: booking.id });
     }
@@ -826,8 +857,13 @@ export async function logAuditEvent(event: {
   entityId?: string;
   metadata?: Record<string, unknown>;
 }): Promise<void> {
+  // Audit log writes are non-blocking, but a long-running outage means
+  // we're losing compliance evidence — Sentry should see it. supabase
+  // resolves with { error } for PostgREST failures (RLS, table missing,
+  // constraint) rather than rejecting, so we check BOTH: the resolved
+  // error AND any thrown exception.
   try {
-    await supabase
+    const { error } = await supabase
       .from('audit_logs')
       .insert({
         user_id: event.userId,
@@ -836,9 +872,13 @@ export async function logAuditEvent(event: {
         entity_id: event.entityId,
         metadata: event.metadata || {},
       });
+    if (error) {
+      reportDatabaseError('logAuditEvent', error, {
+        action: event.action,
+        userId: event.userId,
+      });
+    }
   } catch (e) {
-    // Audit log writes are non-blocking, but a long-running outage
-    // would mean we're losing compliance evidence — Sentry should see it.
     reportDatabaseError('logAuditEvent', e, {
       action: event.action,
       userId: event.userId,
@@ -1229,20 +1269,26 @@ export async function getMarketplaceInsights(): Promise<MarketplaceInsight> {
 // ============================================
 
 export async function trackPriceChange(equipmentId: string, oldPrice: number, newPrice: number): Promise<void> {
-  // Get users who favorited this equipment
-  const { data: favorites } = await supabase
+  // Get users who favorited this equipment. Supabase resolves with
+  // { error } for PostgREST failures rather than rejecting, so capture
+  // it before treating !favorites as "nobody favorited this".
+  const { data: favorites, error: favError } = await supabase
     .from('favorites')
     .select('user_id')
     .eq('equipment_id', equipmentId);
 
+  if (favError) {
+    reportDatabaseError('trackPriceChange.favoritesQuery', favError, { equipmentId });
+    return;
+  }
   if (!favorites || favorites.length === 0) return;
 
   // Create price drop alerts for each user
   if (newPrice < oldPrice) {
     const discount = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
-    
+
     for (const fav of favorites) {
-      await createAlert({
+      const alert = await createAlert({
         user_id: fav.user_id,
         type: 'price_drop',
         title: 'Price Drop Alert!',
@@ -1253,6 +1299,15 @@ export async function trackPriceChange(equipmentId: string, oldPrice: number, ne
         data: { oldPrice, newPrice, discount },
         action_url: `/equipment/${equipmentId}`,
       });
+      // createAlert returns null on failure (it swallows the underlying
+      // error). Without this, a wholesale price-drop notification outage
+      // would be undetectable.
+      if (alert === null) {
+        errorMonitoring.captureMessage(
+          `Price-drop createAlert returned null for equipment ${equipmentId}`,
+          'warning'
+        );
+      }
     }
   }
 }
