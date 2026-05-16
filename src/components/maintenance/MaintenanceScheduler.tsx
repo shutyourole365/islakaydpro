@@ -15,6 +15,7 @@ import {
 import type { Equipment } from '../../types';
 import { getEquipment } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
+import CalendarMonthGrid, { type CalendarEvent, type CalendarEventColor } from '../ui/CalendarMonthGrid';
 
 interface MaintenanceSchedulerProps {
   equipment?: Equipment[];
@@ -214,6 +215,24 @@ export default function MaintenanceScheduler({ equipment: propEquipment, classNa
       task.status === 'overdue' || task.scheduledDate < now
     );
   }, [maintenanceTasks]);
+
+  const calendarEvents = useMemo<CalendarEvent[]>(() => {
+    const colorFor = (task: MaintenanceTask): CalendarEventColor => {
+      if (task.status === 'overdue') return 'red';
+      if (task.status === 'completed') return 'green';
+      if (task.status === 'cancelled') return 'gray';
+      if (task.priority === 'critical' || task.priority === 'high') return 'amber';
+      if (task.priority === 'medium') return 'blue';
+      return 'gray';
+    };
+    return filteredTasks.map((task) => ({
+      id: task.id,
+      date: task.scheduledDate,
+      label: `${task.title} · ${task.equipmentName}`,
+      color: colorFor(task),
+      meta: `${task.status} · ${task.priority}`,
+    }));
+  }, [filteredTasks]);
 
   const handleTaskStatusUpdate = (taskId: string, newStatus: MaintenanceTask['status']) => {
     setMaintenanceTasks(prev =>
@@ -474,13 +493,14 @@ export default function MaintenanceScheduler({ equipment: propEquipment, classNa
 
       {/* Calendar View */}
       {viewMode === 'calendar' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            <Calendar className="w-12 h-12 mx-auto mb-4" />
-            <p>Calendar view coming soon!</p>
-            <p className="text-sm">View your maintenance schedule in calendar format.</p>
-          </div>
-        </div>
+        // No onEventClick: the surrounding component currently discards
+        // selectedTask state (line 55) and doesn't render an editor, so a
+        // calendar click would lead to a dead end. Wire this up when the
+        // task editor drawer is added (tracked separately).
+        <CalendarMonthGrid
+          events={calendarEvents}
+          emptyMessage="No maintenance scheduled this month. Adjust filters or add a task."
+        />
       )}
 
       {/* Kanban View */}

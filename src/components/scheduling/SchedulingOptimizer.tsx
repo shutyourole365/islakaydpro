@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-  Calendar,
   TrendingUp,
   DollarSign,
   AlertCircle,
@@ -12,6 +11,7 @@ import {
 import type { Equipment, Booking } from '../../types';
 import { getEquipment, getBookings } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
+import CalendarMonthGrid, { type CalendarEvent, type CalendarEventColor } from '../ui/CalendarMonthGrid';
 
 interface SchedulingOptimizerProps {
   equipment?: Equipment[];
@@ -46,6 +46,7 @@ export default function SchedulingOptimizer({
 }: SchedulingOptimizerProps) {
   const { user } = useAuth();
   const [optimizations, setOptimizations] = useState<ScheduleOptimization[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'week' | 'month' | 'quarter'>('week');
   const [viewMode, setViewMode] = useState<'overview' | 'detailed' | 'calendar'>('overview');
@@ -189,6 +190,7 @@ export default function SchedulingOptimizer({
         const bookingsList = Array.isArray(bookingsData) ? bookingsData : (bookingsData as { data?: Booking[] })?.data || [];
         const opts = generateOptimizations(equipmentList, bookingsList);
         setOptimizations(opts);
+        setBookings(bookingsList);
       } catch (error) {
         console.error('Failed to load scheduling data:', error);
       } finally {
@@ -251,6 +253,50 @@ export default function SchedulingOptimizer({
     setAutoOptimize(!autoOptimize);
     // In a real app, this would trigger automatic price adjustments and scheduling
   };
+
+  const calendarEvents = useMemo<CalendarEvent[]>(() => {
+    const priorityById = new Map<string, ScheduleOptimization['priority']>();
+    const nameById = new Map<string, string>();
+    for (const opt of optimizations) {
+      priorityById.set(opt.equipmentId, opt.priority);
+      nameById.set(opt.equipmentId, opt.equipmentName);
+    }
+
+    const colorFor = (booking: Booking): CalendarEventColor => {
+      if (booking.status === 'cancelled') return 'gray';
+      if (booking.status === 'completed') return 'green';
+      const priority = priorityById.get(booking.equipment_id);
+      if (priority === 'high') return 'red';
+      if (priority === 'medium') return 'amber';
+      return 'blue';
+    };
+
+    // booking.start_date / end_date are YYYY-MM-DD strings. new Date(str)
+    // interprets them as UTC midnight, which shifts the local day for
+    // non-UTC timezones (e.g. AEST renders a 2026-06-01 booking on May 31).
+    // Parse as local-date so the calendar lands on the correct cell.
+    const parseLocalDate = (iso: string): Date => {
+      const [y, m, d] = iso.split('-').map(Number);
+      return new Date(y, (m ?? 1) - 1, d ?? 1);
+    };
+
+    return bookings
+      .filter((b) => b.status !== 'cancelled')
+      .map((booking) => {
+        const start = parseLocalDate(booking.start_date);
+        // Prefer the persisted total_days; treat the date range as inclusive.
+        const days = Math.max(1, booking.total_days ?? 1);
+        const eqName =
+          booking.equipment?.title ?? nameById.get(booking.equipment_id) ?? 'Equipment';
+        return {
+          id: booking.id,
+          date: start,
+          label: `${eqName} · ${days}d`,
+          color: colorFor(booking),
+          meta: `${booking.status} · $${booking.total_amount?.toFixed?.(0) ?? booking.total_amount}`,
+        };
+      });
+  }, [bookings, optimizations]);
 
   if (loading) {
     return (
@@ -523,13 +569,10 @@ export default function SchedulingOptimizer({
 
       {/* Calendar View */}
       {viewMode === 'calendar' && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            <Calendar className="w-12 h-12 mx-auto mb-4" />
-            <p>Calendar view coming soon!</p>
-            <p className="text-sm">View scheduling optimizations in calendar format.</p>
-          </div>
-        </div>
+        <CalendarMonthGrid
+          events={calendarEvents}
+          emptyMessage="No bookings scheduled this month."
+        />
       )}
     </div>
   );
