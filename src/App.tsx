@@ -1198,8 +1198,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                   setIsGroupBookingOpen(false);
                   setBookingEquipment(null);
                 }}
-                onComplete={(data) => {
-                  console.log('Group booking:', data);
+                onComplete={(_data) => {
                   setIsGroupBookingOpen(false);
                   addToast({ type: 'success', title: 'Group booking confirmed!', message: 'All participants will receive confirmation emails.' });
                 }}
@@ -1220,8 +1219,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                 bookingId="demo-booking-123"
                 equipmentTitle="CAT 320 Excavator"
                 onClose={() => setIsSplitPaymentOpen(false)}
-                onComplete={(data) => {
-                  console.log('Split payment:', data);
+                onComplete={(_data) => {
                   setIsSplitPaymentOpen(false);
                   addToast({ type: 'success', title: 'Payment split configured', message: 'All parties will be notified.' });
                 }}
@@ -1245,7 +1243,6 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                 rentalDays={7}
                 onClose={() => setIsInsuranceQuoteOpen(false)}
                 onSelect={(plan) => {
-                  console.log('Insurance plan:', plan);
                   setIsInsuranceQuoteOpen(false);
                   addToast({ type: 'success', title: 'Insurance selected!', message: `${plan.name} plan applied.` });
                 }}
@@ -1268,8 +1265,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                 equipmentId={bookingEquipment?.id || 'demo-equipment'}
                 equipmentTitle="CAT 320 Excavator"
                 mode="check-in"
-                onComplete={(result) => {
-                  console.log('QR check result:', result);
+                onComplete={(_result) => {
                   setIsQRCheckInOpen(false);
                   addToast({ type: 'success', title: 'Check-in successful!', message: 'Enjoy your rental.' });
                 }}
@@ -1290,8 +1286,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                 equipmentId={bookingEquipment.id}
                 equipmentTitle={bookingEquipment.title}
                 type="post-rental"
-                onComplete={(report) => {
-                  console.log('Damage report:', report);
+                onComplete={(_report) => {
                   setIsDamageDetectionOpen(false);
                   addToast({ type: 'success', title: 'Inspection complete', message: 'Report saved successfully.' });
                 }}
@@ -1320,7 +1315,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
               </button>
               <SmartPricingEngine
                 equipment={bookingEquipment}
-                onPriceChange={(prices) => console.log('New prices:', prices)}
+                onPriceChange={() => { /* TODO: wire SmartPricingEngine output to backend */ }}
               />
             </div>
           </div>
@@ -1363,8 +1358,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                 equipmentTitle={bookingEquipment.title}
                 equipmentImages={bookingEquipment.images}
                 depositAmount={bookingEquipment.deposit_amount}
-                onComplete={(report) => {
-                  console.log('Damage report:', report);
+                onComplete={(_report) => {
                   setIsDamageWizardOpen(false);
                   addToast({ type: 'success', title: 'Return inspection complete', message: 'Thank you for returning the equipment.' });
                 }}
@@ -1432,8 +1426,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
             <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto">
               <PhotoMessaging
                 conversationId={messageConversationId}
-                onSendMessage={async (content, photos) => {
-                  console.log('Message sent:', { content, photos });
+                onSendMessage={async (_content, _photos) => {
                   setIsPhotoMessagingOpen(false);
                   addToast({ type: 'success', title: 'Message sent!', message: 'Photos delivered successfully.' });
                 }}
@@ -1457,8 +1450,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                 equipmentId={reviewEquipment.id}
                 equipmentTitle={reviewEquipment.title}
                 bookingId={reviewBookingId}
-                onSubmit={async (reviewData) => {
-                  console.log('Review submitted:', reviewData);
+                onSubmit={async (_reviewData) => {
                   setIsEnhancedReviewOpen(false);
                   setReviewEquipment(null);
                   setReviewBookingId(null);
@@ -1486,7 +1478,6 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                 totalAmount={bookingEquipment.daily_rate * 7}
                 depositAmount={bookingEquipment.deposit_amount}
                 onPaymentComplete={async (paymentData) => {
-                  console.log('Payment completed:', paymentData);
                   setIsMultiPaymentOpen(false);
                   addToast({ type: 'success', title: 'Payment successful!', message: `Method: ${paymentData.method}` });
                 }}
@@ -1637,8 +1628,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
               endDate: new Date(Date.now() + 86400000 * 10).toISOString().split('T')[0],
             }}
             savedPaymentMethod={{ type: 'card', last4: '4242' }}
-            onConfirm={(bookingData) => {
-              console.log('Quick booking confirmed:', bookingData);
+            onConfirm={(_bookingData) => {
               setIsQuickBookOpen(false);
               addToast({ type: 'success', title: 'Booking confirmed!', message: 'Check your email for details.' });
             }}
