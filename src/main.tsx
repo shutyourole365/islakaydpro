@@ -87,7 +87,17 @@ if (!envValidation.isValid && import.meta.env.PROD) {
 // Dynamic import keeps the analytics module (and any of its module-level
 // side effects) out of the eager bundle until consent is in hand.
 if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true' && hasAnalyticsConsent()) {
-  void import('./services/analytics').then(({ analytics }) => analytics.initialize());
+  void import('./services/analytics')
+    .then(({ analytics }) => analytics.initialize())
+    .catch((e) => {
+      // If the analytics module itself fails to load (network blip on the
+      // dynamic chunk, syntax error after a deploy mismatch), don't leave
+      // an unhandled promise rejection — forward to Sentry so we know.
+      errorMonitoring.captureException(
+        e instanceof Error ? e : new Error(String(e)),
+        { startup: { source: 'main.analyticsImport' } }
+      );
+    });
 }
 
 // Initialize performance monitoring in production
