@@ -25,6 +25,7 @@ import { createBooking, getBookingById, checkAvailability } from '../../services
 import type { Booking } from '../../types';
 import { createCheckoutSession } from '../../services/payments';
 import { sendBookingConfirmation } from '../../services/email';
+import { errorMonitoring } from '../../services/errorMonitoring';
 import { useToast } from '../ui/Toast';
 
 interface BookingSystemProps {
@@ -323,8 +324,24 @@ export default function BookingSystem({
           });
           window.location.href = checkout.url;
           return;
-        } catch {
-          // If Stripe redirect fails, still show confirmation
+        } catch (stripeError) {
+          // Stripe checkout creation failed — DO NOT silently fall through
+          // to the confirmation screen, which would make the user think a
+          // payment succeeded when no charge happened. Surface the failure
+          // and stop the flow. The booking row exists at this point (so it
+          // can be paid via a manual link later) but the renter must know
+          // the redirect didn't work.
+          errorMonitoring.captureException(
+            stripeError instanceof Error ? stripeError : new Error(String(stripeError)),
+            { booking: { source: 'BookingSystem.stripeCheckout', bookingId: newBooking.id } }
+          );
+          setIsProcessing(false);
+          addToast({
+            type: 'error',
+            title: 'Payment redirect failed',
+            message: 'Your booking is saved but we couldn\'t open the payment page. Please retry from your bookings dashboard.',
+          });
+          return;
         }
       }
 

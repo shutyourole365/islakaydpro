@@ -46,8 +46,13 @@ describe('database → errorMonitoring wiring', () => {
   });
 
   describe('logAuditEvent — resolved { error } shape', () => {
-    it('reports a PostgREST error returned in { error } (the real supabase failure mode)', async () => {
-      const pgError = { message: 'RLS denied', code: '42501' };
+    it('lifts PostgREST .message into the Error and preserves .code/.hint/.details in context', async () => {
+      const pgError = {
+        message: 'new row violates row-level security policy',
+        code: '42501',
+        hint: 'check RLS on audit_logs',
+        details: 'user u1 has no insert privilege',
+      };
       fromMock.mockReturnValue({
         insert: vi.fn().mockResolvedValue({ error: pgError }),
       });
@@ -58,11 +63,31 @@ describe('database → errorMonitoring wiring', () => {
 
       expect(captureExceptionMock).toHaveBeenCalledTimes(1);
       const [err, context] = captureExceptionMock.mock.calls[0];
-      // The PostgrestError-like object gets wrapped into an Error via String(...)
       expect(err).toBeInstanceOf(Error);
+      // The PostgREST message must NOT be lost to "[object Object]".
+      expect((err as Error).message).toBe('new row violates row-level security policy');
       expect(context).toMatchObject({
-        database: { source: 'logAuditEvent', action: 'sign_in', userId: 'u1' },
+        database: {
+          source: 'logAuditEvent',
+          action: 'sign_in',
+          userId: 'u1',
+          code: '42501',
+          hint: 'check RLS on audit_logs',
+          details: 'user u1 has no insert privilege',
+        },
       });
+    });
+
+    it('falls back to "Unknown database error" when the object has no .message', async () => {
+      fromMock.mockReturnValue({
+        insert: vi.fn().mockResolvedValue({ error: { code: '23505' } }),
+      });
+
+      await logAuditEvent({ userId: 'u1', action: 'sign_in' });
+
+      const [err, context] = captureExceptionMock.mock.calls[0];
+      expect((err as Error).message).toBe('Unknown database error');
+      expect((context as { database: { code: string } }).database.code).toBe('23505');
     });
 
     it('does not report when supabase resolves with { error: null }', async () => {

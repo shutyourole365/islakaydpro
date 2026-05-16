@@ -26,15 +26,38 @@ import type {
 // convention as the ErrorBoundary / serviceWorker / AuthContext wiring).
 // `extra` is spread BEFORE `source` so a call site can never clobber the
 // source tag by accident.
+//
+// Supabase `{ error }` results carry PostgrestError-shaped objects with
+// `.message` / `.code` / `.hint` / `.details` properties — `String(obj)`
+// would just produce "[object Object]". When we see that shape, lift the
+// message into the Error and preserve the rest as Sentry context so
+// triage has something useful to read.
 function reportDatabaseError(
   source: string,
   error: unknown,
   extra?: Record<string, unknown>
 ): void {
-  errorMonitoring.captureException(
-    error instanceof Error ? error : new Error(String(error)),
-    { database: { ...extra, source } }
-  );
+  let normalized: Error;
+  const pgFields: Record<string, unknown> = {};
+
+  if (error instanceof Error) {
+    normalized = error;
+  } else if (error && typeof error === 'object') {
+    const obj = error as { message?: unknown; code?: unknown; hint?: unknown; details?: unknown };
+    const msg = typeof obj.message === 'string' && obj.message.length > 0
+      ? obj.message
+      : 'Unknown database error';
+    normalized = new Error(msg);
+    if (typeof obj.code === 'string') pgFields.code = obj.code;
+    if (typeof obj.hint === 'string') pgFields.hint = obj.hint;
+    if (typeof obj.details === 'string') pgFields.details = obj.details;
+  } else {
+    normalized = new Error(String(error));
+  }
+
+  errorMonitoring.captureException(normalized, {
+    database: { ...extra, ...pgFields, source },
+  });
 }
 
 export async function getProfile(userId: string): Promise<Profile | null> {
