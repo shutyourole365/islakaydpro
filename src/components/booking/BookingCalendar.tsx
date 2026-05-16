@@ -147,6 +147,7 @@ export default function BookingCalendar({
         <div className="flex items-center justify-between">
           <button
             onClick={prevMonth}
+            aria-label="Previous month"
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={currentMonth <= new Date(today.getFullYear(), today.getMonth(), 1)}
           >
@@ -157,6 +158,7 @@ export default function BookingCalendar({
           </h3>
           <button
             onClick={nextMonth}
+            aria-label="Next month"
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
            >
             <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />

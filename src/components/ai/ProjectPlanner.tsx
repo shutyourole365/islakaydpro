@@ -146,7 +146,7 @@ export default function ProjectPlanner({ onClose, onBrowseEquipment }: ProjectPl
               <p className="text-xs text-teal-100">Tell me your project — I'll figure out the gear</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
+          <button onClick={onClose} aria-label="Close project planner" className="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors">
             <X className="w-4 h-4 text-white" />
           </button>
         </div>
