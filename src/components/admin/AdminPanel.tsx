@@ -221,6 +221,7 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
               <button
                 onClick={() => { loadStats(); loadUsers(); loadEquipment(); loadBookings(); }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Refresh dashboard data"
                 title="Refresh"
               >
                 <RefreshCw className="w-4 h-4 text-gray-500" />
@@ -377,18 +378,19 @@ export default function AdminPanel({ onBack }: AdminPanelProps) {
                             onClick={() => handleVerifyUser(u.id)}
                             disabled={actionLoading === u.id}
                             className="p-1.5 text-teal-600 hover:bg-teal-50 rounded transition-colors"
+                            aria-label={`Verify user ${u.email}`}
                             title="Verify user"
                           >
                             <CheckCircle2 className="w-4 h-4" />
                           </button>
                         )}
-                        <button className="p-1.5 text-gray-400 hover:bg-gray-100 rounded transition-colors" title="View profile">
+                        <button className="p-1.5 text-gray-400 hover:bg-gray-100 rounded transition-colors" aria-label={`View profile for ${u.email}`} title="View profile">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 text-blue-400 hover:bg-blue-50 rounded transition-colors" title="Email user">
+                        <button className="p-1.5 text-blue-400 hover:bg-blue-50 rounded transition-colors" aria-label={`Send email to ${u.email}`} title="Email user">
                           <Mail className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 text-red-400 hover:bg-red-50 rounded transition-colors" title="Suspend">
+                        <button className="p-1.5 text-red-400 hover:bg-red-50 rounded transition-colors" aria-label={`Suspend ${u.email}`} title="Suspend">
                           <Ban className="w-4 h-4" />
                         </button>
                       </div>

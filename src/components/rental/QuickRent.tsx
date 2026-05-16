@@ -229,6 +229,7 @@ export default function QuickRent({
             <div className="relative p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
               <button
                 onClick={onClose}
+                aria-label="Close quick rent"
                 className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30"
               >
                 <X className="w-5 h-5" />

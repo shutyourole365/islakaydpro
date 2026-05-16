@@ -193,6 +193,7 @@ export default function GroupBooking({
             </div>
             <button
               onClick={onClose}
+              aria-label="Close group booking"
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
             >
               <XCircle className="w-6 h-6" />

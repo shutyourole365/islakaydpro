@@ -235,6 +235,7 @@ export default function QRCheckInOut({
             </div>
             <button
               onClick={onClose}
+              aria-label="Close QR check-in"
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
             >
               <XCircle className="w-6 h-6" />
