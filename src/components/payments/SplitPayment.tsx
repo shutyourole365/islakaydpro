@@ -14,6 +14,7 @@ import {
   UserPlus,
   RefreshCw,
 } from 'lucide-react';
+import { errorMonitoring } from '../../services/errorMonitoring';
 
 interface SplitPaymentProps {
   bookingId: string;
@@ -176,8 +177,16 @@ export default function SplitPayment({
           text: `You've been invited to split the cost of renting ${equipmentTitle}`,
           url: shareLink,
         });
-      } catch {
-        // user dismissed the native share sheet — nothing to do
+      } catch (e) {
+        // AbortError == user dismissed the share sheet (expected, no
+        // signal). Anything else (invalid payload, OS-level error) is
+        // worth seeing — forward to Sentry.
+        if (!(e instanceof DOMException && e.name === 'AbortError')) {
+          errorMonitoring.captureException(
+            e instanceof Error ? e : new Error(String(e)),
+            { share: { source: 'SplitPayment.share' } }
+          );
+        }
       }
     }
   };
