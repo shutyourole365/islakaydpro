@@ -5,10 +5,12 @@ import { ToastProvider } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { registerServiceWorker } from './lib/serviceWorker';
-import { analytics } from './services/analytics';
+// NOTE: analytics is dynamic-imported below to keep its module-level
+// side effects from firing before the cookie-consent check runs.
 import { errorMonitoring } from './services/errorMonitoring';
 import { PerformanceMonitor } from './utils/performance';
 import { validateEnvironment, logValidationResults } from './utils/envValidation';
+import { hasAnalyticsConsent } from './utils/consent';
 import './index.css';
 
 // Dev-only: hide Vite error overlay from accessibility scans
@@ -76,9 +78,16 @@ if (!envValidation.isValid && import.meta.env.PROD) {
   throw new Error('Environment validation failed. Check console for details.');
 }
 
-// Initialize analytics if enabled
-if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
-  analytics.initialize();
+// Initialize analytics only when (a) the feature flag is on AND (b) the
+// user has explicitly opted in via the cookie-consent banner. First-time
+// visitors see the banner before any analytics SDK is loaded; runtime
+// acceptance is handled in useCookieConsent which calls analytics.initialize()
+// after persisting the consent settings.
+//
+// Dynamic import keeps the analytics module (and any of its module-level
+// side effects) out of the eager bundle until consent is in hand.
+if (import.meta.env.VITE_ENABLE_ANALYTICS === 'true' && hasAnalyticsConsent()) {
+  void import('./services/analytics').then(({ analytics }) => analytics.initialize());
 }
 
 // Initialize performance monitoring in production
