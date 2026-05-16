@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { sanitizeInput } from '../utils/validation';
+import { sanitizeInput, enforceMaxLength } from '../utils/validation';
 import { errorMonitoring } from './errorMonitoring';
 import type {
   Profile,
@@ -49,6 +49,10 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 }
 
 export async function updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile> {
+  enforceMaxLength(updates.full_name, 'fullName', 'Full name');
+  enforceMaxLength(updates.bio, 'bio', 'Bio');
+  enforceMaxLength(updates.location, 'locationText', 'Location');
+
   const { data, error } = await supabase
     .from('profiles')
     .update({ ...updates, updated_at: new Date().toISOString() })
@@ -148,6 +152,12 @@ export async function getEquipmentById(id: string): Promise<Equipment | null> {
 }
 
 export async function createEquipment(equipment: Omit<Equipment, 'id' | 'created_at' | 'updated_at' | 'rating' | 'total_reviews' | 'total_bookings'>): Promise<Equipment> {
+  enforceMaxLength(equipment.title, 'equipmentTitle', 'Title');
+  enforceMaxLength(equipment.description, 'equipmentDescription', 'Description');
+  enforceMaxLength(equipment.brand, 'equipmentBrand', 'Brand');
+  enforceMaxLength(equipment.model, 'equipmentModel', 'Model');
+  enforceMaxLength(equipment.location, 'locationText', 'Location');
+
   const { data, error } = await supabase
     .from('equipment')
     .insert(equipment)
@@ -159,6 +169,12 @@ export async function createEquipment(equipment: Omit<Equipment, 'id' | 'created
 }
 
 export async function updateEquipment(id: string, updates: Partial<Equipment>): Promise<Equipment> {
+  enforceMaxLength(updates.title, 'equipmentTitle', 'Title');
+  enforceMaxLength(updates.description, 'equipmentDescription', 'Description');
+  enforceMaxLength(updates.brand, 'equipmentBrand', 'Brand');
+  enforceMaxLength(updates.model, 'equipmentModel', 'Model');
+  enforceMaxLength(updates.location, 'locationText', 'Location');
+
   // Fetch current price before update to detect changes
   let previousDailyRate: number | undefined;
   if (updates.daily_rate !== undefined) {
@@ -454,6 +470,9 @@ export async function getReviews(filters: {
 }
 
 export async function createReview(review: Omit<Review, 'id' | 'created_at' | 'response'>): Promise<Review> {
+  enforceMaxLength(review.title, 'reviewTitle', 'Review title');
+  enforceMaxLength(review.comment, 'reviewComment', 'Review');
+
   const { data, error } = await supabase
     .from('reviews')
     .insert(review)
@@ -466,6 +485,8 @@ export async function createReview(review: Omit<Review, 'id' | 'created_at' | 'r
 
 
 export async function addReviewResponse(reviewId: string, response: string): Promise<Review> {
+  enforceMaxLength(response, 'reviewResponse', 'Response');
+
   const { data, error } = await supabase
     .from("reviews")
     .update({ response })
@@ -732,6 +753,8 @@ export async function sendMessage(message: {
   content: string;
   equipmentId?: string;
 }): Promise<Message> {
+  enforceMaxLength(message.content, 'messageContent', 'Message');
+
   const { data, error } = await supabase
     .from('messages')
     .insert({
