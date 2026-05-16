@@ -75,7 +75,9 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       scope: '/',
     });
 
-    console.log('Service worker registered:', registration.scope);
+    if (import.meta.env.DEV) {
+      console.log('Service worker registered:', registration.scope);
+    }
     return registration;
   } catch (error) {
     console.error('Service worker registration failed:', error);
@@ -139,7 +141,9 @@ export async function subscribeToPush(userId: string): Promise<boolean> {
 
     if (error) throw error;
 
-    console.log('Push subscription registered successfully');
+    if (import.meta.env.DEV) {
+      console.log('Push subscription registered successfully');
+    }
     return true;
   } catch (error) {
     console.error('Push subscription failed:', error);
@@ -172,7 +176,9 @@ export async function unsubscribeFromPush(): Promise<boolean> {
       },
     });
 
-    console.log('Push unsubscription successful');
+    if (import.meta.env.DEV) {
+      console.log('Push unsubscription successful');
+    }
     return true;
   } catch (error) {
     console.error('Push unsubscription failed:', error);

@@ -62,10 +62,8 @@ export default function InstallPrompt() {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
 
-      if (outcome === 'accepted') {
-        console.log('PWA installed');
-      } else {
-        console.log('PWA installation dismissed');
+      if (import.meta.env.DEV) {
+        console.log(outcome === 'accepted' ? 'PWA installed' : 'PWA installation dismissed');
       }
     } catch (error) {
       console.error('PWA installation error:', error);

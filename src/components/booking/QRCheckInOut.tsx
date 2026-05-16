@@ -69,7 +69,7 @@ export default function QRCheckInOut({
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => console.log('Location not available')
+        () => { if (import.meta.env.DEV) console.log('Location not available'); }
       );
     }
 
@@ -207,8 +207,8 @@ export default function QRCheckInOut({
           title: `Equipment ${mode === 'check-in' ? 'Pickup' : 'Return'} QR Code`,
           text: `Scan this QR code to ${mode === 'check-in' ? 'pick up' : 'return'} ${equipmentTitle}`,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch {
+        // user dismissed the native share sheet — nothing to do
       }
     } else {
       alert('Sharing not supported on this device');

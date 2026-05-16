@@ -534,7 +534,10 @@ export default function AIAssistantEnhanced() {
 
   const handleFeedback = (messageId: string, isPositive: boolean) => {
     setFeedbackGiven((prev) => new Set([...prev, messageId]));
-    console.log(`Feedback for message ${messageId}: ${isPositive ? 'positive' : 'negative'}`);
+    // TODO: wire to backend feedback endpoint. DEV-only trace for now.
+    if (import.meta.env.DEV) {
+      console.log(`Feedback for message ${messageId}: ${isPositive ? 'positive' : 'negative'}`);
+    }
   };
 
   const handleSend = useCallback(() => {

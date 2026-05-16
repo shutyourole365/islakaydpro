@@ -22,7 +22,7 @@ function reportServiceWorkerError(
 
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) {
-    console.log('Service Worker not supported');
+    if (import.meta.env.DEV) console.log('Service Worker not supported');
     return null;
   }
 
@@ -31,7 +31,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       scope: '/',
     });
 
-    console.log('Service Worker registered:', registration.scope);
+    if (import.meta.env.DEV) console.log('Service Worker registered:', registration.scope);
 
     // Check for updates periodically
     setInterval(() => {
@@ -75,7 +75,7 @@ export async function unregisterServiceWorker(): Promise<boolean> {
 // Push Notification utilities
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!('Notification' in window)) {
-    console.log('Notifications not supported');
+    if (import.meta.env.DEV) console.log('Notifications not supported');
     return 'denied';
   }
 
@@ -101,7 +101,7 @@ export async function subscribeToPushNotifications(
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
     });
 
-    console.log('Push subscription:', subscription);
+    if (import.meta.env.DEV) console.log('Push subscription:', subscription);
     return subscription;
   } catch (error) {
     reportServiceWorkerError('push_subscribe', error);
@@ -132,7 +132,7 @@ export async function showLocalNotification(
   const permission = await requestNotificationPermission();
   
   if (permission !== 'granted') {
-    console.log('Notification permission denied');
+    if (import.meta.env.DEV) console.log('Notification permission denied');
     return;
   }
 
@@ -186,7 +186,7 @@ export async function clearAppCache(): Promise<void> {
   if ('caches' in window) {
     const cacheNames = await caches.keys();
     await Promise.all(cacheNames.map((name) => caches.delete(name)));
-    console.log('All caches cleared');
+    if (import.meta.env.DEV) console.log('All caches cleared');
   }
 }
 

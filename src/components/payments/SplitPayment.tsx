@@ -176,8 +176,8 @@ export default function SplitPayment({
           text: `You've been invited to split the cost of renting ${equipmentTitle}`,
           url: shareLink,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch {
+        // user dismissed the native share sheet — nothing to do
       }
     }
   };
