@@ -82,10 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { analytics: analyticsService } = await import('../services/analytics');
         analyticsService.trackError(`Auth data load failed: ${(error as Error).message}`, false);
       }
-      // Send to Sentry if configured
+      // Send to Sentry if configured. Nest under a single key so the
+      // Sentry.setContext call inside captureException receives an object
+      // value (it rejects primitives — same convention as the
+      // ErrorBoundary wiring).
       errorMonitoring.captureException(error as Error, {
-        context: 'AuthContext.loadUserData',
-        userId,
+        auth: { source: 'AuthContext.loadUserData', userId },
       });
     }
   }, []);
@@ -103,7 +105,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const count = await getUnreadMessageCount(state.user.id);
       setState(prev => ({ ...prev, unreadMessages: count }));
     } catch (e) {
-      console.error('refreshMessages error', e);
+      errorMonitoring.captureException(e as Error, {
+        auth: { source: 'AuthContext.refreshMessages', userId: state.user.id },
+      });
     }
   }, [state.user]);
 
@@ -188,6 +192,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
       }
     } catch (error) {
+      // Capture the original (pre-friendly-message) error for triage.
+      // Sentry's ignoreErrors config already filters common network noise.
+      errorMonitoring.captureException(error as Error, {
+        auth: { source: 'AuthContext.signIn' },
+      });
       const message = getAuthErrorMessage(error as Error);
       throw new Error(message);
     }
@@ -239,8 +248,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       const errorMsg = (error as Error).message;
       if (errorMsg === 'EMAIL_CONFIRMATION_REQUIRED') {
+        // Expected control-flow signal, not a real failure — don't capture.
         throw new Error('Please check your email to confirm your account before signing in.');
       }
+      // Capture the original for triage before throwing the friendly message.
+      errorMonitoring.captureException(error as Error, {
+        auth: { source: 'AuthContext.signUp' },
+      });
       const message = getAuthErrorMessage(error as Error);
       throw new Error(message);
     }
