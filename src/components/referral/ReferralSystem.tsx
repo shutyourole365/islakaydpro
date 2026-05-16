@@ -11,23 +11,13 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getMyReferralCode, listMyReferrals, type ReferralRecord } from '../../services/referrals';
 
 interface ReferralSystemProps {
   className?: string;
 }
 
-interface Referral {
-  id: string;
-  referredUser: {
-    name: string;
-    email: string;
-    avatar?: string;
-  };
-  status: 'pending' | 'completed' | 'rewarded';
-  joinedDate: Date;
-  rewardEarned: number;
-  rewardType: 'credit' | 'discount' | 'premium';
-}
+type Referral = ReferralRecord;
 
 interface ReferralStats {
   totalReferrals: number;
@@ -88,49 +78,41 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     const loadReferralData = async () => {
       if (!user) return;
-
-      try {
-        // Mock data - in real app, this would come from API
-        const mockReferrals: Referral[] = [
-          {
-            id: '1',
-            referredUser: { name: 'John Smith', email: 'john@example.com' },
-            status: 'completed',
-            joinedDate: new Date('2024-01-15'),
-            rewardEarned: 50,
-            rewardType: 'credit',
-          },
-          {
-            id: '2',
-            referredUser: { name: 'Sarah Johnson', email: 'sarah@example.com' },
-            status: 'rewarded',
-            joinedDate: new Date('2024-01-20'),
-            rewardEarned: 75,
-            rewardType: 'discount',
-          },
-          {
-            id: '3',
-            referredUser: { name: 'Mike Wilson', email: 'mike@example.com' },
-            status: 'pending',
-            joinedDate: new Date('2024-02-01'),
-            rewardEarned: 0,
-            rewardType: 'credit',
-          },
-        ];
-
-        setReferrals(mockReferrals);
-        setReferralCode(`ISLAKAYD-${user.id.slice(0, 8).toUpperCase()}`);
-      } catch (error) {
-        console.error('Failed to load referral data:', error);
-      } finally {
-        setLoading(false);
+      setLoading(true);
+      // Settle independently so an error in one branch doesn't skip the
+      // fallback for the other (Promise.all would short-circuit and leave
+      // the referral code blank if listMyReferrals failed first).
+      const fallbackCode = `ISLAKAYD-${user.id.slice(0, 8).toUpperCase()}`;
+      const [codeResult, rowsResult] = await Promise.allSettled([
+        getMyReferralCode(user.id),
+        listMyReferrals(user.id),
+      ]);
+      if (cancelled) return;
+      if (codeResult.status === 'fulfilled') {
+        setReferralCode(codeResult.value ?? fallbackCode);
+      } else {
+        console.error('Failed to load referral code:', codeResult.reason);
+        setReferralCode(fallbackCode);
       }
+      if (rowsResult.status === 'fulfilled') {
+        setReferrals(rowsResult.value);
+      } else {
+        console.error('Failed to load referrals list:', rowsResult.reason);
+        setReferrals([]);
+      }
+      setLoading(false);
     };
 
     loadReferralData();
-  }, [user]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   const stats: ReferralStats = useMemo(() => {
     const totalReferrals = referrals.length;
@@ -420,7 +402,9 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
                     </div>
                     <div>
                       <div className="font-medium text-gray-900 dark:text-white">{referral.referredUser.name}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{referral.referredUser.email}</div>
+                      {referral.referredUser.email && (
+                        <div className="text-sm text-gray-600 dark:text-gray-400">{referral.referredUser.email}</div>
+                      )}
                       <div className="text-xs text-gray-500 dark:text-gray-500">
                         Joined {referral.joinedDate.toLocaleDateString()}
                       </div>

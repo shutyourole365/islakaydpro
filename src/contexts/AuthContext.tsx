@@ -4,12 +4,13 @@ import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
 import { getProfile, getUserAnalytics, getUnreadNotificationCount, getUnreadMessageCount, subscribeToNotifications, logAuditEvent } from '../services/database';
 import { errorMonitoring } from '../services/errorMonitoring';
-import { 
-  signInWithRetry, 
+import {
+  signInWithRetry,
   signUpWithRetry,
   getAuthErrorMessage,
   isEmailConfirmationRequired,
 } from '../services/authHelpers';
+import { captureReferralFromUrl, peekPendingReferralCode, clearPendingReferralCode } from '../services/referrals';
 
 interface AuthState {
   user: User | null;
@@ -119,6 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.user]);
 
   useEffect(() => {
+    captureReferralFromUrl();
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState(prev => ({
         ...prev,
@@ -203,13 +205,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    // Peek (don't consume) so a failed signup retry can still attribute
+    // the referral. Cleared only on success below.
+    const referralCode = peekPendingReferralCode();
     try {
+      const metadata: Record<string, unknown> = { full_name: fullName };
+      if (referralCode) metadata.referral_code = referralCode;
+
       const data = await signUpWithRetry(
-        email, 
-        password, 
-        { full_name: fullName },
+        email,
+        password,
+        metadata,
         { maxAttempts: 3, delayMs: 1000 }
       );
+      // Supabase returns a user with an empty identities array when the
+      // email is already registered (anti-enumeration). Only clear the
+      // pending referral code if a new account was actually created.
+      const isNewSignup = (data?.user?.identities?.length ?? 0) > 0;
+      if (isNewSignup && referralCode) clearPendingReferralCode();
 
       if (data.user) {
         // Create profile (may fail if email confirmation required)

@@ -2,6 +2,7 @@ import { useState, useId } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { signUpWithRetry, getAuthErrorMessage } from '../../services/authHelpers';
+import { peekPendingReferralCode, clearPendingReferralCode } from '../../services/referrals';
 import { sendWelcomeEmail } from '../../services/email';
 import SocialAuth from './SocialAuth';
 import BiometricAuth from './BiometricAuth';
@@ -64,9 +65,19 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     setLoading(true);
     setError('');
     setSuccess('');
+    // Peek the pending referral code so a failed signup retry still
+    // attributes correctly; only clear after the user is created.
+    const referralCode = peekPendingReferralCode();
+    const metadata: Record<string, unknown> = { full_name: fullName };
+    if (referralCode) metadata.referral_code = referralCode;
     try {
-      const data = await signUpWithRetry(email, password, { full_name: fullName }, { maxAttempts: 3, delayMs: 1000 });
+      const data = await signUpWithRetry(email, password, metadata, { maxAttempts: 3, delayMs: 1000 });
       if (data.user) {
+        // Supabase returns a fake user with an empty identities array when
+        // the email is already registered (anti-enumeration). Only clear
+        // the pending referral code if a new account was actually created.
+        const isNewSignup = (data.user.identities?.length ?? 0) > 0;
+        if (referralCode && isNewSignup) clearPendingReferralCode();
         if (!data.session) {
           sendWelcomeEmail(email, fullName).catch(() => {});
           setSuccess('✅ Account created! Please check your email to confirm your account.');
