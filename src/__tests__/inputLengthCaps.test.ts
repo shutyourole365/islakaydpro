@@ -74,6 +74,7 @@ import {
   createEquipment,
   updateEquipment,
   addReviewResponse,
+  submitReview,
 } from '../services/database';
 
 describe('database service: input length caps', () => {
@@ -170,6 +171,45 @@ describe('database service: input length caps', () => {
     await expect(
       updateEquipment('eq-1', { title: 'x'.repeat(201) })
     ).rejects.toThrow(/Title must be 200 characters or fewer/);
+
+    expect(fromMock).not.toHaveBeenCalled();
+  });
+
+  // submitReview is the alternate review-write entry point (used by the
+  // dashboard) that bypasses createReview. Both paths must enforce the
+  // same cap, otherwise the DoS guard is incomplete.
+  it('submitReview rejects oversized comment before calling supabase', async () => {
+    fromMock.mockReturnValue({ insert: vi.fn() });
+
+    await expect(
+      submitReview({
+        bookingId: 'b-1',
+        equipmentId: 'eq-1',
+        reviewerId: 'u-1',
+        revieweeId: 'u-2',
+        rating: 5,
+        title: 'ok',
+        comment: 'x'.repeat(5001),
+      } as Parameters<typeof submitReview>[0])
+    ).rejects.toThrow(/Review must be 5000 characters or fewer/);
+
+    expect(fromMock).not.toHaveBeenCalled();
+  });
+
+  it('submitReview rejects oversized title before calling supabase', async () => {
+    fromMock.mockReturnValue({ insert: vi.fn() });
+
+    await expect(
+      submitReview({
+        bookingId: 'b-1',
+        equipmentId: 'eq-1',
+        reviewerId: 'u-1',
+        revieweeId: 'u-2',
+        rating: 5,
+        title: 'x'.repeat(201),
+        comment: 'fine',
+      } as Parameters<typeof submitReview>[0])
+    ).rejects.toThrow(/Review title must be 200 characters or fewer/);
 
     expect(fromMock).not.toHaveBeenCalled();
   });

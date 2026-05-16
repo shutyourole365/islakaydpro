@@ -6,6 +6,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { sendMessageNotification } from '../../services/pushNotifications';
+import { enforceMaxLength } from '../../utils/validation';
 
 interface Message {
   id: string;
@@ -218,6 +219,17 @@ export default function MessagingPage({
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedConv || !user || sending) return;
     const content = newMessage.trim();
+    try {
+      // Service-layer DoS guard — apply here too since this component
+      // bypasses services/database.sendMessage and inserts directly.
+      enforceMaxLength(content, 'messageContent', 'Message');
+    } catch (e) {
+      // Surface the validation error; don't clear the input so the user
+      // can trim it down.
+      setSending(false);
+      alert(e instanceof Error ? e.message : 'Message too long');
+      return;
+    }
     setNewMessage('');
     setSending(true);
     try {

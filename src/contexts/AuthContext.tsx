@@ -11,6 +11,7 @@ import {
   isEmailConfirmationRequired,
 } from '../services/authHelpers';
 import { captureReferralFromUrl, peekPendingReferralCode, clearPendingReferralCode } from '../services/referrals';
+import { enforceMaxLength } from '../utils/validation';
 
 interface AuthState {
   user: User | null;
@@ -205,6 +206,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
+    // Service-layer DoS guard — signUp ends up doing a direct
+    // supabase.from('profiles').upsert below, bypassing updateProfile.
+    // Apply the same cap here so an oversized name can't reach the DB.
+    enforceMaxLength(fullName, 'fullName', 'Full name');
+
     // Peek (don't consume) so a failed signup retry can still attribute
     // the referral. Cleared only on success below.
     const referralCode = peekPendingReferralCode();

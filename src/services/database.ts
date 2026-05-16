@@ -1360,6 +1360,9 @@ export interface ReviewSubmission {
 }
 
 export async function submitReview(data: ReviewSubmission): Promise<void> {
+  enforceMaxLength(data.title, 'reviewTitle', 'Review title');
+  enforceMaxLength(data.comment, 'reviewComment', 'Review');
+
   const { error } = await supabase.from('reviews').insert({
     booking_id: data.bookingId,
     listing_id: data.equipmentId, // reviews table uses listing_id
