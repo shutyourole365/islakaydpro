@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 
 interface ShareEquipmentProps {
   equipmentId: string;
@@ -34,7 +35,7 @@ export default function ShareEquipment({
 
   if (!isOpen) return null;
 
-  const shareUrl = `${window.location.origin}/equipment/${equipmentId}`;
+  const shareUrl = `${getPublicAppUrl()}/equipment/${equipmentId}`;
   const shareText = `Check out this equipment for rent: ${equipmentTitle}`;
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedText = encodeURIComponent(shareText);
