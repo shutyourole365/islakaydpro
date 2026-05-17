@@ -136,7 +136,9 @@ export default function GroupBooking({
   const pricing = calculatePricing();
 
   const generateShareLink = () => {
-    const link = `https://islakayd.com/group/${equipmentId}/${Date.now().toString(36)}`;
+    // Use the current origin so dev / preview / prod all generate working
+    // links (was hardcoded to https://islakayd.com which broke local + previews).
+    const link = `${window.location.origin}/group/${equipmentId}/${Date.now().toString(36)}`;
     setShareLink(link);
     navigator.clipboard.writeText(link);
     alert('Invite link copied to clipboard!');
