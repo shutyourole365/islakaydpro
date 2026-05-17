@@ -1,4 +1,4 @@
-﻿SELECT kcu.table_name, kcu.column_name
+SELECT kcu.table_name, kcu.column_name
 FROM information_schema.key_column_usage kcu
 JOIN information_schema.table_constraints tc
   ON kcu.constraint_name = tc.constraint_name
