@@ -16,6 +16,7 @@ import {
   Tag,
   Loader2,
 } from 'lucide-react';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 
 interface GroupBookingProps {
   equipmentId: string;
@@ -136,9 +137,10 @@ export default function GroupBooking({
   const pricing = calculatePricing();
 
   const generateShareLink = () => {
-    // Use the current origin so dev / preview / prod all generate working
-    // links (was hardcoded to https://islakayd.com which broke local + previews).
-    const link = `${window.location.origin}/group/${equipmentId}/${Date.now().toString(36)}`;
+    // Use getPublicAppUrl() (VITE_APP_URL with origin fallback) so the
+    // link is externally reachable in every build — including Capacitor
+    // mobile, where window.location.origin would be capacitor://localhost.
+    const link = `${getPublicAppUrl()}/group/${equipmentId}/${Date.now().toString(36)}`;
     setShareLink(link);
     navigator.clipboard.writeText(link);
     alert('Invite link copied to clipboard!');
