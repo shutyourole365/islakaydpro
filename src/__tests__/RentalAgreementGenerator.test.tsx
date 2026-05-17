@@ -281,4 +281,60 @@ describe('RentalAgreementGenerator', () => {
       );
     });
   });
+
+  // Regression coverage for the alert() -> useToast migration. These two
+  // paths used to call window.alert(); they now surface a toast and must
+  // continue to surface SOMETHING the user can see.
+  describe('Toast surfacing (post alert() migration)', () => {
+    it('surfaces an error toast when the booking lookup returns no row', async () => {
+      mockChain.single.mockResolvedValueOnce({ data: null, error: { message: 'not found' } });
+
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      await waitFor(() => expect(screen.getByText('Rental Agreements')).toBeInTheDocument());
+
+      const input = screen.getByPlaceholderText('Paste your booking ID');
+      await user.type(input, 'bad-booking-id');
+      const generateBtn = screen.getByRole('button', { name: /Generate/i });
+      await user.click(generateBtn);
+
+      await waitFor(() => {
+        expect(screen.getByText('Booking not found')).toBeInTheDocument();
+      });
+    });
+
+    it('surfaces a warning toast when an agreement already exists', async () => {
+      // 1st single() resolves the booking lookup (success)
+      mockChain.single.mockResolvedValueOnce({
+        data: {
+          id: 'booking-xyz',
+          owner_id: 'user-1',
+          renter_id: 'user-2',
+          start_date: '2026-03-01',
+          end_date: '2026-03-05',
+          total_amount: 1000,
+          deposit_amount: 500,
+          daily_rate: 200,
+          service_fee: 50,
+          equipment: { title: 'Test Equipment' },
+        },
+        error: null,
+      });
+      // maybeSingle() returns an existing agreement
+      mockChain.maybeSingle.mockResolvedValueOnce({ data: { id: 'existing-agr' }, error: null });
+
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      await waitFor(() => expect(screen.getByText('Rental Agreements')).toBeInTheDocument());
+
+      const input = screen.getByPlaceholderText('Paste your booking ID');
+      await user.type(input, 'booking-xyz');
+      const generateBtn = screen.getByRole('button', { name: /Generate/i });
+      await user.click(generateBtn);
+
+      await waitFor(() => {
+        expect(screen.getByText('Agreement exists')).toBeInTheDocument();
+      });
+    });
+  });
 });
