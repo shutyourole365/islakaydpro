@@ -20,6 +20,7 @@ import {
   Grid3X3,
   List,
 } from 'lucide-react';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 
 interface Equipment {
   id: string;
@@ -151,7 +152,7 @@ export default function WishlistCollections({
   };
 
   const shareCollection = (collection: WishlistCollection) => {
-    const url = `${window.location.origin}/wishlist/${collection.id}`;
+    const url = `${getPublicAppUrl()}/wishlist/${collection.id}`;
     navigator.clipboard.writeText(url);
     alert('Collection link copied to clipboard!');
     setMenuOpen(null);

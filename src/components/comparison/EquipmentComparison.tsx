@@ -15,6 +15,7 @@ import {
   Search,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 
 interface EquipmentComparisonProps {
   items?: Equipment[];
@@ -200,7 +201,7 @@ export default function EquipmentComparison({
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/compare?ids=${selectedIds.join(',')}`;
+    const url = `${getPublicAppUrl()}/compare?ids=${selectedIds.join(',')}`;
     try {
       await navigator.clipboard.writeText(url);
       alert('Comparison link copied to clipboard!');
