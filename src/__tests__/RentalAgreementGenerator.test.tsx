@@ -1,7 +1,13 @@
+import type { ReactElement } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render as rtlRender, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RentalAgreementGenerator from '../components/agreements/RentalAgreementGenerator';
+import { ToastProvider } from '../components/ui/Toast';
+
+// The component now uses useToast — wrap every render in ToastProvider.
+const render = (ui: ReactElement) =>
+  rtlRender(<ToastProvider>{ui}</ToastProvider>);
 
 vi.mock('../contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'user-1', email: 'test@test.com' } }),

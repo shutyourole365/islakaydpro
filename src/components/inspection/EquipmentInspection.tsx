@@ -14,6 +14,7 @@ import {
   Gauge,
 } from 'lucide-react';
 import ProgressBar from '../ui/ProgressBar';
+import { useToast } from '../ui/Toast';
 import type { Equipment, InspectionReport } from '../../types';
 
 interface EquipmentInspectionProps {
@@ -46,6 +47,7 @@ export default function EquipmentInspection({
   onInspectionComplete,
   className = ''
 }: EquipmentInspectionProps) {
+  const { addToast } = useToast();
   const [categories, setCategories] = useState<InspectionCategory[]>([]);
   const [currentCategory, setCurrentCategory] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -324,12 +326,19 @@ export default function EquipmentInspection({
       onInspectionComplete?.(report);
       setOverallStatus(overallStatus);
 
-      // Show success message
-      alert(`Inspection completed with status: ${overallStatus.toUpperCase()}`);
+      addToast({
+        type: 'success',
+        title: 'Inspection complete',
+        message: `Status: ${overallStatus.toUpperCase()}`,
+      });
 
     } catch (error) {
       console.error('Failed to submit inspection:', error);
-      alert('Failed to submit inspection. Please try again.');
+      addToast({
+        type: 'error',
+        title: 'Submission failed',
+        message: 'Failed to submit inspection. Please try again.',
+      });
     } finally {
       setIsSubmitting(false);
     }

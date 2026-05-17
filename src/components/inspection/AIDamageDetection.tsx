@@ -16,6 +16,7 @@ import {
   Info,
 } from 'lucide-react';
 import ProgressBar from '../ui/ProgressBar';
+import { useToast } from '../ui/Toast';
 
 interface AIDamageDetectionProps {
   equipmentId: string;
@@ -56,6 +57,7 @@ export default function AIDamageDetection({
   onComplete,
   onClose,
 }: AIDamageDetectionProps) {
+  const { addToast } = useToast();
   // equipmentTitle reserved for display in future enhancement
   const [photos, setPhotos] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
@@ -80,7 +82,11 @@ export default function AIDamageDetection({
       }
     } catch (err) {
       console.error('Camera error:', err);
-      alert('Could not access camera. Please upload photos instead.');
+      addToast({
+        type: 'error',
+        title: 'Camera unavailable',
+        message: 'Could not access camera. Please upload photos instead.',
+      });
     }
   };
 
@@ -127,7 +133,11 @@ export default function AIDamageDetection({
 
   const analyzePhotos = async () => {
     if (photos.length === 0) {
-      alert('Please add at least one photo to analyze');
+      addToast({
+        type: 'warning',
+        title: 'No photos yet',
+        message: 'Please add at least one photo to analyze.',
+      });
       return;
     }
 
