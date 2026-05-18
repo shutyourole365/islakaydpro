@@ -16,6 +16,7 @@ import {
   Tag,
   Loader2,
 } from 'lucide-react';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 import { useToast } from '../ui/Toast';
 
 interface GroupBookingProps {
@@ -142,7 +143,10 @@ export default function GroupBooking({
   const pricing = calculatePricing();
 
   const generateShareLink = async () => {
-    const link = `https://islakayd.com/group/${equipmentId}/${Date.now().toString(36)}`;
+    // Use getPublicAppUrl() (VITE_APP_URL with origin fallback) so the
+    // link is externally reachable in every build — including Capacitor
+    // mobile, where window.location.origin would be capacitor://localhost.
+    const link = `${getPublicAppUrl()}/group/${equipmentId}/${Date.now().toString(36)}`;
     setShareLink(link);
     try {
       await navigator.clipboard.writeText(link);

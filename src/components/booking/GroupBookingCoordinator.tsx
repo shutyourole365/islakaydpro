@@ -17,6 +17,7 @@ import {
   Sparkles,
   CreditCard,
 } from 'lucide-react';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 
 interface GroupMember {
   id: string;
@@ -224,7 +225,10 @@ export default function GroupBookingCoordinator({
   };
 
   const copyInviteLink = async () => {
-    const link = `${window.location.origin}/join/${booking.id}`;
+    // getPublicAppUrl() falls back to window.location.origin; swap is so
+    // the link works in Capacitor builds where origin would be
+    // capacitor://localhost.
+    const link = `${getPublicAppUrl()}/join/${booking.id}`;
     try {
       await navigator.clipboard.writeText(link);
       setCopySuccess(true);

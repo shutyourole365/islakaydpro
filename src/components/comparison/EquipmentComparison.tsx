@@ -15,6 +15,7 @@ import {
   Search,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 import { useToast } from '../ui/Toast';
 
 interface EquipmentComparisonProps {
@@ -202,7 +203,7 @@ export default function EquipmentComparison({
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/compare?ids=${selectedIds.join(',')}`;
+    const url = `${getPublicAppUrl()}/compare?ids=${selectedIds.join(',')}`;
     try {
       await navigator.clipboard.writeText(url);
       addToast({

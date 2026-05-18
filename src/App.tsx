@@ -1604,15 +1604,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
               setSelectedEquipment(equipment);
               setIsRecommendationsOpen(false);
             }}
-            onFavoriteClick={(id) => {
-              if (favorites.has(id)) {
-                removeFavorite(user!.id, id);
-                setFavorites(prev => { const next = new Set(prev); next.delete(id); return next; });
-              } else {
-                addFavorite(user!.id, id);
-                setFavorites(prev => new Set(prev).add(id));
-              }
-            }}
+            onFavoriteClick={(id) => { void handleFavoriteToggle(id); }}
             favorites={favorites}
           />
         </Suspense>

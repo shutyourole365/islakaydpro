@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { errorMonitoring } from '../../services/errorMonitoring';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 import { useToast } from '../ui/Toast';
 
 interface SplitPaymentProps {
@@ -157,7 +158,10 @@ export default function SplitPayment({
     // Simulate sending invites
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    const link = `https://islakayd.com/split/${bookingId}/${Date.now().toString(36)}`;
+    // Use getPublicAppUrl() (VITE_APP_URL with origin fallback) so the
+    // link is externally reachable in every build — including Capacitor
+    // mobile, where window.location.origin would be capacitor://localhost.
+    const link = `${getPublicAppUrl()}/split/${bookingId}/${Date.now().toString(36)}`;
     setShareLink(link);
 
     const finalSplits = calculateSplits();

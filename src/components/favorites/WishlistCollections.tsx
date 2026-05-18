@@ -20,6 +20,7 @@ import {
   Grid3X3,
   List,
 } from 'lucide-react';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 import { useToast } from '../ui/Toast';
 
 interface Equipment {
@@ -153,7 +154,10 @@ export default function WishlistCollections({
   };
 
   const shareCollection = async (collection: WishlistCollection) => {
-    const url = `${window.location.origin}/wishlist/${collection.id}`;
+    // getPublicAppUrl() falls back to window.location.origin; swap is so
+    // the link works in Capacitor builds where origin would be
+    // capacitor://localhost.
+    const url = `${getPublicAppUrl()}/wishlist/${collection.id}`;
     try {
       await navigator.clipboard.writeText(url);
       addToast({
