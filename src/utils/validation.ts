@@ -1,6 +1,54 @@
 // note: sanitize_html types imported separately for compile
 // import sanitizeHtml from 'sanitize-html'; // commented out, unused
 
+// Hard caps on user-content fields written to the database. These are
+// the LAST defense — UI components should also have their own
+// character-counter affordances — but if anything slips through, the
+// service layer rejects it before we send a 10MB review body or 50KB
+// chat message to Postgres.
+//
+// Numbers picked from common UGC patterns:
+//   - Twitter / Bluesky post-class       ~300
+//   - Reddit comment                     10000
+//   - GitHub issue body                  65536
+// We're more conservative: 5000 for free-form prose, smaller for
+// names and short fields.
+export const INPUT_LIMITS = {
+  fullName: 100,
+  bio: 500,
+  equipmentTitle: 200,
+  equipmentBrand: 100,
+  equipmentModel: 100,
+  equipmentDescription: 5000,
+  locationText: 200,
+  reviewTitle: 200,
+  reviewComment: 5000,
+  reviewResponse: 2000,
+  messageContent: 5000,
+} as const;
+
+export type InputLimitKey = keyof typeof INPUT_LIMITS;
+
+/**
+ * Throws a user-facing Error if `value` exceeds the configured max
+ * for `field`. Null / undefined / non-string values pass through
+ * untouched — callers can do their own required-ness checks. This
+ * helper is purely a length-cap guard.
+ */
+export function enforceMaxLength(
+  value: unknown,
+  field: InputLimitKey,
+  displayName?: string
+): void {
+  if (typeof value !== 'string') return;
+  const max = INPUT_LIMITS[field];
+  if (value.length > max) {
+    throw new Error(
+      `${displayName ?? field} must be ${max} characters or fewer (got ${value.length}).`
+    );
+  }
+}
+
 export function sanitizeInput(input: string): string {
   // Basic sanitization: strip HTML tags and dangerous patterns
   let sanitized = input;
