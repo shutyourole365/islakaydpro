@@ -12,6 +12,7 @@ import {
   DollarSign,
   Trophy,
 } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 interface ReferralProgramProps {
   userId: string;
@@ -48,6 +49,7 @@ interface LeaderboardEntry {
 }
 
 export default function ReferralProgram({ userId, userName }: ReferralProgramProps) {
+  const { addToast } = useToast();
   const [stats, setStats] = useState<ReferralStats | null>(null);
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -110,7 +112,10 @@ export default function ReferralProgram({ userId, userName }: ReferralProgramPro
     setTimeout(() => {
       setInviteSent(false);
       setInviteEmail('');
-      alert('Invitation sent!');
+      addToast({
+        type: 'success',
+        title: 'Invitation sent',
+      });
     }, 1500);
   };
 

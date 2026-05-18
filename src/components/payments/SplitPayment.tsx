@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { errorMonitoring } from '../../services/errorMonitoring';
+import { useToast } from '../ui/Toast';
 
 interface SplitPaymentProps {
   bookingId: string;
@@ -56,6 +57,7 @@ export default function SplitPayment({
   onComplete,
   onClose,
 }: SplitPaymentProps) {
+  const { addToast } = useToast();
   const [participants, setParticipants] = useState<Participant[]>([
     { id: '1', name: 'You', email: 'you@example.com', avatarColor: avatarColors[0] },
   ]);
@@ -70,7 +72,11 @@ export default function SplitPayment({
 
   const addParticipant = () => {
     if (!newParticipant.name || !newParticipant.email) {
-      alert('Please enter name and email');
+      addToast({
+        type: 'warning',
+        title: 'Missing details',
+        message: 'Please enter both a name and an email.',
+      });
       return;
     }
 
@@ -167,10 +173,17 @@ export default function SplitPayment({
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareLink);
-      alert('Link copied to clipboard!');
+      addToast({
+        type: 'success',
+        title: 'Link copied to clipboard',
+      });
     } catch (err) {
       console.error('Failed to copy split-payment link:', err);
-      alert('Could not copy link. Please copy it manually.');
+      addToast({
+        type: 'error',
+        title: 'Could not copy link',
+        message: 'Please copy it manually.',
+      });
     }
   };
 
