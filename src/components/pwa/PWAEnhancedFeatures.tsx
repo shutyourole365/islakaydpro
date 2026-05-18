@@ -35,28 +35,58 @@ export default function PWAEnhancedFeatures({ onClose }: PWAEnhancedFeaturesProp
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    // Service-worker update listeners get tracked so cleanup can remove
+    // them. registration is long-lived (it survives this component's
+    // lifetime), so an 'updatefound' handler added inside the Promise
+    // and never removed would leak forever — including any 'statechange'
+    // listener it attaches to newWorker after the component unmounts.
+    let isMounted = true;
+    let registrationForCleanup: ServiceWorkerRegistration | null = null;
+    let updateFoundHandler: (() => void) | null = null;
+    // updatefound can fire more than once during a single mount (each SW
+    // update is a new worker), so track them per-worker.
+    const statechangeHandlers = new Map<ServiceWorker, () => void>();
+
     // Check for service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then(registration => {
+        // The component may have unmounted while the Promise was pending;
+        // if so, don't attach anything.
+        if (!isMounted) return;
+
+        registrationForCleanup = registration;
         setSwRegistration(registration);
 
         // Check for updates
-        registration.addEventListener('updatefound', () => {
+        updateFoundHandler = () => {
           const newWorker = registration.installing;
-          if (newWorker) {
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                setUpdateAvailable(true);
-              }
-            });
-          }
-        });
+          if (!newWorker) return;
+          const handleStateChange = () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              if (isMounted) setUpdateAvailable(true);
+            }
+            // Self-remove once the worker reaches a terminal state for our
+            // purposes: 'installed' (we've already signaled the update —
+            // no more useful transitions to react to) or 'redundant' (the
+            // worker was superseded / install failed). Without this, the
+            // Map grows unbounded across repeated SW updates on a long
+            // mount.
+            if (newWorker.state === 'installed' || newWorker.state === 'redundant') {
+              newWorker.removeEventListener('statechange', handleStateChange);
+              statechangeHandlers.delete(newWorker);
+            }
+          };
+          newWorker.addEventListener('statechange', handleStateChange);
+          statechangeHandlers.set(newWorker, handleStateChange);
+        };
+        registration.addEventListener('updatefound', updateFoundHandler);
       });
     }
 
     // Estimate cache size
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       navigator.storage.estimate().then(estimate => {
+        if (!isMounted) return;
         const sizeInMB = (estimate.usage || 0) / (1024 * 1024);
         setCacheSize(sizeInMB);
       });
@@ -74,8 +104,17 @@ export default function PWAEnhancedFeatures({ onClose }: PWAEnhancedFeaturesProp
     });
 
     return () => {
+      isMounted = false;
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+
+      if (registrationForCleanup && updateFoundHandler) {
+        registrationForCleanup.removeEventListener('updatefound', updateFoundHandler);
+      }
+      statechangeHandlers.forEach((handler, worker) => {
+        worker.removeEventListener('statechange', handler);
+      });
+      statechangeHandlers.clear();
     };
   }, []);
 
