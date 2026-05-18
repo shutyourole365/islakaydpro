@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 
 interface DisputeCenterProps {
   onBack: () => void;
@@ -116,6 +117,7 @@ async function sendDisputeMessage(disputeId: string, senderId: string, content: 
 
 export default function DisputeCenter({ onBack, bookingId }: DisputeCenterProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [disputes, setDisputes] = useState<Dispute[]>([]);
   const [selected, setSelected] = useState<Dispute | null>(null);
   const [messages, setMessages] = useState<DisputeMessage[]>([]);
@@ -195,7 +197,11 @@ export default function DisputeCenter({ onBack, bookingId }: DisputeCenterProps)
         .single();
 
       if (!booking) {
-        alert('Booking not found. Please check the Booking ID.');
+        addToast({
+          type: 'error',
+          title: 'Booking not found',
+          message: 'Please check the Booking ID and try again.',
+        });
         return;
       }
 

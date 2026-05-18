@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { sendMessageNotification } from '../../services/pushNotifications';
 import { enforceMaxLength } from '../../utils/validation';
+import { useToast } from '../ui/Toast';
 
 interface Message {
   id: string;
@@ -45,6 +46,7 @@ export default function MessagingPage({
   onBack,
 }: MessagingPageProps) {
   const { user, profile } = useAuth();
+  const { addToast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConv, setSelectedConv] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -227,7 +229,11 @@ export default function MessagingPage({
       // Surface the validation error; don't clear the input so the user
       // can trim it down.
       setSending(false);
-      alert(e instanceof Error ? e.message : 'Message too long');
+      addToast({
+        type: 'error',
+        title: 'Message not sent',
+        message: e instanceof Error ? e.message : 'Message too long.',
+      });
       return;
     }
     setNewMessage('');

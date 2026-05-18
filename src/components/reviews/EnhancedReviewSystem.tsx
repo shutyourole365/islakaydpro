@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Star, ThumbsUp, Camera, Shield, Award, TrendingUp, MessageSquare } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 interface EnhancedReviewSystemProps {
   equipmentId: string;
@@ -31,6 +32,7 @@ export default function EnhancedReviewSystem({
   onSubmit,
   onClose,
 }: EnhancedReviewSystemProps) {
+  const { addToast } = useToast();
   const [step, setStep] = useState<'rating' | 'aspects' | 'details' | 'photos'  >('rating');
   const [overallRating, setOverallRating] = useState(0);
   const [aspectRatings, setAspectRatings] = useState({
@@ -66,13 +68,21 @@ export default function EnhancedReviewSystem({
     const files = Array.from(e.target.files || []);
     
     if (files.length + selectedPhotos.length > 5) {
-      alert('Maximum 5 photos per review');
+      addToast({
+        type: 'warning',
+        title: 'Too many photos',
+        message: 'Maximum 5 photos per review.',
+      });
       return;
     }
 
     const validFiles = files.filter(file => {
       if (file.size > 5 * 1024 * 1024) {
-        alert(`${file.name} is too large (max 5MB)`);
+        addToast({
+          type: 'warning',
+          title: 'File too large',
+          message: `${file.name} exceeds the 5MB limit.`,
+        });
         return false;
       }
       return file.type.startsWith('image/');
@@ -89,12 +99,20 @@ export default function EnhancedReviewSystem({
 
   const handleSubmit = async () => {
     if (overallRating === 0) {
-      alert('Please select an overall rating');
+      addToast({
+        type: 'warning',
+        title: 'Rating required',
+        message: 'Please select an overall rating.',
+      });
       return;
     }
 
     if (!title.trim() || !comment.trim()) {
-      alert('Please provide a title and comment');
+      addToast({
+        type: 'warning',
+        title: 'Review incomplete',
+        message: 'Please provide both a title and a comment.',
+      });
       return;
     }
 
@@ -111,7 +129,11 @@ export default function EnhancedReviewSystem({
       onClose();
     } catch (error) {
       console.error('Failed to submit review:', error);
-      alert('Failed to submit review. Please try again.');
+      addToast({
+        type: 'error',
+        title: 'Submission failed',
+        message: 'Could not submit your review. Please try again.',
+      });
     } finally {
       setIsSubmitting(false);
     }

@@ -17,6 +17,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { errorMonitoring } from '../../services/errorMonitoring';
+import { useToast } from '../ui/Toast';
 
 interface QRCheckInOutProps {
   bookingId: string;
@@ -44,6 +45,7 @@ export default function QRCheckInOut({
   onComplete,
   onClose,
 }: QRCheckInOutProps) {
+  const { addToast } = useToast();
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -198,7 +200,11 @@ export default function QRCheckInOut({
 
   const downloadQR = () => {
     // In production, generate actual downloadable QR image
-    alert('QR Code downloaded to your device!');
+    addToast({
+      type: 'success',
+      title: 'QR code downloaded',
+      message: 'Saved to your device.',
+    });
   };
 
   const shareQR = async () => {
@@ -220,7 +226,11 @@ export default function QRCheckInOut({
         }
       }
     } else {
-      alert('Sharing not supported on this device');
+      addToast({
+        type: 'warning',
+        title: 'Sharing unavailable',
+        message: 'Native sharing is not supported on this device.',
+      });
     }
   };
 
