@@ -11,6 +11,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 import { getMyReferralCode, listMyReferrals, type ReferralRecord } from '../../services/referrals';
 
 interface ReferralSystemProps {
@@ -149,7 +150,7 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
   };
 
   const handleShare = (platform: string) => {
-    const shareUrl = `${window.location.origin}/signup?ref=${referralCode}`;
+    const shareUrl = `${getPublicAppUrl()}/signup?ref=${referralCode}`;
     const shareText = `Join Islakayd and get exclusive equipment rental deals! Use my referral code: ${referralCode}`;
 
     switch (platform) {

@@ -17,6 +17,7 @@ import {
   Sparkles,
   CreditCard,
 } from 'lucide-react';
+import { getPublicAppUrl } from '../../utils/publicUrl';
 
 interface GroupMember {
   id: string;
@@ -224,7 +225,7 @@ export default function GroupBookingCoordinator({
   };
 
   const copyInviteLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/join/${booking.id}`);
+    navigator.clipboard.writeText(`${getPublicAppUrl()}/join/${booking.id}`);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
