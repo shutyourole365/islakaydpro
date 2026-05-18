@@ -17,6 +17,7 @@ import {
 import { getNotifications, markNotificationRead, markAllNotificationsRead } from '../../services/database';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 import type { Notification } from '../../types';
 
 interface NotificationCenterProps {
@@ -65,6 +66,7 @@ function getTimeAgo(dateStr: string): string {
 
 export default function NotificationCenter({ onBack }: NotificationCenterProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'bookings' | 'messages'>('all');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,6 +80,11 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
       setNotifications(data.map((n: Notification) => ({ ...n, timeAgo: getTimeAgo(n.created_at) })));
     } catch (err) {
       console.error('Failed to load notifications:', err);
+      addToast({
+        type: 'error',
+        title: 'Could not load notifications',
+        message: err instanceof Error ? err.message : 'Please try again.',
+      });
     } finally {
       setLoading(false);
     }
