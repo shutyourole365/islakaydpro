@@ -55,6 +55,8 @@ export default function QRCheckInOut({
   const [qrData, setQrData] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scanTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Generate QR data
@@ -78,6 +80,8 @@ export default function QRCheckInOut({
 
     return () => {
       stopCamera();
+      if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
+      if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current);
     };
   }, [bookingId, equipmentId, mode]);
 
@@ -115,10 +119,10 @@ export default function QRCheckInOut({
 
   const scanQRCode = () => {
     // Simulated QR scanning - in production, use a QR library like jsQR
-    const checkForQR = setInterval(() => {
+    scanIntervalRef.current = setInterval(() => {
       // Simulate finding QR code after 2 seconds
-      setTimeout(() => {
-        clearInterval(checkForQR);
+      scanTimeoutRef.current = setTimeout(() => {
+        if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
         handleQRDetected();
       }, 2000);
     }, 500);
