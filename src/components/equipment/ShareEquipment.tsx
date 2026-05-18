@@ -29,7 +29,7 @@ export default function ShareEquipment({
   isOpen,
   onClose,
 }: ShareEquipmentProps) {
-  const { success } = useToast();
+  const { success, error } = useToast();
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -101,10 +101,15 @@ export default function ShareEquipment({
     {
       name: 'Instagram',
       icon: Instagram,
-      action: () => {
+      action: async () => {
         // Instagram doesn't support direct sharing, so we'll copy to clipboard
-        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-        success('Content copied! You can now paste it in Instagram.');
+        try {
+          await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+          success('Content copied! You can now paste it in Instagram.');
+        } catch (err) {
+          console.error('Failed to copy Instagram share content:', err);
+          error('Could not copy content. Please try again.');
+        }
       },
       color: 'bg-pink-100 hover:bg-pink-200 text-pink-700',
     },

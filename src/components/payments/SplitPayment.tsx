@@ -164,9 +164,14 @@ export default function SplitPayment({
     }
   };
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(shareLink);
-    alert('Link copied to clipboard!');
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      alert('Link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy split-payment link:', err);
+      alert('Could not copy link. Please copy it manually.');
+    }
   };
 
   const shareNative = async () => {

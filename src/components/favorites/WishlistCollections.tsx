@@ -150,10 +150,15 @@ export default function WishlistCollections({
     setMenuOpen(null);
   };
 
-  const shareCollection = (collection: WishlistCollection) => {
+  const shareCollection = async (collection: WishlistCollection) => {
     const url = `${window.location.origin}/wishlist/${collection.id}`;
-    navigator.clipboard.writeText(url);
-    alert('Collection link copied to clipboard!');
+    try {
+      await navigator.clipboard.writeText(url);
+      alert('Collection link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy collection link:', err);
+      alert('Could not copy link. Please copy it manually.');
+    }
     setMenuOpen(null);
   };
 
