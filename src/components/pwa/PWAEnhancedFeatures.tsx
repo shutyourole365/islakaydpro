@@ -65,6 +65,16 @@ export default function PWAEnhancedFeatures({ onClose }: PWAEnhancedFeaturesProp
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               if (isMounted) setUpdateAvailable(true);
             }
+            // Self-remove once the worker reaches a terminal state for our
+            // purposes: 'installed' (we've already signaled the update —
+            // no more useful transitions to react to) or 'redundant' (the
+            // worker was superseded / install failed). Without this, the
+            // Map grows unbounded across repeated SW updates on a long
+            // mount.
+            if (newWorker.state === 'installed' || newWorker.state === 'redundant') {
+              newWorker.removeEventListener('statechange', handleStateChange);
+              statechangeHandlers.delete(newWorker);
+            }
           };
           newWorker.addEventListener('statechange', handleStateChange);
           statechangeHandlers.set(newWorker, handleStateChange);
