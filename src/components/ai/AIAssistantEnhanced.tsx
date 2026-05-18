@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { streamMessage, analyzeProject, getRecommendations, getPersonalizedRecommendations, getEquipmentHelp, loadChatHistory, saveChatMessage, clearChatHistory } from '../../services/ai';
 import { useLocalStorage } from '../../hooks';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 import {
   X,
   Send,
@@ -87,6 +88,7 @@ const WELCOME_MESSAGE: Message = {
 
 export default function AIAssistantEnhanced() {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(true);
@@ -198,7 +200,11 @@ export default function AIAssistantEnhanced() {
 
   const toggleVoiceInput = () => {
     if (!recognitionRef.current) {
-      alert('Speech recognition not supported in this browser');
+      addToast({
+        type: 'warning',
+        title: 'Voice input unavailable',
+        message: 'Speech recognition is not supported in this browser.',
+      });
       return;
     }
 

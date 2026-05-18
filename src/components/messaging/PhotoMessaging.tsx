@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { Camera, Image, X, Send, Paperclip, Smile } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 interface PhotoMessagingProps {
   conversationId: string;
@@ -8,6 +9,7 @@ interface PhotoMessagingProps {
 }
 
 export default function PhotoMessaging({ conversationId, onSendMessage, onClose }: PhotoMessagingProps) {
+  const { addToast } = useToast();
   const [message, setMessage] = useState('');
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -25,17 +27,29 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
     const files = Array.from(e.target.files || []);
     
     if (files.length + selectedPhotos.length > 5) {
-      alert('Maximum 5 photos per message');
+      addToast({
+        type: 'warning',
+        title: 'Too many photos',
+        message: 'Maximum 5 photos per message.',
+      });
       return;
     }
 
     const newPhotos = files.filter(file => {
       if (file.size > 5 * 1024 * 1024) {
-        alert(`${file.name} is too large. Maximum 5MB per photo.`);
+        addToast({
+          type: 'warning',
+          title: 'File too large',
+          message: `${file.name} exceeds the 5MB limit.`,
+        });
         return false;
       }
       if (!file.type.startsWith('image/')) {
-        alert(`${file.name} is not an image file.`);
+        addToast({
+          type: 'warning',
+          title: 'Not an image',
+          message: `${file.name} is not an image file.`,
+        });
         return false;
       }
       return true;
@@ -72,7 +86,11 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
       setPreviewUrls([]);
     } catch (error) {
       console.error('Failed to send message:', error);
-      alert('Failed to send message. Please try again.');
+      addToast({
+        type: 'error',
+        title: 'Send failed',
+        message: 'Could not send your message. Please try again.',
+      });
     } finally {
       setIsSending(false);
     }

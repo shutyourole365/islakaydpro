@@ -15,6 +15,7 @@ import {
   Search,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
+import { useToast } from '../ui/Toast';
 
 interface EquipmentComparisonProps {
   items?: Equipment[];
@@ -53,6 +54,7 @@ export default function EquipmentComparison({
   favorites = new Set(),
   maxItems = 4,
 }: EquipmentComparisonProps) {
+  const { addToast } = useToast();
   const [activeCategory, setActiveCategory] = useState<ComparisonCategory>('overview');
   const [highlightDifferences, setHighlightDifferences] = useState(true);
 
@@ -203,9 +205,17 @@ export default function EquipmentComparison({
     const url = `${window.location.origin}/compare?ids=${selectedIds.join(',')}`;
     try {
       await navigator.clipboard.writeText(url);
-      alert('Comparison link copied to clipboard!');
+      addToast({
+        type: 'success',
+        title: 'Comparison link copied',
+        message: 'Share it with anyone.',
+      });
     } catch {
-      alert('Failed to copy link');
+      addToast({
+        type: 'error',
+        title: 'Could not copy link',
+        message: 'Please copy it manually.',
+      });
     }
   };
 

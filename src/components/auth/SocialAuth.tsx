@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 
 interface SocialAuthProps {
   onError: (error: string) => void;
@@ -21,6 +22,7 @@ interface SocialProvider {
 export default function SocialAuth({ onError, onLoading, mode, isAge18Plus = false, agreeToTerms = false }: SocialAuthProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const { signInWithGoogle } = useAuth();
+  const { addToast } = useToast();
 
   // Validate age/terms for signup paths
   const validateSignupRequirements = (): boolean => {
@@ -134,7 +136,11 @@ export default function SocialAuth({ onError, onLoading, mode, isAge18Plus = fal
           if (error) {
             onError(error.message);
           } else {
-            alert('Check your email for the magic link!');
+            addToast({
+              type: 'success',
+              title: 'Magic link sent',
+              message: 'Check your email to finish signing in.',
+            });
           }
         }}
         aria-label="Send magic link"
