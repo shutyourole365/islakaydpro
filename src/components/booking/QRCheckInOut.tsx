@@ -112,6 +112,14 @@ export default function QRCheckInOut({
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
       tracks.forEach(track => track.stop());
     }
+    // Stop the scan poll too — otherwise the simulator keeps ticking
+    // and fires handleQRDetected() at the 2s mark even after the user
+    // has cancelled. handleQRDetected calls onComplete, so a cancelled
+    // scan would still trigger the completion callback.
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
     setScanning(false);
   };
 
