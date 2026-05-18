@@ -29,12 +29,14 @@ export default function InstallPrompt() {
       }
     }
 
+    let bannerTimeout: ReturnType<typeof setTimeout> | null = null;
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
 
       // Show banner after 30 seconds on page
-      setTimeout(() => {
+      bannerTimeout = setTimeout(() => {
         setShowBanner(true);
       }, 30000);
     };
@@ -52,6 +54,7 @@ export default function InstallPrompt() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      if (bannerTimeout) clearTimeout(bannerTimeout);
     };
   }, []);
 
