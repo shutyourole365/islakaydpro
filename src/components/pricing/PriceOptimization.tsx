@@ -13,6 +13,7 @@ import {
 import type { Equipment } from '../../types';
 import { getEquipment, getBookings } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 
 interface PriceOptimizationProps {
   equipment: Equipment;
@@ -37,6 +38,7 @@ interface MarketData {
 
 export default function PriceOptimization({ equipment, className = '' }: PriceOptimizationProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [recommendation, setRecommendation] = useState<PriceRecommendation | null>(null);
   const [marketData, setMarketData] = useState<MarketData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -159,7 +161,10 @@ export default function PriceOptimization({ equipment, className = '' }: PriceOp
     setApplied(true);
     // Simulate API call
     setTimeout(() => {
-      alert('Price optimization applied successfully!');
+      addToast({
+        type: 'success',
+        title: 'Price optimization applied',
+      });
     }, 1000);
   };
 

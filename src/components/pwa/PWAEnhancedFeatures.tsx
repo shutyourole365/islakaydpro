@@ -9,12 +9,14 @@ import {
   Globe,
   Smartphone
 } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 interface PWAEnhancedFeaturesProps {
   onClose: () => void;
 }
 
 export default function PWAEnhancedFeatures({ onClose }: PWAEnhancedFeaturesProps) {
+  const { addToast } = useToast();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -89,17 +91,28 @@ export default function PWAEnhancedFeatures({ onClose }: PWAEnhancedFeaturesProp
       const cacheNames = await caches.keys();
       await Promise.all(cacheNames.map(name => caches.delete(name)));
       setCacheSize(0);
-      alert('Cache cleared successfully!');
+      addToast({
+        type: 'success',
+        title: 'Cache cleared',
+      });
     }
   };
 
   const handleDownloadForOffline = async () => {
     // In production, this would prefetch critical assets
-    alert('Downloading content for offline use...');
+    addToast({
+      type: 'info',
+      title: 'Downloading content',
+      message: 'Caching for offline use…',
+    });
 
     // Simulate download
     setTimeout(() => {
-      alert('✅ Content downloaded! You can now use Islakayd offline.');
+      addToast({
+        type: 'success',
+        title: 'Offline content ready',
+        message: 'You can now use Islakayd offline.',
+      });
     }, 2000);
   };
 

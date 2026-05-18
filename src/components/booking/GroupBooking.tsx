@@ -17,6 +17,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { getPublicAppUrl } from '../../utils/publicUrl';
+import { useToast } from '../ui/Toast';
 
 interface GroupBookingProps {
   equipmentId: string;
@@ -59,6 +60,7 @@ export default function GroupBooking({
   onComplete,
   onClose,
 }: GroupBookingProps) {
+  const { addToast } = useToast();
   const [step, setStep] = useState<'team' | 'schedule' | 'review'>('team');
   const [teamName, setTeamName] = useState('');
   const [members, setMembers] = useState<TeamMember[]>([
@@ -81,7 +83,11 @@ export default function GroupBooking({
 
   const addMember = () => {
     if (!newMember.name || !newMember.email) {
-      alert('Please enter name and email');
+      addToast({
+        type: 'warning',
+        title: 'Missing details',
+        message: 'Please enter both a name and an email.',
+      });
       return;
     }
 
@@ -136,14 +142,27 @@ export default function GroupBooking({
 
   const pricing = calculatePricing();
 
-  const generateShareLink = () => {
+  const generateShareLink = async () => {
     // Use getPublicAppUrl() (VITE_APP_URL with origin fallback) so the
     // link is externally reachable in every build — including Capacitor
     // mobile, where window.location.origin would be capacitor://localhost.
     const link = `${getPublicAppUrl()}/group/${equipmentId}/${Date.now().toString(36)}`;
     setShareLink(link);
-    navigator.clipboard.writeText(link);
-    alert('Invite link copied to clipboard!');
+    try {
+      await navigator.clipboard.writeText(link);
+      addToast({
+        type: 'success',
+        title: 'Invite link copied',
+        message: 'Share it with your team.',
+      });
+    } catch (err) {
+      console.error('Failed to copy invite link:', err);
+      addToast({
+        type: 'error',
+        title: 'Could not copy link',
+        message: 'Please copy it manually.',
+      });
+    }
   };
 
   const handleSubmit = async () => {

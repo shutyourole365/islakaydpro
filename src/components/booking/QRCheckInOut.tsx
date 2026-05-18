@@ -16,6 +16,8 @@ import {
   AlertTriangle,
   Shield,
 } from 'lucide-react';
+import { errorMonitoring } from '../../services/errorMonitoring';
+import { useToast } from '../ui/Toast';
 
 interface QRCheckInOutProps {
   bookingId: string;
@@ -43,6 +45,7 @@ export default function QRCheckInOut({
   onComplete,
   onClose,
 }: QRCheckInOutProps) {
+  const { addToast } = useToast();
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -52,6 +55,8 @@ export default function QRCheckInOut({
   const [qrData, setQrData] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const scanTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Generate QR data
@@ -69,12 +74,14 @@ export default function QRCheckInOut({
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => console.log('Location not available')
+        () => { if (import.meta.env.DEV) console.log('Location not available'); }
       );
     }
 
     return () => {
       stopCamera();
+      if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
+      if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current);
     };
   }, [bookingId, equipmentId, mode]);
 
@@ -112,10 +119,10 @@ export default function QRCheckInOut({
 
   const scanQRCode = () => {
     // Simulated QR scanning - in production, use a QR library like jsQR
-    const checkForQR = setInterval(() => {
+    scanIntervalRef.current = setInterval(() => {
       // Simulate finding QR code after 2 seconds
-      setTimeout(() => {
-        clearInterval(checkForQR);
+      scanTimeoutRef.current = setTimeout(() => {
+        if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
         handleQRDetected();
       }, 2000);
     }, 500);
@@ -197,7 +204,11 @@ export default function QRCheckInOut({
 
   const downloadQR = () => {
     // In production, generate actual downloadable QR image
-    alert('QR Code downloaded to your device!');
+    addToast({
+      type: 'success',
+      title: 'QR code downloaded',
+      message: 'Saved to your device.',
+    });
   };
 
   const shareQR = async () => {
@@ -207,11 +218,23 @@ export default function QRCheckInOut({
           title: `Equipment ${mode === 'check-in' ? 'Pickup' : 'Return'} QR Code`,
           text: `Scan this QR code to ${mode === 'check-in' ? 'pick up' : 'return'} ${equipmentTitle}`,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch (e) {
+        // AbortError == user dismissed the share sheet (expected, no
+        // signal). Anything else (invalid payload, OS-level error) is
+        // worth seeing — forward to Sentry.
+        if (!(e instanceof DOMException && e.name === 'AbortError')) {
+          errorMonitoring.captureException(
+            e instanceof Error ? e : new Error(String(e)),
+            { share: { source: 'QRCheckInOut.share' } }
+          );
+        }
       }
     } else {
-      alert('Sharing not supported on this device');
+      addToast({
+        type: 'warning',
+        title: 'Sharing unavailable',
+        message: 'Native sharing is not supported on this device.',
+      });
     }
   };
 

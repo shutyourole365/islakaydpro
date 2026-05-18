@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Zap,
   CheckCircle,
@@ -99,6 +99,19 @@ export default function QuickRent({
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + selectedDuration.days);
 
+  // Hold the countdown interval so it can be cleared on unmount; otherwise
+  // setCountdown keeps firing on an unmounted component if the user closes
+  // the modal mid-countdown.
+  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+    };
+  }, []);
+
   // Handle quick rent
   const handleQuickRent = async () => {
     if (!selectedPayment) return;
@@ -107,10 +120,13 @@ export default function QuickRent({
     setCountdown(3);
 
     // Countdown
-    const interval = setInterval(() => {
+    countdownIntervalRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          clearInterval(interval);
+          if (countdownIntervalRef.current) {
+            clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
+          }
           processRent();
           return 0;
         }
@@ -140,6 +156,10 @@ export default function QuickRent({
   };
 
   const cancelQuickRent = () => {
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
     setShowConfirmation(false);
     setCountdown(3);
   };

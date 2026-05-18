@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 
 interface RentalAgreementGeneratorProps {
   onBack: () => void;
@@ -110,6 +111,7 @@ Renter: ${agreement.renter_signed_at ? `Signed on ${new Date(agreement.renter_si
 
 export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAgreementGeneratorProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [selected, setSelected] = useState<Agreement | null>(null);
   const [loading, setLoading] = useState(true);
@@ -142,7 +144,7 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
         .single();
 
       if (bError || !booking) {
-        alert('Booking not found. Please check the ID.');
+        addToast({ type: 'error', title: 'Booking not found', message: 'Please check the ID and try again.' });
         return;
       }
 
@@ -155,7 +157,7 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
         .maybeSingle();
 
       if (existing) {
-        alert('An agreement already exists for this booking.');
+        addToast({ type: 'warning', title: 'Agreement exists', message: 'A rental agreement already exists for this booking.' });
         await loadAgreements();
         return;
       }

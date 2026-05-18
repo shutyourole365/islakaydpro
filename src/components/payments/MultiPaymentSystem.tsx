@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { 
-  CreditCard, 
-  Smartphone, 
-  Wallet, 
-  Check, 
+import {
+  CreditCard,
+  Smartphone,
+  Wallet,
+  Check,
   Lock,
   Calendar,
   DollarSign,
   AlertCircle,
   Star
 } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 interface MultiPaymentSystemProps {
   bookingId: string;
@@ -36,6 +37,7 @@ export default function MultiPaymentSystem({
   onPaymentComplete,
   onClose,
 }: MultiPaymentSystemProps) {
+  const { addToast } = useToast();
   const [selectedMethod, setSelectedMethod] = useState<PaymentData['method']>('card');
   const [useInstallments, setUseInstallments] = useState(false);
   const [installmentFrequency, setInstallmentFrequency] = useState<'weekly' | 'biweekly' | 'monthly'>('monthly');
@@ -127,7 +129,11 @@ export default function MultiPaymentSystem({
       onClose();
     } catch (error) {
       console.error('Payment failed:', error);
-      alert('Payment failed. Please try again.');
+      addToast({
+        type: 'error',
+        title: 'Payment failed',
+        message: 'Could not process your payment. Please try again.',
+      });
     } finally {
       setIsProcessing(false);
     }

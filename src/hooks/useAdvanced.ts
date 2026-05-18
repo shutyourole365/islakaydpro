@@ -463,9 +463,11 @@ export function useOptimisticUpdate<T>() {
  */
 export function useAnalytics() {
   const track = useCallback((event: string, properties?: Record<string, unknown>) => {
-    // Replace with actual analytics implementation
-    console.log('[Analytics]', event, properties);
-    
+    // TODO: wire to real analytics service. DEV-only trace for now.
+    if (import.meta.env.DEV) {
+      console.log('[Analytics]', event, properties);
+    }
+
     // Example: send to GA4
     if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
       (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', event, properties);

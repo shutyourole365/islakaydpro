@@ -224,10 +224,18 @@ export default function GroupBookingCoordinator({
     onRemoveMember?.(memberId);
   };
 
-  const copyInviteLink = () => {
-    navigator.clipboard.writeText(`${getPublicAppUrl()}/join/${booking.id}`);
-    setCopySuccess(true);
-    setTimeout(() => setCopySuccess(false), 2000);
+  const copyInviteLink = async () => {
+    // getPublicAppUrl() falls back to window.location.origin; swap is so
+    // the link works in Capacitor builds where origin would be
+    // capacitor://localhost.
+    const link = `${getPublicAppUrl()}/join/${booking.id}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy invite link:', err);
+    }
   };
 
   const getStatusBadge = (status: GroupMember['status']) => {

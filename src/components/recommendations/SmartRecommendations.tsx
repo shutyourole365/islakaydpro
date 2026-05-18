@@ -212,8 +212,10 @@ export default function SmartRecommendations({
     if (!isPositive) {
       setDismissedIds(prev => new Set([...prev, equipmentId]));
     }
-    // In production, send feedback to backend for ML training
-    console.log(`Feedback for ${equipmentId}: ${isPositive ? 'positive' : 'negative'}`);
+    // TODO: send feedback to backend for ML training. DEV-only trace for now.
+    if (import.meta.env.DEV) {
+      console.log(`Feedback for ${equipmentId}: ${isPositive ? 'positive' : 'negative'}`);
+    }
   };
 
   const tabs = [

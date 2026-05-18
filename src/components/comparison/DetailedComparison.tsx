@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Check, Minus, Star, Share2 } from 'lucide-react';
 import type { Equipment } from '../../types';
+import { useToast } from '../ui/Toast';
 
 interface DetailedComparisonProps {
   items: Equipment[];
@@ -10,6 +11,7 @@ interface DetailedComparisonProps {
 }
 
 export default function DetailedComparison({ items, onClose, onRemove, onBook }: DetailedComparisonProps) {
+  const { addToast } = useToast();
   const [viewMode, setViewMode] = useState<'overview' | 'pricing' | 'specifications'>('overview');
 
   const comparisonRows = [
@@ -122,7 +124,10 @@ export default function DetailedComparison({ items, onClose, onRemove, onBook }:
 
               onClick={() => {
                 // Share comparison logic
-                alert('Share comparison link copied!');
+                addToast({
+                  type: 'success',
+                  title: 'Comparison link copied',
+                });
               }}
               className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >

@@ -29,12 +29,14 @@ export default function InstallPrompt() {
       }
     }
 
+    let bannerTimeout: ReturnType<typeof setTimeout> | null = null;
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
 
       // Show banner after 30 seconds on page
-      setTimeout(() => {
+      bannerTimeout = setTimeout(() => {
         setShowBanner(true);
       }, 30000);
     };
@@ -52,6 +54,7 @@ export default function InstallPrompt() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
+      if (bannerTimeout) clearTimeout(bannerTimeout);
     };
   }, []);
 
@@ -62,10 +65,8 @@ export default function InstallPrompt() {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
 
-      if (outcome === 'accepted') {
-        console.log('PWA installed');
-      } else {
-        console.log('PWA installation dismissed');
+      if (import.meta.env.DEV) {
+        console.log(outcome === 'accepted' ? 'PWA installed' : 'PWA installation dismissed');
       }
     } catch (error) {
       console.error('PWA installation error:', error);

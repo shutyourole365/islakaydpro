@@ -14,7 +14,9 @@ import {
   UserPlus,
   RefreshCw,
 } from 'lucide-react';
+import { errorMonitoring } from '../../services/errorMonitoring';
 import { getPublicAppUrl } from '../../utils/publicUrl';
+import { useToast } from '../ui/Toast';
 
 interface SplitPaymentProps {
   bookingId: string;
@@ -56,6 +58,7 @@ export default function SplitPayment({
   onComplete,
   onClose,
 }: SplitPaymentProps) {
+  const { addToast } = useToast();
   const [participants, setParticipants] = useState<Participant[]>([
     { id: '1', name: 'You', email: 'you@example.com', avatarColor: avatarColors[0] },
   ]);
@@ -70,7 +73,11 @@ export default function SplitPayment({
 
   const addParticipant = () => {
     if (!newParticipant.name || !newParticipant.email) {
-      alert('Please enter name and email');
+      addToast({
+        type: 'warning',
+        title: 'Missing details',
+        message: 'Please enter both a name and an email.',
+      });
       return;
     }
 
@@ -167,9 +174,21 @@ export default function SplitPayment({
     }
   };
 
-  const copyLink = () => {
-    navigator.clipboard.writeText(shareLink);
-    alert('Link copied to clipboard!');
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      addToast({
+        type: 'success',
+        title: 'Link copied to clipboard',
+      });
+    } catch (err) {
+      console.error('Failed to copy split-payment link:', err);
+      addToast({
+        type: 'error',
+        title: 'Could not copy link',
+        message: 'Please copy it manually.',
+      });
+    }
   };
 
   const shareNative = async () => {
@@ -180,8 +199,16 @@ export default function SplitPayment({
           text: `You've been invited to split the cost of renting ${equipmentTitle}`,
           url: shareLink,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch (e) {
+        // AbortError == user dismissed the share sheet (expected, no
+        // signal). Anything else (invalid payload, OS-level error) is
+        // worth seeing — forward to Sentry.
+        if (!(e instanceof DOMException && e.name === 'AbortError')) {
+          errorMonitoring.captureException(
+            e instanceof Error ? e : new Error(String(e)),
+            { share: { source: 'SplitPayment.share' } }
+          );
+        }
       }
     }
   };

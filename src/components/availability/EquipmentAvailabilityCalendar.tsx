@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight, Clock, MapPin, DollarSign, Check, X, AlertCircle } from 'lucide-react';
 import { getEquipment, getEquipmentAvailability, blockDates, unblockDates } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 
 interface EquipmentAvailabilityCalendarProps {
   onBack: () => void;
@@ -77,6 +78,7 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 
 export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvailabilityCalendarProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [equipmentList, setEquipmentList] = useState<CalendarEquipment[]>(sampleEquipment);
   const [selected, setSelected] = useState(sampleEquipment[0]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -384,7 +386,13 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
                         await unblockDates(selectedDate);
                         await loadAvailability(selected.id, selected.dailyRate);
                         setSelectedDate(null);
-                      } catch { alert('Failed to unblock date.'); }
+                      } catch {
+                        addToast({
+                          type: 'error',
+                          title: 'Unblock failed',
+                          message: 'Could not unblock this date. Please try again.',
+                        });
+                      }
                     }}
                   >
                     Unblock this date
@@ -429,7 +437,13 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
                         await blockDates(selected.id, selectionStart, selectionEnd, 'unavailable');
                         await loadAvailability(selected.id, selected.dailyRate);
                         setSelectionStart(null); setSelectionEnd(null);
-                      } catch { alert('Failed to block dates. Please try again.'); }
+                      } catch {
+                        addToast({
+                          type: 'error',
+                          title: 'Block failed',
+                          message: 'Could not block these dates. Please try again.',
+                        });
+                      }
                     }}
                   >
                     Block {rangeDays} Days

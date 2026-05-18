@@ -18,6 +18,7 @@ import {
   Loader2,
   XCircle,
 } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 interface BlockchainContractProps {
   bookingId: string;
@@ -68,6 +69,7 @@ export default function BlockchainContract({
   onSign,
   onClose,
 }: BlockchainContractProps) {
+  const { addToast } = useToast();
   // bookingId, ownerId, equipmentId, equipmentTitle reserved for blockchain integration
   const [status, setStatus] = useState<ContractStatus>({
     created: true,
@@ -116,9 +118,21 @@ export default function BlockchainContract({
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    alert('Copied to clipboard!');
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      addToast({
+        type: 'success',
+        title: 'Copied to clipboard',
+      });
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+      addToast({
+        type: 'error',
+        title: 'Copy failed',
+        message: 'Please copy the value manually.',
+      });
+    }
   };
 
   const formatAddress = (address: string) => {
