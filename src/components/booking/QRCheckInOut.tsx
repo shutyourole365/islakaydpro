@@ -118,6 +118,12 @@ export default function QRCheckInOut({
   const scanQRCode = () => {
     // Simulated QR scanning - in production, use a QR library like jsQR.
     // Poll every 500ms; "find" the QR after ~2s of scanning.
+    // Re-entry guard: a previous scan may still be running (user stopped
+    // + restarted the camera). Clear it before starting a new poll.
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
     const scanStartedAt = Date.now();
     scanIntervalRef.current = setInterval(() => {
       if (Date.now() - scanStartedAt >= 2000) {
