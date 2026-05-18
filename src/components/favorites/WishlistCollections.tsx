@@ -20,6 +20,7 @@ import {
   Grid3X3,
   List,
 } from 'lucide-react';
+import { useToast } from '../ui/Toast';
 
 interface Equipment {
   id: string;
@@ -91,6 +92,7 @@ export default function WishlistCollections({
   onEquipmentClick,
   className = '',
 }: WishlistCollectionsProps) {
+  const { addToast } = useToast();
   const [selectedCollection, setSelectedCollection] = useState<WishlistCollection | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,10 +156,18 @@ export default function WishlistCollections({
     const url = `${window.location.origin}/wishlist/${collection.id}`;
     try {
       await navigator.clipboard.writeText(url);
-      alert('Collection link copied to clipboard!');
+      addToast({
+        type: 'success',
+        title: 'Collection link copied',
+        message: 'Share it with anyone.',
+      });
     } catch (err) {
       console.error('Failed to copy collection link:', err);
-      alert('Could not copy link. Please copy it manually.');
+      addToast({
+        type: 'error',
+        title: 'Could not copy link',
+        message: 'Please copy it manually.',
+      });
     }
     setMenuOpen(null);
   };
