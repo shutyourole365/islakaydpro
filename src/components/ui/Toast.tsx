@@ -68,8 +68,19 @@ export function useToast() {
 }
 
 function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast: (id: string) => void }) {
+  // aria-live='polite' announces toasts to assistive tech as they
+  // arrive. Each individual ToastItem ALSO carries its own role —
+  // 'alert' (assertive) for errors so they interrupt speech, 'status'
+  // (polite) for everything else. Without this, replacing alert()
+  // with toasts would be an a11y regression — native alert() is
+  // announced by the browser, our toast wasn't.
   return (
-    <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-3">
+    <div
+      className="fixed bottom-6 right-6 z-[200] flex flex-col gap-3"
+      aria-live="polite"
+      aria-atomic="false"
+      aria-relevant="additions"
+    >
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onClose={() => removeToast(toast.id)} />
       ))}
@@ -106,8 +117,14 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
 
   const Icon = icons[toast.type];
 
+  // role='alert' is implicitly assertive — appropriate for errors that
+  // must interrupt. role='status' is polite — appropriate for
+  // success/warning/info.
+  const role = toast.type === 'error' ? 'alert' : 'status';
+
   return (
     <div
+      role={role}
       className={`flex items-start gap-3 min-w-[320px] max-w-md p-4 rounded-xl border shadow-lg animate-slide-in-right ${colors[toast.type]}`}
     >
       <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconColors[toast.type]}`} />
