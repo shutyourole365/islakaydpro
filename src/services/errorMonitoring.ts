@@ -125,7 +125,9 @@ class ErrorMonitoring {
   // Capture custom message
   captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info') {
     if (!this.initialized) {
-      console.log(`Message (not sent to Sentry) [${level}]:`, message);
+      if (import.meta.env.DEV) {
+        console.log(`Message (not sent to Sentry) [${level}]:`, message);
+      }
       return;
     }
     

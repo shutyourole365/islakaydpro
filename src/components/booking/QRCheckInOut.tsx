@@ -16,6 +16,7 @@ import {
   AlertTriangle,
   Shield,
 } from 'lucide-react';
+import { errorMonitoring } from '../../services/errorMonitoring';
 
 interface QRCheckInOutProps {
   bookingId: string;
@@ -69,7 +70,7 @@ export default function QRCheckInOut({
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => console.log('Location not available')
+        () => { if (import.meta.env.DEV) console.log('Location not available'); }
       );
     }
 
@@ -207,8 +208,16 @@ export default function QRCheckInOut({
           title: `Equipment ${mode === 'check-in' ? 'Pickup' : 'Return'} QR Code`,
           text: `Scan this QR code to ${mode === 'check-in' ? 'pick up' : 'return'} ${equipmentTitle}`,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch (e) {
+        // AbortError == user dismissed the share sheet (expected, no
+        // signal). Anything else (invalid payload, OS-level error) is
+        // worth seeing — forward to Sentry.
+        if (!(e instanceof DOMException && e.name === 'AbortError')) {
+          errorMonitoring.captureException(
+            e instanceof Error ? e : new Error(String(e)),
+            { share: { source: 'QRCheckInOut.share' } }
+          );
+        }
       }
     } else {
       alert('Sharing not supported on this device');

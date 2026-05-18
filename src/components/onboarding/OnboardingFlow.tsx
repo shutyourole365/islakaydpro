@@ -275,7 +275,7 @@ export default function OnboardingFlow({ onComplete, onSkip }: OnboardingFlowPro
                         setPreferences(prev => ({ ...prev, location: 'Current Location' }));
                       },
                       () => {
-                        console.log('Location access denied');
+                        if (import.meta.env.DEV) console.log('Location access denied');
                       }
                     );
                   }
