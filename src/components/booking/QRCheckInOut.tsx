@@ -56,7 +56,6 @@ export default function QRCheckInOut({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const scanTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Generate QR data
@@ -81,7 +80,6 @@ export default function QRCheckInOut({
     return () => {
       stopCamera();
       if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
-      if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current);
     };
   }, [bookingId, equipmentId, mode]);
 
@@ -114,17 +112,35 @@ export default function QRCheckInOut({
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
       tracks.forEach(track => track.stop());
     }
+    // Stop the scan poll too — otherwise the simulator keeps ticking
+    // and fires handleQRDetected() at the 2s mark even after the user
+    // has cancelled. handleQRDetected calls onComplete, so a cancelled
+    // scan would still trigger the completion callback.
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
     setScanning(false);
   };
 
   const scanQRCode = () => {
-    // Simulated QR scanning - in production, use a QR library like jsQR
+    // Simulated QR scanning - in production, use a QR library like jsQR.
+    // Poll every 500ms; "find" the QR after ~2s of scanning.
+    // Re-entry guard: a previous scan may still be running (user stopped
+    // + restarted the camera). Clear it before starting a new poll.
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
+    const scanStartedAt = Date.now();
     scanIntervalRef.current = setInterval(() => {
-      // Simulate finding QR code after 2 seconds
-      scanTimeoutRef.current = setTimeout(() => {
-        if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
+      if (Date.now() - scanStartedAt >= 2000) {
+        if (scanIntervalRef.current) {
+          clearInterval(scanIntervalRef.current);
+          scanIntervalRef.current = null;
+        }
         handleQRDetected();
-      }, 2000);
+      }
     }, 500);
   };
 

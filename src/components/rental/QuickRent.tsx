@@ -115,6 +115,14 @@ export default function QuickRent({
   // Handle quick rent
   const handleQuickRent = async () => {
     if (!selectedPayment) return;
+    // Re-entry guard: a previous Quick Rent click may still be counting
+    // down. Clear that interval before starting a new one — otherwise the
+    // old interval is orphaned (ref now points at the new one) and keeps
+    // firing setCountdown + eventually processRent() a second time.
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
 
     setShowConfirmation(true);
     setCountdown(3);
