@@ -595,7 +595,10 @@ export default function AIAssistantEnhanced() {
     <>
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setIsOpen(true);
+            void trackAIEvent('assistant_opened');
+          }}
           aria-label="Open AI assistant"
           className="fixed bottom-6 right-6 z-50 group"
         >
@@ -648,7 +651,10 @@ export default function AIAssistantEnhanced() {
                 {isExpanded ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
               </button>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  void trackAIEvent('assistant_closed');
+                }}
                 aria-label="Close assistant"
                 className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30"
               >
