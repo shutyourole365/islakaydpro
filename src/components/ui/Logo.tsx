@@ -1,5 +1,3 @@
-import { useId } from 'react';
-
 interface LogoProps {
   variant?: 'full' | 'icon' | 'wordmark';
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -14,10 +12,12 @@ const sizeMap = {
   xl: { icon: 'w-14 h-14', text: 'text-3xl', gap: 'gap-3.5' },
 };
 
-function LogoMark({ className = '' }: { className?: string }) {
-  const uid = useId().replace(/:/g, '');
-  const gradId = `ik-grad-${uid}`;
-  const accentId = `ik-accent-${uid}`;
+// Minimal "IK" monogram inside a rounded square. Flat fill (no gradient)
+// matches the Vercel/Linear/Spotify-style minimal mark direction. Uses
+// Plus Jakarta Sans 800, which is already loaded for the app (see
+// tailwind.config.js `display` font stack + the Google Fonts <link> in
+// index.html).
+function LogoMark({ className = '', inverse = false }: { className?: string; inverse?: boolean }) {
   return (
     <svg
       viewBox="0 0 48 48"
@@ -25,31 +25,27 @@ function LogoMark({ className = '' }: { className?: string }) {
       className={className}
       aria-hidden="true"
     >
-      <defs>
-        <linearGradient id={gradId} x1="0%" y1="0%" x2="120%" y2="120%">
-          <stop offset="0%" stopColor="#06b6d4" />
-          <stop offset="50%" stopColor="#0891b2" />
-          <stop offset="100%" stopColor="#0e7490" />
-        </linearGradient>
-        <linearGradient id={accentId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-
-      {/* Modern rounded background */}
-      <rect width="48" height="48" rx="11" fill={`url(#${gradId})`} />
-
-      {/* Island silhouette - modern, geometric */}
-      <g fill="white">
-        {/* Main island shape - smooth organic curves */}
-        <path d="M 12 28 Q 10 24 12 20 Q 14 16 18 16 Q 22 15 24 14 Q 26 15 28 16 Q 32 16 34 20 Q 36 24 34 28 Q 32 32 28 33 Q 24 34 20 34 Q 16 32 14 30 Z" />
-        {/* Water reflection accent */}
-        <ellipse cx="24" cy="35.5" rx="14" ry="2.5" fill="white" opacity="0.25" />
-      </g>
-
-      {/* Accent highlight */}
-      <ellipse cx="22" cy="22" rx="6" ry="5" fill={`url(#${accentId})`} />
+      {/* Solid background — cyan-600 in default mode, white when used on
+          a dark transparent header (inverse). */}
+      <rect
+        width="48"
+        height="48"
+        rx="11"
+        fill={inverse ? '#ffffff' : '#0891b2'}
+      />
+      <text
+        x="24"
+        y="24"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontFamily="'Plus Jakarta Sans', Inter, system-ui, sans-serif"
+        fontWeight="800"
+        fontSize="22"
+        letterSpacing="-1.2"
+        fill={inverse ? '#0891b2' : '#ffffff'}
+      >
+        IK
+      </text>
     </svg>
   );
 }
@@ -63,16 +59,15 @@ function Wordmark({
 }) {
   return (
     <span
-      className={`leading-none ${className}`}
-      style={{ fontFamily: "'Brush Script MT', 'Lucida Handwriting', cursive" }}
+      className={`leading-none font-display ${className}`}
+      style={{ fontWeight: 800, letterSpacing: '-0.025em' }}
     >
       <span
         className={
           inverse
             ? 'text-white'
-            : 'bg-gradient-to-r from-cyan-600 via-cyan-500 to-teal-600 bg-clip-text text-transparent dark:from-cyan-300 dark:via-cyan-200 dark:to-teal-300'
+            : 'bg-gradient-to-r from-cyan-700 via-cyan-600 to-teal-600 bg-clip-text text-transparent dark:from-cyan-300 dark:via-cyan-200 dark:to-teal-300'
         }
-        style={{ fontStyle: 'italic', fontWeight: '500', letterSpacing: '-0.02em' }}
       >
         IslaKayd
       </span>
@@ -89,7 +84,7 @@ export default function Logo({
   const s = sizeMap[size];
 
   if (variant === 'icon') {
-    return <LogoMark className={`${s.icon} ${className}`} />;
+    return <LogoMark className={`${s.icon} ${className}`} inverse={inverse} />;
   }
 
   if (variant === 'wordmark') {
@@ -98,7 +93,7 @@ export default function Logo({
 
   return (
     <span className={`inline-flex items-center ${s.gap} ${className}`}>
-      <LogoMark className={`${s.icon} drop-shadow-sm`} />
+      <LogoMark className={s.icon} inverse={inverse} />
       <Wordmark className={s.text} inverse={inverse} />
     </span>
   );
