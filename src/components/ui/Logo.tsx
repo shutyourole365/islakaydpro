@@ -1,5 +1,3 @@
-import { useId } from 'react';
-
 interface LogoProps {
   variant?: 'full' | 'icon' | 'wordmark';
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -20,9 +18,6 @@ const sizeMap = {
 // tailwind.config.js `display` font stack + the Google Fonts <link> in
 // index.html).
 function LogoMark({ className = '', inverse = false }: { className?: string; inverse?: boolean }) {
-  // Need a unique id per render so multiple <Logo /> on the same page
-  // don't share clip ids (kept for future when we restore a clip/mask).
-  useId();
   return (
     <svg
       viewBox="0 0 48 48"
