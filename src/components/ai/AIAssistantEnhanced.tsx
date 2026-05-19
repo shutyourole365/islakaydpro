@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { streamMessage, analyzeProject, getRecommendations, getPersonalizedRecommendations, getEquipmentHelp, loadChatHistory, saveChatMessage, clearChatHistory } from '../../services/ai';
+import { streamMessage, analyzeProject, getRecommendations, getPersonalizedRecommendations, getEquipmentHelp, loadChatHistory, saveChatMessage, clearChatHistory, trackAIEvent } from '../../services/ai';
 import { useLocalStorage } from '../../hooks';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../ui/Toast';
@@ -540,10 +540,8 @@ export default function AIAssistantEnhanced() {
 
   const handleFeedback = (messageId: string, isPositive: boolean) => {
     setFeedbackGiven((prev) => new Set([...prev, messageId]));
-    // TODO: wire to backend feedback endpoint. DEV-only trace for now.
-    if (import.meta.env.DEV) {
-      console.log(`Feedback for message ${messageId}: ${isPositive ? 'positive' : 'negative'}`);
-    }
+    // Fire-and-forget — trackAIEvent never throws.
+    void trackAIEvent('feedback', { message_id: messageId, is_positive: isPositive });
   };
 
   const handleSend = useCallback(() => {

@@ -5,7 +5,17 @@ import type { Equipment } from '../../types';
 interface SmartPricingProps {
   equipment: Equipment;
   allEquipment?: Equipment[];
-  onPriceChange?: (prices: PriceSuggestion) => void;
+  /**
+   * Called when the user explicitly clicks "Apply this price" on a
+   * generated suggestion. Used by the owner to commit the suggestion
+   * to the database. NOT called automatically when analysis
+   * completes — that would silently change the listing every time
+   * the user clicked "Analyze Market".
+   *
+   * When omitted (e.g. for non-owner viewers), the Apply button is
+   * hidden and the component renders as read-only market intel.
+   */
+  onApplyPrice?: (prices: PriceSuggestion) => void | Promise<void>;
 }
 
 interface PriceSuggestion {
@@ -27,7 +37,7 @@ interface MarketData {
   demandScore: number;
 }
 
-export default function SmartPricingEngine({ equipment, allEquipment = [], onPriceChange }: SmartPricingProps) {
+export default function SmartPricingEngine({ equipment, allEquipment = [], onApplyPrice }: SmartPricingProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestion, setSuggestion] = useState<PriceSuggestion | null>(null);
   const [marketData, setMarketData] = useState<MarketData | null>(null);
@@ -102,10 +112,6 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
     setSuggestion(newSuggestion);
     setMarketData(market);
     setIsAnalyzing(false);
-
-    if (onPriceChange) {
-      onPriceChange(newSuggestion);
-    }
   };
 
   const getConditionMultiplier = (condition: string): number => {
@@ -267,6 +273,19 @@ export default function SmartPricingEngine({ equipment, allEquipment = [], onPri
                 <span>${marketData.maxPrice}</span>
               </div>
             </div>
+          )}
+
+          {/* Apply button — only shown to the listing owner. Calls
+              onApplyPrice with the full suggestion; parent decides
+              what to do (update equipment, show confirmation, etc.). */}
+          {onApplyPrice && suggestion.dailyRate !== equipment.daily_rate && (
+            <button
+              onClick={() => onApplyPrice(suggestion)}
+              className="w-full py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-600 hover:to-indigo-700 transition-all flex items-center justify-center gap-2"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Apply ${suggestion.dailyRate}/day to your listing
+            </button>
           )}
         </div>
       )}

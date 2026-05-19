@@ -3,7 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import type { Category, Equipment, SearchFilters } from './types';
 import { useToast } from './components/ui/Toast';
-import { createEquipment } from './services/database';
+import { createEquipment, updateEquipment } from './services/database';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Hero from './components/home/Hero';
@@ -1315,7 +1315,38 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
               </button>
               <SmartPricingEngine
                 equipment={bookingEquipment}
-                onPriceChange={() => { /* TODO: wire SmartPricingEngine output to backend */ }}
+                // Only pass onApplyPrice when the viewer owns the listing.
+                // Non-owners see SmartPricingEngine as read-only market intel
+                // (no Apply button rendered).
+                onApplyPrice={
+                  user && bookingEquipment.owner_id === user.id
+                    ? async (suggestion) => {
+                        try {
+                          // Capture the returned Equipment and update
+                          // local state so reopening SmartPricing /
+                          // EquipmentDetail / etc. reflects the new
+                          // price immediately, not after a refetch.
+                          const updated = await updateEquipment(bookingEquipment.id, {
+                            daily_rate: suggestion.dailyRate,
+                          });
+                          setBookingEquipment(updated);
+                          addToast({
+                            type: 'success',
+                            title: 'Price updated',
+                            message: `Your daily rate is now $${suggestion.dailyRate}.`,
+                          });
+                          setIsSmartPricingOpen(false);
+                        } catch (e) {
+                          console.error('Failed to apply suggested price:', e);
+                          addToast({
+                            type: 'error',
+                            title: 'Could not update price',
+                            message: e instanceof Error ? e.message : 'Please try again.',
+                          });
+                        }
+                      }
+                    : undefined
+                }
               />
             </div>
           </div>
