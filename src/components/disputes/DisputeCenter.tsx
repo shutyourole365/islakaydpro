@@ -142,6 +142,11 @@ export default function DisputeCenter({ onBack, bookingId }: DisputeCenterProps)
       setDisputes(data);
     } catch (err) {
       console.error('Failed to load disputes:', err);
+      addToast({
+        type: 'error',
+        title: 'Could not load disputes',
+        message: err instanceof Error ? err.message : 'Please try again.',
+      });
     } finally {
       setLoading(false);
     }

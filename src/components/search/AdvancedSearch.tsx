@@ -10,6 +10,7 @@ import {
 import type { Equipment, Booking } from '../../types';
 import { getEquipment, getBookings } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 
 interface AdvancedSearchProps {
   onEquipmentSelect?: (equipment: Equipment) => void;
@@ -41,6 +42,7 @@ interface AISuggestion {
 
 export default function AdvancedSearch({ onEquipmentSelect, className = '' }: AdvancedSearchProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
@@ -73,6 +75,11 @@ export default function AdvancedSearch({ onEquipmentSelect, className = '' }: Ad
         generateAISuggestions(equipmentData.data, bookingsData);
       } catch (error) {
         console.error('Failed to load search data:', error);
+        addToast({
+          type: 'error',
+          title: 'Search unavailable',
+          message: error instanceof Error ? error.message : 'Could not load listings. Please retry.',
+        });
       } finally {
         setLoading(false);
       }

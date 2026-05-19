@@ -109,6 +109,11 @@ export default function MessagingPage({
       }
     } catch (err) {
       console.error('Load conversations error:', err);
+      addToast({
+        type: 'error',
+        title: 'Could not load conversations',
+        message: err instanceof Error ? err.message : 'Please try again.',
+      });
     } finally {
       setLoading(false);
     }

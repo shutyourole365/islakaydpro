@@ -127,9 +127,18 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
       .select(`*, owner:profiles!rental_agreements_owner_id_fkey(full_name), renter:profiles!rental_agreements_renter_id_fkey(full_name)`)
       .or(`owner_id.eq.${user.id},renter_id.eq.${user.id}`)
       .order('created_at', { ascending: false });
-    if (!error) setAgreements((data || []) as Agreement[]);
+    if (error) {
+      console.error('Failed to load agreements:', error);
+      addToast({
+        type: 'error',
+        title: 'Could not load agreements',
+        message: error.message,
+      });
+    } else {
+      setAgreements((data || []) as Agreement[]);
+    }
     setLoading(false);
-  }, [user]);
+  }, [user, addToast]);
 
   useEffect(() => { loadAgreements(); }, [loadAgreements]);
 

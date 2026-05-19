@@ -15,6 +15,7 @@ import {
 import type { Equipment, Booking, UserAnalytics } from '../../types';
 import { getUserAnalytics, getBookings, getEquipment } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../ui/Toast';
 
 interface AnalyticsDashboardProps {
   className?: string;
@@ -37,6 +38,7 @@ interface ChartData {
 
 export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboardProps) {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -59,6 +61,11 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
         setEquipment(equipmentData.data);
       } catch (error) {
         console.error('Failed to load analytics:', error);
+        addToast({
+          type: 'error',
+          title: 'Could not load analytics',
+          message: error instanceof Error ? error.message : 'Please try again.',
+        });
       } finally {
         setLoading(false);
       }
