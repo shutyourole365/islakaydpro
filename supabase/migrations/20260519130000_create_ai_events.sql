@@ -26,26 +26,27 @@ CREATE INDEX IF NOT EXISTS idx_ai_events_type_created
 
 ALTER TABLE ai_events ENABLE ROW LEVEL SECURITY;
 
--- Signed-in users may insert their own events. user_id may also be
--- null for anonymous traffic (e.g. assistant_opened on a logged-out
--- landing page), which we still want to capture.
+-- All policies scoped to TO authenticated to match the canonical
+-- pattern in 20260124000001_add_stripe_payments.sql. user_id stays
+-- nullable on the table for future flexibility (e.g. service-role
+-- inserts) but writes from the client require auth.
+
+-- Signed-in users may insert their own events.
 CREATE POLICY "Users can insert own ai events"
   ON ai_events FOR INSERT
-  WITH CHECK (
-    user_id IS NULL
-    OR user_id = (select auth.uid())
-  );
+  TO authenticated
+  WITH CHECK (user_id = (select auth.uid()));
 
 -- Users can read their own events; admins (profiles.is_admin = true)
--- can read everything for the AI Telemetry dashboard. Matches the
--- canonical admin pattern used in 20260124000001_add_stripe_payments.sql
--- and elsewhere — profiles.role does not exist in this schema.
+-- can read everything for the AI Telemetry dashboard.
 CREATE POLICY "Users can read own ai events"
   ON ai_events FOR SELECT
+  TO authenticated
   USING (user_id = (select auth.uid()));
 
 CREATE POLICY "Admins can read all ai events"
   ON ai_events FOR SELECT
+  TO authenticated
   USING (
     EXISTS (
       SELECT 1 FROM profiles

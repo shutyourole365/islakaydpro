@@ -73,19 +73,22 @@ export type AIEventType =
  * `void trackAIEvent(...)`. Failures (network, RLS, table missing)
  * are forwarded to Sentry so they don't go silently dark.
  *
- * user_id is read from the current session; anonymous events (no
- * logged-in user) are recorded with user_id = null per the RLS
- * policy, which is useful for capturing assistant_opened on
- * landing pages.
+ * Reads user_id from the LOCAL session cache (getSession, not
+ * getUser) so high-frequency events like message_sent don't add a
+ * network round-trip per write. RLS requires authentication, so
+ * if there's no session we skip the write entirely.
  */
 export async function trackAIEvent(
   eventType: AIEventType,
   payload: Record<string, unknown> = {}
 ): Promise<void> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const userId = session?.user?.id;
+    if (!userId) return; // Not authenticated; RLS would reject the insert.
+
     const { error } = await supabase.from('ai_events').insert({
-      user_id: user?.id ?? null,
+      user_id: userId,
       event_type: eventType,
       payload,
     });

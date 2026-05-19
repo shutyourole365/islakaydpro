@@ -1322,9 +1322,14 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
                   user && bookingEquipment.owner_id === user.id
                     ? async (suggestion) => {
                         try {
-                          await updateEquipment(bookingEquipment.id, {
+                          // Capture the returned Equipment and update
+                          // local state so reopening SmartPricing /
+                          // EquipmentDetail / etc. reflects the new
+                          // price immediately, not after a refetch.
+                          const updated = await updateEquipment(bookingEquipment.id, {
                             daily_rate: suggestion.dailyRate,
                           });
+                          setBookingEquipment(updated);
                           addToast({
                             type: 'success',
                             title: 'Price updated',
