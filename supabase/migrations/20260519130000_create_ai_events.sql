@@ -36,8 +36,10 @@ CREATE POLICY "Users can insert own ai events"
     OR user_id = (select auth.uid())
   );
 
--- Users can read their own events; admins (profile.role = 'admin')
--- can read everything for the AI Telemetry dashboard.
+-- Users can read their own events; admins (profiles.is_admin = true)
+-- can read everything for the AI Telemetry dashboard. Matches the
+-- canonical admin pattern used in 20260124000001_add_stripe_payments.sql
+-- and elsewhere — profiles.role does not exist in this schema.
 CREATE POLICY "Users can read own ai events"
   ON ai_events FOR SELECT
   USING (user_id = (select auth.uid()));
@@ -48,6 +50,6 @@ CREATE POLICY "Admins can read all ai events"
     EXISTS (
       SELECT 1 FROM profiles
       WHERE profiles.id = (select auth.uid())
-        AND profiles.role = 'admin'
+        AND profiles.is_admin = true
     )
   );
