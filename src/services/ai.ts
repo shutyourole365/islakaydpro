@@ -50,6 +50,54 @@ export async function saveChatMessage(
   if (error) console.error('saveChatMessage:', error);
 }
 
+// ── AI telemetry events ─────────────────────────────────────────
+
+/**
+ * Documented event types — keep in sync with the README's list and
+ * Admin → AI Telemetry. event_type is text in the database so adding
+ * a new value here doesn't require a migration; this union just
+ * helps callers stay consistent.
+ */
+export type AIEventType =
+  | 'assistant_opened'
+  | 'assistant_closed'
+  | 'toggle_llm'
+  | 'message_sent'
+  | 'response_received'
+  | 'feedback'
+  | 'image_uploaded'
+  | 'image_analyzed';
+
+/**
+ * Fire-and-forget AI telemetry write. Never throws — callers can
+ * `void trackAIEvent(...)`. Failures (network, RLS, table missing)
+ * are forwarded to Sentry so they don't go silently dark.
+ *
+ * user_id is read from the current session; anonymous events (no
+ * logged-in user) are recorded with user_id = null per the RLS
+ * policy, which is useful for capturing assistant_opened on
+ * landing pages.
+ */
+export async function trackAIEvent(
+  eventType: AIEventType,
+  payload: Record<string, unknown> = {}
+): Promise<void> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from('ai_events').insert({
+      user_id: user?.id ?? null,
+      event_type: eventType,
+      payload,
+    });
+    if (error) throw error;
+  } catch (e) {
+    errorMonitoring.captureException(
+      e instanceof Error ? e : new Error(String(e)),
+      { ai: { source: 'trackAIEvent', eventType } }
+    );
+  }
+}
+
 /** Delete all messages for a session (used by "Clear Conversation"). */
 export async function clearChatHistory(sessionId: string): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser();

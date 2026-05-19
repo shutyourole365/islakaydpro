@@ -463,12 +463,16 @@ export function useOptimisticUpdate<T>() {
  */
 export function useAnalytics() {
   const track = useCallback((event: string, properties?: Record<string, unknown>) => {
-    // TODO: wire to real analytics service. DEV-only trace for now.
+    // Forwards to GA4 if window.gtag is loaded (see <head> setup in
+    // index.html when VITE_GA_MEASUREMENT_ID is set). DEV builds also
+    // log to console for inspection. There's no separate custom
+    // analytics backend — GA is the destination.
     if (import.meta.env.DEV) {
       console.log('[Analytics]', event, properties);
     }
 
-    // Example: send to GA4
+    // Forward to GA4 (no-op when gtag isn't loaded — e.g. when
+    // VITE_GA_MEASUREMENT_ID is unset).
     if (typeof window !== 'undefined' && (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag) {
       (window as unknown as { gtag: (...args: unknown[]) => void }).gtag('event', event, properties);
     }
