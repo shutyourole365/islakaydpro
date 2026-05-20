@@ -21,11 +21,13 @@
 DROP FUNCTION IF EXISTS public.create_notification();
 DROP FUNCTION IF EXISTS public.log_audit_event();
 
--- ─── 2. Back-fill equipment_owner_counts materialized view ──────────────────
--- IF NOT EXISTS so this is a no-op on prod (the view is already there) and
--- only creates the object on preview / fresh-deploy databases. After creation,
--- mirror the access-tightening from the previous security migration so newly
--- created instances aren't exposed to anon/authenticated.
+-- ─── 2. Back-fill equipment_owner_counts matview + indexes + refresher ──────
+-- All `IF NOT EXISTS` so these are no-ops on prod (everything is already there)
+-- and only create the objects on preview / fresh-deploy databases.
+--
+-- The unique index on owner_id is REQUIRED by the refresher function below —
+-- `REFRESH MATERIALIZED VIEW CONCURRENTLY` only works when the view has at
+-- least one unique index. The non-unique index mirrors what prod has.
 CREATE MATERIALIZED VIEW IF NOT EXISTS public.equipment_owner_counts AS
 SELECT
   owner_id,
@@ -34,7 +36,35 @@ SELECT
 FROM public.equipment
 GROUP BY owner_id;
 
+CREATE UNIQUE INDEX IF NOT EXISTS uq_mview_equipment_owner_id
+  ON public.equipment_owner_counts (owner_id);
+CREATE INDEX IF NOT EXISTS idx_mview_equipment_owner_id
+  ON public.equipment_owner_counts (owner_id);
+
 REVOKE SELECT ON public.equipment_owner_counts FROM anon, authenticated, PUBLIC;
+
+-- Refresher function — called by the dashboard-only
+-- `refresh_equipment_owner_counts` Edge Function on a cron schedule. Without
+-- this back-fill, the function would be missing on preview / fresh deploys
+-- and the Edge Function call would fail.
+CREATE OR REPLACE FUNCTION public.refresh_equipment_owner_counts()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  REFRESH MATERIALIZED VIEW CONCURRENTLY public.equipment_owner_counts;
+EXCEPTION WHEN OTHERS THEN
+  -- Swallow errors so a transient refresh failure doesn't break cron;
+  -- mirrors the existing prod definition. Real failures surface in logs.
+  NULL;
+END;
+$$;
+
+-- Lock down EXECUTE — only service_role (the Edge Function's role) needs it.
+REVOKE EXECUTE ON FUNCTION public.refresh_equipment_owner_counts() FROM anon, authenticated, PUBLIC;
+GRANT EXECUTE ON FUNCTION public.refresh_equipment_owner_counts() TO service_role;
 
 -- ─── 3. Equipment view-count column + RPC ───────────────────────────────────
 ALTER TABLE public.equipment
@@ -56,7 +86,13 @@ $$;
 -- one thing (increment a counter on a row keyed by uuid); no other side
 -- effects, so the elevated-privilege scope is intentionally minimal.
 -- search_path is pinned to prevent search_path injection.
-REVOKE EXECUTE ON FUNCTION public.increment_view_count(uuid) FROM PUBLIC;
+--
+-- Revoke from anon/authenticated/PUBLIC explicitly (not just PUBLIC) because
+-- CREATE OR REPLACE preserves any pre-existing grants if the function already
+-- exists on the target DB. Without this, a stale GRANT could survive and the
+-- explicit one below would just augment it. Mirrors the security hardening
+-- migration's defensive pattern.
+REVOKE EXECUTE ON FUNCTION public.increment_view_count(uuid) FROM anon, authenticated, PUBLIC;
 GRANT EXECUTE ON FUNCTION public.increment_view_count(uuid) TO anon, authenticated, service_role;
 
 COMMENT ON FUNCTION public.increment_view_count(uuid) IS
