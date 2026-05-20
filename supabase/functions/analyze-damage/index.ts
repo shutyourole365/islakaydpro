@@ -16,6 +16,14 @@ const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY ?? '' });
 // latency dominate before then; cap at 8 to keep one analysis cheap and snappy.
 const MAX_PHOTOS = 8;
 
+// Per-photo and total-payload caps on the base64 string length. Count-only
+// limits aren't enough — a single oversized photo can blow up token cost,
+// upstream timeouts, and Edge Function memory. 6 MB base64 ≈ 4.5 MB decoded
+// per image; 25 MB total leaves headroom under the Supabase Edge Function
+// body limit while bounding worst-case Claude input tokens.
+const MAX_PHOTO_BASE64_BYTES = 6 * 1024 * 1024;
+const MAX_TOTAL_BASE64_BYTES = 25 * 1024 * 1024;
+
 type DamageType = 'scratch' | 'dent' | 'crack' | 'stain' | 'missing-part' | 'wear' | 'other';
 type Severity = 'minor' | 'moderate' | 'major';
 type MediaType = 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif';
@@ -62,17 +70,33 @@ serve(async (req) => {
 
     const limitedPhotos = photos.slice(0, MAX_PHOTOS);
 
+    let totalBytes = 0;
     const imageBlocks = limitedPhotos.map((dataUrl, idx) => {
       const match = dataUrl.match(/^data:(image\/(?:jpeg|png|webp|gif));base64,(.+)$/);
       if (!match) {
         throw new Error(`Photo ${idx + 1} is not a base64 data URL of a supported image type`);
+      }
+      const base64 = match[2];
+      if (base64.length > MAX_PHOTO_BASE64_BYTES) {
+        throw new Error(
+          `Photo ${idx + 1} is ${Math.round(base64.length / 1024 / 1024)} MB ` +
+            `(limit ${MAX_PHOTO_BASE64_BYTES / 1024 / 1024} MB). ` +
+            `Reduce image resolution or compression before retrying.`
+        );
+      }
+      totalBytes += base64.length;
+      if (totalBytes > MAX_TOTAL_BASE64_BYTES) {
+        throw new Error(
+          `Combined photo payload exceeds ${MAX_TOTAL_BASE64_BYTES / 1024 / 1024} MB ` +
+            `after photo ${idx + 1}. Send fewer photos or compress them before retrying.`
+        );
       }
       return {
         type: 'image' as const,
         source: {
           type: 'base64' as const,
           media_type: match[1] as MediaType,
-          data: match[2],
+          data: base64,
         },
       };
     });
