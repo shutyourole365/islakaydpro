@@ -39,15 +39,21 @@ Deno.serve(async (_req: Request) => {
     const client = new Client({ connectionString });
     await client.connect();
 
-    const res = await client.query("SELECT current_database() AS db, now() AS now");
-
-    await client.end();
+    // try/finally so the client is closed even if query() throws — otherwise
+    // the connection leaks until the Edge Function isolate is recycled.
+    let rows: Array<Record<string, unknown>> | undefined;
+    try {
+      const res = await client.query("SELECT current_database() AS db, now() AS now");
+      rows = res.rows;
+    } finally {
+      await client.end();
+    }
 
     return new Response(
       JSON.stringify({
         ok: true,
-        database: res.rows?.[0]?.db ?? null,
-        now: res.rows?.[0]?.now ?? null,
+        database: rows?.[0]?.db ?? null,
+        now: rows?.[0]?.now ?? null,
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );

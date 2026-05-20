@@ -34,7 +34,14 @@ Deno.serve(async (req: Request) => {
     }
 
     // 2) Read back the cache table for the last N days.
-    const fromDate = new Date(Date.now() - parseInt(days) * 24 * 60 * 60 * 1000)
+    // Validate `days` — an invalid query-string (?days=foo) would make
+    // parseInt return NaN, and `new Date(NaN).toISOString()` throws. Clamp
+    // to a sensible 1..365 window.
+    const parsedDays = parseInt(days, 10);
+    const windowDays = Number.isFinite(parsedDays) && parsedDays >= 1 && parsedDays <= 365
+      ? parsedDays
+      : 7;
+    const fromDate = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000)
       .toISOString()
       .slice(0, 10);
 
@@ -48,6 +55,15 @@ Deno.serve(async (req: Request) => {
         },
       }
     );
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("notification_analytics_cache read failed:", res.status, text);
+      return new Response(
+        JSON.stringify({ error: "cache_read_failed" }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
     const data = await res.json();
     return new Response(
