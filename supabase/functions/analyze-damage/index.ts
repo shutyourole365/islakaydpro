@@ -52,6 +52,16 @@ function json(body: unknown, status = 200): Response {
   });
 }
 
+// Thrown when the client sends photos that violate size limits. Lets the
+// top-level catch return HTTP 413 (Payload Too Large) for client input
+// errors instead of misclassifying them as 500 server failures.
+class PayloadTooLargeError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'PayloadTooLargeError';
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -78,7 +88,7 @@ serve(async (req) => {
       }
       const base64 = match[2];
       if (base64.length > MAX_PHOTO_BASE64_BYTES) {
-        throw new Error(
+        throw new PayloadTooLargeError(
           `Photo ${idx + 1} is ${Math.round(base64.length / 1024 / 1024)} MB ` +
             `(limit ${MAX_PHOTO_BASE64_BYTES / 1024 / 1024} MB). ` +
             `Reduce image resolution or compression before retrying.`
@@ -86,7 +96,7 @@ serve(async (req) => {
       }
       totalBytes += base64.length;
       if (totalBytes > MAX_TOTAL_BASE64_BYTES) {
-        throw new Error(
+        throw new PayloadTooLargeError(
           `Combined photo payload exceeds ${MAX_TOTAL_BASE64_BYTES / 1024 / 1024} MB ` +
             `after photo ${idx + 1}. Send fewer photos or compress them before retrying.`
         );
@@ -181,6 +191,7 @@ boundingBox uses percentages of the photo dimensions where {x, y} is the top-lef
   } catch (error) {
     console.error('analyze-damage error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    return json({ error: message, damages: [] }, 500);
+    const status = error instanceof PayloadTooLargeError ? 413 : 500;
+    return json({ error: message, damages: [] }, status);
   }
 });
