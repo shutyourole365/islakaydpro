@@ -27,7 +27,6 @@ export default defineConfig({
             './src/components/subscription/SubscriptionPlans',
             './src/components/booking/GroupBooking',
             './src/components/inspection/AIDamageDetection',
-            './src/components/contracts/BlockchainContract',
             './src/components/fleet/FleetManager',
           ],
 
