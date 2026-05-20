@@ -29,7 +29,14 @@ Deno.serve(async (_req: Request) => {
     // to exist; SELECT id LIMIT 1 is trivial under any RLS policy that
     // allows anon to see profile rows (most marketplace apps expose at
     // least public profile data).
-    await supabase.from("profiles").select("id").limit(1);
+    //
+    // supabase-js returns { data, error } rather than throwing, so we have
+    // to check `error` explicitly — otherwise an RLS denial or schema
+    // mismatch would silently report 'success: true'.
+    const { error: dbError } = await supabase.from("profiles").select("id").limit(1);
+    if (dbError) {
+      throw dbError;
+    }
 
     const timestamp = new Date().toISOString();
 
