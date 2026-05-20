@@ -1,7 +1,17 @@
 // Triggers refresh_notification_analytics_cache() RPC and returns the last N
 // days of cache rows. Used by the admin analytics dashboard.
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+};
+
 Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   try {
     const url = new URL(req.url);
     const params = url.searchParams;
@@ -12,7 +22,7 @@ Deno.serve(async (req: Request) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 
     if (!supabaseUrl) {
-      return new Response(JSON.stringify({ error: "Missing SUPABASE_URL" }), { status: 500 });
+      return new Response(JSON.stringify({ error: "Missing SUPABASE_URL" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 });
     }
 
     // 1) Trigger refresh via service_role.
@@ -29,7 +39,7 @@ Deno.serve(async (req: Request) => {
       const text = await rpcRes.text();
       return new Response(
         JSON.stringify({ error: "refresh_failed", details: text }),
-        { status: 502 }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 502 }
       );
     }
 
@@ -61,17 +71,17 @@ Deno.serve(async (req: Request) => {
       console.error("notification_analytics_cache read failed:", res.status, text);
       return new Response(
         JSON.stringify({ error: "cache_read_failed" }),
-        { status: 502, headers: { "Content-Type": "application/json" } }
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 502 }
       );
     }
 
     const data = await res.json();
     return new Response(
       JSON.stringify({ ok: true, rows: data }),
-      { headers: { "Content-Type": "application/json" } }
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (err) {
     console.error("refresh-notification-analytics error:", err);
-    return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Internal server error" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 });
   }
 });

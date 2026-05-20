@@ -2,7 +2,9 @@
 // VIEW CONCURRENTLY public.equipment_owner_counts). Wired to a cron schedule
 // in the Supabase dashboard.
 
-import { createClient } from "npm:@supabase/supabase-js@2.35.0";
+// Pinned to 2.39.3 to match the shared supabase/functions/import_map.json
+// and the rest of the Edge Functions in this project.
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 Deno.serve(async (_req: Request) => {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
