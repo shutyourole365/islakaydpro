@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import ProgressBar from '../ui/ProgressBar';
 import { useToast } from '../ui/Toast';
+import { supabase } from '../../lib/supabase';
 
 interface AIDamageDetectionProps {
   equipmentId: string;
@@ -143,38 +144,43 @@ export default function AIDamageDetection({
 
     setAnalyzing(true);
 
-    // Simulate AI analysis
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-    // Generate mock damage detection results
-    const mockDamages: DetectedDamage[] = [
-      {
-        id: '1',
-        type: 'scratch',
-        severity: 'minor',
-        location: 'Front panel, upper right',
-        confidence: 0.94,
-        boundingBox: { x: 60, y: 20, width: 15, height: 8 },
-        estimatedCost: 45,
-        description: 'Surface scratch approximately 3cm in length. Does not affect functionality.',
-      },
-      {
-        id: '2',
-        type: 'wear',
-        severity: 'minor',
-        location: 'Handle grip',
-        confidence: 0.87,
-        boundingBox: { x: 10, y: 50, width: 20, height: 30 },
-        estimatedCost: 0,
-        description: 'Normal wear on handle grip consistent with regular use.',
-      },
-    ];
+      const response = await fetch(`${supabaseUrl}/functions/v1/analyze-damage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token ?? anonKey}`,
+          apikey: anonKey,
+        },
+        body: JSON.stringify({
+          photos,
+          equipmentTitle: _equipmentTitle,
+          type,
+        }),
+      });
 
-    // Randomly decide if there are damages
-    const hasDamages = Math.random() > 0.4;
-    setDamages(hasDamages ? mockDamages : []);
-    setAnalyzed(true);
-    setAnalyzing(false);
+      const payload = await response.json();
+      if (!response.ok || payload.error) {
+        throw new Error(payload.error || `Analysis failed (HTTP ${response.status})`);
+      }
+
+      const results: DetectedDamage[] = Array.isArray(payload.damages) ? payload.damages : [];
+      setDamages(results);
+      setAnalyzed(true);
+    } catch (err) {
+      console.error('Damage analysis error:', err);
+      addToast({
+        type: 'error',
+        title: 'Analysis failed',
+        message: err instanceof Error ? err.message : 'Please try again in a moment.',
+      });
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   const generateReport = useCallback((): DamageReport => {
