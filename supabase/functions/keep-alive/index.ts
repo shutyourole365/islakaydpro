@@ -28,8 +28,9 @@ Deno.serve(async (_req: Request) => {
       }
     );
   } catch (err) {
+    console.error("keep-alive error:", err);
     return new Response(
-      JSON.stringify({ success: false, error: String(err) }),
+      JSON.stringify({ success: false, error: "Internal server error" }),
       {
         headers: { "Content-Type": "application/json" },
         status: 500,

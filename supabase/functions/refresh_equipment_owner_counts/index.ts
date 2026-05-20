@@ -21,10 +21,12 @@ Deno.serve(async (_req: Request) => {
   try {
     const { error } = await supabase.rpc("refresh_equipment_owner_counts");
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+      console.error("refresh_equipment_owner_counts rpc error:", error);
+      return new Response(JSON.stringify({ error: "Refresh failed" }), { status: 500 });
     }
     return new Response(JSON.stringify({ status: "ok" }), { status: 200 });
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 });
+    console.error("refresh_equipment_owner_counts error:", err);
+    return new Response(JSON.stringify({ error: "Internal server error" }), { status: 500 });
   }
 });
