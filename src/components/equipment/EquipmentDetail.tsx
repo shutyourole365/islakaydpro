@@ -15,14 +15,12 @@ import {
   Truck,
   AlertCircle,
   Info,
-  DollarSign,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
 import ReviewsSection from '../reviews/ReviewsSection';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import ShareEquipment from './ShareEquipment';
-import PriceNegotiator from '../negotiation/PriceNegotiator';
 
 interface EquipmentDetailProps {
   equipment: Equipment;
@@ -45,7 +43,6 @@ export default function EquipmentDetail({
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
-  const [showNegotiator, setShowNegotiator] = useState(false);
   const [canLeaveReview, setCanLeaveReview] = useState(false);
   const [reviewBookingId, setReviewBookingId] = useState<string | undefined>(undefined);
   const { user } = useAuth();
@@ -420,14 +417,6 @@ export default function EquipmentDetail({
                   Message Owner
                 </button>
 
-                <button
-                  onClick={() => setShowNegotiator(true)}
-                  className="w-full py-4 border border-orange-200 dark:border-orange-800 text-orange-700 dark:text-orange-400 font-semibold rounded-xl hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center justify-center gap-2"
-                >
-                  <DollarSign className="w-5 h-5" />
-                  Negotiate Price
-                </button>
-
                 {/* Owner card */}
                 <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                   <div className="flex items-start gap-3">
@@ -476,22 +465,6 @@ export default function EquipmentDetail({
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
       />
-
-      {showNegotiator && pricing && (
-        <PriceNegotiator
-          equipmentId={equipment.id}
-          equipmentTitle={equipment.title}
-          originalDailyRate={equipment.daily_rate}
-          ownerId={equipment.owner_id}
-          ownerName={equipment.owner?.full_name || 'Owner'}
-          rentalDays={pricing.days}
-          onAccepted={() => {
-            setShowNegotiator(false);
-          }}
-          onRejected={() => setShowNegotiator(false)}
-          onClose={() => setShowNegotiator(false)}
-        />
-      )}
     </div>
   );
 }
