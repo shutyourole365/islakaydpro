@@ -38,8 +38,12 @@ GROUP BY owner_id;
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_mview_equipment_owner_id
   ON public.equipment_owner_counts (owner_id);
-CREATE INDEX IF NOT EXISTS idx_mview_equipment_owner_id
-  ON public.equipment_owner_counts (owner_id);
+
+-- Prod has a redundant non-unique index on the same column (left over from
+-- when the matview was first created via SQL editor). The unique index above
+-- covers both uniqueness and lookups, so the non-unique one just adds write
+-- and storage overhead on every refresh. Drop it from prod here.
+DROP INDEX IF EXISTS public.idx_mview_equipment_owner_id;
 
 REVOKE SELECT ON public.equipment_owner_counts FROM anon, authenticated, PUBLIC;
 
