@@ -91,4 +91,18 @@ DROP POLICY IF EXISTS "Public can view equipment images" ON storage.objects;
 -- 5. Revoke SELECT on the equipment_owner_counts materialized view from anon/authenticated.
 --    Refreshed by the `refresh_equipment_owner_counts` Edge Function (service_role).
 --    Verified: nothing in src/ or supabase/functions/ reads the view directly.
-REVOKE SELECT ON public.equipment_owner_counts FROM anon, authenticated, PUBLIC;
+--    Wrapped in an IF EXISTS check because the view is another prod-only orphan
+--    (not in any migration file); preview branches don't have it. The advisor
+--    flagged it on prod, so the REVOKE matters there.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = 'public'
+      AND c.relname = 'equipment_owner_counts'
+      AND c.relkind = 'm'
+  ) THEN
+    REVOKE SELECT ON public.equipment_owner_counts FROM anon, authenticated, PUBLIC;
+  END IF;
+END $$;
