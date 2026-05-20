@@ -52,12 +52,33 @@ END $$;
 -- 3. Revoke EXECUTE on server-side SECURITY DEFINER RPCs from anon/authenticated.
 --    These are utility functions the frontend never calls. service_role retains
 --    EXECUTE so Edge Functions and admin paths keep working.
-REVOKE EXECUTE ON FUNCTION public.create_notification() FROM anon, authenticated, PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.create_notification(uuid, text, text, text, jsonb) FROM anon, authenticated, PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.log_audit_event() FROM anon, authenticated, PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.log_audit_event(uuid, text, text, uuid, jsonb) FROM anon, authenticated, PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.generate_referral_code() FROM anon, authenticated, PUBLIC;
-REVOKE EXECUTE ON FUNCTION public.refresh_equipment_owner_counts() FROM anon, authenticated, PUBLIC;
+--    Uses a DO block (same pattern as step 2) so it covers every overload that
+--    exists on the target database without hard-coding signatures. Prod and
+--    preview have drifted: prod has no-arg overloads of create_notification and
+--    log_audit_event that aren't in any migration file (orphan functions
+--    created manually via SQL editor — flagged as a follow-up). This loop
+--    catches them whether they exist or not.
+DO $$
+DECLARE
+  fn record;
+BEGIN
+  FOR fn IN
+    SELECT n.nspname || '.' || p.proname || '(' ||
+           pg_catalog.pg_get_function_identity_arguments(p.oid) || ')' AS sig
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+      AND p.prosecdef = true
+      AND p.proname IN (
+        'create_notification',
+        'log_audit_event',
+        'generate_referral_code',
+        'refresh_equipment_owner_counts'
+      )
+  LOOP
+    EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM anon, authenticated, PUBLIC', fn.sig);
+  END LOOP;
+END $$;
 
 -- 4. Drop the overly broad SELECT policy on the equipment-images bucket.
 --    `equipment-images` is a public bucket; public URLs served by
