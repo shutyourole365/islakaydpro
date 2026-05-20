@@ -80,7 +80,7 @@ Strongly recommended:
 - [ ] `VITE_SENTRY_DSN=https://...@sentry.io/...`
 - [ ] `VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX`
 - [ ] `VITE_ENABLE_ANALYTICS=true`
-- [ ] `VITE_APP_VERSION` — set per-deploy. In `netlify.toml` add: `VITE_APP_VERSION = "$COMMIT_REF"` so Sentry events tag the git SHA.
+- [ ] `VITE_APP_VERSION` — set per-deploy so Sentry releases match the deployed commit. Netlify doesn't expand `$COMMIT_REF` inside `netlify.toml`'s `[build.environment]` block (it would be a literal string), so do it in the build command instead: in `netlify.toml`, set `[build]` `command = "VITE_APP_VERSION=$COMMIT_REF npm run build"` (Netlify injects `COMMIT_REF` as a real env var at build time).
 - [ ] `VITE_VAPID_PUBLIC_KEY` — same value as server-side `VAPID_PUBLIC_KEY` from Phase 1.
 
 Social links (only the ones you actually have — empty values render no icon, that's intentional):
@@ -177,7 +177,11 @@ While running this, watch:
 - [ ] Stripe Dashboard → Events for webhook delivery
 - [ ] Resend Dashboard → Logs for email delivery
 
-Use real test cards (Stripe lists them) but **switch to live mode in Stripe** before this — otherwise the Connect / webhook flow won't be in the configuration you'll ship.
+**Stripe mode for the smoke test — pick one, don't mix:**
+
+Option A (recommended): **test mode**. Set Stripe to test mode, use test cards (`4242 4242 4242 4242`), and configure a *separate* test-mode webhook endpoint at the same Edge Function URL with its own `STRIPE_WEBHOOK_SECRET` set in Phase 1. This validates the full Connect / webhook path without real money. After it passes, swap the secrets over to live values and do step B.
+
+Option B: **live mode dry-run with a real low-value charge**. Use a real card, charge yourself $1, refund immediately. Use this only as a final sanity check after Option A passes. Test cards are rejected in live mode, so do not mix the two — pick one, run it cleanly, then switch.
 
 ---
 
@@ -187,7 +191,7 @@ Use real test cards (Stripe lists them) but **switch to live mode in Stripe** be
 - [ ] Confirm Sentry alert rules are armed and point at a channel you'll see
 - [ ] Have a rollback path ready:
   - Netlify → Deploys → previous successful deploy → Publish (instant rollback for frontend)
-  - Edge Functions: redeploy previous version via `supabase functions deploy <slug> --no-verify-jwt` from a previous commit
+  - Edge Functions: redeploy previous version with `supabase functions deploy <slug>` from a previous commit. **Preserve each function's existing JWT-verification setting** — only pass `--no-verify-jwt` for functions that are intentionally public (currently just `keep-alive`); all others should keep JWT verification on. Cross-reference the `verify_jwt` field in `list_edge_functions` output before rolling back.
   - Database: migrations don't auto-rollback. Have a hand-written DOWN migration for any risky change (the security migration in Phase 4 should ship with one)
 - [ ] First 24h: check Sentry every couple of hours
 - [ ] Set a calendar reminder for 7-day post-launch review
