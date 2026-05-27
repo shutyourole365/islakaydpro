@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getPublicAppUrl } from '../../utils/publicUrl';
-import { getMyReferralCode, listMyReferrals, type ReferralRecord } from '../../services/referrals';
+import { getMyReferralCode, listMyReferrals, getFoundingOwnerStatus, type ReferralRecord } from '../../services/referrals';
 
 interface ReferralSystemProps {
   className?: string;
@@ -76,6 +76,7 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
   const [loading, setLoading] = useState(true);
   const [showShareModal, setShowShareModal] = useState(false);
   const [referralCode, setReferralCode] = useState('');
+  const [feeFreeUntil, setFeeFreeUntil] = useState<Date | null>(null);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -88,9 +89,10 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
       // fallback for the other (Promise.all would short-circuit and leave
       // the referral code blank if listMyReferrals failed first).
       const fallbackCode = `ISLAKAYD-${user.id.slice(0, 8).toUpperCase()}`;
-      const [codeResult, rowsResult] = await Promise.allSettled([
+      const [codeResult, rowsResult, founderResult] = await Promise.allSettled([
         getMyReferralCode(user.id),
         listMyReferrals(user.id),
+        getFoundingOwnerStatus(user.id),
       ]);
       if (cancelled) return;
       if (codeResult.status === 'fulfilled') {
@@ -104,6 +106,12 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
       } else {
         console.error('Failed to load referrals list:', rowsResult.reason);
         setReferrals([]);
+      }
+      if (founderResult.status === 'fulfilled') {
+        setFeeFreeUntil(founderResult.value.feeFreeUntil);
+      } else {
+        console.error('Failed to load founding owner status:', founderResult.reason);
+        setFeeFreeUntil(null);
       }
       setLoading(false);
     };
@@ -207,8 +215,24 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
     );
   }
 
+  const feeFreeActive = feeFreeUntil != null && feeFreeUntil.getTime() > Date.now();
+
   return (
     <div className={className}>
+      {/* Founding Owner reward banner */}
+      {feeFreeActive && (
+        <div className="mb-6 p-5 rounded-xl bg-gradient-to-r from-teal-600 to-emerald-500 text-white flex items-start gap-3">
+          <Trophy className="w-6 h-6 flex-shrink-0 mt-0.5" />
+          <div>
+            <div className="font-semibold">You're a Founding Owner — 0% platform fees unlocked</div>
+            <div className="text-sm text-white/90">
+              Your referrals earned you fee-free listings until{' '}
+              {feeFreeUntil!.toLocaleDateString()}. Refer more owners to extend it.
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -289,7 +313,7 @@ export default function ReferralSystem({ className = '' }: ReferralSystemProps) 
           </button>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-          Share this code with friends. They'll get a discount on their first rental, and you'll earn rewards when they complete their first booking.
+          Share this code with other equipment owners. When someone you refer lists their first item, you earn Founding Owner rewards — 0% platform fees that grow the more owners you bring on.
         </p>
       </div>
 

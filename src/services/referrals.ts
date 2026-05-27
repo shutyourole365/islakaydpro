@@ -68,6 +68,22 @@ export async function getMyReferralCode(userId: string): Promise<string | null> 
   return data?.referral_code ?? null;
 }
 
+// Returns the Founding Owner fee-free window earned via referrals, or null.
+// feeFreeUntil is only meaningful when it's in the future.
+export async function getFoundingOwnerStatus(
+  userId: string
+): Promise<{ feeFreeUntil: Date | null }> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('founding_owner_fee_free_until')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  const raw = data?.founding_owner_fee_free_until ?? null;
+  return { feeFreeUntil: raw ? new Date(raw) : null };
+}
+
 interface ReferralRow {
   id: string;
   status: ReferralStatus;
