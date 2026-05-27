@@ -112,6 +112,7 @@ const HelpCenter = lazy(() => import('./components/support/HelpCenter'));
 const Safety = lazy(() => import('./components/support/Safety'));
 const TrustAndVerification = lazy(() => import('./components/support/TrustAndVerification'));
 const ContactUs = lazy(() => import('./components/support/ContactUs'));
+const OwnersLanding = lazy(() => import('./components/marketing/OwnersLanding'));
 
 // Utility Pages
 const MaintenanceScheduler = lazy(() => import('./components/maintenance/MaintenanceScheduler'));
@@ -130,7 +131,7 @@ const PageLoader = () => (
 
 
 function AppContent() {
-type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | 'privacy' | 'terms' | '404';
+type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | 'privacy' | 'terms' | 'owners' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications, unreadMessages } = useAuth();
   const [showOwnerActivation, setShowOwnerActivation] = useState(false);
   const { addToast } = useToast();
@@ -392,7 +393,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
   };
 
   const handleNavigate = (page: string) => {
-    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', 'messaging', 'privacy', 'terms', '404'];
+    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', 'messaging', 'privacy', 'terms', 'owners', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
   };
 
@@ -1806,6 +1807,12 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       {currentPage === 'contact' && (
         <Suspense fallback={<PageLoader />}>
           <ContactUs onBack={() => setCurrentPage('home')} />
+        </Suspense>
+      )}
+
+      {currentPage === 'owners' && (
+        <Suspense fallback={<PageLoader />}>
+          <OwnersLanding onListItem={handleListEquipment} />
         </Suspense>
       )}
 

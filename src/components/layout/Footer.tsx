@@ -24,6 +24,7 @@ export default function Footer({ onNavigate }: FooterProps) {
       { label: 'Vehicles', page: 'browse', category: 'vehicles' },
     ],
     'List Equipment': [
+      { label: 'Why list your gear', page: 'owners' },
       { label: 'Start Listing', page: 'list-equipment' },
       { label: 'Pricing Calculator', page: 'pricing-calculator' },
       { label: 'Insurance Options', page: 'insurance' },
