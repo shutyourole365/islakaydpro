@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, TrendingUp, MapPin, Star, Heart, Clock, Zap } from 'lucide-react';
-import type { Equipment, EquipmentId, UserId } from '../../types';
+import type { Equipment } from '../../types';
+import { getEquipment } from '../../services/database';
 
 interface RecommendationsProps {
   currentEquipment?: Equipment;
@@ -32,83 +33,43 @@ export default function EquipmentRecommendations({
   });
 
   useEffect(() => {
-    // Simulate recommendation algorithm
-    // In production, this would call your recommendation API
+    let cancelled = false;
+
+    const loadRecommendations = async () => {
+      const exclude = (list: Equipment[]) =>
+        list.filter((e) => e.id !== currentEquipment?.id);
+
+      try {
+        const [similar, trending, nearby] = await Promise.all([
+          currentEquipment?.category_id
+            ? getEquipment({ categoryId: currentEquipment.category_id, limit: 10 }).then((r) => r.data)
+            : Promise.resolve<Equipment[]>([]),
+          getEquipment({ featured: true, limit: 10 }).then((r) => r.data),
+          userLocation
+            ? getEquipment({ location: userLocation, limit: 10 }).then((r) => r.data)
+            : Promise.resolve<Equipment[]>([]),
+        ]);
+
+        if (cancelled) return;
+        setRecommendations({
+          similar: exclude(similar),
+          // We don't track co-rental data yet; leave empty so the section
+          // hides rather than showing fabricated "frequently rented together".
+          alsoRented: [],
+          nearbyAlternatives: exclude(nearby),
+          trending: exclude(trending),
+        });
+      } catch {
+        if (cancelled) return;
+        setRecommendations({ similar: [], alsoRented: [], nearbyAlternatives: [], trending: [] });
+      }
+    };
+
     loadRecommendations();
-  }, [currentEquipment, userBookingHistory]);
-
-  const loadRecommendations = () => {
-    // Demo data - replace with actual API calls
-    const demoEquipment: Equipment[] = [
-      {
-        id: 'rec-1' as EquipmentId,
-        owner_id: 'owner1' as UserId,
-        category_id: 'cat1',
-        title: 'Kubota Mini Excavator - 3 Ton',
-        description: 'Compact excavator perfect for tight spaces',
-        brand: 'Kubota',
-        model: 'KX033-4',
-        condition: 'excellent',
-        daily_rate: 350,
-        weekly_rate: 2100,
-        monthly_rate: 7000,
-        deposit_amount: 1500,
-        location: 'Los Angeles, CA',
-        latitude: 34.0622,
-        longitude: -118.2537,
-        images: ['https://images.pexels.com/photos/1078884/pexels-photo-1078884.jpeg'],
-        features: ['GPS Navigation', 'AC Cabin', 'Zero Tail Swing'],
-        specifications: { weight: '3 tons', reach: '15 ft' },
-        availability_status: 'available',
-        min_rental_days: 1,
-        max_rental_days: 60,
-        rating: 4.8,
-        total_reviews: 32,
-        total_bookings: 67,
-        is_featured: false,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: 'rec-2' as EquipmentId,
-        owner_id: 'owner2' as UserId,
-        category_id: 'cat2',
-        title: 'Canon R6 Mark II Camera Body',
-        description: 'Latest mirrorless camera for professionals',
-        brand: 'Canon',
-        model: 'R6 Mark II',
-        condition: 'new',
-        daily_rate: 135,
-        weekly_rate: 750,
-        monthly_rate: 2400,
-        deposit_amount: 600,
-        location: 'San Francisco, CA',
-        latitude: 37.7849,
-        longitude: -122.4094,
-        images: ['https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg'],
-        features: ['24MP Sensor', '4K 60fps', 'Image Stabilization'],
-        specifications: { sensor: '24MP Full Frame', video: '4K 60fps' },
-        availability_status: 'available',
-        min_rental_days: 1,
-        max_rental_days: 21,
-        rating: 5.0,
-        total_reviews: 28,
-        total_bookings: 92,
-        is_featured: true,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ];
-
-    setRecommendations({
-      similar: demoEquipment,
-      alsoRented: demoEquipment,
-      nearbyAlternatives: demoEquipment,
-      trending: demoEquipment,
-    });
-  };
+    return () => {
+      cancelled = true;
+    };
+  }, [currentEquipment, userLocation]);
 
   const RecommendationCard = ({ equipment, reason }: { equipment: Equipment; reason: string }) => (
     <div className="flex-shrink-0 w-72 bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden group cursor-pointer">
