@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import { signUpWithRetry, getAuthErrorMessage } from '../../services/authHelpers';
 import { peekPendingReferralCode, clearPendingReferralCode } from '../../services/referrals';
 import { sendWelcomeEmail } from '../../services/email';
+import { validatePassword } from '../../utils/validation';
 import SocialAuth from './SocialAuth';
 import BiometricAuth from './BiometricAuth';
 import Logo from '../ui/Logo';
@@ -62,6 +63,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
       setError('You must agree to the Terms of Service and Privacy Policy.');
       return;
     }
+    const pwCheck = validatePassword(password);
+    if (!pwCheck.valid) {
+      setError(pwCheck.error ?? 'Please choose a stronger password.');
+      return;
+    }
     setLoading(true);
     setError('');
     setSuccess('');
@@ -109,7 +115,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
   const handleSetNewPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    const pwCheck = validatePassword(password);
+    if (!pwCheck.valid) { setError(pwCheck.error ?? 'Please choose a stronger password.'); return; }
     setLoading(true);
     setError('');
     const { error } = await supabase.auth.updateUser({ password });
@@ -283,7 +290,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
                       required
-                      minLength={6}
+                      minLength={8}
                       className={`${inputBase} pl-12 pr-12`}
                     />
                     <button
