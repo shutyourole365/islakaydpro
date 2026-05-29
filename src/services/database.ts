@@ -715,10 +715,8 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
     .limit(50);
 
   if (unreadOnly) {
-    query = query.eq('read', false);
+    query = query.eq('is_read', false);
   }
-
-  query = query.order('created_at', { ascending: false }).limit(50);
 
   const { data, error } = await query;
 
@@ -729,7 +727,7 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
 export async function markNotificationRead(id: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ read: true })
+    .update({ is_read: true })
     .eq('id', id);
 
   if (error) throw error;
@@ -738,9 +736,9 @@ export async function markNotificationRead(id: string): Promise<void> {
 export async function markAllNotificationsRead(userId: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ read: true })
+    .update({ is_read: true })
     .eq('user_id', userId)
-    .eq('read', false);
+    .eq('is_read', false);
 
   if (error) throw error;
 }
@@ -750,7 +748,7 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .eq('read', false);
+    .eq('is_read', false);
 
   if (error) throw error;
   return count || 0;
@@ -773,7 +771,7 @@ export async function getUnreadMessageCount(userId: string): Promise<number> {
     .select('id', { count: 'exact', head: true })
     .in('conversation_id', convIds)
     .neq('sender_id', userId)
-    .eq('read', false);
+    .eq('is_read', false);
 
   if (error) return 0;
   return count || 0;

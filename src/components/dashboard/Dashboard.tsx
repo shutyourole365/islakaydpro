@@ -214,13 +214,13 @@ export default function Dashboard({
 
   const handleMarkNotificationRead = async (id: string) => {
     await markNotificationRead(id);
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
   };
 
   const handleMarkAllRead = async () => {
     if (!user) return;
     await markAllNotificationsRead(user.id);
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
   };
 
   const handleSendMessage = async () => {
@@ -340,7 +340,7 @@ export default function Dashboard({
     { id: 'listings', label: 'My Listings', icon: Package, badge: pendingOwnerBookings.length },
     { id: 'favorites', label: 'Favorites', icon: Heart, badge: favorites.length },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
-    { id: 'notifications', label: 'Notifications', icon: Activity, badge: notifications.filter(n => !n.read).length },
+    { id: 'notifications', label: 'Notifications', icon: Activity, badge: notifications.filter(n => !n.is_read).length },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'settings', label: 'Settings', icon: Settings },
     { id: 'referral', label: 'Referrals', icon: Users },
@@ -1083,7 +1083,7 @@ export default function Dashboard({
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900">
-                    Notifications ({notifications.filter(n => !n.read).length} unread)
+                    Notifications ({notifications.filter(n => !n.is_read).length} unread)
                   </h2>
                   <div className="flex items-center gap-3">
                     <button
@@ -1093,7 +1093,7 @@ export default function Dashboard({
                       <Settings className="w-4 h-4" />
                       Settings
                     </button>
-                    {notifications.some(n => !n.read) && (
+                    {notifications.some(n => !n.is_read) && (
                       <button
                         onClick={handleMarkAllRead}
                         className="text-teal-600 text-sm font-medium hover:text-teal-700"
@@ -1121,7 +1121,7 @@ export default function Dashboard({
                         {notifications.map((notification) => (
                           <div
                             key={notification.id}
-                            className={`p-4 flex items-start gap-4 ${!notification.read ? 'bg-teal-50/50' : ''}`}
+                            className={`p-4 flex items-start gap-4 ${!notification.is_read ? 'bg-teal-50/50' : ''}`}
                           >
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                               notification.type.includes('booking') ? 'bg-blue-100 text-blue-600' :
@@ -1139,7 +1139,7 @@ export default function Dashboard({
                               <p className="text-sm text-gray-600">{notification.message}</p>
                               <p className="text-xs text-gray-500 mt-1">{formatRelativeTime(notification.created_at)}</p>
                             </div>
-                            {!notification.read && (
+                            {!notification.is_read && (
                               <button
                                 onClick={() => handleMarkNotificationRead(notification.id)}
                                 className="p-1 text-teal-600 hover:bg-teal-100 rounded"

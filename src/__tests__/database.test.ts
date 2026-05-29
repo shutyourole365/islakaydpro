@@ -170,11 +170,11 @@ describe('Database Service', () => {
         title: 'New Booking Request',
         message: 'Someone wants to rent your excavator',
         data: { booking_id: 'booking-456' },
-        read: false,
+        is_read: false,
         created_at: new Date().toISOString(),
       };
 
-      expect(notification.read).toBe(false);
+      expect(notification.is_read).toBe(false);
       expect(notification.type).toBe('new_booking');
       expect(notification.data.booking_id).toBeDefined();
     });
