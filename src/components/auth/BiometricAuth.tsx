@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Fingerprint, Smartphone, ShieldCheck, AlertCircle } from 'lucide-react';
+import {
+  isPlatformAuthenticatorAvailable,
+  hasRegisteredPasskey,
+  registerPasskey,
+  authenticatePasskey,
+} from '../../utils/webauthn';
 
 interface BiometricAuthProps {
   onSuccess: () => void;
@@ -20,14 +26,13 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
   const [isRegistered, setIsRegistered] = useState(false);
 
   const checkBiometricCapabilities = useCallback(async () => {
-    if (!window.PublicKeyCredential) {
+    const platformAuth = await isPlatformAuthenticatorAvailable();
+    if (!platformAuth) {
       setCapabilities({ available: false, type: 'unknown', platformAuthenticator: false });
       return;
     }
 
     try {
-      const platformAuth = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-      
       // Detect biometric type (simplified detection)
       const userAgent = navigator.userAgent.toLowerCase();
       let type: BiometricCapabilities['type'] = 'unknown';
@@ -53,9 +58,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
   }, []);
 
   const checkIfRegistered = useCallback(() => {
-    // Check localStorage for registered credentials
-    const stored = localStorage.getItem(`biometric_${userId}`);
-    setIsRegistered(!!stored);
+    setIsRegistered(userId ? hasRegisteredPasskey(userId) : false);
   }, [userId]);
 
   useEffect(() => {
@@ -69,45 +72,9 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
     setIsRegistering(true);
 
     try {
-      // Generate challenge (in production, this should come from server)
-      const challenge = new Uint8Array(32);
-      crypto.getRandomValues(challenge);
-
-      const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
-        challenge,
-        rp: {
-          name: 'Islakayd',
-          id: window.location.hostname,
-        },
-        user: {
-          id: new TextEncoder().encode(userId),
-          name: userId,
-          displayName: 'Islakayd User',
-        },
-        pubKeyCredParams: [
-          { alg: -7, type: 'public-key' }, // ES256
-          { alg: -257, type: 'public-key' }, // RS256
-        ],
-        authenticatorSelection: {
-          authenticatorAttachment: 'platform',
-          userVerification: 'required',
-          residentKey: 'preferred',
-        },
-        timeout: 60000,
-        attestation: 'none',
-      };
-
-      const credential = await navigator.credentials.create({
-        publicKey: publicKeyCredentialCreationOptions,
-      }) as PublicKeyCredential;
-
-      if (credential) {
-        // Store credential ID (in production, send to server)
-        const credentialId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-        localStorage.setItem(`biometric_${userId}`, credentialId);
-        setIsRegistered(true);
-        onSuccess();
-      }
+      await registerPasskey(userId);
+      setIsRegistered(true);
+      onSuccess();
     } catch (error) {
       console.error('Biometric registration error:', error);
       onError('Biometric registration failed. Please try again.');
@@ -122,38 +89,8 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
     setIsAuthenticating(true);
 
     try {
-      const storedCredentialId = localStorage.getItem(`biometric_${userId}`);
-      if (!storedCredentialId) {
-        onError('No biometric credential found. Please register first.');
-        setIsAuthenticating(false);
-        return;
-      }
-
-      // Generate challenge
-      const challenge = new Uint8Array(32);
-      crypto.getRandomValues(challenge);
-
-      // Convert stored credential ID back to ArrayBuffer
-      const credentialIdArray = Uint8Array.from(atob(storedCredentialId), c => c.charCodeAt(0));
-
-      const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
-        challenge,
-        allowCredentials: [{
-          id: credentialIdArray,
-          type: 'public-key',
-          transports: ['internal'],
-        }],
-        userVerification: 'required',
-        timeout: 60000,
-      };
-
-      const assertion = await navigator.credentials.get({
-        publicKey: publicKeyCredentialRequestOptions,
-      });
-
-      if (assertion) {
-        onSuccess();
-      }
+      await authenticatePasskey(userId);
+      onSuccess();
     } catch (error) {
       console.error('Biometric authentication error:', error);
       onError('Biometric authentication failed. Please try again or use password.');

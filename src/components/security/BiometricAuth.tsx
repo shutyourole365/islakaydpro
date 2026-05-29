@@ -11,6 +11,13 @@ import {
   X,
   Loader2,
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import {
+  isPlatformAuthenticatorAvailable,
+  hasRegisteredPasskey,
+  registerPasskey,
+  authenticatePasskey,
+} from '../../utils/webauthn';
 
 interface BiometricAuthProps {
   onSuccess: () => void;
@@ -19,6 +26,8 @@ interface BiometricAuthProps {
 }
 
 export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticate' }: BiometricAuthProps) {
+  const { user } = useAuth();
+  const userId = user?.id;
   const [status, setStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
   const [biometricType, setBiometricType] = useState<'fingerprint' | 'face' | 'none'>('none');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -30,48 +39,41 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
   }, []);
 
   const checkBiometricSupport = async () => {
-    try {
-      // Check if WebAuthn is available
-      if (window.PublicKeyCredential) {
-        const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-        setIsSupported(available);
-        if (available) {
-          // Determine the likely biometric type based on platform
-          const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-          const isApple = /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent);
-          setBiometricType(isApple && isMobile ? 'face' : 'fingerprint');
-        }
-      } else {
-        setIsSupported(false);
-      }
-    } catch {
-      setIsSupported(false);
+    const available = await isPlatformAuthenticatorAvailable();
+    setIsSupported(available);
+    if (available) {
+      // Determine the likely biometric type based on platform
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      const isApple = /iPhone|iPad|iPod|Mac/i.test(navigator.userAgent);
+      setBiometricType(isApple && isMobile ? 'face' : 'fingerprint');
     }
   };
 
   const startBiometricAuth = async () => {
+    if (!userId) {
+      setStatus('error');
+      setErrorMessage('Please sign in before using biometric authentication.');
+      return;
+    }
+
     setStatus('scanning');
     setErrorMessage(null);
 
     try {
-      // Simulate biometric authentication
-      // In production, use WebAuthn API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Simulate success (80% success rate for demo)
-      const isSuccess = Math.random() > 0.2;
-      
-      if (isSuccess) {
-        setStatus('success');
-        setTimeout(() => {
-          onSuccess();
-        }, 1500);
+      // Run the real platform authenticator ceremony (WebAuthn). Register a
+      // passkey the first time, then authenticate against it afterwards.
+      if (mode === 'register' || !hasRegisteredPasskey(userId)) {
+        await registerPasskey(userId);
       } else {
-        throw new Error('Authentication failed. Please try again.');
+        await authenticatePasskey(userId);
       }
+      setStatus('success');
+      setTimeout(() => {
+        onSuccess();
+      }, 1200);
     } catch (err) {
       setStatus('error');
-      setErrorMessage(err instanceof Error ? err.message : 'Authentication failed');
+      setErrorMessage(err instanceof Error ? err.message : 'Authentication failed. Please try again.');
     }
   };
 
@@ -235,11 +237,11 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>256-bit end-to-end encryption</span>
+                  <span>Backed by your device's secure hardware</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Compliant with FIDO2 security standards</span>
+                  <span>Uses the WebAuthn / FIDO2 passkey standard</span>
                 </li>
               </ul>
             </div>
