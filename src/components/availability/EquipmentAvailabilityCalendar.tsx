@@ -31,40 +31,17 @@ const generateSlots = (baseRate: number): BookingSlot[] => {
     const date = new Date(today);
     date.setDate(date.getDate() + i);
     const dateStr = date.toISOString().split('T')[0];
-    const rand = Math.random();
-    let status: BookingSlot['status'] = 'available';
-    let bookedBy: string | undefined;
-    let price = baseRate;
 
-    if (i < 0) {
-      status = rand < 0.7 ? 'booked' : 'available';
-      bookedBy = status === 'booked' ? 'Past Renter' : undefined;
-    } else if (rand < 0.25) {
-      status = 'booked';
-      bookedBy = ['John D.', 'Sarah M.', 'Mike R.', 'Lisa K.', 'David W.'][Math.floor(Math.random() * 5)];
-    } else if (rand < 0.3) {
-      status = 'maintenance';
-    } else if (rand < 0.33) {
-      status = 'blocked';
-    }
-
-    // Weekend pricing
+    // Every date starts available; real booked / maintenance / blocked
+    // statuses are merged in from getEquipmentAvailability(). We never
+    // fabricate bookings or renter names.
     const dayOfWeek = date.getDay();
-    if (dayOfWeek === 0 || dayOfWeek === 6) {
-      price = Math.round(baseRate * 1.15);
-    }
+    const price = dayOfWeek === 0 || dayOfWeek === 6 ? Math.round(baseRate * 1.15) : baseRate;
 
-    slots.push({ date: dateStr, status, bookedBy, price });
+    slots.push({ date: dateStr, status: 'available', price });
   }
   return slots;
 };
-
-const sampleEquipment: CalendarEquipment[] = [
-  { id: '1', name: 'CAT 320 Excavator', location: 'Los Angeles, CA', dailyRate: 450, image: 'https://images.pexels.com/photos/2058128/pexels-photo-2058128.jpeg', slots: generateSlots(450) },
-  { id: '2', name: 'Sony A7IV Camera Kit', location: 'San Francisco, CA', dailyRate: 125, image: 'https://images.pexels.com/photos/51383/photo-camera-subject-photographer-51383.jpeg', slots: generateSlots(125) },
-  { id: '3', name: 'DeWalt Power Tool Kit', location: 'Austin, TX', dailyRate: 75, image: 'https://images.pexels.com/photos/1249611/pexels-photo-1249611.jpeg', slots: generateSlots(75) },
-  { id: '4', name: 'DJI Mavic 3 Pro Drone', location: 'Seattle, WA', dailyRate: 150, image: 'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg', slots: generateSlots(150) },
-];
 
 const statusStyles = {
   available: { bg: 'bg-green-100 hover:bg-green-200 dark:bg-green-900/30 dark:hover:bg-green-900/50', text: 'text-green-700 dark:text-green-300', dot: 'bg-green-500' },
@@ -79,30 +56,38 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvailabilityCalendarProps) {
   const { user } = useAuth();
   const { addToast } = useToast();
-  const [equipmentList, setEquipmentList] = useState<CalendarEquipment[]>(sampleEquipment);
-  const [selected, setSelected] = useState(sampleEquipment[0]);
+  const [equipmentList, setEquipmentList] = useState<CalendarEquipment[]>([]);
+  const [selected, setSelected] = useState<CalendarEquipment | null>(null);
+  const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectionStart, setSelectionStart] = useState<string | null>(null);
   const [selectionEnd, setSelectionEnd] = useState<string | null>(null);
 
-  // Load equipment list (owner's equipment if logged in, else show sample)
+  // Load the owner's real equipment. No user (or no listings) => empty state.
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
     getEquipment({ ownerId: user.id, limit: 10 }).then(({ data }) => {
-      if (data.length > 0) {
-        const items: CalendarEquipment[] = data.map(eq => ({
-          id: eq.id,
-          name: eq.title,
-          location: eq.location || '',
-          dailyRate: eq.daily_rate,
-          image: eq.images?.[0] || '',
-          slots: generateSlots(eq.daily_rate),
-        }));
-        setEquipmentList(items);
-        setSelected(items[0]);
-      }
-    }).catch(() => {});
+      if (cancelled) return;
+      const items: CalendarEquipment[] = data.map(eq => ({
+        id: eq.id,
+        name: eq.title,
+        location: eq.location || '',
+        dailyRate: eq.daily_rate,
+        image: eq.images?.[0] || '',
+        slots: generateSlots(eq.daily_rate),
+      }));
+      setEquipmentList(items);
+      setSelected(items[0] ?? null);
+    }).catch(() => {}).finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+    return () => { cancelled = true; };
   }, [user]);
 
   // Load real availability slots when selected equipment changes
@@ -135,7 +120,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
           return { ...eq, slots: merged };
         }));
         setSelected(prev => {
-          if (prev.id !== equipmentId) return prev;
+          if (!prev || prev.id !== equipmentId) return prev;
           const merged = prev.slots.map(s => statusMap[s.date] ? { ...s, status: statusMap[s.date] } : s);
           return { ...prev, slots: merged };
         });
@@ -144,10 +129,12 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
   }, []);
 
   useEffect(() => {
-    if (selected.id !== sampleEquipment[0]?.id) {
+    if (selected) {
       loadAvailability(selected.id, selected.dailyRate);
     }
-  }, [selected.id, selected.dailyRate, loadAvailability]);
+    // Depend on primitives, not the `selected` object, since loadAvailability
+    // replaces it with a new reference (which would otherwise loop).
+  }, [selected?.id, selected?.dailyRate, loadAvailability]);
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -156,7 +143,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
 
   const slotMap = useMemo(() => {
     const map: Record<string, BookingSlot> = {};
-    selected.slots.forEach((s) => { map[s.date] = s; });
+    selected?.slots.forEach((s) => { map[s.date] = s; });
     return map;
   }, [selected]);
 
@@ -205,7 +192,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
   const selectedSlot = selectedDate ? slotMap[selectedDate] : null;
 
   const rangeAvailable = useMemo(() => {
-    if (!selectionStart || !selectionEnd) return true;
+    if (!selectionStart || !selectionEnd || !selected) return true;
     for (const slot of selected.slots) {
       if (slot.date >= selectionStart && slot.date <= selectionEnd && slot.status !== 'available') {
         return false;
@@ -243,6 +230,24 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
           </div>
         </div>
 
+        {loading ? (
+          <div className="flex items-center justify-center py-24 text-gray-400" role="status" aria-label="Loading">
+            <Clock className="w-6 h-6 animate-spin" />
+          </div>
+        ) : !selected ? (
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+            <Clock className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+              {user ? 'No equipment to manage yet' : 'Sign in to manage availability'}
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+              {user
+                ? 'List a piece of equipment to set its availability and block out dates here.'
+                : 'Sign in and list equipment to manage its rental calendar.'}
+            </p>
+          </div>
+        ) : (
+          <>
         {/* Equipment Selector */}
         <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
           {equipmentList.map((eq) => (
@@ -474,6 +479,8 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
             </div>
           </div>
         </div>
+          </>
+        )}
       </div>
     </div>
   );
