@@ -60,6 +60,18 @@ function reportDatabaseError(
   });
 }
 
+/**
+ * Sanitize a free-text search term before it is interpolated into a PostgREST
+ * `.or(...)` filter string. `sanitizeInput` strips HTML but leaves the
+ * PostgREST logic-tree metacharacters (`,` `(` `)` `\`) intact — and those let
+ * a crafted term break out of the `ilike` value and inject extra conditions
+ * (e.g. `x,is_active.eq.false` to surface inactive listings). We strip them so
+ * the term can only ever match as a literal `ilike` pattern.
+ */
+export function sanitizeSearchTerm(input: string): string {
+  return sanitizeInput(input).replace(/[,()\\]/g, ' ').trim();
+}
+
 export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
@@ -121,9 +133,10 @@ export async function getEquipment(filters?: {
     query = query.eq('owner_id', filters.ownerId);
   }
   if (filters?.search) {
-    // Sanitize search input to prevent SQL injection
-    const sanitizedSearch = sanitizeInput(filters.search);
-    query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%`);
+    const sanitizedSearch = sanitizeSearchTerm(filters.search);
+    if (sanitizedSearch) {
+      query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%`);
+    }
   }
   if (filters?.minPrice !== undefined) {
     query = query.gte('daily_rate', filters.minPrice);
@@ -180,6 +193,25 @@ export async function createEquipment(equipment: Omit<Equipment, 'id' | 'created
   enforceMaxLength(equipment.brand, 'equipmentBrand', 'Brand');
   enforceMaxLength(equipment.model, 'equipmentModel', 'Model');
   enforceMaxLength(equipment.location, 'locationText', 'Location');
+
+  // Guard against pricing/rental-window values that would publish a broken or
+  // un-bookable listing (negative rates, or min > max so no range validates).
+  if (!(equipment.daily_rate > 0)) {
+    throw new Error('Daily rate must be greater than 0.');
+  }
+  if (equipment.deposit_amount != null && equipment.deposit_amount < 0) {
+    throw new Error('Deposit amount cannot be negative.');
+  }
+  if (equipment.min_rental_days != null && equipment.min_rental_days < 1) {
+    throw new Error('Minimum rental days must be at least 1.');
+  }
+  if (
+    equipment.min_rental_days != null &&
+    equipment.max_rental_days != null &&
+    equipment.max_rental_days < equipment.min_rental_days
+  ) {
+    throw new Error('Maximum rental days cannot be less than minimum rental days.');
+  }
 
   const { data, error } = await supabase
     .from('equipment')
@@ -683,10 +715,8 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
     .limit(50);
 
   if (unreadOnly) {
-    query = query.eq('read', false);
+    query = query.eq('is_read', false);
   }
-
-  query = query.order('created_at', { ascending: false }).limit(50);
 
   const { data, error } = await query;
 
@@ -697,7 +727,7 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
 export async function markNotificationRead(id: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ read: true })
+    .update({ is_read: true })
     .eq('id', id);
 
   if (error) throw error;
@@ -706,9 +736,9 @@ export async function markNotificationRead(id: string): Promise<void> {
 export async function markAllNotificationsRead(userId: string): Promise<void> {
   const { error } = await supabase
     .from('notifications')
-    .update({ read: true })
+    .update({ is_read: true })
     .eq('user_id', userId)
-    .eq('read', false);
+    .eq('is_read', false);
 
   if (error) throw error;
 }
@@ -718,7 +748,7 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
-    .eq('read', false);
+    .eq('is_read', false);
 
   if (error) throw error;
   return count || 0;
@@ -741,7 +771,7 @@ export async function getUnreadMessageCount(userId: string): Promise<number> {
     .select('id', { count: 'exact', head: true })
     .in('conversation_id', convIds)
     .neq('sender_id', userId)
-    .eq('read', false);
+    .eq('is_read', false);
 
   if (error) return 0;
   return count || 0;
@@ -1245,7 +1275,10 @@ export async function createBulkBooking(booking: Omit<BulkBookingRecord, 'id' | 
     .select()
     .single();
 
-  if (error) return null;
+  if (error) {
+    reportDatabaseError('createBulkBooking', error, { renterId: booking.renter_id });
+    return null;
+  }
   return data;
 }
 

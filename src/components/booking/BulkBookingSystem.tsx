@@ -188,6 +188,7 @@ export default function BulkBookingSystem({ initialEquipment = [], onComplete, o
   });
   const [step, setStep] = useState<'cart' | 'dates' | 'review' | 'payment' | 'complete'>('cart');
   const [isLoading, setIsLoading] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
   const [showEquipmentPicker, setShowEquipmentPicker] = useState(false);
   const [globalStartDate, setGlobalStartDate] = useState('');
   const [globalEndDate, setGlobalEndDate] = useState('');
@@ -313,6 +314,7 @@ export default function BulkBookingSystem({ initialEquipment = [], onComplete, o
   const processBooking = async () => {
     if (!user) return;
     setIsLoading(true);
+    setBookingError(null);
     try {
       const record = await createBulkBooking({
         renter_id: user.id as UserId,
@@ -331,6 +333,14 @@ export default function BulkBookingSystem({ initialEquipment = [], onComplete, o
         payment_status: 'pending',
         booking_status: 'pending',
       });
+
+      // createBulkBooking returns null when the insert fails (RLS denial,
+      // constraint violation, etc). Treat that as a hard failure rather than
+      // showing a fabricated confirmation for a reservation that never saved.
+      if (!record) {
+        setBookingError('We could not complete your booking. Please try again.');
+        return;
+      }
 
       setStep('complete');
 
@@ -353,8 +363,8 @@ export default function BulkBookingSystem({ initialEquipment = [], onComplete, o
         onComplete(completedBooking);
       }
     } catch {
-      // If DB insert fails, still show confirmation UI
-      setStep('complete');
+      // Keep the user on the review step with a retry instead of faking success.
+      setBookingError('Something went wrong while booking. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -612,6 +622,15 @@ export default function BulkBookingSystem({ initialEquipment = [], onComplete, o
   // Render review step
   const renderReview = () => (
     <div className="space-y-6">
+      {bookingError && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 p-4 rounded-lg border border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300"
+        >
+          <X className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <p className="text-sm">{bookingError}</p>
+        </div>
+      )}
       {/* Order Summary */}
       <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
         <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 border-b border-gray-200 dark:border-gray-600">

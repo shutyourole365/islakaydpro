@@ -138,7 +138,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
   const markAsRead = async (id: string) => {
     try {
       await markNotificationRead(id);
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
     } catch (err) {
       console.error('Failed to mark notification read:', err);
     }
@@ -148,7 +148,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
     if (!user) return;
     try {
       await markAllNotificationsRead(user.id);
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
     } catch (err) {
       console.error('Failed to mark all notifications read:', err);
     }
@@ -173,13 +173,13 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
   };
 
   const filteredNotifications = notifications.filter(n => {
-    if (activeTab === 'unread') return !n.read;
+    if (activeTab === 'unread') return !n.is_read;
     if (activeTab === 'bookings') return n.type.startsWith('booking');
     if (activeTab === 'messages') return n.type === 'new_message';
     return true;
   });
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const tabs = [
     { id: 'all', label: 'All' },
@@ -263,7 +263,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
             <div
               key={notification.id}
               className={`bg-white rounded-xl p-4 border transition-all ${
-                notification.read ? 'border-gray-100' : 'border-teal-200 bg-teal-50/50'
+                notification.is_read ? 'border-gray-100' : 'border-teal-200 bg-teal-50/50'
               }`}
             >
               <div className="flex items-start gap-4">
@@ -273,7 +273,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h3 className={`font-semibold ${notification.read ? 'text-gray-700' : 'text-gray-900'}`}>
+                      <h3 className={`font-semibold ${notification.is_read ? 'text-gray-700' : 'text-gray-900'}`}>
                         {notification.title}
                       </h3>
                       <p className="text-gray-600 text-sm mt-0.5">{notification.message}</p>
@@ -283,7 +283,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
-                      {!notification.read && (
+                      {!notification.is_read && (
                         <button
                           aria-label="Mark as read"
                           onClick={() => markAsRead(notification.id)}

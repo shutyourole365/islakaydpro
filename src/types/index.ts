@@ -157,7 +157,7 @@ export interface Message {
   conversation_id: string | null;
   sender_id: string;
   content: string;
-  read: boolean;
+  is_read: boolean;
   type?: string;
   metadata?: Record<string, unknown>;
   created_at: string;
@@ -196,8 +196,7 @@ export interface Notification {
   title: string;
   message: string;
   data: Record<string, unknown>;
-  read: boolean;
-  is_read?: boolean; // alias for backwards compat
+  is_read: boolean;
   created_at: string;
 }
 

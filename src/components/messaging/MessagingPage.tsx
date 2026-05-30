@@ -15,7 +15,7 @@ interface Message {
   sender_id: string;
   content: string;
   created_at: string;
-  read: boolean;
+  is_read: boolean;
 }
 
 interface Conversation {
@@ -95,7 +95,7 @@ export default function MessagingPage({
             .from('messages')
             .select('*', { count: 'exact', head: true })
             .eq('conversation_id', conv.id)
-            .eq('read', false)
+            .eq('is_read', false)
             .neq('sender_id', user.id);
           return { ...conv, otherUser, unread_count: count || 0 };
         })
@@ -133,9 +133,9 @@ export default function MessagingPage({
       // Mark unread messages as read
       await supabase
         .from('messages')
-        .update({ read: true })
+        .update({ is_read: true })
         .eq('conversation_id', convId)
-        .eq('read', false)
+        .eq('is_read', false)
         .neq('sender_id', user?.id ?? '');
     }
   }, [user?.id, scrollToBottom]);
@@ -161,7 +161,7 @@ export default function MessagingPage({
         setTimeout(scrollToBottom, 50);
         // Mark as read if we're the recipient
         if (msg.sender_id !== user?.id) {
-          supabase.from('messages').update({ read: true }).eq('id', msg.id);
+          supabase.from('messages').update({ is_read: true }).eq('id', msg.id);
         }
       })
       .subscribe();
@@ -248,7 +248,7 @@ export default function MessagingPage({
         conversation_id: selectedConv.id,
         sender_id: user.id,
         content,
-        read: false,
+        is_read: false,
       });
       if (error) throw error;
 
@@ -453,7 +453,7 @@ export default function MessagingPage({
                               {formatTime(msg.created_at)}
                             </span>
                             {isOwn && (
-                              msg.read
+                              msg.is_read
                                 ? <CheckCheck className="w-3 h-3 text-teal-200" />
                                 : <Check className="w-3 h-3 text-teal-300" />
                             )}

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { sanitizeSearchTerm } from '../services/database';
 
 // Mock supabase
 vi.mock('../lib/supabase', () => ({
@@ -169,11 +170,11 @@ describe('Database Service', () => {
         title: 'New Booking Request',
         message: 'Someone wants to rent your excavator',
         data: { booking_id: 'booking-456' },
-        read: false,
+        is_read: false,
         created_at: new Date().toISOString(),
       };
 
-      expect(notification.read).toBe(false);
+      expect(notification.is_read).toBe(false);
       expect(notification.type).toBe('new_booking');
       expect(notification.data.booking_id).toBeDefined();
     });
@@ -198,8 +199,36 @@ describe('Database Service', () => {
       const page = 2;
       const pageSize = 10;
       const offset = (page - 1) * pageSize;
-      
+
       expect(offset).toBe(10);
+    });
+  });
+
+  describe('sanitizeSearchTerm (PostgREST .or() injection guard)', () => {
+    it('passes ordinary search terms through unchanged', () => {
+      expect(sanitizeSearchTerm('excavator')).toBe('excavator');
+      expect(sanitizeSearchTerm('mini excavator 3t')).toBe('mini excavator 3t');
+    });
+
+    it('strips commas so extra OR filter conditions cannot be injected', () => {
+      const malicious = 'x,is_active.eq.false';
+      const cleaned = sanitizeSearchTerm(malicious);
+      expect(cleaned).not.toContain(',');
+      // The injected column reference must not survive as a parseable filter token.
+      expect(cleaned).toBe('x is_active.eq.false');
+    });
+
+    it('strips parentheses and backslashes used for logic-tree grouping/escaping', () => {
+      const cleaned = sanitizeSearchTerm('a(b)c\\d');
+      expect(cleaned).not.toMatch(/[()\\]/);
+    });
+
+    it('strips HTML before the PostgREST sanitization runs', () => {
+      expect(sanitizeSearchTerm('<script>alert(1)</script>drill')).not.toContain('<');
+    });
+
+    it('returns an empty string when nothing usable remains', () => {
+      expect(sanitizeSearchTerm('(),')).toBe('');
     });
   });
 });

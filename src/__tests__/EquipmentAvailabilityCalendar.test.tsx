@@ -1,516 +1,270 @@
 import type { ReactElement } from 'react';
+import type { Mock } from 'vitest';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render as rtlRender, screen } from '@testing-library/react';
+import { render as rtlRender, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EquipmentAvailabilityCalendar from '../components/availability/EquipmentAvailabilityCalendar';
 import { ToastProvider } from '../components/ui/Toast';
+import {
+  getEquipment,
+  getEquipmentAvailability,
+  blockDates,
+  unblockDates,
+} from '../services/database';
 
-// The component now uses useToast — wrap every render in ToastProvider.
+// The component uses useToast — wrap every render in ToastProvider.
 const render = (ui: ReactElement) =>
   rtlRender(<ToastProvider>{ui}</ToastProvider>);
 
+// Reconfigurable auth state so individual tests can simulate
+// logged-out / logged-in owners.
+const authState: { user: { id: string } | null } = { user: { id: 'owner-1' } };
 vi.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({ user: null }),
+  useAuth: () => authState,
 }));
 
 vi.mock('../services/database', () => ({
-  getEquipment: vi.fn().mockResolvedValue({ data: [] }),
-  getEquipmentAvailability: vi.fn().mockResolvedValue([]),
-  blockDates: vi.fn().mockResolvedValue(undefined),
-  unblockDates: vi.fn().mockResolvedValue(undefined),
+  getEquipment: vi.fn(),
+  getEquipmentAvailability: vi.fn(),
+  blockDates: vi.fn(),
+  unblockDates: vi.fn(),
 }));
 
-describe('EquipmentAvailabilityCalendar', () => {
-  const mockOnBack = vi.fn();
+const mockEquipment = [
+  { id: 'eq-1', title: 'Test Excavator', location: 'Denver, CO', daily_rate: 200, images: ['https://example.com/a.jpg'] },
+  { id: 'eq-2', title: 'Test Camera', location: 'Austin, TX', daily_rate: 90, images: ['https://example.com/b.jpg'] },
+];
 
-  beforeEach(() => {
-    mockOnBack.mockClear();
+const getEquipmentMock = getEquipment as unknown as Mock;
+const getAvailabilityMock = getEquipmentAvailability as unknown as Mock;
+const blockDatesMock = blockDates as unknown as Mock;
+const unblockDatesMock = unblockDates as unknown as Mock;
+
+const mockOnBack = vi.fn();
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  authState.user = { id: 'owner-1' };
+  getEquipmentMock.mockResolvedValue({ data: mockEquipment, count: mockEquipment.length });
+  getAvailabilityMock.mockResolvedValue([]);
+  blockDatesMock.mockResolvedValue(undefined);
+  unblockDatesMock.mockResolvedValue(undefined);
+});
+
+// Render and wait for the owner's equipment to load.
+const renderLoaded = async () => {
+  render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+  await screen.findAllByText('Test Excavator');
+};
+
+// Find a calendar day cell by its day number. Day buttons render the number
+// (optionally followed by a "$price"), so anchor the match to avoid e.g. "1"
+// matching "10".
+const dayButton = (n: number) =>
+  screen
+    .getAllByRole('button')
+    .find((b) => new RegExp(`^${n}(\\$|$)`).test((b.textContent || '').trim()));
+
+describe('EquipmentAvailabilityCalendar', () => {
+  describe('Empty states', () => {
+    it('prompts logged-out users to sign in (no fabricated equipment)', async () => {
+      authState.user = null;
+      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+      expect(await screen.findByText(/Sign in to manage availability/i)).toBeInTheDocument();
+      // None of the old hardcoded demo equipment should appear.
+      expect(screen.queryByText('CAT 320 Excavator')).not.toBeInTheDocument();
+    });
+
+    it('shows an empty state for an owner with no listings', async () => {
+      getEquipmentMock.mockResolvedValue({ data: [], count: 0 });
+      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+      expect(await screen.findByText(/No equipment to manage yet/i)).toBeInTheDocument();
+    });
+
+    it('does not query availability when there is no equipment', async () => {
+      getEquipmentMock.mockResolvedValue({ data: [], count: 0 });
+      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+      await screen.findByText(/No equipment to manage yet/i);
+      expect(getAvailabilityMock).not.toHaveBeenCalled();
+    });
   });
 
-  describe('Component Rendering', () => {
-    it('should render with main title and description', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+  describe('Component rendering (owner with equipment)', () => {
+    it('renders the title and description', async () => {
+      await renderLoaded();
       expect(screen.getByText('Availability Calendar')).toBeInTheDocument();
       expect(screen.getByText(/Check equipment availability/i)).toBeInTheDocument();
     });
 
-    it('should display back button', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const backButton = screen.getByRole('button', { name: /go back/i });
-      expect(backButton).toBeInTheDocument();
+    it('renders the back button', async () => {
+      await renderLoaded();
+      expect(screen.getByRole('button', { name: /go back/i })).toBeInTheDocument();
     });
 
-    it('should display equipment selector', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const elements = screen.getAllByText('CAT 320 Excavator');
-      expect(elements.length).toBeGreaterThan(0);
-      const sonyElements = screen.getAllByText('Sony A7IV Camera Kit');
-      expect(sonyElements.length).toBeGreaterThan(0);
+    it('renders the current month and year', async () => {
+      await renderLoaded();
+      const months = screen.queryAllByText(
+        /January|February|March|April|May|June|July|August|September|October|November|December/
+      );
+      expect(months.length).toBeGreaterThan(0);
     });
 
-    it('should display calendar', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Check for month/year display
-      const monthElements = screen.queryAllByText(/January|February|March|April|May|June|July|August|September|October|November|December/);
-      expect(monthElements.length > 0).toBe(true);
-    });
-  });
-
-  describe('Equipment Selection', () => {
-    it('should select first equipment by default', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const elements = screen.getAllByText('CAT 320 Excavator');
-      expect(elements.length).toBeGreaterThan(0);
-      expect(screen.getByText('$450/day')).toBeInTheDocument();
-    });
-
-    it('should display all equipment options', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const excavatorElements = screen.getAllByText('CAT 320 Excavator');
-      expect(excavatorElements.length).toBeGreaterThan(0);
-      const sonyElements = screen.getAllByText('Sony A7IV Camera Kit');
-      expect(sonyElements.length).toBeGreaterThan(0);
-      const dewaltElements = screen.getAllByText('DeWalt Power Tool Kit');
-      expect(dewaltElements.length).toBeGreaterThan(0);
-      const djiElements = screen.getAllByText('DJI Mavic 3 Pro Drone');
-      expect(djiElements.length).toBeGreaterThan(0);
-    });
-
-    it('should change equipment when clicked', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const cameraButton = screen.getByRole('button', { name: /Sony A7IV Camera Kit/i });
-      await user.click(cameraButton);
-
-      expect(screen.getByText('$125/day')).toBeInTheDocument();
-    });
-
-    it('should display equipment location', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Los Angeles, CA')).toBeInTheDocument();
-    });
-
-    it('should display daily rate for each equipment', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('$450/day')).toBeInTheDocument();
-    });
-  });
-
-  describe('Calendar Navigation', () => {
-    it('should display month and year', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Current month should be displayed
-      const dateElements = screen.queryAllByText(/January|February|March|April|May|June|July|August|September|October|November|December/);
-      expect(dateElements.length > 0).toBe(true);
-    });
-
-    it('should navigate to next month', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const nextButtons = screen.getAllByRole('button', { name: /next month/i });
-      await user.click(nextButtons[0]);
-
-      // Month should have changed
-      expect(screen.queryByText(/January|February|March|April|May|June|July|August|September|October|November|December/i)).toBeInTheDocument();
-    });
-
-    it('should navigate to previous month', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const prevButtons = screen.getAllByRole('button', { name: /previous month/i });
-      await user.click(prevButtons[0]);
-
-      // Month should have changed
-      expect(screen.queryByText(/January|February|March|April|May|June|July|August|September|October|November|December/i)).toBeInTheDocument();
-    });
-
-    it('should display day headers', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+    it('renders day-of-week headers', async () => {
+      await renderLoaded();
       expect(screen.getByText('Sun')).toBeInTheDocument();
       expect(screen.getByText('Mon')).toBeInTheDocument();
       expect(screen.getByText('Sat')).toBeInTheDocument();
     });
   });
 
-  describe('Calendar Date Selection & Rendering', () => {
-    it('should display calendar days', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Check for presence of day numbers
-      expect(screen.getByText('1')).toBeInTheDocument();
+  describe('Equipment selection', () => {
+    it('lists the owner real equipment in the selector', async () => {
+      await renderLoaded();
+      expect(screen.getAllByText('Test Excavator').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Test Camera').length).toBeGreaterThan(0);
     });
 
-    it('should allow single date selection', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+    it('selects the first equipment by default and shows its rate', async () => {
+      await renderLoaded();
+      expect(screen.getAllByText('$200/day').length).toBeGreaterThan(0);
+      expect(screen.getByText('Denver, CO')).toBeInTheDocument();
+    });
 
-      // Click on a specific date
-      const dateButtons = screen.getAllByRole('button');
-      const availableDate = dateButtons.find(btn => {
-        const text = btn.textContent;
-        return text === '5' || text === '10' || text === '15';
+    it('switches equipment when another option is clicked', async () => {
+      const user = userEvent.setup();
+      await renderLoaded();
+      await user.click(screen.getByRole('button', { name: /Test Camera/i }));
+      await waitFor(() => {
+        expect(screen.getAllByText('$90/day').length).toBeGreaterThan(0);
       });
-
-      if (availableDate) {
-        await user.click(availableDate);
-        expect(availableDate).toBeInTheDocument();
-      }
-    });
-
-    it('should display status legend', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const availableElements = screen.getAllByText('Available');
-      expect(availableElements.length).toBeGreaterThan(0);
-      const bookedElements = screen.getAllByText('Booked');
-      expect(bookedElements.length).toBeGreaterThan(0);
-    });
-
-    it('should show available dates with green highlight', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Status legend should include green color for available
-      const availableElements = screen.getAllByText('Available');
-      expect(availableElements.length).toBeGreaterThan(0);
-    });
-
-    it('should show booked dates with red highlight', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const bookedElements = screen.getAllByText('Booked');
-      expect(bookedElements.length).toBeGreaterThan(0);
     });
   });
 
-  describe('Date Range Booking Selection', () => {
-    it('should allow range selection', async () => {
+  describe('Calendar navigation', () => {
+    it('navigates to the next month', async () => {
       const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-      const secondDate = dateButtons.find(btn => btn.textContent === '10');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-        // Both should be selected
-        expect(firstDate).toBeInTheDocument();
-        expect(secondDate).toBeInTheDocument();
-      }
+      await renderLoaded();
+      await user.click(screen.getByRole('button', { name: /next month/i }));
+      expect(
+        screen.queryByText(
+          /January|February|March|April|May|June|July|August|September|October|November|December/i
+        )
+      ).toBeInTheDocument();
     });
 
-    it('should display booking selection summary', async () => {
+    it('navigates to the previous month', async () => {
       const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-      const secondDate = dateButtons.find(btn => btn.textContent === '10');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-
-        // Calendar data is randomly generated - dates may or may not be available
-        // If both dates are available, Booking Selection panel shows; otherwise no assertion needed
-        const bookingSelection = screen.queryByText('Booking Selection');
-        expect(bookingSelection === null || bookingSelection !== null).toBe(true);
-      }
-      // Pass the test - the component behavior is tested here regardless
-      expect(true).toBe(true);
+      await renderLoaded();
+      await user.click(screen.getByRole('button', { name: /previous month/i }));
+      expect(
+        screen.queryByText(
+          /January|February|March|April|May|June|July|August|September|October|November|December/i
+        )
+      ).toBeInTheDocument();
     });
 
-    it('should calculate rental days correctly', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-      const secondDate = dateButtons.find(btn => btn.textContent === '10');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-
-        // Calendar data is randomly generated - Duration only appears if both dates are available
-        const durationEl = screen.queryByText(/Duration/i);
-        expect(durationEl === null || durationEl !== null).toBe(true);
-      }
-      expect(true).toBe(true);
-    });
-
-    it('should calculate estimated total cost', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-      const secondDate = dateButtons.find(btn => btn.textContent === '10');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-
-        // Calendar data is randomly generated - Est. Total only appears if both dates are available
-        const estTotal = screen.queryByText('Est. Total');
-        expect(estTotal === null || estTotal !== null).toBe(true);
-      }
-      expect(true).toBe(true);
-    });
-
-    it('should show warning for unavailable dates in range', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      // Try to select a range that includes booked dates
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '1');
-      const secondDate = dateButtons.find(btn => btn.textContent === '20');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-
-        // Calendar data is randomly generated - warning only appears if range includes unavailable dates
-        // and if both clicks triggered a range selection
-        const unavailableMsg = screen.queryByText(/unavailable/i);
-        expect(unavailableMsg === null || unavailableMsg !== null).toBe(true);
-      }
-      // Component renders without error
-      expect(true).toBe(true);
+    it('renders day-number cells', async () => {
+      await renderLoaded();
+      expect(dayButton(1)).toBeTruthy();
+      expect(dayButton(15)).toBeTruthy();
     });
   });
 
-  describe('Equipment Information Display', () => {
-    it('should display equipment name', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const elements = screen.getAllByText('CAT 320 Excavator');
-      expect(elements.length).toBeGreaterThan(0);
+  describe('Date selection', () => {
+    it('shows the selected-date info panel with an Available status', async () => {
+      const user = userEvent.setup();
+      await renderLoaded();
+      const day = dayButton(12);
+      expect(day).toBeTruthy();
+      await user.click(day!);
+      // The info panel renders the status badge text directly.
+      await waitFor(() => {
+        expect(screen.getAllByText(/Available/i).length).toBeGreaterThan(0);
+      });
     });
 
-    it('should display equipment location', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Los Angeles, CA')).toBeInTheDocument();
-    });
-
-    it('should display daily rate', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('$450/day')).toBeInTheDocument();
-    });
-
-    it('should display equipment image', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const images = screen.queryAllByRole('img');
-      expect(images.length > 0).toBe(true);
-    });
-
-    it('should display minimum rental period', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText(/Min 1 day rental/i)).toBeInTheDocument();
+    it('builds a booking selection summary for a date range', async () => {
+      const user = userEvent.setup();
+      await renderLoaded();
+      await user.click(dayButton(10)!);
+      await user.click(dayButton(13)!);
+      await waitFor(() => {
+        expect(screen.getByText('Booking Selection')).toBeInTheDocument();
+        expect(screen.getByText('Est. Total')).toBeInTheDocument();
+      });
     });
   });
 
-  describe('Month Statistics Display', () => {
-    it('should display available days count', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const availableElements = screen.getAllByText('Available');
-      expect(availableElements.length).toBeGreaterThan(0);
+  describe('Month statistics', () => {
+    it('shows the month overview with status labels', async () => {
+      await renderLoaded();
+      expect(screen.getByText('Month Overview')).toBeInTheDocument();
+      expect(screen.getAllByText('Available').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Booked').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Maintenance').length).toBeGreaterThan(0);
     });
 
-    it('should display booked days count', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const bookedElements = screen.getAllByText('Booked');
-      expect(bookedElements.length).toBeGreaterThan(0);
-    });
-
-    it('should display maintenance days count', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const maintenanceElements = screen.getAllByText('Maintenance');
-      expect(maintenanceElements.length).toBeGreaterThan(0);
-    });
-
-    it('should display availability percentage', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
+    it('shows an availability percentage', async () => {
+      await renderLoaded();
       expect(screen.getByText(/availability this month/i)).toBeInTheDocument();
-    });
-
-    it('should calculate correct percentage for available days', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Should show percentage format
       expect(screen.getByText(/%/)).toBeInTheDocument();
     });
-  });
 
-  describe('Selected Date Information', () => {
-    it('should display selected date info panel', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-
-      if (firstDate) {
-        await user.click(firstDate);
-        // After clicking a date, the info panel shows the status badge text (Available/Booked/Maintenance/Blocked)
-        // Component does NOT have a "Status:" label - it shows the status value directly
-        const statusElements = screen.queryAllByText(/Available|Booked|Maintenance|Blocked/i);
-        expect(statusElements.length).toBeGreaterThan(0);
-      }
-    });
-
-    it('should display date status', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const availableDate = dateButtons.find(btn => btn.textContent?.trim() === '5');
-
-      if (availableDate) {
-        await user.click(availableDate);
-        // Component shows status as badge text (Available/Booked/Maintenance/Blocked), not as "Status:" label
-        const statusElements = screen.queryAllByText(/Available|Booked|Maintenance|Blocked/i);
-        expect(statusElements.length).toBeGreaterThan(0);
-      }
-    });
-
-    it('should display date price when available', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const availableDate = dateButtons.find(btn => btn.textContent?.trim() === '5');
-
-      if (availableDate) {
-        await user.click(availableDate);
-        expect(screen.queryByText(/Rate:/i)).toBeDefined();
-      }
-    });
-
-    it('should show booked by information', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      // Click on a date that might be booked
-      const testDate = dateButtons[15]; // Try a date further in the month
-
-      if (testDate) {
-        await user.click(testDate);
-        // If booked, should show "Booked by:"
-        expect(screen.queryByText(/Booked by:/i)).toBeDefined();
-      }
+    it('shows the status legend', async () => {
+      await renderLoaded();
+      expect(screen.getAllByText('Blocked').length).toBeGreaterThan(0);
     });
   });
 
-  describe('Price Displays', () => {
-    it('should display daily prices on calendar', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Prices should be shown on available dates
-      expect(screen.getByText('$450/day')).toBeInTheDocument();
+  describe('Availability data wiring', () => {
+    it('queries real availability for the selected equipment', async () => {
+      await renderLoaded();
+      await waitFor(() => {
+        expect(getAvailabilityMock).toHaveBeenCalledWith(
+          'eq-1',
+          expect.any(String),
+          expect.any(String)
+        );
+      });
     });
 
-    it('should show weekend pricing adjustments', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Weekend rates should be ~15% higher
-      const priceElements = screen.queryAllByText(/\$[0-9]+/);
-      expect(priceElements.length).toBeGreaterThan(0);
-    });
-
-    it('should display total cost calculation', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-      const secondDate = dateButtons.find(btn => btn.textContent === '10');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-
-        // Dollar amounts appear in the calendar regardless (daily rate $450/day is always shown)
-        const dollarElements = screen.queryAllByText(/\$[0-9,]+/);
-        expect(dollarElements.length).toBeGreaterThan(0);
-      }
-      // Daily rate is always shown even without selection
-      const dollarElements = screen.queryAllByText(/\$[0-9,]+/);
-      expect(dollarElements.length).toBeGreaterThan(0);
+    it('merges real booked ranges instead of inventing them', async () => {
+      // Build a booked range squarely inside the generated window (today±).
+      const d = new Date();
+      const iso = (offset: number) => {
+        const x = new Date(d);
+        x.setDate(x.getDate() + offset);
+        return x.toISOString().split('T')[0];
+      };
+      getAvailabilityMock.mockResolvedValue([
+        { start_date: iso(1), end_date: iso(2), reason: 'booked' },
+      ]);
+      await renderLoaded();
+      // No fabricated renter names should ever appear.
+      expect(screen.queryByText(/John D\.|Sarah M\.|Past Renter/)).not.toBeInTheDocument();
     });
   });
 
-  describe('Booking Button', () => {
-    it('should display book button when range selected', async () => {
+  describe('Blocking dates', () => {
+    it('calls blockDates when an available range is blocked', async () => {
       const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-      const secondDate = dateButtons.find(btn => btn.textContent === '10');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-
-        // Book button only appears if both selected dates are available (random data)
-        const bookButtons = screen.queryAllByRole('button', { name: /Book/i });
-        // Test that the component renders buttons (regardless of selection state)
-        expect(bookButtons.length >= 0).toBe(true);
-      }
-      // Component renders - assertion passes
-      expect(true).toBe(true);
-    });
-
-    it('should show correct duration in book button', async () => {
-      const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const dateButtons = screen.getAllByRole('button');
-      const firstDate = dateButtons.find(btn => btn.textContent === '5');
-      const secondDate = dateButtons.find(btn => btn.textContent === '10');
-
-      if (firstDate && secondDate) {
-        await user.click(firstDate);
-        await user.click(secondDate);
-
-        // Book N Days button only appears when range is available (random data)
-        const bookDaysButtons = screen.queryAllByRole('button', { name: /Book.*Days/i });
-        expect(bookDaysButtons.length >= 0).toBe(true);
-      }
-      expect(true).toBe(true);
+      await renderLoaded();
+      await user.click(dayButton(10)!);
+      await user.click(dayButton(13)!);
+      const blockBtn = await screen.findByRole('button', { name: /Block \d+ Days/i });
+      await user.click(blockBtn);
+      await waitFor(() => {
+        expect(blockDatesMock).toHaveBeenCalled();
+      });
     });
   });
 
-  describe('Navigation Callbacks', () => {
-    it('should call onBack when back button is clicked', async () => {
+  describe('Navigation callbacks', () => {
+    it('calls onBack when the back button is clicked', async () => {
       const user = userEvent.setup();
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-
-      const backButton = screen.getByRole('button', { name: /go back/i });
-      await user.click(backButton);
-
+      await renderLoaded();
+      await user.click(screen.getByRole('button', { name: /go back/i }));
       expect(mockOnBack).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('Responsive Layout', () => {
-    it('should display equipment selector horizontally scrollable', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      const excavatorElements = screen.getAllByText('CAT 320 Excavator');
-      expect(excavatorElements.length).toBeGreaterThan(0);
-      const sonyElements = screen.getAllByText('Sony A7IV Camera Kit');
-      expect(sonyElements.length).toBeGreaterThan(0);
-    });
-
-    it('should display calendar with grid layout', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      // Check for day headers which indicate grid structure
-      expect(screen.getByText('Sun')).toBeInTheDocument();
-      expect(screen.getByText('Sat')).toBeInTheDocument();
-    });
-
-    it('should display sidebar with statistics', () => {
-      render(<EquipmentAvailabilityCalendar onBack={mockOnBack} />);
-      expect(screen.getByText('Month Overview')).toBeInTheDocument();
     });
   });
 });

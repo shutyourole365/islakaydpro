@@ -205,9 +205,26 @@ export default function SchedulingOptimizer({
     const slots: TimeSlot[] = [];
     const now = new Date();
     const days = selectedTimeframe === 'week' ? 7 : selectedTimeframe === 'month' ? 30 : 90;
+    const totalEquipment = optimizations.length;
+    const activeBookings = bookings.filter((b) => b.status !== 'cancelled');
 
     for (let i = 0; i < days; i++) {
       const date = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
+      const dayStr = date.toISOString().split('T')[0];
+
+      // Derive availability/demand from real bookings overlapping this day
+      // (distinct equipment booked), rather than fabricating with Math.random.
+      const bookedIds = new Set<string>();
+      for (const b of activeBookings) {
+        const start = b.start_date.split('T')[0];
+        const end = b.end_date.split('T')[0];
+        if (dayStr >= start && dayStr <= end) bookedIds.add(b.equipment_id);
+      }
+      const bookedRatio = totalEquipment > 0 ? Math.min(1, bookedIds.size / totalEquipment) : 0;
+      const availability = (1 - bookedRatio) * 100;
+      const demand = bookedRatio * 10;
+      const basePrice = 50;
+      const price = basePrice * (1 + (demand / 10) * 0.5); // Dynamic pricing
 
       // Generate hourly slots for the day
       for (let hour = 8; hour < 18; hour++) {
@@ -215,12 +232,6 @@ export default function SchedulingOptimizer({
         startTime.setHours(hour, 0, 0, 0);
         const endTime = new Date(startTime);
         endTime.setHours(hour + 1, 0, 0, 0);
-
-        // Calculate availability and demand for this slot
-        const availability = Math.random() * 100; // Mock data
-        const demand = Math.random() * 10; // Mock data
-        const basePrice = 50;
-        const price = basePrice * (1 + (demand / 10) * 0.5); // Dynamic pricing
 
         slots.push({
           startTime,
@@ -233,7 +244,7 @@ export default function SchedulingOptimizer({
     }
 
     return slots;
-  }, [selectedTimeframe]);
+  }, [selectedTimeframe, bookings, optimizations.length]);
 
   const stats = useMemo(() => {
     const totalRevenue = optimizations.reduce((sum, opt) => sum + opt.revenuePotential, 0);
