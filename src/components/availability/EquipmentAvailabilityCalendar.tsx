@@ -67,6 +67,9 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
   // Load the owner's real equipment. No user (or no listings) => empty state.
   useEffect(() => {
     if (!user) {
+      // Clear any equipment from a previous session so it doesn't linger after logout.
+      setEquipmentList([]);
+      setSelected(null);
       setLoading(false);
       return;
     }
@@ -84,11 +87,20 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
       }));
       setEquipmentList(items);
       setSelected(items[0] ?? null);
-    }).catch(() => {}).finally(() => {
+    }).catch(() => {
+      // Surface load failures instead of silently showing an empty-account state.
+      if (!cancelled) {
+        addToast({
+          type: 'error',
+          title: 'Could not load your equipment',
+          message: 'Please check your connection and try again.',
+        });
+      }
+    }).finally(() => {
       if (!cancelled) setLoading(false);
     });
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, addToast]);
 
   // Load real availability slots when selected equipment changes
   const loadAvailability = useCallback(async (equipmentId: string, _dailyRate: number) => {

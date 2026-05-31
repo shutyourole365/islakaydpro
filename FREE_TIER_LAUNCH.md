@@ -48,7 +48,7 @@ SPA redirect, Node 20).
 1. Create a free Netlify account, "Add new site" → import this GitHub repo.
 2. Set **Environment variables** (Site settings → Environment variables):
    - `VITE_SUPABASE_URL` = your new project URL
-   - `VITE_SUPABASE_ANON_KEY` = the new project's `anon` public key
+   - `VITE_SUPABASE_ANON_KEY` = the project's **legacy anon JWT** key (Project Settings → API → "Legacy anon, service_role" tab — the long `eyJ…` value). **Do not** use the `sb_publishable_…` key: the pinned `@supabase/supabase-js` (2.57.x) doesn't fully support that format and the client errors at startup.
    - `VITE_APP_URL` = your Netlify URL (e.g. `https://islakayd.netlify.app`)
    - `VITE_ENABLE_AI` = `true` (optional)
    - `VITE_STRIPE_PUBLIC_KEY` = `pk_test_...` (Stripe **test** mode for free)

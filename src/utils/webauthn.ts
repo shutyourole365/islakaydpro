@@ -27,7 +27,10 @@ export function hasRegisteredPasskey(userId: string): boolean {
   }
 }
 
-function randomChallenge(): Uint8Array<ArrayBuffer> {
+// No explicit return-type annotation: let TS infer it. `new Uint8Array(32)` is
+// ArrayBuffer-backed, which satisfies BufferSource on both older (non-generic
+// Uint8Array) and newer (generic Uint8Array<ArrayBuffer>) TypeScript lib versions.
+function randomChallenge() {
   const challenge = new Uint8Array(32);
   crypto.getRandomValues(challenge);
   return challenge;
@@ -38,11 +41,18 @@ function randomChallenge(): Uint8Array<ArrayBuffer> {
  * biometric prompt; resolves only if the authenticator confirms the user.
  */
 export async function registerPasskey(userId: string): Promise<void> {
+  // WebAuthn caps the user handle at 64 bytes. A Supabase UUID is 36 bytes so
+  // this is normally fine, but guard against unexpectedly long ids.
+  const userHandle = new TextEncoder().encode(userId);
+  if (userHandle.byteLength === 0 || userHandle.byteLength > 64) {
+    throw new Error('Cannot register a passkey: invalid user identifier length.');
+  }
+
   const options: PublicKeyCredentialCreationOptions = {
     challenge: randomChallenge(),
     rp: { name: 'Islakayd', id: window.location.hostname },
     user: {
-      id: new TextEncoder().encode(userId),
+      id: userHandle,
       name: userId,
       displayName: 'Islakayd User',
     },
@@ -65,7 +75,13 @@ export async function registerPasskey(userId: string): Promise<void> {
   if (!credential) throw new Error('Biometric setup was cancelled.');
 
   const credentialId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-  localStorage.setItem(storageKey(userId), credentialId);
+  try {
+    localStorage.setItem(storageKey(userId), credentialId);
+  } catch {
+    // A credential was created on the authenticator but we couldn't persist its
+    // id (storage full / disabled). Surface it rather than reporting success.
+    throw new Error('Biometric setup could not be saved on this device. Please enable storage and try again.');
+  }
 }
 
 /**

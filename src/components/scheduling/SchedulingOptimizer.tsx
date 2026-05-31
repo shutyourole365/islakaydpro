@@ -210,7 +210,8 @@ export default function SchedulingOptimizer({
 
     for (let i = 0; i < days; i++) {
       const date = new Date(now.getTime() + i * 24 * 60 * 60 * 1000);
-      const dayStr = date.toISOString().split('T')[0];
+      // Use the local calendar date (not toISOString, which shifts day in non-UTC zones).
+      const dayStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
       // Derive availability/demand from real bookings overlapping this day
       // (distinct equipment booked), rather than fabricating with Math.random.
