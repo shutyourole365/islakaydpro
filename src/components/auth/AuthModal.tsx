@@ -290,7 +290,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
                       required
-                      minLength={8}
+                      minLength={mode === 'signin' ? 1 : 8}
                       className={`${inputBase} pl-12 pr-12`}
                     />
                     <button

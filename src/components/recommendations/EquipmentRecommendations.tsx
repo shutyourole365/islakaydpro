@@ -39,30 +39,31 @@ export default function EquipmentRecommendations({
       const exclude = (list: Equipment[]) =>
         list.filter((e) => e.id !== currentEquipment?.id);
 
-      try {
-        const [similar, trending, nearby] = await Promise.all([
-          currentEquipment?.category_id
-            ? getEquipment({ categoryId: currentEquipment.category_id, limit: 10 }).then((r) => r.data)
-            : Promise.resolve<Equipment[]>([]),
-          getEquipment({ featured: true, limit: 10 }).then((r) => r.data),
-          userLocation
-            ? getEquipment({ location: userLocation, limit: 10 }).then((r) => r.data)
-            : Promise.resolve<Equipment[]>([]),
-        ]);
+      // allSettled so one failed query doesn't blank every rail — each
+      // section renders independently from whatever succeeded.
+      const [similarResult, trendingResult, nearbyResult] = await Promise.allSettled([
+        currentEquipment?.category_id
+          ? getEquipment({ categoryId: currentEquipment.category_id, limit: 10 }).then((r) => r.data)
+          : Promise.resolve<Equipment[]>([]),
+        getEquipment({ featured: true, limit: 10 }).then((r) => r.data),
+        userLocation
+          ? getEquipment({ location: userLocation, limit: 10 }).then((r) => r.data)
+          : Promise.resolve<Equipment[]>([]),
+      ]);
 
-        if (cancelled) return;
-        setRecommendations({
-          similar: exclude(similar),
-          // We don't track co-rental data yet; leave empty so the section
-          // hides rather than showing fabricated "frequently rented together".
-          alsoRented: [],
-          nearbyAlternatives: exclude(nearby),
-          trending: exclude(trending),
-        });
-      } catch {
-        if (cancelled) return;
-        setRecommendations({ similar: [], alsoRented: [], nearbyAlternatives: [], trending: [] });
-      }
+      if (cancelled) return;
+      const similar = similarResult.status === 'fulfilled' ? similarResult.value : [];
+      const trending = trendingResult.status === 'fulfilled' ? trendingResult.value : [];
+      const nearby = nearbyResult.status === 'fulfilled' ? nearbyResult.value : [];
+
+      setRecommendations({
+        similar: exclude(similar),
+        // We don't track co-rental data yet; leave empty so the section
+        // hides rather than showing fabricated "frequently rented together".
+        alsoRented: [],
+        nearbyAlternatives: exclude(nearby),
+        trending: exclude(trending),
+      });
     };
 
     loadRecommendations();

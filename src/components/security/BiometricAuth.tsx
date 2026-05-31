@@ -60,11 +60,15 @@ export default function BiometricAuth({ onSuccess, onCancel, mode = 'authenticat
     setErrorMessage(null);
 
     try {
-      // Run the real platform authenticator ceremony (WebAuthn). Register a
-      // passkey the first time, then authenticate against it afterwards.
-      if (mode === 'register' || !hasRegisteredPasskey(userId)) {
+      // Run the real platform authenticator ceremony (WebAuthn). Only enroll a
+      // passkey in 'register' mode; an authenticate attempt with no passkey is
+      // an error, not a silent enrollment.
+      if (mode === 'register') {
         await registerPasskey(userId);
       } else {
+        if (!hasRegisteredPasskey(userId)) {
+          throw new Error('No passkey is registered on this device. Please set up biometrics first.');
+        }
         await authenticatePasskey(userId);
       }
       setStatus('success');
