@@ -1,5 +1,5 @@
 // AI Chat Handler — Anthropic SDK with streaming
-// Upgraded: claude-opus-4-6 + npm:@anthropic-ai/sdk + SSE streaming
+// Model: claude-haiku-4-5 (cost-efficient); override with the AI_MODEL secret.
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
@@ -12,6 +12,9 @@ const corsHeaders = {
 
 const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
 const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+// Default to the cost-efficient Haiku model; override via the AI_MODEL secret
+// (e.g. claude-sonnet-4-6) without a redeploy.
+const AI_MODEL = Deno.env.get('AI_MODEL') ?? 'claude-haiku-4-5-20251001';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -153,7 +156,7 @@ Description: ${equipment.description}`;
         async start(controller) {
           try {
             const s = anthropic.messages.stream({
-              model: 'claude-opus-4-6',
+              model: AI_MODEL,
               max_tokens: 1024,
               system: systemBlocks,
               messages: claudeMessages,
@@ -208,7 +211,7 @@ Description: ${equipment.description}`;
 
     if (ANTHROPIC_API_KEY && (provider === 'anthropic' || !OPENAI_API_KEY)) {
       const msg = await anthropic.messages.create({
-        model: 'claude-opus-4-6',
+        model: AI_MODEL,
         max_tokens: 1024,
         system: systemBlocks,
         messages: claudeMessages,
