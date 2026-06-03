@@ -12,9 +12,11 @@ chores only you can do. Verified live state as of 2026-06-03 below — this is
   `platform_settings` (6 rows) seeded.
 - **Edge Functions** — 5 deployed & `ACTIVE`: `ai-chat`, `create-checkout`,
   `stripe-webhook`, `payouts`, `send-email`.
-- **Frontend** — deployed on Vercel project `islakaydpro`
-  (`prj_IqOmnrHsNbwjl4KmgD2Fxe8cgkiU`), auto-deploys from `main`, production
-  build `READY`.
+- **Frontend** — **Netlify is the canonical host** (project `islakayden`).
+  `netlify.toml` is already configured (build `npx vite build`, publish `dist`,
+  SPA redirect, Node 20) and deploy previews build cleanly. The old Vercel
+  project sprawl is being retired (Vercel team plan is paused for billing —
+  irrelevant now that we're on Netlify).
 - **Security audit** — clean. The one advisor warning (`increment_view_count`
   callable by anon) is an intentional design (anonymous view counter,
   minimal-scope `SECURITY DEFINER`, pinned `search_path`) — leave it.
@@ -47,31 +49,35 @@ most likely reason something "doesn't work" after launch.
       Events: `checkout.session.completed`, `payment_intent.succeeded`,
       `payment_intent.payment_failed`, `account.updated`, `transfer.created`.
       Copy the signing secret → set as `STRIPE_WEBHOOK_SECRET` (step 1).
-- [ ] Vercel → project `islakaydpro` → Settings → Environment Variables →
+- [ ] Netlify → site `islakayden` → Site settings → **Environment variables** →
       set `VITE_STRIPE_PUBLIC_KEY=pk_test_...` (currently **empty** — this is why
-      payments aren't wired on the frontend).
-- [ ] **Redeploy** the Vercel site — Vite bakes `VITE_*` in at build time, so a
-      redeploy is required for the new key to take effect.
+      payments aren't wired on the frontend). While here, confirm
+      `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (the long legacy `eyJ…` JWT,
+      **not** the `sb_publishable_…` key), `VITE_APP_URL`, and `VITE_ENABLE_AI`
+      are set.
+- [ ] **Redeploy** the Netlify site (Deploys → Trigger deploy) — Vite bakes
+      `VITE_*` in at build time, so a redeploy is required for the new key to
+      take effect.
 
 When you're ready for real money: swap the four `test` values for `live` ones
 (`pk_live_`, `sk_live_`, a live-mode webhook + its secret) and redeploy. Don't
 mix test and live keys.
 
-### 3. Pick ONE canonical project + domain, delete the rest
-You have **9 Vercel projects** — this sprawl is the main source of "which one
-is real?" confusion. Keep **`islakaydpro`** (it's the GitHub-connected,
-auto-deploying one).
+### 3. Clean up the abandoned hosts (Netlify is canonical)
+Decision made: **Netlify site `islakayden` is the production host.** The Vercel
+side is being retired — that sprawl (9 Vercel projects) plus the paused Vercel
+billing is no longer relevant.
 
-- [ ] **First**, in Vercel → each project → Settings → **Domains**, find which
-      project your real domain (`islakayd.com` or similar) is attached to.
-      Whichever holds the live domain is canonical — if that's not
-      `islakaydpro`, re-point the domain to `islakaydpro` (or move the GitHub
-      connection) **before** deleting anything.
-- [ ] Verify `islakaydpro-legal` isn't separately serving your legal pages.
-- [ ] Then delete the other 8: `islakaydpro-vrxb`, `islakayd`, `islakayd.`,
+- [ ] Point your real domain (`islakayd.com` or similar) at the `islakayden`
+      Netlify site: Netlify → Domain management → add custom domain, then update
+      DNS as instructed. Confirm SSL provisions (Netlify does Let's Encrypt
+      automatically).
+- [ ] Set `VITE_APP_URL` in Netlify to that domain → redeploy.
+- [ ] Disconnect/delete the Vercel projects so nothing auto-deploys or confuses
+      future you: `islakaydpro`, `islakaydpro-vrxb`, `islakayd`, `islakayd.`,
       `sb1-ur6rm1gb`, `islakayd-zpgm`, `islakayd-ysxn`, `islakaydpro-legal`,
-      `islakad`.
-- [ ] Set `VITE_APP_URL` in Vercel to your real domain → redeploy.
+      `islakad`. (Check Domains on each first — don't delete one that still
+      holds the live domain until DNS is re-pointed to Netlify.)
 
 ### 4. Smoke test (test card `4242 4242 4242 4242`)
 On the live site, run the happy path end-to-end:
@@ -93,8 +99,8 @@ Resend → Logs (email delivery).
 - [ ] Free-tier note: the Supabase project pauses after ~7 days idle. Deploy the
       `keep-alive` function or ping the app periodically.
 - [ ] Tag the release: `git tag -a v1.0.0 -m "Initial release" && git push --tags`
-- [ ] Rollback path: Vercel → Deployments → previous `READY` → Promote (instant
-      frontend rollback).
+- [ ] Rollback path: Netlify → Deploys → previous successful deploy → Publish
+      (instant frontend rollback).
 
 That's the whole launch. Steps 1–2 are the real blockers; 3 is cleanup; 4 is
 verification. One focused evening.
