@@ -20,6 +20,7 @@ import RealTimeNotifications from '../notifications/RealTimeNotifications';
 import ThemeToggle from '../ui/ThemeToggle';
 import Logo from '../ui/Logo';
 import { useAuth } from '../../contexts/AuthContext';
+import { SHOW_PREVIEW_FEATURES } from '../../config/launchFlags';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -431,8 +432,9 @@ export default function Header({
                           <Wrench className="w-5 h-5 text-gray-400" />
                           Maintenance
                         </button>
+                        {SHOW_PREVIEW_FEATURES && (
                         <button
-                         
+
                           onClick={() => {
                             onNavigate('scheduler');
                             setIsProfileMenuOpen(false);
@@ -442,6 +444,7 @@ export default function Header({
                           <Calendar className="w-5 h-5 text-gray-400" />
                           Smart Scheduler
                         </button>
+                        )}
                         <button
                          
                           onClick={() => {
@@ -601,8 +604,9 @@ export default function Header({
                     <Wrench className="w-4 h-4" />
                     Maintenance
                   </button>
+                  {SHOW_PREVIEW_FEATURES && (
                   <button
-                   
+
                     onClick={() => {
                       onNavigate('scheduler');
                       setIsMobileMenuOpen(false);
@@ -612,6 +616,7 @@ export default function Header({
                     <Calendar className="w-4 h-4" />
                     Smart Scheduler
                   </button>
+                  )}
                   <button
                    
                     onClick={() => {

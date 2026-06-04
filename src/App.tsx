@@ -29,6 +29,7 @@ const EquipmentComparison = lazy(() => import('./components/comparison/Equipment
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
 const FeatureShowcase = lazy(() => import('./components/ui/FeatureShowcase'));
+import { SHOW_PREVIEW_FEATURES } from './config/launchFlags';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
 import { useCookieConsent } from './hooks/useCookieConsent';
@@ -1402,7 +1403,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       )}
 
       {/* Feature Showcase Modal */}
-      {isFeatureShowcaseOpen && (
+      {SHOW_PREVIEW_FEATURES && isFeatureShowcaseOpen && (
         <Suspense fallback={<PageLoader />}>
           <FeatureShowcase
             onFeatureSelect={handleFeatureSelect}
@@ -1412,7 +1413,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
       )}
 
       {/* Feature Showcase Floating Button */}
-      {currentPage !== 'list-equipment' && isAuthenticated && (
+      {SHOW_PREVIEW_FEATURES && currentPage !== 'list-equipment' && isAuthenticated && (
         <button
           aria-label="Open premium features" onClick={() => setIsFeatureShowcaseOpen(true)}
           className="fixed bottom-6 left-6 z-40 group"
