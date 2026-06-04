@@ -63,6 +63,7 @@ import {
 import { sendBookingApproved, sendBookingDeclined } from '../../services/email';
 import { supabase } from '../../lib/supabase';
 import ReferralProgram from '../referral/ReferralProgram';
+import AnimatedNumber from '../ui/AnimatedNumber';
 
 // Lazy load components for better performance
 const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
@@ -479,8 +480,8 @@ export default function Dashboard({
                       { label: 'Verify ID', icon: Shield, page: 'id-verification', color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30' },
                         { label: 'Recurring', icon: RefreshCw, page: 'recurring-rentals', color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30' },
                     ].map(action => (
-                      <button key={action.page} onClick={() => onNavigate(action.page)} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent transition-colors ${action.color}`}>
-                        <action.icon className="w-5 h-5" />
+                      <button key={action.page} onClick={() => onNavigate(action.page)} className={`group flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent transition-all duration-300 hover:-translate-y-1 hover:shadow-soft ${action.color}`}>
+                        <action.icon className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
                         <span className="text-xs font-semibold">{action.label}</span>
                       </button>
                     ))}
@@ -493,24 +494,28 @@ export default function Dashboard({
                     icon={DollarSign}
                     color="bg-green-500"
                     trend={12}
+                    index={0}
                   />
                   <StatCard
                     label="Total Spent"
                     value={`$${(analytics?.total_spent || 0).toLocaleString()}`}
                     icon={TrendingUp}
                     color="bg-blue-500"
+                    index={1}
                   />
                   <StatCard
                     label="Active Listings"
                     value={myListings.length.toString()}
                     icon={Package}
                     color="bg-amber-500"
+                    index={2}
                   />
                   <StatCard
                     label="Response Rate"
                     value={`${analytics?.response_rate || 0}%`}
                     icon={Activity}
                     color="bg-teal-500"
+                    index={3}
                   />
                 </div>
 
@@ -1447,25 +1452,31 @@ export default function Dashboard({
   );
 }
 
-function StatCard({ label, value, icon: Icon, color, trend }: {
+function StatCard({ label, value, icon: Icon, color, trend, index = 0 }: {
   label: string;
   value: string;
   icon: typeof DollarSign;
   color: string;
   trend?: number;
+  index?: number;
 }) {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white mb-4`}>
+    <div
+      className="group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 animate-fade-in-up transition-all duration-300 hover:shadow-soft-lg hover:-translate-y-1"
+      style={{ animationDelay: `${index * 80}ms`, animationFillMode: 'backwards' }}
+    >
+      <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white mb-4 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3`}>
         <Icon className="w-6 h-6" />
       </div>
       <div className="flex items-end justify-between">
         <div>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          <p className="text-sm text-gray-500">{label}</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
+            <AnimatedNumber value={value} />
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
         </div>
         {trend !== undefined && (
-          <div className={`flex items-center gap-1 text-sm ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <div className={`flex items-center gap-1 text-sm ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
             {trend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
             {Math.abs(trend)}%
           </div>
