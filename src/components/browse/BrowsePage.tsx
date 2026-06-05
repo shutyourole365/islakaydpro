@@ -572,10 +572,11 @@ export default function BrowsePage({
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredEquipment.map((item) => (
+            {filteredEquipment.map((item, idx) => (
               <div
                 key={item.id}
-                className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-xl transition-all duration-300"
+                className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 animate-fade-in-up"
+                style={{ animationDelay: `${Math.min(idx, 11) * 60}ms`, animationFillMode: 'backwards' }}
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img

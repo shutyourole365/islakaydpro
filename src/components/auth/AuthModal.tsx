@@ -143,13 +143,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={onClose} />
 
       <div
         role="dialog"
         aria-modal="true"
         aria-label="Sign in"
-        className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden flex"
+        className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl overflow-hidden flex animate-scale-in"
       >
         {/* Left panel — brand */}
         <div className="hidden lg:flex flex-col w-2/5 bg-brand-gradient p-10 text-white">
