@@ -377,8 +377,8 @@ export default function BookingSystem({
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -414,11 +414,11 @@ export default function BookingSystem({
                   }`}
                 >
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                       index < currentStepIndex
                         ? 'bg-teal-500 text-white'
                         : index === currentStepIndex
-                        ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400'
+                        ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 scale-110 ring-4 ring-teal-500/15'
                         : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
                     }`}
                   >
@@ -428,7 +428,7 @@ export default function BookingSystem({
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`w-12 sm:w-24 h-0.5 mx-2 ${
+                    className={`w-12 sm:w-24 h-0.5 mx-2 transition-colors duration-500 ${
                       index < currentStepIndex ? 'bg-teal-500' : 'bg-gray-200 dark:bg-gray-700'
                     }`}
                   />
@@ -439,7 +439,7 @@ export default function BookingSystem({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div key={currentStep} className="flex-1 overflow-y-auto p-6 animate-fade-in">
           {/* Step 1: Date Selection */}
           {currentStep === 'dates' && (
             <div className="grid md:grid-cols-2 gap-6">
@@ -868,8 +868,8 @@ export default function BookingSystem({
           {/* Step 4: Confirmation */}
           {currentStep === 'confirmation' && (
             <div className="text-center py-8">
-              <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-green-500 dark:text-green-400" />
+              <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
+                <CheckCircle className="w-10 h-10 text-green-500 dark:text-green-400 animate-bounce-gentle" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Booking Confirmed!</h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6">

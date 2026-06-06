@@ -34,13 +34,24 @@ export default function ThemeToggle({ variant = 'icon', className = '' }: ThemeT
       <button
         onClick={toggleTheme}
         aria-label={`Switch to ${resolvedTheme === 'light' ? 'dark' : 'light'} mode`}
-        className={`p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${className}`}
+        className={`p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-90 ${className}`}
       >
-        {resolvedTheme === 'light' ? (
-          <Moon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-        ) : (
-          <Sun className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-        )}
+        <span className="relative block w-5 h-5">
+          <Moon
+            className={`absolute inset-0 w-5 h-5 text-gray-600 dark:text-gray-300 transition-all duration-500 ${
+              resolvedTheme === 'light'
+                ? 'opacity-100 rotate-0 scale-100'
+                : 'opacity-0 -rotate-90 scale-0'
+            }`}
+          />
+          <Sun
+            className={`absolute inset-0 w-5 h-5 text-gray-600 dark:text-gray-300 transition-all duration-500 ${
+              resolvedTheme === 'dark'
+                ? 'opacity-100 rotate-0 scale-100'
+                : 'opacity-0 rotate-90 scale-0'
+            }`}
+          />
+        </span>
       </button>
     );
   }
@@ -61,7 +72,7 @@ export default function ThemeToggle({ variant = 'icon', className = '' }: ThemeT
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-40 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
+          <div className="absolute right-0 mt-2 w-40 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50 animate-scale-in origin-top-right">
             {themes.map(({ value, label, icon: Icon }) => (
               <button
                 key={value}

@@ -20,6 +20,7 @@ import RealTimeNotifications from '../notifications/RealTimeNotifications';
 import ThemeToggle from '../ui/ThemeToggle';
 import Logo from '../ui/Logo';
 import { useAuth } from '../../contexts/AuthContext';
+import { SHOW_PREVIEW_FEATURES } from '../../config/launchFlags';
 
 interface HeaderProps {
   onSearchClick: () => void;
@@ -162,7 +163,7 @@ export default function Header({
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {isCompanyMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 animate-scale-in origin-top">
                     <button
 
                       onClick={() => {
@@ -239,7 +240,7 @@ export default function Header({
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 {isSupportMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 animate-scale-in origin-top">
                     <button
                      
                       onClick={() => {
@@ -369,7 +370,7 @@ export default function Header({
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden animate-scale-in origin-top-right">
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <p className="font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{displayEmail}</p>
@@ -431,8 +432,9 @@ export default function Header({
                           <Wrench className="w-5 h-5 text-gray-400" />
                           Maintenance
                         </button>
+                        {SHOW_PREVIEW_FEATURES && (
                         <button
-                         
+
                           onClick={() => {
                             onNavigate('scheduler');
                             setIsProfileMenuOpen(false);
@@ -442,6 +444,7 @@ export default function Header({
                           <Calendar className="w-5 h-5 text-gray-400" />
                           Smart Scheduler
                         </button>
+                        )}
                         <button
                          
                           onClick={() => {
@@ -510,7 +513,7 @@ export default function Header({
       </div>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-xl">
+        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-xl animate-fade-in-down">
           <div className="px-4 py-6 space-y-4">
             <button
              
@@ -601,8 +604,9 @@ export default function Header({
                     <Wrench className="w-4 h-4" />
                     Maintenance
                   </button>
+                  {SHOW_PREVIEW_FEATURES && (
                   <button
-                   
+
                     onClick={() => {
                       onNavigate('scheduler');
                       setIsMobileMenuOpen(false);
@@ -612,6 +616,7 @@ export default function Header({
                     <Calendar className="w-4 h-4" />
                     Smart Scheduler
                   </button>
+                  )}
                   <button
                    
                     onClick={() => {

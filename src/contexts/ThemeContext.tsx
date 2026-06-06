@@ -1,4 +1,16 @@
-import { createContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useEffect, useRef, useState, ReactNode } from 'react';
+
+/**
+ * Briefly enables a global color transition so light/dark switches cross-fade
+ * instead of flipping instantly. The class is removed once the transition has
+ * run so it never affects other interactions.
+ */
+function runThemeTransition() {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement;
+  root.classList.add('theme-transition');
+  window.setTimeout(() => root.classList.remove('theme-transition'), 450);
+}
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -35,16 +47,23 @@ function getInitialResolvedTheme(): 'light' | 'dark' {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(getStoredTheme);
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(getInitialResolvedTheme);
+  const lastAppliedRef = useRef<'light' | 'dark' | null>(null);
 
   // Update resolved theme based on theme setting and system preference
   useEffect(() => {
     const resolved = theme === 'system' ? getSystemTheme() : theme;
-    
+
     // Only update state if it changed
     if (resolved !== resolvedTheme) {
       setResolvedTheme(resolved);
     }
-    
+
+    // Cross-fade on real changes only — not on the initial paint.
+    if (lastAppliedRef.current !== null && lastAppliedRef.current !== resolved) {
+      runThemeTransition();
+    }
+    lastAppliedRef.current = resolved;
+
     // Apply to document
     const root = document.documentElement;
     if (resolved === 'dark') {
@@ -59,6 +78,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       if (theme === 'system') {
         const newResolved = getSystemTheme();
         setResolvedTheme(newResolved);
+        runThemeTransition();
         if (newResolved === 'dark') {
           root.classList.add('dark');
         } else {
