@@ -67,17 +67,27 @@ export function generateCSV(reportData: ReportData): string {
   return csv;
 }
 
+function escapeHtml(text: string | null | undefined): string {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 export function generateHTML(reportData: ReportData): string {
   const bookingRows = reportData.bookings
     .map(b => `
       <tr>
-        <td>${b.id}</td>
-        <td>${b.renter_name || 'N/A'}</td>
-        <td>${b.equipment?.name || 'Unknown'}</td>
+        <td>${escapeHtml(b.id)}</td>
+        <td>${escapeHtml(b.renter_name || 'N/A')}</td>
+        <td>${escapeHtml(b.equipment?.name || 'Unknown')}</td>
         <td>${new Date(b.start_date).toLocaleDateString()}</td>
         <td>${new Date(b.end_date).toLocaleDateString()}</td>
         <td>$${b.total_price?.toFixed(2) || '0.00'}</td>
-        <td>${b.status || 'pending'}</td>
+        <td>${escapeHtml(b.status || 'pending')}</td>
         <td>${b.rating ? `${b.rating}/5` : 'N/A'}</td>
       </tr>
     `)
@@ -107,7 +117,7 @@ export function generateHTML(reportData: ReportData): string {
     </head>
     <body>
       <h1>Equipment Rental Report</h1>
-      <p>Period: ${reportData.period}</p>
+      <p>Period: ${escapeHtml(reportData.period)}</p>
 
       <div class="summary">
         <h2 style="color: #0d9488; margin-top: 0;">Summary</h2>
