@@ -1,5 +1,7 @@
 import { supabase } from '../lib/supabase';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 export interface EquipmentTrend {
   equipmentId: string;
   name: string;
