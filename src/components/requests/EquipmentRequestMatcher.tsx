@@ -175,7 +175,7 @@ export default function EquipmentRequestMatcher() {
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as any)}
+            onClick={() => setActiveTab(id as 'browse' | 'create' | 'my-requests')}
             className={`pb-4 px-2 font-medium flex items-center gap-2 transition ${
               activeTab === id
                 ? 'border-b-2 border-teal-500 text-teal-600 dark:text-teal-400'

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Share2, Copy, Mail, Lock, Eye, FileText, Trash2, Loader2, Check, X, Plus } from 'lucide-react';
+import { Share2, Copy, Mail, Trash2, Loader2, Check, X, Plus } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../ui/Toast';
 import {
