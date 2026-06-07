@@ -194,9 +194,12 @@ export function downloadHTML(filename: string, content: string): void {
 }
 
 export function openPrintPreview(content: string): void {
-  const printWindow = window.open('', '_blank');
+  const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const printWindow = window.open(url, '_blank');
   if (printWindow) {
-    printWindow.document.write(content);
-    printWindow.document.close();
+    window.addEventListener('load', () => {
+      URL.revokeObjectURL(url);
+    }, { once: true });
   }
 }
