@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Search, Bell, BellOff, Trash2, Edit2, Plus, Filter, X, Loader2 } from 'lucide-react';
+import { Search, Bell, BellOff, Trash2, Edit2, Plus, Filter, X, Loader2, Copy, Clock, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getSavedSearches, deleteSavedSearch } from '../../services/database';
+import { getSavedSearches, deleteSavedSearch, saveSearch } from '../../services/database';
+import { useToast } from '../ui/Toast';
 import type { SavedSearch as DBSavedSearch } from '../../types';
 
 interface SavedSearchesProps {
@@ -11,10 +12,12 @@ interface SavedSearchesProps {
 
 export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesProps) {
   const { user } = useAuth();
+  const { showToast } = useToast();
   const [searches, setSearches] = useState<DBSavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  const [cloning, setCloning] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -43,6 +46,25 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
     setSearches(prev => prev.map(s => s.id === id ? { ...s, name: editName } : s));
     setEditingId(null);
     setEditName('');
+  };
+
+  const handleCloneSearch = async (search: DBSavedSearch) => {
+    if (!user) return;
+    try {
+      setCloning(search.id);
+      const newSearch = await saveSearch({
+        user_id: user.id,
+        name: `${search.name} (copy)`,
+        filters: search.filters,
+        alert_enabled: false,
+      });
+      setSearches(prev => [newSearch as DBSavedSearch, ...prev]);
+      showToast('Search cloned successfully', 'success');
+    } catch {
+      showToast('Failed to clone search', 'error');
+    } finally {
+      setCloning(null);
+    }
   };
 
   const formatFilters = (filters: DBSavedSearch['filters']) => {
@@ -156,10 +178,17 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
                       {formatFilters(search.filters)}
                     </p>
 
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-4 text-sm flex-wrap">
+                      <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                        <Clock className="w-3.5 h-3.5" />
                         Created {new Date(search.created_at).toLocaleDateString()}
                       </span>
+                      {search.last_alert_at && (
+                        <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                          <Eye className="w-3.5 h-3.5" />
+                          Last alert {new Date(search.last_alert_at).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -187,7 +216,22 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
                     </button>
 
                     <button
-                      aria-label="Delete saved search" onClick={() => handleDelete(search.id)}
+                      aria-label="Clone search"
+                      onClick={() => handleCloneSearch(search)}
+                      disabled={cloning === search.id}
+                      title="Create a copy of this search"
+                      className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50 transition-all"
+                    >
+                      {cloning === search.id ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Copy className="w-5 h-5" />
+                      )}
+                    </button>
+
+                    <button
+                      aria-label="Delete saved search"
+                      onClick={() => handleDelete(search.id)}
                       className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                     >
                       <Trash2 className="w-5 h-5" />
