@@ -12,7 +12,7 @@ interface SavedSearchesProps {
 
 export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesProps) {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [searches, setSearches] = useState<DBSavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -59,9 +59,9 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
         alert_enabled: false,
       });
       setSearches(prev => [newSearch as DBSavedSearch, ...prev]);
-      showToast('Search cloned successfully', 'success');
+      success('Search cloned successfully');
     } catch {
-      showToast('Failed to clone search', 'error');
+      showError('Failed to clone search');
     } finally {
       setCloning(null);
     }

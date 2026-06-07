@@ -13,7 +13,7 @@ import {
 
 export default function ExportReportsPanel() {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [loading, setLoading] = useState(false);
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -30,9 +30,9 @@ export default function ExportReportsPanel() {
       const csv = generateCSV(report);
       const filename = `bookings-report-${startDate}-to-${endDate}.csv`;
       downloadCSV(filename, csv);
-      showToast('Report exported as CSV', 'success');
+      success('Report exported as CSV');
     } catch {
-      showToast('Failed to export CSV', 'error');
+      showError('Failed to export CSV');
     } finally {
       setLoading(false);
     }
@@ -46,9 +46,9 @@ export default function ExportReportsPanel() {
       const html = generateHTML(report);
       const filename = `bookings-report-${startDate}-to-${endDate}.html`;
       downloadHTML(filename, html);
-      showToast('Report exported as HTML', 'success');
+      success('Report exported as HTML');
     } catch {
-      showToast('Failed to export HTML', 'error');
+      showError('Failed to export HTML');
     } finally {
       setLoading(false);
     }
@@ -61,9 +61,9 @@ export default function ExportReportsPanel() {
       const report = await getBookingsReport(user.id, startDate, endDate);
       const html = generateHTML(report);
       openPrintPreview(html);
-      showToast('Print preview opened', 'success');
+      success('Print preview opened');
     } catch {
-      showToast('Failed to open print preview', 'error');
+      showError('Failed to open print preview');
     } finally {
       setLoading(false);
     }

@@ -260,7 +260,6 @@ export async function getRequestsNearLocation(
 }
 
 export async function getRecommendedRequests(
-  ownerId: string,
   category: string
 ): Promise<EquipmentRequest[]> {
   const { data, error } = await supabase

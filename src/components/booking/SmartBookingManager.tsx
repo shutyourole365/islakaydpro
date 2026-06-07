@@ -13,7 +13,7 @@ import {
 
 export default function SmartBookingManager() {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [bundles, setBundles] = useState<EquipmentBundle[]>([]);
   const [recurring, setRecurring] = useState<RecurringBooking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function SmartBookingManager() {
       setBundles(bundlesData);
       setRecurring(recurringData);
     } catch {
-      showToast('Failed to load data', 'error');
+      showError('Failed to load data');
     } finally {
       setLoading(false);
     }
@@ -54,12 +54,12 @@ export default function SmartBookingManager() {
 
     try {
       await createBundle(user.id, bundleForm);
-      showToast('Bundle created', 'success');
+      success('Bundle created');
       setBundleForm({ name: '', description: '', equipmentIds: [], bundleDiscountPercent: 10 });
       setShowForm(false);
       loadData();
     } catch {
-      showToast('Failed to create bundle', 'error');
+      showError('Failed to create bundle');
     }
   };
 
@@ -67,10 +67,10 @@ export default function SmartBookingManager() {
     if (!confirm('Delete this bundle?')) return;
     try {
       await deleteBundle(id);
-      showToast('Bundle deleted', 'success');
+      success('Bundle deleted');
       loadData();
     } catch {
-      showToast('Failed to delete bundle', 'error');
+      showError('Failed to delete bundle');
     }
   };
 

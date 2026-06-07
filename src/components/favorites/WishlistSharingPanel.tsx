@@ -27,7 +27,7 @@ const permissionDescriptions: Record<PermissionLevel, string> = {
 
 export default function WishlistSharingPanel({ wishlistId, wishlistName = 'Wishlist' }: WishlistSharingPanelProps) {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [sharedWith, setSharedWith] = useState<SharedWishlist[]>([]);
   const [shareLinks, setShareLinks] = useState<WishlistShareLink[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,9 +53,9 @@ export default function WishlistSharingPanel({ wishlistId, wishlistName = 'Wishl
         getSharedWishlists(user.id),
       ]);
       setSharedWith(shares.filter(s => s.wishlist_id === wishlistId));
-    } catch (error) {
-      console.error('Failed to load shares:', error);
-      showToast('Failed to load shared wishlists', 'error');
+    } catch (err) {
+      console.error('Failed to load shares:', err);
+      showError('Failed to load shared wishlists');
     } finally {
       setLoading(false);
     }
@@ -67,14 +67,14 @@ export default function WishlistSharingPanel({ wishlistId, wishlistName = 'Wishl
     try {
       setSubmitting(true);
       await shareWishlistWithUser(wishlistId, emailInput, emailPermission);
-      showToast(`Wishlist shared with ${emailInput}`, 'success');
+      success(`Wishlist shared with ${emailInput}`);
       setEmailInput('');
       setEmailPermission('view');
       setShowEmailForm(false);
       loadShares();
-    } catch (error) {
-      console.error('Failed to share wishlist:', error);
-      showToast('Failed to share wishlist', 'error');
+    } catch (err) {
+      console.error('Failed to share wishlist:', err);
+      showError('Failed to share wishlist');
     } finally {
       setSubmitting(false);
     }
@@ -88,13 +88,13 @@ export default function WishlistSharingPanel({ wishlistId, wishlistName = 'Wishl
       const expiresIn = expiryDays ? expiryDays * 24 * 60 * 60 * 1000 : undefined;
       const link = await createShareLink(wishlistId, linkPermission, expiresIn);
       setShareLinks([link, ...shareLinks]);
-      showToast('Share link created', 'success');
+      success('Share link created');
       setShowLinkForm(false);
       setLinkPermission('view');
       setExpiryDays(null);
-    } catch (error) {
-      console.error('Failed to create share link:', error);
-      showToast('Failed to create share link', 'error');
+    } catch (err) {
+      console.error('Failed to create share link:', err);
+      showError('Failed to create share link');
     } finally {
       setSubmitting(false);
     }
@@ -104,10 +104,10 @@ export default function WishlistSharingPanel({ wishlistId, wishlistName = 'Wishl
     try {
       await removeWishlistShare(shareId);
       setSharedWith(prev => prev.filter(s => s.id !== shareId));
-      showToast('Removed from shared list', 'success');
-    } catch (error) {
-      console.error('Failed to remove share:', error);
-      showToast('Failed to remove share', 'error');
+      success('Removed from shared list');
+    } catch (err) {
+      console.error('Failed to remove share:', err);
+      showError('Failed to remove share');
     }
   };
 
@@ -115,19 +115,19 @@ export default function WishlistSharingPanel({ wishlistId, wishlistName = 'Wishl
     try {
       await disableShareLink(linkId);
       setShareLinks(prev => prev.map(l => l.id === linkId ? { ...l, is_active: false } : l));
-      showToast('Share link disabled', 'success');
-    } catch (error) {
-      console.error('Failed to disable link:', error);
-      showToast('Failed to disable link', 'error');
+      success('Share link disabled');
+    } catch (err) {
+      console.error('Failed to disable link:', err);
+      showError('Failed to disable link');
     }
   };
 
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      showToast('Copied to clipboard', 'success');
+      success('Copied to clipboard');
     } catch {
-      showToast('Failed to copy', 'error');
+      showError('Failed to copy');
     }
   };
 

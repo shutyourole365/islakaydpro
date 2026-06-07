@@ -26,7 +26,7 @@ import {
 
 export default function EquipmentRequestMatcher() {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [activeTab, setActiveTab] = useState<'browse' | 'create' | 'my-requests'>('browse');
   const [requests, setRequests] = useState<EquipmentRequest[]>([]);
   const [matches, setMatches] = useState<RequestMatch[]>([]);
@@ -67,9 +67,9 @@ export default function EquipmentRequestMatcher() {
       setLoading(true);
       const data = await getActiveRequests(user.id);
       setRequests(data);
-    } catch (error) {
-      console.error('Failed to load requests:', error);
-      showToast('Failed to load requests', 'error');
+    } catch (err) {
+      console.error('Failed to load requests:', err);
+      showError('Failed to load requests');
     } finally {
       setLoading(false);
     }
@@ -77,12 +77,12 @@ export default function EquipmentRequestMatcher() {
 
   const handleCreateRequest = async () => {
     if (!user?.id || !formData.title.trim() || !formData.category) {
-      showToast('Please fill in all required fields', 'error');
+      showError('Please fill in all required fields');
       return;
     }
 
     if (new Date(formData.start_date) >= new Date(formData.end_date)) {
-      showToast('End date must be after start date', 'error');
+      showError('End date must be after start date');
       return;
     }
 
@@ -109,7 +109,7 @@ export default function EquipmentRequestMatcher() {
         expires_at: expiresAt.toISOString(),
       });
 
-      showToast('Request created successfully!', 'success');
+      success('Request created successfully!');
       setShowCreateForm(false);
       setFormData({
         title: '',
@@ -123,9 +123,9 @@ export default function EquipmentRequestMatcher() {
         must_have_features: '',
       });
       loadRequests();
-    } catch (error) {
-      console.error('Failed to create request:', error);
-      showToast('Failed to create request', 'error');
+    } catch (err) {
+      console.error('Failed to create request:', err);
+      showError('Failed to create request');
     } finally {
       setLoading(false);
     }
@@ -137,10 +137,10 @@ export default function EquipmentRequestMatcher() {
       const foundMatches = await findMatches(requestId);
       setMatches(foundMatches);
       await updateRequestStatus(requestId, 'matched');
-      showToast(`Found ${foundMatches.length} matching equipment!`, 'success');
-    } catch (error) {
-      console.error('Failed to find matches:', error);
-      showToast('Failed to find matches', 'error');
+      success(`Found ${foundMatches.length} matching equipment!`);
+    } catch (err) {
+      console.error('Failed to find matches:', err);
+      showError('Failed to find matches');
     } finally {
       setLoading(false);
     }
@@ -150,10 +150,10 @@ export default function EquipmentRequestMatcher() {
     try {
       await updateRequestStatus(requestId, 'cancelled');
       setRequests(prev => prev.filter(r => r.id !== requestId));
-      showToast('Request cancelled', 'success');
-    } catch (error) {
-      console.error('Failed to cancel request:', error);
-      showToast('Failed to cancel request', 'error');
+      success('Request cancelled');
+    } catch (err) {
+      console.error('Failed to cancel request:', err);
+      showError('Failed to cancel request');
     }
   };
 

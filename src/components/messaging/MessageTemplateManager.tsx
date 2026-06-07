@@ -12,7 +12,7 @@ import {
 
 export default function MessageTemplateManager() {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -36,7 +36,7 @@ export default function MessageTemplateManager() {
       const data = await getMessageTemplates(user.id);
       setTemplates(data);
     } catch {
-      showToast('Failed to load templates', 'error');
+      showError('Failed to load templates');
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ export default function MessageTemplateManager() {
     try {
       if (editingTemplate) {
         // Update logic would go here
-        showToast('Template updated', 'success');
+        success('Template updated');
       } else {
         await createMessageTemplate(user.id, {
           name: formData.name,
@@ -58,13 +58,13 @@ export default function MessageTemplateManager() {
           type: formData.type,
           variables: extractVariables(formData.content),
         });
-        showToast('Template created', 'success');
+        success('Template created');
       }
       setShowForm(false);
       setFormData({ name: '', subject: '', content: '', type: 'custom' });
       loadTemplates();
     } catch {
-      showToast('Failed to save template', 'error');
+      showError('Failed to save template');
     }
   };
 
@@ -78,10 +78,10 @@ export default function MessageTemplateManager() {
     if (!confirm('Delete this template?')) return;
     try {
       await deleteMessageTemplate(id);
-      showToast('Template deleted', 'success');
+      success('Template deleted');
       loadTemplates();
     } catch {
-      showToast('Failed to delete template', 'error');
+      showError('Failed to delete template');
     }
   };
 
@@ -95,10 +95,10 @@ export default function MessageTemplateManager() {
         type: defaultTemplate.type,
         variables: extractVariables(defaultTemplate.content),
       });
-      showToast('Default template added', 'success');
+      success('Default template added');
       loadTemplates();
     } catch {
-      showToast('Failed to add template', 'error');
+      showError('Failed to add template');
     }
   };
 
@@ -154,7 +154,7 @@ export default function MessageTemplateManager() {
               required
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Common variables: {{renter_name}}, {{equipment_name}}, {{start_date}}, {{end_date}}, {{total_price}}
+              Common variables: {'{renter_name}'}, {'{equipment_name}'}, {'{start_date}'}, {'{end_date}'}, {'{total_price}'}
             </p>
           </div>
 

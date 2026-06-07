@@ -24,7 +24,7 @@ const defaultPreferences: SmartNotificationPreferences = {
 
 export default function SmartNotificationsPanel() {
   const { user } = useAuth();
-  const { showToast } = useToast();
+  const { success, error: showError } = useToast();
   const [preferences, setPreferences] = useState<SmartNotificationPreferences>(defaultPreferences);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -57,8 +57,8 @@ export default function SmartNotificationsPanel() {
           quiet_time_override_urgent: data.quiet_time_override_urgent ?? true,
         });
       }
-    } catch (error) {
-      console.error('Failed to load smart notification preferences:', error);
+    } catch (err) {
+      console.error('Failed to load smart notification preferences:', err);
     } finally {
       setLoading(false);
     }
@@ -74,10 +74,10 @@ export default function SmartNotificationsPanel() {
         updated_at: new Date().toISOString(),
       });
       setPreferences(newPrefs);
-      showToast('Smart notification settings saved', 'success');
-    } catch (error) {
-      console.error('Failed to save preferences:', error);
-      showToast('Failed to save settings', 'error');
+      success('Smart notification settings saved');
+    } catch (err) {
+      console.error('Failed to save preferences:', err);
+      showError('Failed to save settings');
     } finally {
       setSaving(false);
     }
