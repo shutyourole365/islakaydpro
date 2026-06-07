@@ -1,13 +1,13 @@
 import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
-import { ThemeProvider } from '../contexts/ThemeContext';
-import { AuthProvider } from '../contexts/AuthContext';
-import ErrorBoundary from '../components/ui/ErrorBoundary';
-import { ToastProvider } from '../components/ui/Toast';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { AuthProvider } from './contexts/AuthContext';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+import { ToastProvider } from './components/ui/Toast';
 import { vi } from 'vitest';
 
 // Mock Supabase client
-vi.mock('../lib/supabase', () => ({
+vi.mock('./lib/supabase', () => ({
   supabase: {
     auth: {
       getSession: vi.fn(() => Promise.resolve({ data: { session: null } })),
@@ -31,7 +31,7 @@ vi.mock('../lib/supabase', () => ({
 }));
 
 // Mock database services
-vi.mock('../services/database', () => ({
+vi.mock('./services/database', () => ({
   getProfile: vi.fn(() => Promise.resolve({
     id: 'test-user-id',
     full_name: 'Test User',
@@ -46,13 +46,13 @@ vi.mock('../services/database', () => ({
 }));
 
 // Mock AI services
-vi.mock('../services/ai', () => ({
+vi.mock('./services/ai', () => ({
   getPersonalizedRecommendations: vi.fn(() => Promise.resolve([])),
   getChatResponse: vi.fn(() => Promise.resolve({ content: 'Test response' })),
 }));
 
 // Mock payment services
-vi.mock('../services/payments', () => ({
+vi.mock('./services/payments', () => ({
   createPaymentIntent: vi.fn(),
   verifyCheckoutSession: vi.fn(),
 }));
