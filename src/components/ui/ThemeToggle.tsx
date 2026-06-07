@@ -102,7 +102,7 @@ export default function ThemeToggle({
     );
   }
 
-  if (variant === 'extended' || (variant === 'dropdown' && (showColorTheme || showAccessibility))) {
+  if (variant === 'extended' || (showColorTheme || showAccessibility)) {
     return (
       <div ref={dropdownRef} className={`relative ${className}`}>
         <button

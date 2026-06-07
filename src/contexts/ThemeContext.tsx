@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState, ReactNode } from 'react';
-import type { ThemeName, ColorTheme, AccessibilityMode, ThemeConfig, ColorPalette, ColorTheme as CT } from '../types/theme';
+import type { ThemeName, ColorTheme, AccessibilityMode, ColorPalette } from '../types/theme';
 import { COLOR_THEMES } from '../types/theme';
 
 interface ThemeContextType {

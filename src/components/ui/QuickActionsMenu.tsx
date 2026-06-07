@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Plus,
   X,
@@ -34,8 +34,8 @@ interface QuickActionsMenuProps {
   onNavigate: (page: string) => void;
   unreadMessages?: number;
   unreadNotifications?: number;
-  className?: string;
 }
+
 
 const defaultActions = (onNavigate: (page: string) => void, unreadMessages: number, unreadNotifications: number): QuickAction[] => [
   { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" />, color: 'from-blue-500 to-indigo-500', action: () => onNavigate('home') },
@@ -61,19 +61,29 @@ export default function QuickActionsMenu({
   const [isOpen, setIsOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [recentActions, setRecentActions] = useState<string[]>(['search', 'messages', 'ai']);
+  const [storedRecentActions, setStoredRecentActions] = useState<string[]>(['search', 'messages', 'ai']);
   const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const allActions = actions || defaultActions(onNavigate, unreadMessages, unreadNotifications);
+  const defaultActionsArray = defaultActions(onNavigate, unreadMessages, unreadNotifications);
+  const allActions = actions || defaultActionsArray;
 
   const filteredActions = searchQuery
     ? allActions.filter(a => a.label.toLowerCase().includes(searchQuery.toLowerCase()))
     : allActions;
 
-  const recentActionItems = recentActions
+  const recentActionItems = storedRecentActions
     .map(id => allActions.find(a => a.id === id))
     .filter(Boolean) as QuickAction[];
+
+  const handleActionClick = useCallback((action: QuickAction) => {
+    setStoredRecentActions(prev => {
+      const filtered = prev.filter(id => id !== action.id);
+      return [action.id, ...filtered].slice(0, 5);
+    });
+    action.action();
+    handleClose();
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -123,17 +133,6 @@ export default function QuickActionsMenu({
       setSearchQuery('');
       setIsAnimating(false);
     }, 200);
-  };
-
-  const handleActionClick = (action: QuickAction) => {
-    // Add to recent actions
-    setRecentActions(prev => {
-      const filtered = prev.filter(id => id !== action.id);
-      return [action.id, ...filtered].slice(0, 5);
-    });
-    
-    action.action();
-    handleClose();
   };
 
   return (
