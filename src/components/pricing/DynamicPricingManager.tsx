@@ -3,6 +3,7 @@ import { Plus, TrendingUp, DollarSign, Activity, Trash2, Loader2, AlertCircle } 
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../ui/Toast';
 import { supabase } from '../../lib/supabase';
+import type { Equipment } from '../../types';
 import {
   getDynamicPrices,
   getPricingMetrics,
@@ -16,7 +17,7 @@ import {
 export default function DynamicPricingManager() {
   const { user } = useAuth();
   const { success, error: showError } = useToast();
-  const [equipment, setEquipment] = useState<any[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [dynamicPrices, setDynamicPrices] = useState<DynamicPrice[]>([]);

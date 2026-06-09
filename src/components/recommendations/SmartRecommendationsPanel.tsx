@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { TrendingUp, Heart, Package, Zap, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../ui/Toast';
+import type { Equipment } from '../../types';
 import {
   getSmartRecommendations,
   type Recommendation,
@@ -41,15 +42,15 @@ export default function SmartRecommendationsPanel() {
 
         if (error) throw error;
 
-        data = (equipment || []).map((e: any) => ({
-          id: e.id,
-          equipmentId: e.id,
-          equipmentName: e.name,
+        data = (equipment || []).map((e: Equipment) => ({
+          id: String(e.id),
+          equipmentId: String(e.id),
+          equipmentName: e.title,
           reason: 'Trending on IslaKayden',
-          relevanceScore: Math.round((e.rating || 4) * 20),
+          relevanceScore: Math.round(4 * 20),
           basePrice: e.daily_rate,
-          imageUrl: e.image_url || '',
-          category: e.category,
+          imageUrl: '',
+          category: e.category_id || 'Other',
         }));
       }
 
