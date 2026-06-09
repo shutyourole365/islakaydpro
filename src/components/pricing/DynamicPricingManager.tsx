@@ -191,8 +191,8 @@ export default function DynamicPricingManager() {
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
           >
             {equipment.map(eq => (
-              <option key={eq.id} value={eq.id}>
-                {eq.name} - ${eq.daily_rate}/day
+              <option key={eq.id} value={String(eq.id)}>
+                {eq.title} - ${eq.daily_rate}/day
               </option>
             ))}
           </select>
