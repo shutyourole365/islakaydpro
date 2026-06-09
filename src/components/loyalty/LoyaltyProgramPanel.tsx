@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Gift, Star, TrendingUp, Zap, Award, Loader2 } from 'lucide-react';
+import { Gift, TrendingUp, Zap, Award, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../ui/Toast';
 import {
@@ -13,7 +13,7 @@ import {
 
 export default function LoyaltyProgramPanel() {
   const { user } = useAuth();
-  const { success, error: showError } = useToast();
+  const { error: showError } = useToast();
   const [account, setAccount] = useState<LoyaltyAccount | null>(null);
   const [rewards, setRewards] = useState<LoyaltyReward[]>([]);
   const [loading, setLoading] = useState(true);

@@ -4,14 +4,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../ui/Toast';
 import {
   getSmartRecommendations,
-  getSimilarEquipment,
   type Recommendation,
 } from '../../services/recommendationService';
 import { supabase } from '../../lib/supabase';
 
 export default function SmartRecommendationsPanel() {
   const { user } = useAuth();
-  const { success, error: showError } = useToast();
+  const { error: showError } = useToast();
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'personalized' | 'trending'>('personalized');

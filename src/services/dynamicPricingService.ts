@@ -37,7 +37,7 @@ export interface PricingMetrics {
 
 export async function createDynamicPrice(
   equipmentId: string,
-  priceData: Omit<DynamicPrice, 'id' | 'createdAt'>
+  priceData: Omit<DynamicPrice, 'id' | 'createdAt' | 'equipmentId'>
 ): Promise<DynamicPrice> {
   const { data, error } = await supabase
     .from('dynamic_prices')

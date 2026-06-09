@@ -5,15 +5,11 @@ import { useToast } from '../ui/Toast';
 import { supabase } from '../../lib/supabase';
 import {
   getDynamicPrices,
-  getPricingRules,
   getPricingMetrics,
   createDynamicPrice,
   deleteDynamicPrice,
-  createPricingRule,
-  deletePricingRule,
   calculateOptimalPrice,
   type DynamicPrice,
-  type PricingRule,
   type PricingMetrics,
 } from '../../services/dynamicPricingService';
 
@@ -24,20 +20,14 @@ export default function DynamicPricingManager() {
   const [selectedEquipment, setSelectedEquipment] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [dynamicPrices, setDynamicPrices] = useState<DynamicPrice[]>([]);
-  const [pricingRules, setPricingRules] = useState<PricingRule[]>([]);
   const [metrics, setMetrics] = useState<PricingMetrics | null>(null);
   const [showPriceForm, setShowPriceForm] = useState(false);
-  const [showRuleForm, setShowRuleForm] = useState(false);
   const [priceForm, setPriceForm] = useState({
     priceMultiplier: 1.0,
     minDailyRate: 0,
     maxDailyRate: 0,
     effectiveFrom: '',
     reason: '',
-  });
-  const [ruleForm, setRuleForm] = useState({
-    ruleType: 'seasonal' as const,
-    priceMultiplier: 1.0,
   });
 
   useEffect(() => {
@@ -77,14 +67,12 @@ export default function DynamicPricingManager() {
     if (!selectedEquipment) return;
     try {
       setLoading(true);
-      const [prices, rules, metricsData] = await Promise.all([
+      const [prices, metricsData] = await Promise.all([
         getDynamicPrices(selectedEquipment),
-        getPricingRules(selectedEquipment),
         getPricingMetrics(selectedEquipment),
       ]);
 
       setDynamicPrices(prices);
-      setPricingRules(rules);
       setMetrics(metricsData);
     } catch (err) {
       console.error('Failed to load pricing data:', err);
@@ -139,28 +127,6 @@ export default function DynamicPricingManager() {
     } catch (err) {
       console.error('Failed to delete price:', err);
       showError('Failed to delete dynamic price');
-    }
-  };
-
-  const handleCreateRule = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedEquipment) return;
-
-    try {
-      await createPricingRule(selectedEquipment, {
-        ruleType: ruleForm.ruleType,
-        condition: {},
-        priceMultiplier: ruleForm.priceMultiplier,
-        enabled: true,
-      });
-
-      success('Pricing rule created');
-      setShowRuleForm(false);
-      setRuleForm({ ruleType: 'seasonal', priceMultiplier: 1.0 });
-      loadPricingData();
-    } catch (err) {
-      console.error('Failed to create rule:', err);
-      showError('Failed to create pricing rule');
     }
   };
 
