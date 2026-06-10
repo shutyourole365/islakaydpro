@@ -28,6 +28,8 @@ import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
+import CommandPalette from './components/ui/CommandPalette';
+import BackToTop from './components/ui/BackToTop';
 import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
@@ -621,6 +623,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [featuredEquipment, setFeaturedEquipment] = useState<Equipment[]>([]);
   const [isLoadingEquipment, setIsLoadingEquipment] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -851,9 +854,49 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
     }
   };
 
+  // Global keyboard shortcuts: Cmd/Ctrl+K opens the command palette, "/" opens search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(open => !open);
+        return;
+      }
+      const target = e.target as HTMLElement;
+      const isTyping =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable;
+      if (e.key === '/' && !isTyping && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleNavigate = (page: string) => {
     const knownPages: PageType[] = ['home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'sustainability', 'tutorials', 'loyalty', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bundles', 'warranties', 'bulk-booking', 'insights', 'terms', 'privacy', 'cookies', 'refund', 'accessibility', 'cancellation', 'about', 'careers', 'press', 'blog', 'partnerships', 'investors', 'help', 'safety', 'trust', 'contact', 'pricing-calculator', 'insurance', 'host-resources', 'host-community', 'ai-matching', 'smart-contracts', 'ar-preview', 'carbon-tracker', 'equipment-financing', 'iot-telematics', 'ar-visualization', 'gps-tracking', 'crypto-payments', 'ai-insurance', 'sustainability-dashboard', 'social-communities', 'voice-ai-assistant', 'blockchain-contracts', 'vr-training', 'drone-delivery', 'industry-integrations', 'maintenance', 'scheduler', 'equipment-health', 'cost-estimator', 'seasonal-deals', 'rental-history', 'multi-language', 'availability-calendar', 'revenue-dashboard', 'certification-tracker', 'agreement-generator', 'support-tickets', 'requests', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
+  };
+
+  // Adapter for the command palette, which navigates with URL-style paths
+  const handlePaletteNavigate = (path: string) => {
+    const page = path.replace(/^\//, '');
+    if (page === 'list') {
+      handleListEquipment();
+      return;
+    }
+    const pageAliases: Record<string, string> = {
+      '': 'home',
+      messages: 'dashboard',
+      bookings: 'dashboard',
+      favorites: 'dashboard',
+      settings: 'dashboard',
+    };
+    handleNavigate(pageAliases[page] ?? page);
   };
 
   const handleSearch = (query: string) => {
@@ -1758,6 +1801,16 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           unreadNotifications={unreadNotifications}
         />
       )}
+
+      {/* Command Palette (Cmd/Ctrl+K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onNavigate={handlePaletteNavigate}
+      />
+
+      {/* Back to Top */}
+      <BackToTop />
 
       {/* Skip Link for Accessibility */}
       <SkipLink />

@@ -18,6 +18,15 @@ import {
   Wrench,
   Calendar,
   Users,
+  Info,
+  HelpCircle,
+  ShieldCheck,
+  Mail,
+  Briefcase,
+  Newspaper,
+  PenSquare,
+  Handshake,
+  TrendingUp,
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
 import LogoPro from '../branding/LogoPro';
@@ -33,6 +42,32 @@ interface HeaderProps {
   currentPage: string;
 }
 
+const companyLinks = [
+  { label: 'About Us', page: 'about', Icon: Info },
+  { label: 'Careers', page: 'careers', Icon: Briefcase },
+  { label: 'Press', page: 'press', Icon: Newspaper },
+  { label: 'Blog', page: 'blog', Icon: PenSquare },
+  { label: 'Partnerships', page: 'partnerships', Icon: Handshake },
+  { label: 'Investors', page: 'investors', Icon: TrendingUp },
+];
+
+const supportLinks = [
+  { label: 'Help Center', page: 'help', Icon: HelpCircle },
+  { label: 'Safety', page: 'safety', Icon: ShieldCheck },
+  { label: 'Trust & Verification', page: 'trust', Icon: ShieldCheck },
+  { label: 'Contact Us', page: 'contact', Icon: Mail },
+];
+
+const profileLinks = [
+  { label: 'Dashboard', page: 'dashboard', Icon: LayoutDashboard },
+  { label: 'My Listings', page: 'dashboard', Icon: Package },
+  { label: 'Favorites', page: 'dashboard', Icon: Heart },
+  { label: 'Settings', page: 'dashboard', Icon: Settings },
+  { label: 'Maintenance', page: 'maintenance', Icon: Wrench },
+  { label: 'Smart Scheduler', page: 'scheduler', Icon: Calendar },
+  { label: 'Referrals', page: 'referrals', Icon: Users },
+];
+
 export default function Header({
   onSearchClick,
   onAuthClick,
@@ -42,7 +77,7 @@ export default function Header({
   onSignOut,
   currentPage,
 }: HeaderProps) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -51,6 +86,15 @@ export default function Header({
   const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
   const unsubRef = useRef<(() => void) | null>(null);
+
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'My Account';
+  const displayEmail = user?.email || '';
+  const initials = (profile?.full_name || user?.email || 'U')
+    .split(' ')
+    .map(part => part.charAt(0))
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
 
   useEffect(() => {
     if (!user) { setUnreadNotifCount(0); return; }
@@ -63,257 +107,152 @@ export default function Header({
   }, [user]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const closeAllMenus = () => {
+    setIsProfileMenuOpen(false);
+    setIsNotificationsOpen(false);
+    setIsCompanyMenuOpen(false);
+    setIsSupportMenuOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest('.profile-menu') && !target.closest('.profile-button')) {
-        setIsProfileMenuOpen(false);
-      }
-      if (!target.closest('.notifications-menu') && !target.closest('.notifications-button')) {
-        setIsNotificationsOpen(false);
-      }
-      if (!target.closest('.company-menu') && !target.closest('.company-button')) {
-        setIsCompanyMenuOpen(false);
-      }
-      if (!target.closest('.support-menu') && !target.closest('.support-button')) {
-        setIsSupportMenuOpen(false);
+      if (!target.closest('.profile-menu')) setIsProfileMenuOpen(false);
+      if (!target.closest('.notifications-menu')) setIsNotificationsOpen(false);
+      if (!target.closest('.company-menu')) setIsCompanyMenuOpen(false);
+      if (!target.closest('.support-menu')) setIsSupportMenuOpen(false);
+    };
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeAllMenus();
+        setIsMobileMenuOpen(false);
       }
     };
     document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, []);
 
   const isHomePage = currentPage === 'home';
-  const showTransparent = isHomePage && !isScrolled;
+  const showTransparent = isHomePage && !isScrolled && !isMobileMenuOpen;
+
+  const navItemClass = (page?: string) =>
+    `text-sm font-medium transition-colors hover:text-teal-500 ${
+      page && currentPage === page
+        ? 'text-teal-500'
+        : showTransparent
+          ? 'text-white/90'
+          : 'text-gray-700 dark:text-gray-200'
+    }`;
+
+  const dropdownPanelClass =
+    'absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50';
+
+  const dropdownItemClass =
+    'flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
+
+  const scrollToHowItWorks = () => {
+    onNavigate('home');
+    setTimeout(() => {
+      document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  };
+
+  const renderDropdown = (
+    label: string,
+    links: typeof companyLinks,
+    isOpen: boolean,
+    setOpen: (open: boolean) => void,
+    menuClass: string
+  ) => (
+    <div className={`relative ${menuClass}`}>
+      <button
+        onClick={() => setOpen(!isOpen)}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        className={`flex items-center gap-1 ${navItemClass()}`}
+      >
+        {label}
+        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      {isOpen && (
+        <div role="menu" className={dropdownPanelClass}>
+          {links.map(({ label: itemLabel, page, Icon }) => (
+            <button
+              key={itemLabel}
+              role="menuitem"
+              onClick={() => {
+                onNavigate(page);
+                setOpen(false);
+              }}
+              className={dropdownItemClass}
+            >
+              <Icon className="w-4 h-4 text-gray-400" />
+              {itemLabel}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         showTransparent
           ? 'bg-gradient-to-b from-black/50 to-transparent'
-          : 'bg-white shadow-lg'
+          : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg dark:shadow-gray-950/50'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          <div className="flex items-center gap-12">
+          <div className="flex items-center gap-10">
             <button onClick={() => onNavigate('home')} aria-label="Go to home page" className="flex items-center">
-              <LogoPro 
-                variant={showTransparent ? 'light' : 'default'} 
-                size="md" 
-                showText={true}
-              />
+              <LogoPro variant={showTransparent ? 'light' : 'default'} size="md" showText={true} />
             </button>
 
-            <nav className="hidden lg:flex items-center gap-8">
-              <button
-                onClick={() => onNavigate('browse')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
+            <nav className="hidden lg:flex items-center gap-7" aria-label="Primary">
+              <button onClick={() => onNavigate('browse')} className={navItemClass('browse')}>
                 Browse Equipment
               </button>
-              <button
-                onClick={() => onNavigate('requests')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                } ${currentPage === 'requests' ? 'text-teal-500' : ''}`}
-              >
+              <button onClick={() => onNavigate('requests')} className={navItemClass('requests')}>
                 Wanted
               </button>
-              <button
-                onClick={() => onNavigate('help')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
-                Help
-              </button>
-              <button
-                onClick={() => onNavigate('about')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
-                About
-              </button>
-              <button
-               
-                onClick={() => {
-                  onNavigate('home');
-                  setTimeout(() => {
-                    document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
-                }}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700'
-                }`}
-              >
+              <button onClick={scrollToHowItWorks} className={navItemClass()}>
                 How It Works
               </button>
-              
-              {/* Company Dropdown */}
-              <div className="relative company-menu">
-                <button
-                  onClick={() => setIsCompanyMenuOpen(!isCompanyMenuOpen)}
-                  className={`company-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
-                    showTransparent ? 'text-white/90' : 'text-gray-700'
-                  }`}
-                >
-                  Company
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isCompanyMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('about');
-                        setIsCompanyMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      About Us
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('careers');
-                        setIsCompanyMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Careers
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('press');
-                        setIsCompanyMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Press
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('blog');
-                        setIsCompanyMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Blog
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('partnerships');
-                        setIsCompanyMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Partnerships
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('investors');
-                        setIsCompanyMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Investors
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Support Dropdown */}
-              <div className="relative support-menu">
-                <button
-                  onClick={() => setIsSupportMenuOpen(!isSupportMenuOpen)}
-                  className={`support-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
-                    showTransparent ? 'text-white/90' : 'text-gray-700'
-                  }`}
-                >
-                  Support
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {isSupportMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('help');
-                        setIsSupportMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Help Center
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('safety');
-                        setIsSupportMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Safety
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('trust');
-                        setIsSupportMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Trust & Verification
-                    </button>
-                    <button
-                     
-                      onClick={() => {
-                        onNavigate('contact');
-                        setIsSupportMenuOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    >
-                      Contact Us
-                    </button>
-                  </div>
-                )}
-              </div>
+              {renderDropdown('Company', companyLinks, isCompanyMenuOpen, setIsCompanyMenuOpen, 'company-menu')}
+              {renderDropdown('Support', supportLinks, isSupportMenuOpen, setIsSupportMenuOpen, 'support-menu')}
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={onSearchClick}
               className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all ${
                 showTransparent
                   ? 'border-white/30 bg-white/10 text-white hover:bg-white/20'
-                  : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 hover:bg-gray-100'
+                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
               }`}
-             
             >
               <Search className="w-4 h-4" />
               <span className="text-sm">Search equipment...</span>
               <kbd
                 className={`hidden md:inline-flex items-center px-2 py-0.5 rounded text-xs ${
-                  showTransparent ? 'bg-white/20 text-white/70' : 'bg-gray-200 text-gray-500'
+                  showTransparent
+                    ? 'bg-white/20 text-white/70'
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}
               >
-                /
+                ⌘K
               </kbd>
             </button>
 
@@ -326,45 +265,50 @@ export default function Header({
                       ? 'bg-white text-gray-900 hover:bg-gray-100'
                       : 'bg-teal-500 text-white hover:bg-teal-600'
                   }`}
-                 
                 >
                   <Plus className="w-4 h-4" />
                   <span className="text-sm">List Equipment</span>
                 </button>
 
-                <div className="hidden sm:flex items-center gap-2">
-                  <button                    aria-label="Favorites"                    onClick={() => onNavigate('dashboard')}
+                <div className="hidden sm:flex items-center gap-1.5">
+                  <button
+                    aria-label="Favorites"
+                    onClick={() => onNavigate('dashboard')}
                     className={`p-2.5 rounded-full transition-colors ${
                       showTransparent
                         ? 'text-white hover:bg-white/10'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
                     <Heart className="w-5 h-5" />
                   </button>
-                  <button                    aria-label="Messages"                    onClick={() => onNavigate('dashboard')}
-                    className={`p-2.5 rounded-full transition-colors relative ${
+                  <button
+                    aria-label="Messages"
+                    onClick={() => onNavigate('dashboard')}
+                    className={`p-2.5 rounded-full transition-colors ${
                       showTransparent
                         ? 'text-white hover:bg-white/10'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
                     <MessageSquare className="w-5 h-5" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
                   </button>
                   <div className="relative notifications-menu">
                     <button
                       onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                      aria-label="Notifications"
-                      className={`notifications-button p-2.5 rounded-full transition-colors relative ${
+                      aria-label={unreadNotifCount > 0 ? `Notifications, ${unreadNotifCount} unread` : 'Notifications'}
+                      aria-expanded={isNotificationsOpen}
+                      className={`p-2.5 rounded-full transition-colors relative ${
                         showTransparent
                           ? 'text-white hover:bg-white/10'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }`}
                     >
                       <Bell className="w-5 h-5" />
                       {unreadNotifCount > 0 && (
-                        <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full">
+                          {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                        </span>
                       )}
                     </button>
                     <NotificationsDropdown
@@ -379,110 +323,67 @@ export default function Header({
                 </div>
 
                 <div className="relative profile-menu">
-                  <button                    aria-label="Open profile menu"                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className={`profile-button flex items-center gap-2 p-1.5 rounded-full transition-colors ${
-                      showTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100'
+                  <button
+                    aria-label="Open profile menu"
+                    aria-haspopup="menu"
+                    aria-expanded={isProfileMenuOpen}
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                    className={`flex items-center gap-2 p-1.5 rounded-full transition-colors ${
+                      showTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
-                      <User className="w-5 h-5 text-white" />
-                    </div>
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt={displayName}
+                        className="w-9 h-9 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center">
+                        {initials ? (
+                          <span className="text-white text-sm font-semibold">{initials}</span>
+                        ) : (
+                          <User className="w-5 h-5 text-white" />
+                        )}
+                      </div>
+                    )}
                     <ChevronDown
-                      className={`w-4 h-4 transition-transform ${
-                        isProfileMenuOpen ? 'rotate-180' : ''
-                      } ${showTransparent ? 'text-white' : 'text-gray-600'}`}
+                      className={`w-4 h-4 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''} ${
+                        showTransparent ? 'text-white' : 'text-gray-600 dark:text-gray-300'
+                      }`}
                     />
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden">
+                    <div
+                      role="menu"
+                      className="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden"
+                    >
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                        <p className="font-semibold text-gray-900 dark:text-white">John Doe</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">john@example.com</p>
+                        <p className="font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
+                        {displayEmail && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{displayEmail}</p>
+                        )}
                       </div>
                       <div className="py-2">
-                        <button
-                         
-                          onClick={() => {
-                            onNavigate('dashboard');
-                            setIsProfileMenuOpen(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
-                        >
-                          <LayoutDashboard className="w-5 h-5 text-gray-400" />
-                          Dashboard
-                        </button>
-                        <button
-                         
-                          onClick={() => {
-                            onNavigate('dashboard');
-                            setIsProfileMenuOpen(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
-                        >
-                          <Package className="w-5 h-5 text-gray-400" />
-                          My Listings
-                        </button>
-                        <button
-                         
-                          onClick={() => {
-                            onNavigate('dashboard');
-                            setIsProfileMenuOpen(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
-                        >
-                          <Heart className="w-5 h-5 text-gray-400" />
-                          Favorites
-                        </button>
-                        <button
-                         
-                          onClick={() => {
-                            onNavigate('dashboard');
-                            setIsProfileMenuOpen(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full"
-                        >
-                          <Settings className="w-5 h-5 text-gray-400" />
-                          Settings
-                        </button>
-                        <div className="border-t border-gray-100 my-2"></div>
-                        <button
-                         
-                          onClick={() => {
-                            onNavigate('maintenance');
-                            setIsProfileMenuOpen(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
-                        >
-                          <Wrench className="w-5 h-5 text-gray-400" />
-                          Maintenance
-                        </button>
-                        <button
-                         
-                          onClick={() => {
-                            onNavigate('scheduler');
-                            setIsProfileMenuOpen(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
-                        >
-                          <Calendar className="w-5 h-5 text-gray-400" />
-                          Smart Scheduler
-                        </button>
-                        <button
-                         
-                          onClick={() => {
-                            onNavigate('referrals');
-                            setIsProfileMenuOpen(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors w-full"
-                        >
-                          <Users className="w-5 h-5 text-gray-400" />
-                          Referrals
-                        </button>
+                        {profileLinks.map(({ label, page, Icon }) => (
+                          <button
+                            key={label}
+                            role="menuitem"
+                            onClick={() => {
+                              onNavigate(page);
+                              setIsProfileMenuOpen(false);
+                            }}
+                            className={dropdownItemClass}
+                          >
+                            <Icon className="w-5 h-5 text-gray-400" />
+                            {label}
+                          </button>
+                        ))}
                       </div>
                       <div className="border-t border-gray-100 dark:border-gray-700 pt-2">
                         <button
-                         
+                          role="menuitem"
                           onClick={() => {
                             onSignOut();
                             setIsProfileMenuOpen(false);
@@ -499,14 +400,14 @@ export default function Header({
               </>
             ) : (
               <div className="hidden sm:flex items-center gap-3">
+                <ThemeToggle variant="dropdown" />
                 <button
                   onClick={onAuthClick}
                   className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
                     showTransparent
                       ? 'text-white hover:bg-white/10'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
-                 
                 >
                   Sign In
                 </button>
@@ -517,16 +418,20 @@ export default function Header({
                       ? 'bg-white text-gray-900 hover:bg-gray-100'
                       : 'bg-teal-500 text-white hover:bg-teal-600'
                   }`}
-                 
                 >
                   Get Started
                 </button>
               </div>
             )}
 
-            <button              aria-label="Toggle mobile menu"              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            <button
+              aria-label="Toggle mobile menu"
+              aria-expanded={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`lg:hidden p-2.5 rounded-full transition-colors ${
-                showTransparent ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
+                showTransparent
+                  ? 'text-white hover:bg-white/10'
+                  : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
               }`}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -536,67 +441,49 @@ export default function Header({
       </div>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-100 shadow-xl">
+        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-xl max-h-[calc(100vh-5rem)] overflow-y-auto">
           <div className="px-4 py-6 space-y-4">
             <button
-             
               onClick={() => {
                 onSearchClick();
                 setIsMobileMenuOpen(false);
               }}
-              className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 rounded-xl text-gray-600"
+              className="flex items-center gap-3 w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-xl text-gray-600 dark:text-gray-300"
             >
               <Search className="w-5 h-5" />
               <span>Search equipment...</span>
             </button>
 
-            <nav className="space-y-1">
-              <button
-               
-                onClick={() => {
-                  onNavigate('browse');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                Browse Equipment
-              </button>
-              <button
-               
-                onClick={() => {
-                  onNavigate('home');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                How It Works
-              </button>
-              <button
-               
-                onClick={() => {
-                  onNavigate('home');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                For Business
-              </button>
-              <button
-               
-                onClick={() => {
-                  onNavigate('home');
-                  setIsMobileMenuOpen(false);
-                }}
-                className="block w-full text-left px-4 py-3 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
-              >
-                Support
-              </button>
+            <nav className="space-y-1" aria-label="Mobile">
+              {[
+                { label: 'Browse Equipment', action: () => onNavigate('browse') },
+                { label: 'Wanted', action: () => onNavigate('requests') },
+                { label: 'How It Works', action: scrollToHowItWorks },
+                { label: 'About Us', action: () => onNavigate('about') },
+                { label: 'Help Center', action: () => onNavigate('help') },
+                { label: 'Contact Us', action: () => onNavigate('contact') },
+              ].map(({ label, action }) => (
+                <button
+                  key={label}
+                  onClick={() => {
+                    action();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-4 py-3 text-gray-700 dark:text-gray-200 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  {label}
+                </button>
+              ))}
             </nav>
 
+            <div className="flex items-center justify-between px-4 py-2 border-t border-gray-100 dark:border-gray-800 pt-4">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Appearance</span>
+              <ThemeToggle variant="dropdown" />
+            </div>
+
             {isAuthenticated ? (
-              <div className="pt-4 border-t border-gray-100 space-y-3">
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <button
-                 
                   onClick={() => {
                     onListEquipment();
                     setIsMobileMenuOpen(false);
@@ -606,63 +493,62 @@ export default function Header({
                   List Equipment
                 </button>
                 <button
-                 
                   onClick={() => {
                     onNavigate('dashboard');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full py-3 rounded-xl text-gray-700 font-medium border border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="w-full py-3 rounded-xl text-gray-700 dark:text-gray-200 font-medium border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   Dashboard
                 </button>
                 <div className="pt-2 space-y-2">
-                  <button
-                   
-                    onClick={() => {
-                      onNavigate('maintenance');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                  >
-                    <Wrench className="w-4 h-4" />
-                    Maintenance
-                  </button>
-                  <button
-                   
-                    onClick={() => {
-                      onNavigate('scheduler');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Smart Scheduler
-                  </button>
-                  <button
-                   
-                    onClick={() => {
-                      onNavigate('referrals');
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="w-full py-2 px-3 rounded-lg text-gray-600 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                  >
-                    <Users className="w-4 h-4" />
-                    Referrals
-                  </button>
+                  {[
+                    { label: 'Maintenance', page: 'maintenance', Icon: Wrench },
+                    { label: 'Smart Scheduler', page: 'scheduler', Icon: Calendar },
+                    { label: 'Referrals', page: 'referrals', Icon: Users },
+                  ].map(({ label, page, Icon }) => (
+                    <button
+                      key={label}
+                      onClick={() => {
+                        onNavigate(page);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full py-2 px-3 rounded-lg text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center gap-2"
+                    >
+                      <Icon className="w-4 h-4" />
+                      {label}
+                    </button>
+                  ))}
                 </div>
+                <button
+                  onClick={() => {
+                    onSignOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full py-3 rounded-xl text-red-600 dark:text-red-400 font-medium border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
               </div>
             ) : (
-              <div className="pt-4 border-t border-gray-100 space-y-3">
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <button
-                  onClick={onAuthClick}
-                  className="w-full py-3 rounded-xl text-gray-700 font-medium border border-gray-200 hover:bg-gray-50 transition-colors"
-                 >
+                  onClick={() => {
+                    onAuthClick();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full py-3 rounded-xl text-gray-700 dark:text-gray-200 font-medium border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
                   Sign In
                 </button>
                 <button
-                  onClick={onAuthClick}
+                  onClick={() => {
+                    onAuthClick();
+                    setIsMobileMenuOpen(false);
+                  }}
                   className="w-full py-3 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors"
-                 >
+                >
                   Get Started
                 </button>
               </div>
