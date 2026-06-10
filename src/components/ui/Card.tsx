@@ -25,8 +25,8 @@ export function Card({
   return (
     <div
       onClick={onClick}
-      className={`bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-md dark:shadow-lg ${paddings[padding]} ${
-        hover ? 'hover:shadow-xl hover:border-teal-200 dark:hover:border-teal-700 transition-all duration-300 cursor-pointer group hover:-translate-y-0.5' : ''
+      className={`bg-white dark:bg-slate-800 rounded-2xl border border-gray-100/80 dark:border-gray-700/60 shadow-lg dark:shadow-xl ${paddings[padding]} ${
+        hover ? 'hover:shadow-2xl hover:border-teal-200 dark:hover:border-teal-700/40 transition-all duration-300 cursor-pointer group hover:-translate-y-1.5 hover:scale-[1.02]' : 'transition-all duration-300'
       } ${className}`}
     >
       {children}
@@ -55,7 +55,7 @@ interface CardTitleProps {
 }
 
 export function CardTitle({ children, className = '' }: CardTitleProps) {
-  return <h3 className={`text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent ${className}`}>{children}</h3>;
+  return <h3 className={`text-xl font-bold bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-gray-200 dark:to-gray-300 bg-clip-text text-transparent ${className}`}>{children}</h3>;
 }
 
 interface CardDescriptionProps {

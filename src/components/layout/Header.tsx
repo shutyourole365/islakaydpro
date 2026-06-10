@@ -473,10 +473,10 @@ export default function Header({
               <div className="hidden sm:flex items-center gap-3">
                 <button
                   onClick={onAuthClick}
-                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 hover:scale-[1.02] ${
                     showTransparent
-                      ? 'text-white hover:bg-white/10'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'text-white hover:bg-white/20'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-teal-100/50 dark:hover:bg-teal-900/20 hover:text-teal-600 dark:hover:text-teal-400'
                   }`}
 
                 >
@@ -484,12 +484,12 @@ export default function Header({
                 </button>
                 <button
                   onClick={onAuthClick}
-                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
+                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300 hover:scale-[1.02] shadow-lg hover:-translate-y-0.5 ${
                     showTransparent
-                      ? 'bg-white text-gray-900 hover:bg-gray-100'
-                      : 'bg-teal-500 text-white hover:bg-teal-600'
+                      ? 'bg-white text-gray-900 hover:bg-teal-50 shadow-xl'
+                      : 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:shadow-2xl hover:shadow-teal-500/40'
                   }`}
-                 
+
                 >
                   Get Started
                 </button>
@@ -497,8 +497,8 @@ export default function Header({
             )}
 
             <button              aria-label="Toggle mobile menu"              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className={`lg:hidden p-2.5 rounded-full transition-colors ${
-                showTransparent ? 'text-white hover:bg-white/10' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+              className={`lg:hidden p-2.5 rounded-full transition-all duration-300 hover:scale-110 ${
+                showTransparent ? 'text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:bg-teal-100/50 dark:hover:bg-teal-900/30 hover:text-teal-600 dark:hover:text-teal-400'
               }`}
             >
               {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -508,7 +508,7 @@ export default function Header({
       </div>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-xl">
+        <div className="lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200/40 dark:border-gray-800/40 shadow-2xl animate-in slide-in-from-top-4 duration-300">
           <div className="px-4 py-6 space-y-4">
             <button
              

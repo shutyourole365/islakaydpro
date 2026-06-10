@@ -38,7 +38,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     const getInputStyles = () => {
-      let styles = `w-full rounded-xl border-2 bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-0 ${sizes[size]} shadow-sm focus:shadow-lg`;
+      let styles = `w-full rounded-xl border-2 bg-white/80 dark:bg-gray-800/80 dark:text-white dark:placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-0 ${sizes[size]} shadow-md focus:shadow-lg backdrop-blur-sm`;
 
       if (leftIcon) styles += ' pl-11';
       else styles += ' pl-4';
@@ -47,11 +47,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       else styles += ' pr-4';
 
       if (error) {
-        styles += ' border-red-400 focus:border-red-500 focus:ring-red-500/30 focus:shadow-red-500/10';
+        styles += ' border-red-400/60 focus:border-red-500 focus:ring-red-500/40 focus:shadow-red-500/20 focus:shadow-lg';
       } else if (success) {
-        styles += ' border-emerald-400 focus:border-emerald-500 focus:ring-emerald-500/30 focus:shadow-emerald-500/10';
+        styles += ' border-emerald-400/60 focus:border-emerald-500 focus:ring-emerald-500/40 focus:shadow-emerald-500/20 focus:shadow-lg';
       } else {
-        styles += ' border-gray-300 dark:border-gray-700 focus:border-teal-500 focus:ring-teal-500/30 focus:shadow-teal-500/10';
+        styles += ' border-gray-300/60 dark:border-gray-700/60 focus:border-teal-500 focus:ring-teal-500/40 focus:shadow-teal-500/20 focus:shadow-lg';
       }
 
       return styles;
@@ -114,14 +114,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const inputId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
 
     const getTextareaStyles = () => {
-      let styles = 'w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-2 resize-none shadow-sm focus:shadow-lg';
+      let styles = 'w-full px-4 py-3 rounded-xl border-2 bg-white/80 dark:bg-gray-800/80 dark:text-white dark:placeholder-gray-500 transition-all duration-300 focus:outline-none focus:ring-2 resize-none shadow-md focus:shadow-lg backdrop-blur-sm';
 
       if (error) {
-        styles += ' border-red-400 focus:border-red-500 focus:ring-red-500/30 focus:shadow-red-500/10';
+        styles += ' border-red-400/60 focus:border-red-500 focus:ring-red-500/40 focus:shadow-red-500/20 focus:shadow-lg';
       } else if (success) {
-        styles += ' border-emerald-400 focus:border-emerald-500 focus:ring-emerald-500/30 focus:shadow-emerald-500/10';
+        styles += ' border-emerald-400/60 focus:border-emerald-500 focus:ring-emerald-500/40 focus:shadow-emerald-500/20 focus:shadow-lg';
       } else {
-        styles += ' border-gray-300 dark:border-gray-700 focus:border-teal-500 focus:ring-teal-500/30 focus:shadow-teal-500/10';
+        styles += ' border-gray-300/60 dark:border-gray-700/60 focus:border-teal-500 focus:ring-teal-500/40 focus:shadow-teal-500/20 focus:shadow-lg';
       }
 
       return styles;
@@ -164,12 +164,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const inputId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
     const getSelectStyles = () => {
-      let styles = 'w-full px-4 py-3 rounded-xl border-2 bg-white dark:bg-gray-800 dark:text-white transition-all duration-300 focus:outline-none focus:ring-2 appearance-none shadow-sm focus:shadow-lg';
+      let styles = 'w-full px-4 py-3 rounded-xl border-2 bg-white/80 dark:bg-gray-800/80 dark:text-white transition-all duration-300 focus:outline-none focus:ring-2 appearance-none shadow-md focus:shadow-lg backdrop-blur-sm';
 
       if (error) {
-        styles += ' border-red-400 focus:border-red-500 focus:ring-red-500/30 focus:shadow-red-500/10';
+        styles += ' border-red-400/60 focus:border-red-500 focus:ring-red-500/40 focus:shadow-red-500/20 focus:shadow-lg';
       } else {
-        styles += ' border-gray-300 dark:border-gray-700 focus:border-teal-500 focus:ring-teal-500/30 focus:shadow-teal-500/10';
+        styles += ' border-gray-300/60 dark:border-gray-700/60 focus:border-teal-500 focus:ring-teal-500/40 focus:shadow-teal-500/20 focus:shadow-lg';
       }
 
       return styles;
