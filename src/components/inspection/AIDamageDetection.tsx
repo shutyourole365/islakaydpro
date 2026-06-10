@@ -154,7 +154,6 @@ export default function AIDamageDetection({
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session?.access_token ?? anonKey}`,
-          apikey: anonKey,
         },
         body: JSON.stringify({
           photos,
