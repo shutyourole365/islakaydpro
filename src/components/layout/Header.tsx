@@ -86,10 +86,10 @@ export default function Header({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 backdrop-blur-2xl ${
         showTransparent
-          ? 'bg-gradient-to-b from-black/50 to-transparent'
-          : 'bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-900/30'
+          ? 'bg-gradient-to-b from-black/30 via-black/10 to-transparent border-b border-white/5 shadow-none'
+          : 'bg-white/90 dark:bg-gray-950/90 backdrop-blur-3xl border-b border-gray-200/40 dark:border-gray-700/40 shadow-2xl dark:shadow-2xl'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -102,124 +102,125 @@ export default function Header({
               />
             </button>
 
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-1">
               <button
                 onClick={() => onNavigate('browse')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 relative group ${
+                  showTransparent ? 'text-white/90 hover:text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-cyan-50/80 dark:hover:bg-teal-900/20 hover:scale-[1.02]'
                 }`}
               >
                 Browse Equipment
+                <span className="absolute bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 rounded-full group-hover:w-full transition-all duration-300 opacity-0 group-hover:opacity-100"></span>
               </button>
               <button
                 onClick={() => onNavigate('requests')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
-                } ${currentPage === 'requests' ? 'text-teal-500' : ''}`}
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 relative group ${
+                  currentPage === 'requests'
+                    ? (showTransparent ? 'text-white bg-white/20' : 'text-teal-600 dark:text-teal-400 bg-gradient-to-r from-teal-100/60 to-cyan-100/60 dark:from-teal-900/40 dark:to-cyan-900/40')
+                    : (showTransparent ? 'text-white/90 hover:text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-cyan-50/80 dark:hover:bg-teal-900/20 hover:scale-[1.02]')
+                }`}
               >
                 Wanted
+                <span className={`absolute bottom-1 left-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 rounded-full transition-all duration-300 ${currentPage === 'requests' ? 'w-full opacity-100' : 'w-0 group-hover:w-full opacity-0 group-hover:opacity-100'}`}></span>
               </button>
               <button
                 onClick={() => onNavigate('help')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 relative group ${
+                  showTransparent ? 'text-white/90 hover:text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-cyan-50/80 dark:hover:bg-teal-900/20 hover:scale-[1.02]'
                 }`}
               >
                 Help
+                <span className="absolute bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 rounded-full group-hover:w-full transition-all duration-300 opacity-0 group-hover:opacity-100"></span>
               </button>
               <button
                 onClick={() => onNavigate('about')}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 relative group ${
+                  showTransparent ? 'text-white/90 hover:text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-cyan-50/80 dark:hover:bg-teal-900/20 hover:scale-[1.02]'
                 }`}
               >
                 About
+                <span className="absolute bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 rounded-full group-hover:w-full transition-all duration-300 opacity-0 group-hover:opacity-100"></span>
               </button>
               <button
-               
                 onClick={() => {
                   onNavigate('home');
                   setTimeout(() => {
                     document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
                   }, 100);
                 }}
-                className={`text-sm font-medium transition-colors hover:text-teal-500 ${
-                  showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
+                className={`px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 relative group ${
+                  showTransparent ? 'text-white/90 hover:text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-cyan-50/80 dark:hover:bg-teal-900/20 hover:scale-[1.02]'
                 }`}
               >
                 How It Works
+                <span className="absolute bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 rounded-full group-hover:w-full transition-all duration-300 opacity-0 group-hover:opacity-100"></span>
               </button>
               
               {/* Company Dropdown */}
               <div className="relative company-menu">
                 <button
                   onClick={() => setIsCompanyMenuOpen(!isCompanyMenuOpen)}
-                  className={`company-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
-                    showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
+                  className={`company-button flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 relative group ${
+                    showTransparent ? 'text-white/90 hover:text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-cyan-50/80 dark:hover:bg-teal-900/20 hover:scale-[1.02]'
                   }`}
                 >
                   Company
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className={`w-4 h-4 transition-all duration-300 ${isCompanyMenuOpen ? 'rotate-180 text-teal-600 dark:text-teal-400' : ''}`} />
+                  <span className="absolute bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 rounded-full group-hover:w-full transition-all duration-300 opacity-0 group-hover:opacity-100"></span>
                 </button>
                 {isCompanyMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-3 w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-2xl rounded-xl shadow-2xl border border-gray-200/40 dark:border-gray-700/50 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
                     <button
-
                       onClick={() => {
                         onNavigate('about');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       About Us
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('careers');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Careers
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('press');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Press
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('blog');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Blog
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('partnerships');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Partnerships
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('investors');
                         setIsCompanyMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Investors
                     </button>
@@ -231,52 +232,49 @@ export default function Header({
               <div className="relative support-menu">
                 <button
                   onClick={() => setIsSupportMenuOpen(!isSupportMenuOpen)}
-                  className={`support-button flex items-center gap-1 text-sm font-medium transition-colors hover:text-teal-500 ${
-                    showTransparent ? 'text-white/90' : 'text-gray-700 dark:text-gray-300'
+                  className={`support-button flex items-center gap-1 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 relative group ${
+                    showTransparent ? 'text-white/90 hover:text-white hover:bg-white/20' : 'text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gradient-to-r hover:from-teal-50/80 hover:to-cyan-50/80 dark:hover:bg-teal-900/20 hover:scale-[1.02]'
                   }`}
                 >
                   Support
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className={`w-4 h-4 transition-all duration-300 ${isSupportMenuOpen ? 'rotate-180 text-teal-600 dark:text-teal-400' : ''}`} />
+                  <span className="absolute bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 rounded-full group-hover:w-full transition-all duration-300 opacity-0 group-hover:opacity-100"></span>
                 </button>
                 {isSupportMenuOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-3 w-56 bg-white/95 dark:bg-gray-800/95 backdrop-blur-2xl rounded-xl shadow-2xl border border-gray-200/40 dark:border-gray-700/50 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
                     <button
-                     
                       onClick={() => {
                         onNavigate('help');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Help Center
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('safety');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Safety
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('trust');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Trust & Verification
                     </button>
                     <button
-                     
                       onClick={() => {
                         onNavigate('contact');
                         setIsSupportMenuOpen(false);
                       }}
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-all duration-200"
                     >
                       Contact Us
                     </button>
@@ -289,12 +287,12 @@ export default function Header({
           <div className="flex items-center gap-4">
             <button
               onClick={onSearchClick}
-              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all ${
+              className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full border transition-all duration-300 hover:scale-[1.02] ${
                 showTransparent
-                  ? 'border-white/30 bg-white/10 text-white hover:bg-white/20'
-                  : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'border-white/40 bg-white/15 text-white hover:bg-white/25 backdrop-blur-md'
+                  : 'border-gray-300/60 dark:border-gray-600/60 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-md text-gray-600 dark:text-gray-300 hover:border-teal-300 dark:hover:border-teal-600/60 hover:bg-gradient-to-r hover:from-teal-50/60 hover:to-cyan-50/60 dark:hover:bg-teal-900/20'
               }`}
-             
+
             >
               <Search className="w-4 h-4" />
               <span className="text-sm">Search equipment...</span>
@@ -311,12 +309,12 @@ export default function Header({
               <>
                 <button
                   onClick={onListEquipment}
-                  className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all ${
+                  className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all duration-300 hover:scale-[1.02] hover:-translate-y-0.5 shadow-lg ${
                     showTransparent
-                      ? 'bg-white text-gray-900 hover:bg-gray-100'
-                      : 'bg-teal-500 text-white hover:bg-teal-600'
+                      ? 'bg-white text-gray-900 hover:bg-teal-50 shadow-xl'
+                      : 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:shadow-2xl hover:shadow-teal-500/40'
                   }`}
-                 
+
                 >
                   <Plus className="w-4 h-4" />
                   <span className="text-sm">List Equipment</span>
@@ -324,19 +322,19 @@ export default function Header({
 
                 <div className="hidden sm:flex items-center gap-2">
                   <button                    aria-label="Favorites"                    onClick={() => onNavigate('dashboard')}
-                    className={`p-2.5 rounded-full transition-colors ${
+                    className={`p-2.5 rounded-full transition-all duration-300 hover:scale-110 ${
                       showTransparent
-                        ? 'text-white hover:bg-white/10'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? 'text-white hover:bg-white/20'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-teal-100/50 dark:hover:bg-teal-900/30 hover:text-teal-600 dark:hover:text-teal-400'
                     }`}
                   >
                     <Heart className="w-5 h-5" />
                   </button>
                   <button                    aria-label="Messages"                    onClick={() => onNavigate('messaging')}
-                    className={`p-2.5 rounded-full transition-colors relative ${
+                    className={`p-2.5 rounded-full transition-all duration-300 hover:scale-110 relative ${
                       showTransparent
-                        ? 'text-white hover:bg-white/10'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? 'text-white hover:bg-white/20'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-teal-100/50 dark:hover:bg-teal-900/30 hover:text-teal-600 dark:hover:text-teal-400'
                     }`}
                   >
                     <MessageSquare className="w-5 h-5" />
@@ -348,8 +346,8 @@ export default function Header({
 
                 <div className="relative profile-menu">
                   <button                    aria-label="Open profile menu"                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className={`profile-button flex items-center gap-2 p-1.5 rounded-full transition-colors ${
-                      showTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                    className={`profile-button flex items-center gap-2 p-1.5 rounded-full transition-all duration-300 hover:scale-105 ${
+                      showTransparent ? 'hover:bg-white/20' : 'hover:bg-teal-100/50 dark:hover:bg-teal-900/30'
                     }`}
                   >
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center overflow-hidden">
@@ -369,7 +367,7 @@ export default function Header({
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden">
+                    <div className="absolute right-0 mt-3 w-56 bg-white/95 dark:bg-gray-800/95 rounded-2xl shadow-2xl border border-gray-200/40 dark:border-gray-700/50 py-2 overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-top-4 duration-300">
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <p className="font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{displayEmail}</p>

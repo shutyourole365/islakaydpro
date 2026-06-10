@@ -25,8 +25,8 @@ export function Card({
   return (
     <div
       onClick={onClick}
-      className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm ${paddings[padding]} ${
-        hover ? 'hover:shadow-xl hover:border-gray-200 dark:hover:border-gray-600 transition-all duration-300 cursor-pointer' : ''
+      className={`bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-md dark:shadow-lg ${paddings[padding]} ${
+        hover ? 'hover:shadow-xl hover:border-teal-200 dark:hover:border-teal-700 transition-all duration-300 cursor-pointer group hover:-translate-y-0.5' : ''
       } ${className}`}
     >
       {children}
@@ -55,7 +55,7 @@ interface CardTitleProps {
 }
 
 export function CardTitle({ children, className = '' }: CardTitleProps) {
-  return <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${className}`}>{children}</h3>;
+  return <h3 className={`text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-gray-300 bg-clip-text text-transparent ${className}`}>{children}</h3>;
 }
 
 interface CardDescriptionProps {
@@ -64,7 +64,7 @@ interface CardDescriptionProps {
 }
 
 export function CardDescription({ children, className = '' }: CardDescriptionProps) {
-  return <p className={`text-sm text-gray-500 dark:text-gray-400 mt-1 ${className}`}>{children}</p>;
+  return <p className={`text-sm text-gray-600 dark:text-gray-400 mt-2 font-medium ${className}`}>{children}</p>;
 }
 
 interface CardContentProps {
