@@ -16,23 +16,23 @@ export function Badge({
   className = '',
 }: BadgeProps) {
   const variants = {
-    default: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-    primary: 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
-    secondary: 'bg-gray-900 text-white',
-    success: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-    warning: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-    danger: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300',
-    info: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    default: 'bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700 dark:to-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200/50 dark:border-gray-600/50',
+    primary: 'bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/40 dark:to-cyan-900/40 text-teal-700 dark:text-teal-300 border border-teal-200/50 dark:border-teal-700/50',
+    secondary: 'bg-gradient-to-r from-gray-900 to-gray-800 text-white border border-gray-700/50',
+    success: 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/40 dark:to-emerald-900/40 text-green-700 dark:text-green-300 border border-green-200/50 dark:border-green-700/50',
+    warning: 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/40 text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-700/50',
+    danger: 'bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/40 dark:to-pink-900/40 text-red-700 dark:text-red-300 border border-red-200/50 dark:border-red-700/50',
+    info: 'bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/40 dark:to-cyan-900/40 text-blue-700 dark:text-blue-300 border border-blue-200/50 dark:border-blue-700/50',
   };
 
   const sizes = {
-    sm: 'px-2 py-0.5 text-xs',
-    md: 'px-3 py-1 text-sm',
+    sm: 'px-2.5 py-1 text-xs',
+    md: 'px-3.5 py-1.5 text-sm',
   };
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-medium ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full font-medium transition-all duration-300 ${variants[variant]} ${sizes[size]} ${className}`}
     >
       {icon}
       {children}
@@ -47,7 +47,7 @@ export function RatingBadge({ rating, reviews, size = 'md' }: { rating: number; 
   };
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur-sm ${sizes[size]}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-md border border-white/40 shadow-lg ${sizes[size]}`}>
       <Star className={`${size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-amber-500 fill-amber-500`} />
       <span className="font-semibold text-gray-900">{rating.toFixed(1)}</span>
       {reviews !== undefined && (

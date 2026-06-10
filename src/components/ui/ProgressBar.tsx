@@ -21,8 +21,8 @@ export default function ProgressBar({ value, className = '', innerClassName = ''
   }, [value]);
 
   return (
-    <div className={`relative overflow-hidden rounded-full ${className}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-label={ariaLabel}>
-      <div ref={ref} className={`h-full transition-all ${innerClassName}`} />
+    <div className={`relative overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 shadow-sm ${className}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-label={ariaLabel}>
+      <div ref={ref} className={`h-full transition-all duration-500 bg-gradient-to-r from-teal-500 via-cyan-500 to-emerald-500 shadow-lg ${innerClassName}`} />
     </div>
   );
 }
