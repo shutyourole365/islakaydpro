@@ -49,9 +49,9 @@ export default function Footer({ onNavigate }: FooterProps) {
   };
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950 text-gray-300 border-t border-gray-800/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+        <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 animate-fade-in">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
             <a href="/" className="inline-block mb-6">
               <Logo size="md" inverse />
@@ -68,7 +68,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-white transition-all duration-300"
+                    className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-800 to-gray-700 flex items-center justify-center text-gray-400 hover:from-teal-500 hover:to-cyan-500 hover:text-white transition-all duration-300 hover:scale-110 shadow-lg hover:shadow-xl hover:shadow-teal-500/30"
                   >
                     <Icon className="w-5 h-5" />
                   </a>
@@ -84,13 +84,13 @@ export default function Footer({ onNavigate }: FooterProps) {
                 {links.map((link) => (
                   <li key={link.label}>
                     <button
-                     
+
                       onClick={() => {
                         if (link.page) {
                           onNavigate?.(link.page);
                         }
                       }}
-                      className="text-sm text-gray-400 hover:text-teal-400 transition-colors text-left"
+                      className="text-sm text-gray-400 hover:text-teal-400 transition-all duration-300 text-left hover:translate-x-1"
                     >
                       {link.label}
                     </button>
@@ -101,54 +101,54 @@ export default function Footer({ onNavigate }: FooterProps) {
           ))}
         </div>
 
-        <div className="py-8 border-t border-gray-800">
+        <div className="py-8 border-t border-gray-800/50">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
               <button
-               
+
                 onClick={() => onNavigate?.('terms')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-all duration-300 hover:translate-y-[-2px]"
               >
                 Terms of Service
               </button>
               <button
-               
+
                 onClick={() => onNavigate?.('privacy')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-all duration-300 hover:translate-y-[-2px]"
               >
                 Privacy Policy
               </button>
               <button
-               
+
                 onClick={() => onNavigate?.('cookies')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-all duration-300 hover:translate-y-[-2px]"
               >
                 Cookie Policy
               </button>
               <button
-               
+
                 onClick={() => onNavigate?.('refund')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-all duration-300 hover:translate-y-[-2px]"
               >
                 Refund Policy
               </button>
               <button
-               
+
                 onClick={() => onNavigate?.('accessibility')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
+                className="text-gray-400 hover:text-teal-400 transition-all duration-300 hover:translate-y-[-2px]"
               >
                 Accessibility
               </button>
             </div>
             <div className="flex items-center gap-4">
-              <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
+              <select className="bg-gray-800/80 border border-gray-700/60 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/30 transition-all duration-300">
                 <option>English (AU)</option>
                 <option>English (US)</option>
                 <option>Spanish</option>
                 <option>French</option>
                 <option>German</option>
               </select>
-              <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
+              <select className="bg-gray-800/80 border border-gray-700/60 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/30 transition-all duration-300">
                 <option>AUD $</option>
                 <option>USD $</option>
                 <option>EUR</option>

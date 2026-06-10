@@ -102,10 +102,10 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   };
 
   const colors = {
-    success: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300',
-    error: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300',
-    warning: 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300',
-    info: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300',
+    success: 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/40 dark:to-emerald-900/40 border-green-200/60 dark:border-green-700/50 text-green-800 dark:text-green-300',
+    error: 'bg-gradient-to-r from-red-50 to-pink-50 dark:from-red-900/40 dark:to-pink-900/40 border-red-200/60 dark:border-red-700/50 text-red-800 dark:text-red-300',
+    warning: 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/40 border-amber-200/60 dark:border-amber-700/50 text-amber-800 dark:text-amber-300',
+    info: 'bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-blue-900/40 dark:to-cyan-900/40 border-blue-200/60 dark:border-blue-700/50 text-blue-800 dark:text-blue-300',
   };
 
   const iconColors = {
@@ -125,14 +125,14 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   return (
     <div
       role={role}
-      className={`flex items-start gap-3 min-w-[320px] max-w-md p-4 rounded-xl border shadow-lg animate-slide-in-right ${colors[toast.type]}`}
+      className={`flex items-start gap-3 min-w-[320px] max-w-md p-4 rounded-xl border shadow-xl backdrop-blur-sm animate-slide-in-right transition-all duration-300 ${colors[toast.type]}`}
     >
       <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconColors[toast.type]}`} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm">{toast.title}</p>
         {toast.message && <p className="text-sm opacity-80 mt-0.5">{toast.message}</p>}
       </div>
-      <button onClick={onClose} aria-label="Close notification" className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors">
+      <button onClick={onClose} aria-label="Close notification" className="flex-shrink-0 p-1 rounded-lg hover:bg-white/30 dark:hover:bg-white/10 transition-all duration-300 hover:scale-110">
         <X className="w-4 h-4" />
       </button>
     </div>
