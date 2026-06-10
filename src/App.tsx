@@ -131,7 +131,7 @@ const PageLoader = () => (
 
 
 function AppContent() {
-type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | 'privacy' | 'terms' | 'owners' | '404';
+type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bulk-booking' | 'help' | 'safety' | 'trust' | 'contact' | 'maintenance' | 'scheduler' | 'availability-calendar' | 'revenue-dashboard' | 'agreement-generator' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'messaging' | 'privacy' | 'terms' | 'owners' | 'about' | 'favorites' | 'settings' | 'messages' | 'map' | 'search' | 'calendar' | 'rewards' | 'blog' | 'careers' | 'press' | 'partnerships' | 'investors' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications, unreadMessages } = useAuth();
   const [showOwnerActivation, setShowOwnerActivation] = useState(false);
   const { addToast } = useToast();
@@ -393,7 +393,7 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
   };
 
   const handleNavigate = (page: string) => {
-    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', 'messaging', 'privacy', 'terms', 'owners', '404'];
+    const knownPages: PageType[] = ['project-planner', 'home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bulk-booking', 'help', 'safety', 'trust', 'contact', 'maintenance', 'scheduler', 'availability-calendar', 'revenue-dashboard', 'agreement-generator', 'requests', 'disputes', 'id-verification', 'earnings', 'recurring-rentals', 'messaging', 'privacy', 'terms', 'owners', 'about', 'favorites', 'settings', 'messages', 'map', 'search', 'calendar', 'rewards', 'blog', 'careers', 'press', 'partnerships', 'investors', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
   };
 
@@ -1989,6 +1989,57 @@ type PageType = 'project-planner' | 'home' | 'browse' | 'dashboard' | 'list-equi
             }}
           />
         </Suspense>
+      )}
+
+      {/* Handle page redirects */}
+      {(() => {
+        if (currentPage === 'favorites' || currentPage === 'settings' || currentPage === 'rewards') {
+          setCurrentPage('dashboard');
+          return null;
+        }
+        if (currentPage === 'messages') {
+          setCurrentPage('messaging');
+          return null;
+        }
+        if (currentPage === 'map' || currentPage === 'search') {
+          setCurrentPage('browse');
+          return null;
+        }
+        if (currentPage === 'calendar') {
+          setCurrentPage('availability-calendar');
+          return null;
+        }
+        if (currentPage === 'blog') {
+          setCurrentPage('help');
+          return null;
+        }
+        if (currentPage === 'careers' || currentPage === 'press' || currentPage === 'partnerships' || currentPage === 'investors') {
+          setCurrentPage('contact');
+          return null;
+        }
+        return null;
+      })()}
+
+      {/* About Page */}
+      {currentPage === 'about' && (
+        <>
+          <div className="pt-24 pb-16 min-h-screen bg-gradient-to-br from-teal-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800">
+            <div className="max-w-4xl mx-auto px-4">
+              <button
+                onClick={() => setCurrentPage('home')}
+                className="mb-6 flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              >
+                ← Back
+              </button>
+              <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">About IslaKayden</h1>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-lg">
+                <p className="text-gray-700 dark:text-gray-300 mb-4">IslaKayden is a peer-to-peer equipment rental marketplace that connects equipment owners with people who need to rent.</p>
+                <p className="text-gray-700 dark:text-gray-300">Learn more by browsing our equipment or contacting us.</p>
+              </div>
+            </div>
+          </div>
+          <Footer onNavigate={handleNavigate} />
+        </>
       )}
 
       {currentPage === '404' && (
