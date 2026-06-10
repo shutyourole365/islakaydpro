@@ -762,7 +762,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, '', cleanUrl);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

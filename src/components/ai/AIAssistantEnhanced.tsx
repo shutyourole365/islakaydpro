@@ -128,7 +128,6 @@ export default function AIAssistantEnhanced() {
       setShowQuickActions(false);
     }).catch(() => {});
   // Only run once when the widget opens for the first time
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, user]);
 
   // Load personalized recommendations when assistant opens for logged-in users

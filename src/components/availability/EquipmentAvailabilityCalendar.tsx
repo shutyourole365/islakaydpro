@@ -104,7 +104,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
   }, [user]);
 
   // Load real availability slots when selected equipment changes
-  const loadAvailability = useCallback(async (equipmentId: string, _dailyRate: number) => {
+  const loadAvailability = useCallback(async (equipmentId: string) => {
     try {
       const today = new Date();
       const start = new Date(today); start.setDate(today.getDate() - 15);
@@ -143,9 +143,9 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
 
   useEffect(() => {
     if (selected.id !== sampleEquipment[0]?.id) {
-      loadAvailability(selected.id, selected.dailyRate);
+      loadAvailability(selected.id);
     }
-  }, [selected.id, selected.dailyRate, loadAvailability]);
+  }, [selected.id, loadAvailability]);
 
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
@@ -382,7 +382,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
                       if (!selectedDate) return;
                       try {
                         await unblockDates(selectedDate);
-                        await loadAvailability(selected.id, selected.dailyRate);
+                        await loadAvailability(selected.id);
                         setSelectedDate(null);
                       } catch { alert('Failed to unblock date.'); }
                     }}
@@ -427,7 +427,7 @@ export default function EquipmentAvailabilityCalendar({ onBack }: EquipmentAvail
                       if (!selectionStart || !selectionEnd) return;
                       try {
                         await blockDates(selected.id, selectionStart, selectionEnd, 'unavailable');
-                        await loadAvailability(selected.id, selected.dailyRate);
+                        await loadAvailability(selected.id);
                         setSelectionStart(null); setSelectionEnd(null);
                       } catch { alert('Failed to block dates. Please try again.'); }
                     }}

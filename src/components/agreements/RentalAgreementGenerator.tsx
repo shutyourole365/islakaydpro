@@ -315,7 +315,7 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-900 transition-colors">
+          <button onClick={onBack} aria-label="Go back" className="text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>

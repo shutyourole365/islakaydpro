@@ -84,7 +84,7 @@
     "browserslist": "^4.28.1",
     "csstype": "^3.2.3",
     "dotenv": "^17.2.3",
-    "eslint": "^10.0.1",
+    "eslint": "^9.39.4",
     "globals": "^15.9.0",
     "jsdom": "^23.0.1",
     "node-releases": "^2.0.36",

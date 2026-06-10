@@ -266,7 +266,6 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
   const handleUpdateBundle = async () => {
     if (!editingBundleId) return handleSaveBundle();
     const pricing = calculateBundlePricing(formData.equipment_ids);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const saved = await updateEquipmentBundle(editingBundleId, {
       name: formData.name,
       description: formData.description,
@@ -274,7 +273,7 @@ export default function EquipmentBundleDeals({ ownerId, mode = 'browse', onBookB
       min_rental_days: formData.min_rental_days,
       max_rental_days: formData.max_rental_days,
       is_active: true,
-    } as any).catch(() => null);
+    }).catch(() => null);
     const updated: Partial<EquipmentBundle> = saved
       ? (saved as unknown as Partial<EquipmentBundle>)
       : { name: formData.name, description: formData.description, discount_percentage: formData.discount_percentage, original_total: pricing.originalTotal, bundle_price: pricing.discountedTotal };

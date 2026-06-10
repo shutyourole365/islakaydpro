@@ -28,7 +28,7 @@ jobs:
       matrix:
         include:
           - language: javascript-typescript
-            build-mode: autobuild
+            build-mode: none
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -37,10 +37,7 @@ jobs:
         uses: github/codeql-action/init@v4
         with:
           languages: javascript-typescript
-          build-mode: autobuild
-
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+          build-mode: none
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
