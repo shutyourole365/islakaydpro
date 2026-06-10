@@ -19,8 +19,21 @@ export default function SmartRecommendationsPanel() {
 
   useEffect(() => {
     if (!user?.id) return;
-    loadRecommendations();
-    loadWishlist();
+
+    let isMounted = true;
+
+    const load = async () => {
+      if (!isMounted) return;
+      await loadRecommendations();
+      if (!isMounted) return;
+      await loadWishlist();
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user?.id, activeTab]);
 
   const loadRecommendations = async () => {

@@ -60,8 +60,8 @@ export async function getUserProfile(userId: string): Promise<UserProfile> {
     averageRentalDuration: avgDuration,
     totalSpent,
     preferredPriceRange: {
-      min: totalSpent > 0 && bookings ? Math.round((totalSpent / bookings.length) * 0.5) : 0,
-      max: totalSpent > 0 && bookings ? Math.round((totalSpent / bookings.length) * 1.5) : 500,
+      min: totalSpent > 0 && bookings?.length ? Math.round((totalSpent / bookings.length) * 0.5) : 0,
+      max: totalSpent > 0 && bookings?.length ? Math.round((totalSpent / bookings.length) * 1.5) : 500,
     },
   };
 }

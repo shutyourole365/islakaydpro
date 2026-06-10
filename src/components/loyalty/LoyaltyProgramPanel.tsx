@@ -140,8 +140,8 @@ export default function LoyaltyProgramPanel() {
         <div>
           <p className="text-sm font-medium text-gray-900 dark:text-white mb-2">Your Benefits</p>
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {tierBenefit.benefits.map((benefit, idx) => (
-              <li key={idx} className="text-sm flex items-center gap-2 text-gray-700 dark:text-gray-300">
+            {tierBenefit.benefits.map((benefit) => (
+              <li key={benefit} className="text-sm flex items-center gap-2 text-gray-700 dark:text-gray-300">
                 <Zap className="w-4 h-4 text-teal-500" />
                 {benefit}
               </li>
