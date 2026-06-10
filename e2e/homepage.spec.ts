@@ -4,8 +4,8 @@ test.describe('Homepage', () => {
   test('should load the homepage', async ({ page }) => {
     await page.goto('/');
     
-    // Check main heading matches Hero.tsx: "Borrow the tools."
-    await expect(page.getByRole('heading', { name: /borrow the tools/i })).toBeVisible();
+    // Check main heading
+    await expect(page.getByRole('heading', { name: /rent any equipment/i })).toBeVisible();
 
     // Check navigation elements
     await expect(page.getByRole('button', { name: /browse equipment/i })).toBeVisible();
@@ -80,4 +80,3 @@ test.describe('Theme', () => {
     expect(newClass).not.toBe(initialClass);
   });
 });
-

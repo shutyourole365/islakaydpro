@@ -14,14 +14,6 @@ export default defineConfig({
     exclude: ['e2e/**', 'src/__tests__/setup.ts'],
     // Run tests in a single thread to avoid worker temporary-dir race conditions in this environment
     threads: false,
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
-    testTimeout: 10000,
-    hookTimeout: 10000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],

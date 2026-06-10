@@ -34,7 +34,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
       recognition.onresult = (event: any) => {
         let interim = '';
         let final = '';
-
+        
         for (let i = event.resultIndex; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
             final += event.results[i][0].transcript;
@@ -42,7 +42,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
             interim += event.results[i][0].transcript;
           }
         }
-
+        
         setInterimTranscript(interim);
         if (final) {
           setTranscript(prev => prev + final);
@@ -95,17 +95,17 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
   return (
     <div className="relative w-full max-w-2xl mx-auto">
       <form onSubmit={handleSubmit} className="relative">
-        <div className={`relative flex items-center bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 transition-all duration-300 ${
-          isListening ? 'border-teal-500 shadow-teal-100' : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+        <div className={`relative flex items-center bg-white rounded-2xl shadow-lg border-2 transition-all duration-300 ${
+          isListening ? 'border-teal-500 shadow-teal-100' : 'border-gray-200 hover:border-gray-300'
         }`}>
           <Search className="w-5 h-5 text-gray-400 ml-4" />
-
+          
           <input
             type="text"
             value={transcript + interimTranscript}
             onChange={(e) => setTranscript(e.target.value)}
             placeholder={isListening ? "Listening..." : placeholder}
-            className="flex-1 px-4 py-4 bg-transparent outline-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+            className="flex-1 px-4 py-4 bg-transparent outline-none text-gray-900 placeholder-gray-400"
           />
 
           {isSupported && (
@@ -113,9 +113,9 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
               type="button"
               onClick={toggleListening}
               className={`p-3 mr-2 rounded-xl transition-all duration-300 ${
-                isListening
-                  ? 'bg-red-500 text-white animate-pulse'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-teal-500 hover:text-white'
+                isListening 
+                  ? 'bg-red-500 text-white animate-pulse' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-teal-500 hover:text-white'
               }`}
              aria-label={isListening ? 'Stop voice search' : 'Start voice search'}>
               {isListening ? (
@@ -144,7 +144,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
               }}
             />
           ))}
-          <span className="ml-2 text-sm text-teal-600 dark:text-teal-400 font-medium">Listening...</span>
+          <span className="ml-2 text-sm text-teal-600 font-medium">Listening...</span>
         </div>
       )}
 
@@ -155,7 +155,7 @@ export default function VoiceSearch({ onSearch, placeholder = "Search equipment.
             <button
               key={suggestion}
               onClick={() =>  onSearch(suggestion)}
-              className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-sm rounded-full hover:bg-teal-50 dark:hover:bg-teal-900/30 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+              className="px-3 py-1.5 bg-gray-100 text-gray-600 text-sm rounded-full hover:bg-teal-50 hover:text-teal-600 transition-colors"
             >
               {suggestion}
             </button>

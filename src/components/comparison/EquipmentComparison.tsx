@@ -15,8 +15,6 @@ import {
   Search,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
-import { getPublicAppUrl } from '../../utils/publicUrl';
-import { useToast } from '../ui/Toast';
 
 interface EquipmentComparisonProps {
   items?: Equipment[];
@@ -55,7 +53,6 @@ export default function EquipmentComparison({
   favorites = new Set(),
   maxItems = 4,
 }: EquipmentComparisonProps) {
-  const { addToast } = useToast();
   const [activeCategory, setActiveCategory] = useState<ComparisonCategory>('overview');
   const [highlightDifferences, setHighlightDifferences] = useState(true);
 
@@ -169,13 +166,13 @@ export default function EquipmentComparison({
       case 'badge': {
         const condition = String(value).toLowerCase();
         const badgeColors: Record<string, string> = {
-          excellent: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-          good: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-          fair: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
-          poor: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+          excellent: 'bg-green-100 text-green-700',
+          good: 'bg-blue-100 text-blue-700',
+          fair: 'bg-yellow-100 text-yellow-700',
+          poor: 'bg-red-100 text-red-700',
         };
         return (
-          <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${badgeColors[condition] || 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'}`}>
+          <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${badgeColors[condition] || 'bg-gray-100 text-gray-700'}`}>
             {String(value)}
           </span>
         );
@@ -194,29 +191,21 @@ export default function EquipmentComparison({
             </div>
           );
         }
-        return <span className="text-gray-500 dark:text-gray-400">None listed</span>;
+        return <span className="text-gray-500">None listed</span>;
       }
       
       default:
-        return <span className={isBest ? 'font-semibold text-green-600' : 'text-gray-700 dark:text-gray-300'}>{String(value)}</span>;
+        return <span className={isBest ? 'font-semibold text-green-600' : 'text-gray-700'}>{String(value)}</span>;
     }
   };
 
   const handleShare = async () => {
-    const url = `${getPublicAppUrl()}/compare?ids=${selectedIds.join(',')}`;
+    const url = `${window.location.origin}/compare?ids=${selectedIds.join(',')}`;
     try {
       await navigator.clipboard.writeText(url);
-      addToast({
-        type: 'success',
-        title: 'Comparison link copied',
-        message: 'Share it with anyone.',
-      });
+      alert('Comparison link copied to clipboard!');
     } catch {
-      addToast({
-        type: 'error',
-        title: 'Could not copy link',
-        message: 'Please copy it manually.',
-      });
+      alert('Failed to copy link');
     }
   };
 
@@ -227,18 +216,18 @@ export default function EquipmentComparison({
   if (selectedEquipment.length === 0) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <ArrowLeftRight className="w-8 h-8 text-gray-400" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No Equipment Selected</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">No Equipment Selected</h2>
+          <p className="text-gray-600 mb-6">
             Add equipment to compare their features, prices, and specifications side by side.
           </p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
              >
               Cancel
             </button>
@@ -256,30 +245,30 @@ export default function EquipmentComparison({
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-gray-50 overflow-hidden">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-gray-500" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <ArrowLeftRight className="w-5 h-5 text-teal-500" />
                 Compare Equipment
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500">
                 {selectedEquipment.length} of {maxItems} items selected
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <label className="flex items-center gap-2 text-sm text-gray-600">
               <input
                 type="checkbox"
                 checked={highlightDifferences}
@@ -288,17 +277,17 @@ export default function EquipmentComparison({
               />
               Highlight best values
             </label>
-            <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
+            <div className="h-6 w-px bg-gray-200" />
             <button
               onClick={handleShare}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-600 dark:text-gray-400"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
               title="Share comparison"
             >
               <Share2 className="w-5 h-5" />
             </button>
             <button
               onClick={handlePrint}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-600 dark:text-gray-400"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
               title="Print comparison"
             >
               <Printer className="w-5 h-5" />
@@ -308,7 +297,7 @@ export default function EquipmentComparison({
       </div>
 
       {/* Category Tabs */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-1 overflow-x-auto py-2">
             {categories.map((cat) => (
@@ -318,7 +307,7 @@ export default function EquipmentComparison({
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                   activeCategory === cat.id
                     ? 'bg-teal-50 text-teal-700'
-                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
                 {cat.icon}
@@ -332,13 +321,13 @@ export default function EquipmentComparison({
       {/* Comparison Table */}
       <div className="flex-1 overflow-auto p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             {/* Equipment Header Row */}
-            <div className="grid gap-px bg-gray-200 dark:bg-gray-700" style={{ gridTemplateColumns: `200px repeat(${selectedEquipment.length}, 1fr) ${selectedEquipment.length < maxItems ? '100px' : ''}` }}>
-              <div className="bg-gray-50 dark:bg-gray-700/50 p-4" />
-
+            <div className="grid gap-px bg-gray-200" style={{ gridTemplateColumns: `200px repeat(${selectedEquipment.length}, 1fr) ${selectedEquipment.length < maxItems ? '100px' : ''}` }}>
+              <div className="bg-gray-50 p-4" />
+              
               {selectedEquipment.map((equip) => (
-                <div key={equip.id} className="bg-white dark:bg-gray-800 p-4">
+                <div key={equip.id} className="bg-white p-4">
                   <div className="relative">
                     <button
                       onClick={() => handleRemove(equip.id)}
@@ -352,10 +341,10 @@ export default function EquipmentComparison({
                       alt={equip.title}
                       className="w-full h-32 object-cover rounded-lg mb-3"
                     />
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2 mb-2">
+                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-2">
                       {equip.title}
                     </h3>
-                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-3">
                       <div className="flex items-center gap-1">
                         <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
                         {equip.rating.toFixed(1)}
@@ -378,7 +367,7 @@ export default function EquipmentComparison({
                         className={`p-2 rounded-lg transition-colors ${
                           favorites.has(equip.id)
                             ? 'bg-red-50 text-red-500'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-400 hover:text-red-500'
+                            : 'bg-gray-100 text-gray-400 hover:text-red-500'
                         }`}
                       >
                         <Heart className={`w-4 h-4 ${favorites.has(equip.id) ? 'fill-red-500' : ''}`} />
@@ -389,7 +378,7 @@ export default function EquipmentComparison({
               ))}
               
               {selectedEquipment.length < maxItems && (
-                <div className="bg-gray-50 dark:bg-gray-700/50 p-4 flex items-center justify-center">
+                <div className="bg-gray-50 p-4 flex items-center justify-center">
                   <button
                     onClick={onAddEquipment}
                     className="flex flex-col items-center gap-2 text-gray-400 hover:text-teal-500 transition-colors"
@@ -407,24 +396,24 @@ export default function EquipmentComparison({
             {comparisonData[activeCategory].map((row, index) => (
               <div
                 key={row.key}
-                className={`grid gap-px bg-gray-200 dark:bg-gray-700 ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
+                className={`grid gap-px bg-gray-200 ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
                 style={{ gridTemplateColumns: `200px repeat(${selectedEquipment.length}, 1fr) ${selectedEquipment.length < maxItems ? '100px' : ''}` }}
               >
-                <div className={`p-4 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-white dark:bg-gray-800'}`}>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{row.label}</span>
+                <div className={`p-4 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                  <span className="text-sm font-medium text-gray-700">{row.label}</span>
                 </div>
-
+                
                 {selectedEquipment.map((equip) => (
                   <div
                     key={equip.id}
-                    className={`p-4 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-white dark:bg-gray-800'}`}
+                    className={`p-4 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}
                   >
                     {renderValue(row, equip)}
                   </div>
                 ))}
-
+                
                 {selectedEquipment.length < maxItems && (
-                  <div className={`p-4 ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-white dark:bg-gray-800'}`} />
+                  <div className={`p-4 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`} />
                 )}
               </div>
             ))}

@@ -1,6 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { sanitizeInput, enforceMaxLength } from '../utils/validation';
-import { errorMonitoring } from './errorMonitoring';
+import { sanitizeInput } from '../utils/validation';
 import type {
   Profile,
   Equipment,
@@ -18,60 +17,6 @@ import type {
   VerificationRequest,
 } from '../types';
 
-// Forward a swallowed background failure (fire-and-forget notifications,
-// audit-log writes, view-count increments) to Sentry. We deliberately
-// don't rethrow — these are intentionally non-blocking — but they
-// shouldn't be invisible either. Context is nested under a single key
-// so Sentry.setContext gets an object value (rejects primitives — same
-// convention as the ErrorBoundary / serviceWorker / AuthContext wiring).
-// `extra` is spread BEFORE `source` so a call site can never clobber the
-// source tag by accident.
-//
-// Supabase `{ error }` results carry PostgrestError-shaped objects with
-// `.message` / `.code` / `.hint` / `.details` properties — `String(obj)`
-// would just produce "[object Object]". When we see that shape, lift the
-// message into the Error and preserve the rest as Sentry context so
-// triage has something useful to read.
-function reportDatabaseError(
-  source: string,
-  error: unknown,
-  extra?: Record<string, unknown>
-): void {
-  let normalized: Error;
-  const pgFields: Record<string, unknown> = {};
-
-  if (error instanceof Error) {
-    normalized = error;
-  } else if (error && typeof error === 'object') {
-    const obj = error as { message?: unknown; code?: unknown; hint?: unknown; details?: unknown };
-    const msg = typeof obj.message === 'string' && obj.message.length > 0
-      ? obj.message
-      : 'Unknown database error';
-    normalized = new Error(msg);
-    if (typeof obj.code === 'string') pgFields.code = obj.code;
-    if (typeof obj.hint === 'string') pgFields.hint = obj.hint;
-    if (typeof obj.details === 'string') pgFields.details = obj.details;
-  } else {
-    normalized = new Error(String(error));
-  }
-
-  errorMonitoring.captureException(normalized, {
-    database: { ...extra, ...pgFields, source },
-  });
-}
-
-/**
- * Sanitize a free-text search term before it is interpolated into a PostgREST
- * `.or(...)` filter string. `sanitizeInput` strips HTML but leaves the
- * PostgREST logic-tree metacharacters (`,` `(` `)` `\`) intact — and those let
- * a crafted term break out of the `ilike` value and inject extra conditions
- * (e.g. `x,is_active.eq.false` to surface inactive listings). We strip them so
- * the term can only ever match as a literal `ilike` pattern.
- */
-export function sanitizeSearchTerm(input: string): string {
-  return sanitizeInput(input).replace(/[,()\\]/g, ' ').trim();
-}
-
 export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
@@ -84,10 +29,6 @@ export async function getProfile(userId: string): Promise<Profile | null> {
 }
 
 export async function updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile> {
-  enforceMaxLength(updates.full_name, 'fullName', 'Full name');
-  enforceMaxLength(updates.bio, 'bio', 'Bio');
-  enforceMaxLength(updates.location, 'locationText', 'Location');
-
   const { data, error } = await supabase
     .from('profiles')
     .update({ ...updates, updated_at: new Date().toISOString() })
@@ -133,10 +74,9 @@ export async function getEquipment(filters?: {
     query = query.eq('owner_id', filters.ownerId);
   }
   if (filters?.search) {
-    const sanitizedSearch = sanitizeSearchTerm(filters.search);
-    if (sanitizedSearch) {
-      query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%`);
-    }
+    // Sanitize search input to prevent SQL injection
+    const sanitizedSearch = sanitizeInput(filters.search);
+    query = query.or(`title.ilike.%${sanitizedSearch}%,description.ilike.%${sanitizedSearch}%,brand.ilike.%${sanitizedSearch}%`);
   }
   if (filters?.minPrice !== undefined) {
     query = query.gte('daily_rate', filters.minPrice);
@@ -188,31 +128,6 @@ export async function getEquipmentById(id: string): Promise<Equipment | null> {
 }
 
 export async function createEquipment(equipment: Omit<Equipment, 'id' | 'created_at' | 'updated_at' | 'rating' | 'total_reviews' | 'total_bookings'>): Promise<Equipment> {
-  enforceMaxLength(equipment.title, 'equipmentTitle', 'Title');
-  enforceMaxLength(equipment.description, 'equipmentDescription', 'Description');
-  enforceMaxLength(equipment.brand, 'equipmentBrand', 'Brand');
-  enforceMaxLength(equipment.model, 'equipmentModel', 'Model');
-  enforceMaxLength(equipment.location, 'locationText', 'Location');
-
-  // Guard against pricing/rental-window values that would publish a broken or
-  // un-bookable listing (negative rates, or min > max so no range validates).
-  if (!(equipment.daily_rate > 0)) {
-    throw new Error('Daily rate must be greater than 0.');
-  }
-  if (equipment.deposit_amount != null && equipment.deposit_amount < 0) {
-    throw new Error('Deposit amount cannot be negative.');
-  }
-  if (equipment.min_rental_days != null && equipment.min_rental_days < 1) {
-    throw new Error('Minimum rental days must be at least 1.');
-  }
-  if (
-    equipment.min_rental_days != null &&
-    equipment.max_rental_days != null &&
-    equipment.max_rental_days < equipment.min_rental_days
-  ) {
-    throw new Error('Maximum rental days cannot be less than minimum rental days.');
-  }
-
   const { data, error } = await supabase
     .from('equipment')
     .insert(equipment)
@@ -224,12 +139,6 @@ export async function createEquipment(equipment: Omit<Equipment, 'id' | 'created
 }
 
 export async function updateEquipment(id: string, updates: Partial<Equipment>): Promise<Equipment> {
-  enforceMaxLength(updates.title, 'equipmentTitle', 'Title');
-  enforceMaxLength(updates.description, 'equipmentDescription', 'Description');
-  enforceMaxLength(updates.brand, 'equipmentBrand', 'Brand');
-  enforceMaxLength(updates.model, 'equipmentModel', 'Model');
-  enforceMaxLength(updates.location, 'locationText', 'Location');
-
   // Fetch current price before update to detect changes
   let previousDailyRate: number | undefined;
   if (updates.daily_rate !== undefined) {
@@ -250,13 +159,9 @@ export async function updateEquipment(id: string, updates: Partial<Equipment>): 
 
   if (error) throw error;
 
-  // Notify favoriting users if price dropped. Background, non-blocking,
-  // but forward failures to Sentry so price-drop notifications going
-  // silently dark gets noticed.
+  // Notify favoriting users if price dropped
   if (previousDailyRate !== undefined && updates.daily_rate !== undefined && updates.daily_rate < previousDailyRate) {
-    trackPriceChange(id, previousDailyRate, updates.daily_rate).catch((e) => {
-      reportDatabaseError('updateEquipment.trackPriceChange', e, { equipmentId: id });
-    });
+    trackPriceChange(id, previousDailyRate, updates.daily_rate).catch(() => {});
   }
 
   return data;
@@ -272,18 +177,10 @@ export async function deleteEquipment(id: string): Promise<void> {
 }
 
 async function incrementEquipmentViews(equipmentId: string): Promise<void> {
-  // Non-blocking — view-count is best-effort — but Sentry should see it
-  // if the RPC starts failing in production so we know analytics is off.
-  // supabase.rpc resolves with { error } on PostgREST failures rather
-  // than rejecting, so we need to check BOTH shapes: the resolved
-  // error AND any actually-thrown exception (network, runtime).
   try {
-    const { error } = await supabase.rpc('increment_view_count', { equipment_id: equipmentId });
-    if (error) {
-      reportDatabaseError('incrementEquipmentViews', error, { equipmentId });
-    }
-  } catch (e) {
-    reportDatabaseError('incrementEquipmentViews', e, { equipmentId });
+    await supabase.rpc('increment_view_count', { equipment_id: equipmentId });
+  } catch {
+    // Silently ignore view count errors
   }
 }
 
@@ -334,7 +231,7 @@ export async function getBookingById(id: string): Promise<Booking | null> {
   return data;
 }
 
-export async function createBooking(booking: Omit<Booking, 'id' | 'created_at' | 'updated_at'> & { listing_id?: string | null }): Promise<Booking> {
+export async function createBooking(booking: Omit<Booking, 'id' | 'created_at' | 'updated_at'>): Promise<Booking> {
   const { data, error } = await supabase
     .from('bookings')
     .insert(booking)
@@ -354,69 +251,6 @@ export async function updateBookingStatus(id: string, status: Booking['status'])
     .single();
 
   if (error) throw error;
-
-  // Send notification for booking status changes.
-  // For confirmed: the DB trigger (on_booking_confirmed) handles the in-app notification row,
-  // so we only fire the push notification here to avoid a duplicate in-app insert.
-  // For cancelled/completed: we insert the in-app notification AND send a push.
-  if (status === 'confirmed' || status === 'cancelled' || status === 'completed') {
-    const pushType = status as 'confirmed' | 'cancelled' | 'completed';
-    const equipmentName = data.equipment?.title || 'Equipment';
-    const dates = `${data.start_date} to ${data.end_date}`;
-    const ownerName = data.equipment?.owner?.full_name;
-
-    void (async () => {
-      try {
-        if (status === 'cancelled' || status === 'completed') {
-          const notificationType = status === 'cancelled' ? 'booking_cancelled' : 'booking_completed';
-          const title = status === 'cancelled' ? '❌ Booking Cancelled' : '🎉 Rental Completed!';
-          const message = status === 'cancelled'
-            ? `Your booking for ${equipmentName} has been cancelled`
-            : `Your rental of ${equipmentName} is complete. Leave a review!`;
-
-          // supabase.from(...).insert resolves with { error } on
-          // PostgREST failures (RLS, table missing, etc.) instead of
-          // rejecting — explicitly check it.
-          const { error: insertError } = await supabase.from('notifications').insert({
-            user_id: data.renter_id,
-            type: notificationType,
-            title,
-            message,
-            data: { booking_id: data.id },
-            is_read: false,
-            created_at: new Date().toISOString(),
-          });
-          if (insertError) {
-            reportDatabaseError('booking.notification.insert', insertError, {
-              bookingId: data.id,
-              notificationType,
-            });
-          }
-        }
-
-        // sendBookingNotification catches internally and resolves a
-        // success boolean — it never rejects. Await and check.
-        const { sendBookingNotification } = await import('./pushNotifications');
-        const pushed = await sendBookingNotification(data.renter_id, pushType, {
-          equipmentName,
-          dates,
-          ownerName,
-        });
-        if (!pushed) {
-          errorMonitoring.captureMessage(
-            `Push notification failed for booking ${data.id} (${pushType})`,
-            'warning'
-          );
-        }
-      } catch (e) {
-        // Catches actually-thrown exceptions (dynamic-import failure,
-        // runtime errors). Most PostgREST failures land in the
-        // explicit { error } checks above.
-        reportDatabaseError('booking.notify.outer', e, { bookingId: data.id });
-      }
-    })();
-  }
-
   return data;
 }
 
@@ -442,8 +276,7 @@ export async function getEquipmentAvailability(equipmentId: string, startDate?: 
 }
 
 export async function checkAvailability(equipmentId: string, startDate: string, endDate: string): Promise<boolean> {
-  // Check equipment_availability (blocked dates)
-  const { data: blocked, error: blockedError } = await supabase
+  const { data, error } = await supabase
     .from('equipment_availability')
     .select('id')
     .eq('equipment_id', equipmentId)
@@ -451,25 +284,8 @@ export async function checkAvailability(equipmentId: string, startDate: string, 
     .gte('end_date', startDate)
     .limit(1);
 
-  if (blockedError) {
-    // If table doesn't exist yet, fall back to checking bookings
-    console.warn('equipment_availability check failed, falling back to bookings check');
-  } else if (blocked && blocked.length > 0) {
-    return false;
-  }
-
-  // Also check active bookings directly
-  const { data: bookings, error: bookingsError } = await supabase
-    .from('bookings')
-    .select('id')
-    .eq('equipment_id', equipmentId)
-    .in('status', ['pending', 'confirmed', 'active'])
-    .lte('start_date', endDate)
-    .gte('end_date', startDate)
-    .limit(1);
-
-  if (bookingsError) throw bookingsError;
-  return !bookings || bookings.length === 0;
+  if (error) throw error;
+  return !data || data.length === 0;
 }
 
 export async function blockDates(equipmentId: string, startDate: string, endDate: string, reason: EquipmentAvailability['reason']): Promise<EquipmentAvailability> {
@@ -525,9 +341,6 @@ export async function getReviews(filters: {
 }
 
 export async function createReview(review: Omit<Review, 'id' | 'created_at' | 'response'>): Promise<Review> {
-  enforceMaxLength(review.title, 'reviewTitle', 'Review title');
-  enforceMaxLength(review.comment, 'reviewComment', 'Review');
-
   const { data, error } = await supabase
     .from('reviews')
     .insert(review)
@@ -536,131 +349,6 @@ export async function createReview(review: Omit<Review, 'id' | 'created_at' | 'r
 
   if (error) throw error;
   return data;
-}
-
-
-export async function addReviewResponse(reviewId: string, response: string): Promise<Review> {
-  enforceMaxLength(response, 'reviewResponse', 'Response');
-
-  const { data, error } = await supabase
-    .from("reviews")
-    .update({ response })
-    .eq("id", reviewId)
-    .select("*, reviewer:profiles!reviews_reviewer_id_fkey(*)")
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-export async function handlePaymentStatusUpdate(
-  bookingId: string,
-  paymentStatus: 'paid' | 'refunded' | 'failed'
-): Promise<void> {
-  // Get booking details with relations
-  const { data: booking, error: bookingError } = await supabase
-    .from('bookings')
-    .select('*, equipment:equipment(*), renter:profiles!bookings_renter_id_fkey(*), owner:profiles!bookings_owner_id_fkey(*)')
-    .eq('id', bookingId)
-    .single();
-
-  if (bookingError) throw bookingError;
-  if (!booking) return;
-
-  // Determine notification type and details
-  let notificationType: string;
-  let title: string;
-  let message: string;
-  let notificationUser: string;
-
-  if (paymentStatus === 'paid') {
-    notificationType = 'payment_received';
-    title = '💰 Payment Received';
-    message = `Payment of $${booking.total_amount.toFixed(2)} received for your ${booking.equipment?.title} rental`;
-    notificationUser = booking.owner_id; // Notify the owner
-  } else if (paymentStatus === 'refunded') {
-    notificationType = 'payment_refunded';
-    title = '↩️ Payment Refunded';
-    message = `Your $${booking.total_amount.toFixed(2)} refund has been processed`;
-    notificationUser = booking.renter_id; // Notify the renter
-  } else {
-    notificationType = 'payment_failed';
-    title = '❌ Payment Failed';
-    message = `Payment failed for your ${booking.equipment?.title} rental. Please try again.`;
-    notificationUser = booking.renter_id; // Notify the renter
-  }
-
-  const notification = {
-    user_id: notificationUser,
-    type: notificationType,
-    title,
-    message,
-    data: { booking_id: booking.id },
-    is_read: false,
-    created_at: new Date().toISOString(),
-  };
-
-  void (async () => {
-    try {
-      // PostgREST failures resolve with { error } — check explicitly.
-      const { error: insertError } = await supabase.from('notifications').insert(notification);
-      if (insertError) {
-        reportDatabaseError('payment.notification.insert', insertError, {
-          bookingId: booking.id,
-          notificationType,
-        });
-      }
-      // sendPushNotification catches internally and resolves { success }
-      // — never rejects. Await and check the boolean.
-      const { sendPushNotification } = await import('./pushNotifications');
-      const result = await sendPushNotification(notificationUser, {
-        title,
-        body: message,
-        tag: `payment-${booking.id}`,
-        url: '/dashboard?tab=bookings',
-      });
-      if (!result.success) {
-        errorMonitoring.captureMessage(
-          `Push notification failed for payment ${booking.id} (${notificationType})`,
-          'warning'
-        );
-      }
-    } catch (e) {
-      reportDatabaseError('payment.notify.outer', e, { bookingId: booking.id });
-    }
-  })();
-}
-
-export async function updatePaymentStatus(
-  paymentId: string,
-  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded'
-): Promise<void> {
-  // Get payment details
-  const { data: payment, error: paymentError } = await supabase
-    .from('payments')
-    .select('id, booking_id, status')
-    .eq('id', paymentId)
-    .single();
-
-  if (paymentError) throw paymentError;
-  if (!payment) return;
-
-  // Update payment status (this will trigger the on_payment_status_change trigger)
-  const { error: updateError } = await supabase
-    .from('payments')
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq('id', paymentId);
-
-  if (updateError) throw updateError;
-
-  // Send notification based on payment status
-  if (status === 'completed' && payment.status !== 'completed') {
-    await handlePaymentStatusUpdate(payment.booking_id, 'paid');
-  } else if (status === 'refunded' && payment.status !== 'refunded') {
-    await handlePaymentStatusUpdate(payment.booking_id, 'refunded');
-  } else if (status === 'failed' && payment.status !== 'failed') {
-    await handlePaymentStatusUpdate(payment.booking_id, 'failed');
-  }
 }
 
 export async function getFavorites(userId: string): Promise<Favorite[]> {
@@ -710,13 +398,13 @@ export async function getNotifications(userId: string, unreadOnly = false): Prom
   let query = supabase
     .from('notifications')
     .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(50);
+    .eq('user_id', userId);
 
   if (unreadOnly) {
     query = query.eq('is_read', false);
   }
+
+  query = query.order('created_at', { ascending: false }).limit(50);
 
   const { data, error } = await query;
 
@@ -754,38 +442,22 @@ export async function getUnreadNotificationCount(userId: string): Promise<number
   return count || 0;
 }
 
-
-export async function getUnreadMessageCount(userId: string): Promise<number> {
-  // Get conversations this user is in
-  const { data: convs } = await supabase
-    .from('conversations')
-    .select('id')
-    .contains('participants', [userId]);
-
-  if (!convs || convs.length === 0) return 0;
-
-  const convIds = convs.map((c: { id: string }) => c.id);
-
-  const { count, error } = await supabase
-    .from('messages')
-    .select('id', { count: 'exact', head: true })
-    .in('conversation_id', convIds)
-    .neq('sender_id', userId)
-    .eq('is_read', false);
-
-  if (error) return 0;
-  return count || 0;
-}
-
 export async function getConversations(userId: string): Promise<Conversation[]> {
   const { data, error } = await supabase
-    .from('conversations')
-    .select('*')
-    .contains('participants', [userId])
-    .order('last_message_at', { ascending: false, nullsFirst: false });
+    .from('conversation_participants')
+    .select(`
+      conversation:conversations(
+        *,
+        equipment:equipment(*),
+        messages(*, sender:profiles!messages_sender_id_fkey(*))
+      )
+    `)
+    .eq('user_id', userId)
+    .order('conversation(updated_at)', { ascending: false });
 
   if (error) throw error;
-  return (data || []) as unknown as Conversation[];
+
+  return (data || []).map(d => d.conversation).filter(Boolean) as unknown as Conversation[];
 }
 
 export async function getMessages(conversationId: string): Promise<Message[]> {
@@ -806,41 +478,49 @@ export async function sendMessage(message: {
   content: string;
   equipmentId?: string;
 }): Promise<Message> {
-  enforceMaxLength(message.content, 'messageContent', 'Message');
-
   const { data, error } = await supabase
     .from('messages')
     .insert({
       conversation_id: message.conversationId,
       sender_id: message.senderId,
+      receiver_id: message.receiverId,
       content: message.content,
+      equipment_id: message.equipmentId,
     })
     .select('*, sender:profiles!messages_sender_id_fkey(*)')
     .single();
 
   if (error) throw error;
 
-  // Update conversation's last_message and last_message_at
   await supabase
     .from('conversations')
-    .update({
-      last_message: message.content,
-      last_message_at: new Date().toISOString(),
-    })
+    .update({ updated_at: new Date().toISOString() })
     .eq('id', message.conversationId);
 
   return data;
 }
 
-export async function createConversation(participants: string[], _equipmentId?: string): Promise<Conversation> {
+export async function createConversation(participants: string[], equipmentId?: string): Promise<Conversation> {
   const { data: conversation, error: convError } = await supabase
     .from('conversations')
-    .insert({ participants })
+    .insert({ equipment_id: equipmentId })
     .select()
     .single();
 
   if (convError) throw convError;
-  return conversation as unknown as Conversation;
+
+  const participantInserts = participants.map(userId => ({
+    conversation_id: conversation.id,
+    user_id: userId,
+  }));
+
+  const { error: partError } = await supabase
+    .from('conversation_participants')
+    .insert(participantInserts);
+
+  if (partError) throw partError;
+
+  return conversation;
 }
 
 export async function getUserAnalytics(userId: string): Promise<UserAnalytics | null> {
@@ -933,13 +613,8 @@ export async function logAuditEvent(event: {
   entityId?: string;
   metadata?: Record<string, unknown>;
 }): Promise<void> {
-  // Audit log writes are non-blocking, but a long-running outage means
-  // we're losing compliance evidence — Sentry should see it. supabase
-  // resolves with { error } for PostgREST failures (RLS, table missing,
-  // constraint) rather than rejecting, so we check BOTH: the resolved
-  // error AND any thrown exception.
   try {
-    const { error } = await supabase
+    await supabase
       .from('audit_logs')
       .insert({
         user_id: event.userId,
@@ -948,17 +623,8 @@ export async function logAuditEvent(event: {
         entity_id: event.entityId,
         metadata: event.metadata || {},
       });
-    if (error) {
-      reportDatabaseError('logAuditEvent', error, {
-        action: event.action,
-        userId: event.userId,
-      });
-    }
-  } catch (e) {
-    reportDatabaseError('logAuditEvent', e, {
-      action: event.action,
-      userId: event.userId,
-    });
+  } catch {
+    // Silently ignore audit log errors
   }
 }
 
@@ -1275,10 +941,7 @@ export async function createBulkBooking(booking: Omit<BulkBookingRecord, 'id' | 
     .select()
     .single();
 
-  if (error) {
-    reportDatabaseError('createBulkBooking', error, { renterId: booking.renter_id });
-    return null;
-  }
+  if (error) return null;
   return data;
 }
 
@@ -1348,26 +1011,20 @@ export async function getMarketplaceInsights(): Promise<MarketplaceInsight> {
 // ============================================
 
 export async function trackPriceChange(equipmentId: string, oldPrice: number, newPrice: number): Promise<void> {
-  // Get users who favorited this equipment. Supabase resolves with
-  // { error } for PostgREST failures rather than rejecting, so capture
-  // it before treating !favorites as "nobody favorited this".
-  const { data: favorites, error: favError } = await supabase
+  // Get users who favorited this equipment
+  const { data: favorites } = await supabase
     .from('favorites')
     .select('user_id')
     .eq('equipment_id', equipmentId);
 
-  if (favError) {
-    reportDatabaseError('trackPriceChange.favoritesQuery', favError, { equipmentId });
-    return;
-  }
   if (!favorites || favorites.length === 0) return;
 
   // Create price drop alerts for each user
   if (newPrice < oldPrice) {
     const discount = Math.round(((oldPrice - newPrice) / oldPrice) * 100);
-
+    
     for (const fav of favorites) {
-      const alert = await createAlert({
+      await createAlert({
         user_id: fav.user_id,
         type: 'price_drop',
         title: 'Price Drop Alert!',
@@ -1378,103 +1035,7 @@ export async function trackPriceChange(equipmentId: string, oldPrice: number, ne
         data: { oldPrice, newPrice, discount },
         action_url: `/equipment/${equipmentId}`,
       });
-      // createAlert returns null on failure (it swallows the underlying
-      // error). Without this, a wholesale price-drop notification outage
-      // would be undetectable.
-      if (alert === null) {
-        errorMonitoring.captureMessage(
-          `Price-drop createAlert returned null for equipment ${equipmentId}`,
-          'warning'
-        );
-      }
     }
   }
-}
-
-
-// ============================================
-// Review Functions
-// ============================================
-
-export interface ReviewSubmission {
-  bookingId: string;
-  equipmentId: string;
-  reviewerId: string;
-  revieweeId: string;
-  rating: number;
-  title: string;
-  comment: string;
-  aspectRatings?: {
-    condition: number;
-    cleanliness: number;
-    accuracy: number;
-    communication: number;
-    value: number;
-  };
-  photos?: string[];
-  wouldRecommend?: boolean;
-}
-
-export async function submitReview(data: ReviewSubmission): Promise<void> {
-  enforceMaxLength(data.title, 'reviewTitle', 'Review title');
-  enforceMaxLength(data.comment, 'reviewComment', 'Review');
-
-  const { error } = await supabase.from('reviews').insert({
-    booking_id: data.bookingId,
-    listing_id: data.equipmentId, // reviews table uses listing_id
-    equipment_id: data.equipmentId,
-    reviewer_id: data.reviewerId,
-    reviewee_id: data.revieweeId,
-    rating: data.rating,
-    title: data.title,
-    comment: data.comment,
-    review_type: 'renter_to_owner',
-    is_equipment_review: true,
-    aspect_condition: data.aspectRatings?.condition,
-    aspect_cleanliness: data.aspectRatings?.cleanliness,
-    aspect_accuracy: data.aspectRatings?.accuracy,
-    aspect_communication: data.aspectRatings?.communication,
-    aspect_value: data.aspectRatings?.value,
-    photos: data.photos ?? [],
-    would_recommend: data.wouldRecommend ?? true,
-  });
-
-  if (error) throw error;
-}
-
-// Check if the current user can review a booking
-// Rules: booking must be 'completed', user must be the renter, no existing review
-export async function canReviewBooking(bookingId: string, userId: string): Promise<boolean> {
-  const [bookingRes, existingRes] = await Promise.all([
-    supabase
-      .from('bookings')
-      .select('id, status, renter_id')
-      .eq('id', bookingId)
-      .single(),
-    supabase
-      .from('reviews')
-      .select('id')
-      .eq('booking_id', bookingId)
-      .eq('reviewer_id', userId)
-      .maybeSingle(),
-  ]);
-
-  const booking = bookingRes.data;
-  if (!booking) return false;
-  if (booking.renter_id !== userId) return false;
-  if (booking.status !== 'completed') return false;
-  if (existingRes.data) return false; // already reviewed
-
-  return true;
-}
-
-// Fetch all reviews for a booking/reviewer (to show "already reviewed" state in UI)
-export async function getReviewedBookingIds(userId: string): Promise<Set<string>> {
-  const { data } = await supabase
-    .from('reviews')
-    .select('booking_id')
-    .eq('reviewer_id', userId);
-
-  return new Set((data ?? []).map(r => r.booking_id));
 }
 

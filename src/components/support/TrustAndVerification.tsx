@@ -111,7 +111,7 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -122,7 +122,7 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
           Back to Islakayd
         </Button>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-green-600 to-green-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -147,20 +147,20 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
             <div className="max-w-4xl mx-auto">
               {/* Trust Features */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Trust & Safety Features</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Trust & Safety Features</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   {trustFeatures.map((feature, index) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
+                    <div key={index} className="bg-gray-50 rounded-lg p-6">
                       <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-lg flex items-center justify-center mr-4">
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
                           {feature.icon}
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
+                        <h3 className="text-xl font-semibold text-gray-900">{feature.title}</h3>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 mb-4">{feature.description}</p>
+                      <p className="text-gray-600 mb-4">{feature.description}</p>
                       <ul className="space-y-2">
                         {feature.details.map((detail, idx) => (
-                          <li key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                          <li key={idx} className="text-sm text-gray-600 flex items-center">
                             <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
                             {detail}
                           </li>
@@ -173,25 +173,25 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
 
               {/* Verification Levels */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Verification Levels</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Verification Levels</h2>
                 <div className="grid md:grid-cols-3 gap-6">
                   {verificationLevels.map((level, index) => (
-                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                       <div className="text-center mb-4">
                         <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-2 ${
-                          level.badge === 'Bronze' ? 'bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-300' :
-                          level.badge === 'Silver' ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' :
-                          'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300'
+                          level.badge === 'Bronze' ? 'bg-orange-100 text-orange-800' :
+                          level.badge === 'Silver' ? 'bg-gray-100 text-gray-800' :
+                          'bg-yellow-100 text-yellow-800'
                         }`}>
                           {level.badge} Badge
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{level.level}</h3>
+                        <h3 className="text-xl font-semibold text-gray-900">{level.level}</h3>
                       </div>
                       <div className="mb-4">
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">Requirements:</h4>
+                        <h4 className="font-medium text-gray-900 mb-2">Requirements:</h4>
                         <ul className="space-y-1">
                           {level.requirements.map((req, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                            <li key={idx} className="text-sm text-gray-600 flex items-center">
                               <CheckCircle className="w-3 h-3 text-green-600 mr-2 flex-shrink-0" />
                               {req}
                             </li>
@@ -199,10 +199,10 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
                         </ul>
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900 dark:text-white mb-2">Benefits:</h4>
+                        <h4 className="font-medium text-gray-900 mb-2">Benefits:</h4>
                         <ul className="space-y-1">
                           {level.benefits.map((benefit, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 dark:text-gray-400">• {benefit}</li>
+                            <li key={idx} className="text-sm text-gray-600">• {benefit}</li>
                           ))}
                         </ul>
                       </div>
@@ -213,16 +213,16 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
 
               {/* Trust Indicators */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Trust Indicators</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Trust Indicators</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {trustIndicators.map((indicator, index) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 flex items-center">
+                    <div key={index} className="bg-gray-50 rounded-lg p-4 flex items-center">
                       <div className="mr-3">
                         {indicator.icon}
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900 dark:text-white">{indicator.indicator}</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{indicator.description}</p>
+                        <h4 className="font-medium text-gray-900">{indicator.indicator}</h4>
+                        <p className="text-sm text-gray-600">{indicator.description}</p>
                       </div>
                     </div>
                   ))}
@@ -231,48 +231,48 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
 
               {/* Dispute Resolution */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Dispute Resolution Process</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Dispute Resolution Process</h2>
                 <div className="grid md:grid-cols-4 gap-6">
                   {disputeResolution.map((step, index) => (
                     <div key={index} className="text-center">
-                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400 font-bold">
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold">
                         {step.step}
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{step.title}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{step.description}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
+                      <p className="text-sm text-gray-600">{step.description}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Trust Stats */}
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-8 mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Trust by the Numbers</h2>
+              <div className="bg-green-50 rounded-lg p-8 mb-16">
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Trust by the Numbers</h2>
                 <div className="grid md:grid-cols-4 gap-6 text-center">
                   <div>
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">98%</div>
-                    <div className="text-gray-600 dark:text-gray-400">Positive Reviews</div>
+                    <div className="text-3xl font-bold text-green-600 mb-2">98%</div>
+                    <div className="text-gray-600">Positive Reviews</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">24/7</div>
-                    <div className="text-gray-600 dark:text-gray-400">Support Available</div>
+                    <div className="text-3xl font-bold text-green-600 mb-2">24/7</div>
+                    <div className="text-gray-600">Support Available</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">$10M+</div>
-                    <div className="text-gray-600 dark:text-gray-400">Insurance Coverage</div>
+                    <div className="text-3xl font-bold text-green-600 mb-2">$10M+</div>
+                    <div className="text-gray-600">Insurance Coverage</div>
                   </div>
                   <div>
-                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">99.9%</div>
-                    <div className="text-gray-600 dark:text-gray-400">Uptime</div>
+                    <div className="text-3xl font-bold text-green-600 mb-2">99.9%</div>
+                    <div className="text-gray-600">Uptime</div>
                   </div>
                 </div>
               </div>
 
               {/* Get Verified CTA */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-8 text-center">
-                <Eye className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Get Verified Today</h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <div className="bg-blue-50 rounded-lg p-8 text-center">
+                <Eye className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Verified Today</h2>
+                <p className="text-gray-600 mb-6">
                   Join thousands of verified users and build trust in our community. Verification takes just a few minutes and unlocks premium features.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -283,7 +283,7 @@ export default function TrustAndVerification({ onBack }: TrustAndVerificationPro
                     Learn About Verification
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+                <p className="text-sm text-gray-500 mt-4">
                   Verification helps protect both renters and owners. All information is encrypted and secure.
                 </p>
               </div>

@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react';
 import { Shield, DollarSign, AlertTriangle, CheckCircle, FileText, Camera } from 'lucide-react';
 
@@ -127,22 +127,22 @@ export default function DamageReportWizard({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Equipment Return Check</h2>
-                <p className="text-gray-600 dark:text-gray-400">{equipmentTitle}</p>
+                <h2 className="text-xl font-bold text-gray-900">Equipment Return Check</h2>
+                <p className="text-gray-600">{equipmentTitle}</p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
              >
               ✕
             </button>
@@ -150,11 +150,11 @@ export default function DamageReportWizard({
 
           {/* Progress */}
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+            <div className="flex justify-between text-sm text-gray-600 mb-1">
               <span>Step {step} of 3</span>
               <span>{checkedCount}/{checklist.length} items checked</span>
             </div>
-            <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300"
                 style={{ width: `${(step / 3) * 100}%` }}
@@ -168,23 +168,23 @@ export default function DamageReportWizard({
           {/* Step 1: Checklist */}
           {step === 1 && (
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Inspection Checklist</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">Inspection Checklist</h3>
               
               {checklist.map((item) => (
                 <div
                   key={item.id}
                   className={`p-4 rounded-xl border-2 transition-all ${
                     item.status === 'ok'
-                      ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'
+                      ? 'border-green-200 bg-green-50'
                       : item.status === 'issue'
-                      ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'
-                      : 'border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50'
+                      ? 'border-red-200 bg-red-50'
+                      : 'border-gray-200 bg-gray-50'
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-white">{item.label}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">{item.description}</div>
+                      <div className="font-medium text-gray-900">{item.label}</div>
+                      <div className="text-sm text-gray-500">{item.description}</div>
                     </div>
                     
                     <div className="flex gap-2">
@@ -193,7 +193,7 @@ export default function DamageReportWizard({
                         className={`p-2 rounded-lg transition-all ${
                           item.status === 'ok'
                             ? 'bg-green-500 text-white'
-                            : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400 hover:bg-green-100 dark:hover:bg-green-900/30'
+                            : 'bg-gray-200 text-gray-600 hover:bg-green-100'
                         }`}
                       >
                         <CheckCircle className="w-5 h-5" />
@@ -203,7 +203,7 @@ export default function DamageReportWizard({
                         className={`p-2 rounded-lg transition-all ${
                           item.status === 'issue'
                             ? 'bg-red-500 text-white'
-                            : 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30'
+                            : 'bg-gray-200 text-gray-600 hover:bg-red-100'
                         }`}
                       >
                         <AlertTriangle className="w-5 h-5" />
@@ -216,7 +216,7 @@ export default function DamageReportWizard({
                       placeholder="Describe the issue..."
                       value={item.notes || ''}
                       onChange={(e) => updateChecklistItem(item.id, 'issue', e.target.value)}
-                      className="mt-3 w-full p-3 border border-red-200 dark:border-red-800 rounded-lg text-sm resize-none dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                      className="mt-3 w-full p-3 border border-red-200 rounded-lg text-sm resize-none"
                       rows={2}
                     />
                   )}
@@ -228,10 +228,10 @@ export default function DamageReportWizard({
           {/* Step 2: Photos & Details */}
           {step === 2 && (
             <div className="space-y-6">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Photo Documentation</h3>
+              <h3 className="font-semibold text-gray-900">Photo Documentation</h3>
               
               {/* Photo Upload */}
-              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center">
                 <input
                   type="file"
                   accept="image/*"
@@ -245,7 +245,7 @@ export default function DamageReportWizard({
                   className="cursor-pointer flex flex-col items-center"
                 >
                   <Camera className="w-12 h-12 text-gray-400 mb-3" />
-                  <span className="text-gray-600 dark:text-gray-400">Click to upload photos</span>
+                  <span className="text-gray-600">Click to upload photos</span>
                   <span className="text-sm text-gray-400">or drag and drop</span>
                 </label>
               </div>
@@ -276,14 +276,14 @@ export default function DamageReportWizard({
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Additional Notes
                 </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Add any additional details about the equipment condition..."
-                  className="w-full p-4 border border-gray-200 dark:border-gray-600 rounded-xl resize-none dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  className="w-full p-4 border border-gray-200 rounded-xl resize-none"
                   rows={4}
                 />
               </div>
@@ -293,27 +293,27 @@ export default function DamageReportWizard({
           {/* Step 3: Review & Submit */}
           {step === 3 && (
             <div className="space-y-6">
-              <h3 className="font-semibold text-gray-900 dark:text-white">Review & Submit</h3>
+              <h3 className="font-semibold text-gray-900">Review & Submit</h3>
 
               {/* Summary */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Condition Assessment</div>
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="text-sm text-gray-500 mb-1">Condition Assessment</div>
                   <div className={`inline-flex px-3 py-1 rounded-full text-sm font-medium capitalize ${getSeverityColor(severity)}`}>
                     {severity === 'none' ? 'No Issues' : `${severity} Damage`}
                   </div>
                 </div>
                 
-                <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                  <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Estimated Cost</div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <div className="text-sm text-gray-500 mb-1">Estimated Cost</div>
+                  <div className="text-2xl font-bold text-gray-900">
                     ${estimatedCost.toFixed(2)}
                   </div>
                 </div>
               </div>
 
               {/* Deposit Info */}
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+              <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
                 <div className="flex items-center gap-2 text-blue-700 mb-2">
                   <DollarSign className="w-5 h-5" />
                   <span className="font-medium">Deposit Information</span>
@@ -330,7 +330,7 @@ export default function DamageReportWizard({
 
               {/* Issues Summary */}
               {issueCount > 0 && (
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-800">
+                <div className="p-4 bg-red-50 rounded-xl border border-red-100">
                   <div className="flex items-center gap-2 text-red-700 mb-2">
                     <AlertTriangle className="w-5 h-5" />
                     <span className="font-medium">{issueCount} Issue(s) Reported</span>
@@ -352,7 +352,7 @@ export default function DamageReportWizard({
               {/* Photos */}
               {photos.length > 0 && (
                 <div>
-                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{photos.length} Photo(s) Attached</div>
+                  <div className="text-sm font-medium text-gray-700 mb-2">{photos.length} Photo(s) Attached</div>
                   <div className="flex gap-2">
                     {photos.slice(0, 4).map((photo, index) => {
                       // Sanitize photo URL to prevent javascript: or data: URLs
@@ -366,7 +366,7 @@ export default function DamageReportWizard({
                       );
                     })}
                     {photos.length > 4 && (
-                      <div className="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
+                      <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 text-sm">
                         +{photos.length - 4}
                       </div>
                     )}
@@ -378,11 +378,11 @@ export default function DamageReportWizard({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+        <div className="p-6 border-t border-gray-200 flex justify-between">
           {step > 1 ? (
             <button
               onClick={() => setStep(step - 1)}
-              className="px-6 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="px-6 py-2 text-gray-600 hover:text-gray-900 transition-colors"
             >
               Back
             </button>

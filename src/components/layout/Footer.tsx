@@ -1,5 +1,5 @@
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
-import Logo from '../ui/Logo';
+import LogoPro from '../branding/LogoPro';
 
 const socialLinks = [
   { Icon: Facebook, url: import.meta.env.VITE_FACEBOOK_URL, label: 'Facebook' },
@@ -24,7 +24,6 @@ export default function Footer({ onNavigate }: FooterProps) {
       { label: 'Vehicles', page: 'browse', category: 'vehicles' },
     ],
     'List Equipment': [
-      { label: 'Why list your gear', page: 'owners' },
       { label: 'Start Listing', page: 'list-equipment' },
       { label: 'Pricing Calculator', page: 'pricing-calculator' },
       { label: 'Insurance Options', page: 'insurance' },
@@ -54,7 +53,7 @@ export default function Footer({ onNavigate }: FooterProps) {
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
             <a href="/" className="inline-block mb-6">
-              <Logo size="md" inverse />
+              <LogoPro variant="light" size="md" showText={true} />
             </a>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               The world's most advanced equipment rental marketplace. Rent anything, anywhere, powered by AI.

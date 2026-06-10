@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Zap,
   CheckCircle,
@@ -99,42 +99,18 @@ export default function QuickRent({
   const endDate = new Date();
   endDate.setDate(endDate.getDate() + selectedDuration.days);
 
-  // Hold the countdown interval so it can be cleared on unmount; otherwise
-  // setCountdown keeps firing on an unmounted component if the user closes
-  // the modal mid-countdown.
-  const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (countdownIntervalRef.current) {
-        clearInterval(countdownIntervalRef.current);
-      }
-    };
-  }, []);
-
   // Handle quick rent
   const handleQuickRent = async () => {
     if (!selectedPayment) return;
-    // Re-entry guard: a previous Quick Rent click may still be counting
-    // down. Clear that interval before starting a new one — otherwise the
-    // old interval is orphaned (ref now points at the new one) and keeps
-    // firing setCountdown + eventually processRent() a second time.
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-      countdownIntervalRef.current = null;
-    }
 
     setShowConfirmation(true);
     setCountdown(3);
 
     // Countdown
-    countdownIntervalRef.current = setInterval(() => {
+    const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
-          if (countdownIntervalRef.current) {
-            clearInterval(countdownIntervalRef.current);
-            countdownIntervalRef.current = null;
-          }
+          clearInterval(interval);
           processRent();
           return 0;
         }
@@ -164,10 +140,6 @@ export default function QuickRent({
   };
 
   const cancelQuickRent = () => {
-    if (countdownIntervalRef.current) {
-      clearInterval(countdownIntervalRef.current);
-      countdownIntervalRef.current = null;
-    }
     setShowConfirmation(false);
     setCountdown(3);
   };
@@ -205,7 +177,7 @@ export default function QuickRent({
             {/* Requirements */}
             <div className="text-left space-y-3 mb-6">
               <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                userTrustScore >= 80 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'
+                userTrustScore >= 80 ? 'bg-green-50' : 'bg-gray-50'
               }`}>
                 {userTrustScore >= 80 ? (
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -215,7 +187,7 @@ export default function QuickRent({
                 <span className="text-sm">Trust Score 80+ (yours: {userTrustScore})</span>
               </div>
               <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                savedPaymentMethods.length > 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'
+                savedPaymentMethods.length > 0 ? 'bg-green-50' : 'bg-gray-50'
               }`}>
                 {savedPaymentMethods.length > 0 ? (
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -225,7 +197,7 @@ export default function QuickRent({
                 <span className="text-sm">Saved payment method</span>
               </div>
               <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                equipment.instant_book ? 'bg-green-50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-700'
+                equipment.instant_book ? 'bg-green-50' : 'bg-gray-50'
               }`}>
                 {equipment.instant_book ? (
                   <CheckCircle className="w-5 h-5 text-green-600" />
@@ -257,7 +229,6 @@ export default function QuickRent({
             <div className="relative p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
               <button
                 onClick={onClose}
-                aria-label="Close quick rent"
                 className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30"
               >
                 <X className="w-5 h-5" />
@@ -342,7 +313,7 @@ export default function QuickRent({
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <MapPin className="w-5 h-5 text-gray-600" />
                   <div className="text-left">
                     <span className="block font-medium text-gray-900 dark:text-white">Pickup</span>
                     <span className="text-xs text-gray-500">Free</span>
@@ -356,7 +327,7 @@ export default function QuickRent({
                       : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  <Truck className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <Truck className="w-5 h-5 text-gray-600" />
                   <div className="text-left">
                     <span className="block font-medium text-gray-900 dark:text-white">Delivery</span>
                     <span className="text-xs text-gray-500">+$49</span>

@@ -91,23 +91,23 @@ export default function InsuranceOptions({
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}>
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+    <div className={`bg-white rounded-2xl border border-gray-200 overflow-hidden ${className}`}>
+      <div className="p-4 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-teal-500" />
-            <h3 className="font-semibold text-gray-900 dark:text-white">Protection Plans</h3>
+            <h3 className="font-semibold text-gray-900">Protection Plans</h3>
           </div>
           <button
             aria-label="Toggle protection plan information" onClick={() => setShowInfo(!showInfo)}
-            className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors"
           >
             <Info className="w-4 h-4 text-gray-400" />
           </button>
         </div>
 
         {showInfo && (
-          <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-sm text-blue-700 dark:text-blue-300">
+          <div className="mt-3 p-3 bg-blue-50 rounded-xl text-sm text-blue-700">
             <p>
               Protection plans cover accidental damage, theft, and more. Choose a plan
               that fits your needs for peace of mind during your rental.
@@ -122,8 +122,8 @@ export default function InsuranceOptions({
           className={`
             w-full p-4 rounded-xl border-2 transition-all text-left
             ${!selectedPlan
-              ? 'border-gray-300 bg-gray-50 dark:bg-gray-700/50 dark:border-gray-500'
-              : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+              ? 'border-gray-300 bg-gray-50'
+              : 'border-gray-200 hover:border-gray-300'
             }
           `}
         >
@@ -137,11 +137,11 @@ export default function InsuranceOptions({
               >
                 {!selectedPlan && <Check className="w-3 h-3 text-white" />}
               </div>
-              <span className="font-medium text-gray-700 dark:text-gray-300">No Protection</span>
+              <span className="font-medium text-gray-700">No Protection</span>
             </div>
-            <span className="text-gray-500 dark:text-gray-400">$0</span>
+            <span className="text-gray-500">$0</span>
           </div>
-          <p className="ml-8 mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p className="ml-8 mt-1 text-sm text-gray-500">
             You will be responsible for any damage or loss
           </p>
         </button>
@@ -157,8 +157,8 @@ export default function InsuranceOptions({
               className={`
                 rounded-xl border-2 transition-all overflow-hidden
                 ${isSelected
-                  ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-900/30'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  ? 'border-teal-500 bg-teal-50/50'
+                  : 'border-gray-200 hover:border-gray-300'
                 }
                 ${plan.recommended && !isSelected ? 'ring-2 ring-teal-200' : ''}
               `}
@@ -179,23 +179,23 @@ export default function InsuranceOptions({
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 dark:text-white">{plan.name}</span>
+                        <span className="font-medium text-gray-900">{plan.name}</span>
                         {plan.recommended && (
-                          <span className="px-2 py-0.5 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-xs font-medium rounded-full">
+                          <span className="px-2 py-0.5 bg-teal-100 text-teal-700 text-xs font-medium rounded-full">
                             Recommended
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500">
                         Coverage up to {plan.coverage}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-gray-900">
                       ${planPrice.toLocaleString()}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-xs text-gray-500">
                       {plan.price}% of rental
                     </p>
                   </div>
@@ -204,7 +204,7 @@ export default function InsuranceOptions({
 
               <button
                 onClick={() => toggleExpand(plan.id)}
-                className="w-full px-4 py-2 border-t border-gray-100 dark:border-gray-700 flex items-center justify-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="w-full px-4 py-2 border-t border-gray-100 flex items-center justify-center gap-1 text-sm text-gray-500 hover:bg-gray-50 transition-colors"
               >
                 {isExpanded ? 'Hide details' : 'Show details'}
                 {isExpanded ? (
@@ -215,19 +215,19 @@ export default function InsuranceOptions({
               </button>
 
               {isExpanded && (
-                <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-700">
+                <div className="px-4 pb-4 border-t border-gray-100">
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500 dark:text-gray-400">Deductible</span>
-                      <span className="font-medium text-gray-900 dark:text-white">
+                      <span className="text-gray-500">Deductible</span>
+                      <span className="font-medium text-gray-900">
                         {plan.deductible === 0 ? 'None' : `$${plan.deductible}`}
                       </span>
                     </div>
-                    <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Includes:</p>
+                    <div className="pt-2 border-t border-gray-100">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Includes:</p>
                       <ul className="space-y-1.5">
                         {plan.features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                          <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
                             <Check className="w-4 h-4 text-teal-500 mt-0.5 flex-shrink-0" />
                             {feature}
                           </li>
@@ -242,10 +242,10 @@ export default function InsuranceOptions({
         })}
       </div>
 
-      <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border-t border-amber-100 dark:border-amber-800/30">
+      <div className="p-4 bg-amber-50 border-t border-amber-100">
         <div className="flex items-start gap-2">
           <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-700 dark:text-amber-400">
+          <p className="text-sm text-amber-700">
             Protection plans are optional but recommended. Without protection, you may be
             liable for repair or replacement costs up to the full value of the equipment.
           </p>

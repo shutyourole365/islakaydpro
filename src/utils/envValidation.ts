@@ -114,9 +114,7 @@ export function logValidationResults(result: ValidationResult): void {
   }
 
   if (result.isValid && result.warnings.length === 0) {
-    if (import.meta.env.DEV) {
-      console.log('✅ Environment validation passed');
-    }
+    console.log('✅ Environment validation passed');
   }
 }
 

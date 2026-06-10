@@ -35,7 +35,6 @@ vi.mock('../services/database', () => ({
     total_spent: 1000,
   })),
   getUnreadNotificationCount: vi.fn(() => Promise.resolve(3)),
-  getUnreadMessageCount: vi.fn(() => Promise.resolve(0)),
   subscribeToNotifications: vi.fn(() => ({
     unsubscribe: vi.fn(),
   })),
@@ -263,19 +262,6 @@ describe('AuthContext', () => {
         { maxAttempts: 3, delayMs: 1000 }
       );
     });
-
-    // The original (pre-friendly-message) error should be forwarded to
-    // Sentry with a nested auth context so triage isn't blind to the
-    // root cause behind a generic "Invalid email or password" toast.
-    const { errorMonitoring } = await import('../services/errorMonitoring');
-    await waitFor(() => {
-      expect(errorMonitoring.captureException).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'Invalid credentials' }),
-        expect.objectContaining({
-          auth: expect.objectContaining({ source: 'AuthContext.signIn' }),
-        })
-      );
-    });
   });
 
   it('should handle sign up', async () => {
@@ -309,69 +295,6 @@ describe('AuthContext', () => {
         { maxAttempts: 3, delayMs: 1000 }
       );
     });
-  });
-
-  it('should forward signUp errors to errorMonitoring with auth context', async () => {
-    const { signUpWithRetry, getAuthErrorMessage } = await import('../services/authHelpers');
-    (signUpWithRetry as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error('network down')
-    );
-    (getAuthErrorMessage as ReturnType<typeof vi.fn>).mockReturnValue('Sign-up failed');
-
-    const user = userEvent.setup();
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('ready');
-    });
-    await user.click(screen.getByTestId('sign-up'));
-
-    const { errorMonitoring } = await import('../services/errorMonitoring');
-    await waitFor(() => {
-      expect(errorMonitoring.captureException).toHaveBeenCalledWith(
-        expect.objectContaining({ message: 'network down' }),
-        expect.objectContaining({
-          auth: expect.objectContaining({ source: 'AuthContext.signUp' }),
-        })
-      );
-    });
-  });
-
-  it('should NOT forward EMAIL_CONFIRMATION_REQUIRED through errorMonitoring (expected flow)', async () => {
-    const { signUpWithRetry, isEmailConfirmationRequired } = await import('../services/authHelpers');
-    const mockUser = { id: 'pending-user-id', email: 'pending@example.com' };
-    (signUpWithRetry as ReturnType<typeof vi.fn>).mockResolvedValue({
-      user: mockUser,
-      session: null,
-    });
-    (isEmailConfirmationRequired as ReturnType<typeof vi.fn>).mockResolvedValue(true);
-
-    const { errorMonitoring } = await import('../services/errorMonitoring');
-    (errorMonitoring.captureException as Mock).mockClear();
-
-    const user = userEvent.setup();
-    render(
-      <AuthProvider>
-        <AuthConsumer />
-      </AuthProvider>
-    );
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('ready');
-    });
-    await user.click(screen.getByTestId('sign-up'));
-
-    // Give the rethrow a microtask to settle, then assert no capture call
-    // happened for the expected-flow signal.
-    await new Promise((r) => setTimeout(r, 50));
-    const calls = (errorMonitoring.captureException as Mock).mock.calls;
-    expect(
-      calls.some(([, ctx]) =>
-        (ctx as { auth?: { source?: string } })?.auth?.source === 'AuthContext.signUp'
-      )
-    ).toBe(false);
   });
 
   it('should handle sign out', async () => {

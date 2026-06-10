@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { useToast } from '../ui/Toast';
 
 interface RentalAgreementGeneratorProps {
   onBack: () => void;
@@ -42,10 +41,10 @@ interface Agreement {
 }
 
 const STATUS_CONFIG = {
-  pending: { label: 'Awaiting Signatures', bg: 'bg-amber-50 dark:bg-amber-900/20', text: 'text-amber-700 dark:text-amber-300', icon: Clock },
-  owner_signed: { label: 'Owner Signed', bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'text-blue-700 dark:text-blue-300', icon: Pen },
-  fully_signed: { label: 'Fully Signed', bg: 'bg-green-50 dark:bg-green-900/20', text: 'text-green-700 dark:text-green-300', icon: CheckCircle },
-  voided: { label: 'Voided', bg: 'bg-gray-50 dark:bg-gray-700', text: 'text-gray-600 dark:text-gray-400', icon: XCircle },
+  pending: { label: 'Awaiting Signatures', bg: 'bg-amber-50', text: 'text-amber-700', icon: Clock },
+  owner_signed: { label: 'Owner Signed', bg: 'bg-blue-50', text: 'text-blue-700', icon: Pen },
+  fully_signed: { label: 'Fully Signed', bg: 'bg-green-50', text: 'text-green-700', icon: CheckCircle },
+  voided: { label: 'Voided', bg: 'bg-gray-50', text: 'text-gray-600', icon: XCircle },
 };
 
 const STANDARD_TERMS = `
@@ -111,7 +110,6 @@ Renter: ${agreement.renter_signed_at ? `Signed on ${new Date(agreement.renter_si
 
 export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAgreementGeneratorProps) {
   const { user } = useAuth();
-  const { addToast } = useToast();
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [selected, setSelected] = useState<Agreement | null>(null);
   const [loading, setLoading] = useState(true);
@@ -127,18 +125,9 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
       .select(`*, owner:profiles!rental_agreements_owner_id_fkey(full_name), renter:profiles!rental_agreements_renter_id_fkey(full_name)`)
       .or(`owner_id.eq.${user.id},renter_id.eq.${user.id}`)
       .order('created_at', { ascending: false });
-    if (error) {
-      console.error('Failed to load agreements:', error);
-      addToast({
-        type: 'error',
-        title: 'Could not load agreements',
-        message: error.message,
-      });
-    } else {
-      setAgreements((data || []) as Agreement[]);
-    }
+    if (!error) setAgreements((data || []) as Agreement[]);
     setLoading(false);
-  }, [user, addToast]);
+  }, [user]);
 
   useEffect(() => { loadAgreements(); }, [loadAgreements]);
 
@@ -153,7 +142,7 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
         .single();
 
       if (bError || !booking) {
-        addToast({ type: 'error', title: 'Booking not found', message: 'Please check the ID and try again.' });
+        alert('Booking not found. Please check the ID.');
         return;
       }
 
@@ -166,7 +155,7 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
         .maybeSingle();
 
       if (existing) {
-        addToast({ type: 'warning', title: 'Agreement exists', message: 'A rental agreement already exists for this booking.' });
+        alert('An agreement already exists for this booking.');
         await loadAgreements();
         return;
       }
@@ -253,35 +242,35 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
     const renterName = selected.renter?.full_name || 'Renter';
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
+      <div className="min-h-screen bg-gray-50 pt-20">
         <div className="max-w-3xl mx-auto px-4 py-8">
-          <button onClick={() => setSelected(null)} className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors">
+          <button onClick={() => setSelected(null)} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors">
             <ArrowLeft className="w-5 h-5" /> Back to Agreements
           </button>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Rental Agreement</h2>
+              <h2 className="text-xl font-bold text-gray-900">Rental Agreement</h2>
               <span className={`flex items-center gap-1.5 px-3 py-1 ${cfg.bg} ${cfg.text} rounded-full text-sm font-medium`}>
                 <Icon className="w-4 h-4" /> {cfg.label}
               </span>
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 font-mono text-xs text-gray-700 dark:text-gray-300 whitespace-pre-wrap overflow-auto max-h-96 mb-6">
+            <div className="bg-gray-50 rounded-xl p-4 font-mono text-xs text-gray-700 whitespace-pre-wrap overflow-auto max-h-96 mb-6">
               {generateAgreementText(selected, ownerName, renterName)}
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Owner ({ownerName})</p>
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs text-gray-500 mb-1">Owner ({ownerName})</p>
                 {selected.owner_signed_at ? (
                   <p className="text-sm text-green-600 font-medium flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Signed {new Date(selected.owner_signed_at).toLocaleDateString()}</p>
                 ) : (
                   <p className="text-sm text-amber-600 flex items-center gap-1"><Clock className="w-4 h-4" /> Pending</p>
                 )}
               </div>
-              <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Renter ({renterName})</p>
+              <div className="p-3 bg-gray-50 rounded-xl">
+                <p className="text-xs text-gray-500 mb-1">Renter ({renterName})</p>
                 {selected.renter_signed_at ? (
                   <p className="text-sm text-green-600 font-medium flex items-center gap-1"><CheckCircle className="w-4 h-4" /> Signed {new Date(selected.renter_signed_at).toLocaleDateString()}</p>
                 ) : (
@@ -293,7 +282,7 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
             <div className="flex gap-3">
               <button
                 onClick={() => handleDownload(selected)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <Download className="w-4 h-4" /> Download
               </button>
@@ -316,46 +305,46 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 pt-24 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
-          <button onClick={onBack} className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+          <button onClick={onBack} className="text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Rental Agreements</h1>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Digital contracts for your rentals</p>
+            <h1 className="text-2xl font-bold text-gray-900">Rental Agreements</h1>
+            <p className="text-gray-500 text-sm">Digital contracts for your rentals</p>
           </div>
         </div>
 
         {/* Generate new */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Generate Agreement from Booking</h3>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+          <h3 className="font-semibold text-gray-900 mb-4">Generate Agreement from Booking</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Booking ID</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Booking ID</label>
               <input
                 value={bookingIdInput}
                 onChange={e => setBookingIdInput(e.target.value)}
                 placeholder="Paste your booking ID"
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Special Terms (optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Special Terms (optional)</label>
               <textarea
                 value={specialTerms}
                 onChange={e => setSpecialTerms(e.target.value)}
                 rows={2}
                 placeholder="Any additional terms for this rental..."
-                className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
               />
             </div>
             <button
@@ -370,16 +359,16 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
         </div>
 
         {/* Protection note */}
-        <div className="flex items-center gap-3 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-xl border border-teal-100 dark:border-teal-800/40 mb-6">
-          <Shield className="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
-          <p className="text-sm text-teal-800 dark:text-teal-300">Signed agreements provide legal protection for both parties. Both owner and renter must sign before the rental begins.</p>
+        <div className="flex items-center gap-3 p-4 bg-teal-50 rounded-xl border border-teal-100 mb-6">
+          <Shield className="w-5 h-5 text-teal-600 flex-shrink-0" />
+          <p className="text-sm text-teal-800">Signed agreements provide legal protection for both parties. Both owner and renter must sign before the rental begins.</p>
         </div>
 
         {/* Agreement list */}
         {agreements.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <FileText className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400">No agreements yet. Generate one from a booking above.</p>
+          <div className="text-center py-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">No agreements yet. Generate one from a booking above.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -387,13 +376,13 @@ export default function RentalAgreementGenerator({ onBack, bookingId }: RentalAg
               const cfg = STATUS_CONFIG[a.status];
               const Icon = cfg.icon;
               return (
-                <button key={a.id} onClick={() => setSelected(a)} className="w-full bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow text-left flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                <button key={a.id} onClick={() => setSelected(a)} className="w-full bg-white rounded-2xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow text-left flex items-center gap-4">
+                  <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
                     <Package className="w-5 h-5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 dark:text-white truncate">{a.equipment_title}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(a.start_date).toLocaleDateString()} – {new Date(a.end_date).toLocaleDateString()} · ${a.total_amount.toFixed(2)}</p>
+                    <p className="font-semibold text-gray-900 truncate">{a.equipment_title}</p>
+                    <p className="text-sm text-gray-500">{new Date(a.start_date).toLocaleDateString()} – {new Date(a.end_date).toLocaleDateString()} · ${a.total_amount.toFixed(2)}</p>
                   </div>
                   <span className={`flex items-center gap-1.5 px-3 py-1 ${cfg.bg} ${cfg.text} rounded-full text-xs font-medium flex-shrink-0`}>
                     <Icon className="w-3.5 h-3.5" /> {cfg.label}

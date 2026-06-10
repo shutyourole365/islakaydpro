@@ -100,18 +100,13 @@ describe('AI Assistant Integration', () => {
     });
 
     it('should stream response chunks correctly', async () => {
-      // mock underlying fetch response for streamMessage with SSE stream body
-      const sseData = 'data: {"type":"delta","text":"streaming "}\ndata: {"type":"delta","text":"text"}\ndata: {"type":"done","suggestions":["a","b"]}\n';
-      const encoder = new TextEncoder();
-      const stream = new ReadableStream({
-        start(controller) {
-          controller.enqueue(encoder.encode(sseData));
-          controller.close();
-        }
-      });
+      // mock underlying fetch response for streamMessage
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
         ok: true,
-        body: stream,
+        json: () => Promise.resolve({
+          content: 'streaming text',
+          suggestions: ['a','b'],
+        }),
       });
 
       const { streamMessage } = await import('../services/ai');

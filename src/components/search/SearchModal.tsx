@@ -110,10 +110,10 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-3xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
-        <div className="p-6 border-b border-gray-100 dark:border-gray-700">
+      <div className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+        <div className="p-6 border-b border-gray-100">
           <div className="flex items-center gap-4">
-            <div className="flex-1 flex items-center gap-3 bg-gray-50 dark:bg-gray-700 rounded-2xl px-4 py-3">
+            <div className="flex-1 flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3">
               <Search className="w-5 h-5 text-gray-400" />
               <input
                 ref={inputRef}
@@ -121,12 +121,12 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search for equipment, tools, vehicles..."
-                className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none text-lg"
+                className="flex-1 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none text-lg"
               />
               {query && (
                 <button
                   aria-label="Clear search query" onClick={() => setQuery('')}
-                  className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                  className="p-1 rounded-full hover:bg-gray-200 transition-colors"
                 >
                   <X className="w-4 h-4 text-gray-400" />
                 </button>
@@ -135,9 +135,9 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
             <button
               onClick={onClose}
               aria-label="Close search"
-              className="p-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-3 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <X className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+              <X className="w-6 h-6 text-gray-500" />
             </button>
           </div>
 
@@ -146,33 +146,33 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
               onClick={() => setShowFilters(!showFilters)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${
                 showFilters
-                  ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300'
-                  : 'border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-500'
+                  ? 'border-teal-500 bg-teal-50 text-teal-700'
+                  : 'border-gray-200 text-gray-600 hover:border-gray-300'
               }`}
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filters
             </button>
 
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600">
               <MapPin className="w-4 h-4" />
               <input
                 type="text"
                 placeholder="Location"
                 value={filters.location}
                 onChange={(e) => setFilters({ ...filters, location: e.target.value })}
-                className="bg-transparent focus:outline-none w-28 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="bg-transparent focus:outline-none w-28"
               />
             </div>
 
-            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400">
+            <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600">
               <Calendar className="w-4 h-4" />
               <input
                 type="text"
                 placeholder="Dates"
                 value={filters.dateRange}
                 onChange={(e) => setFilters({ ...filters, dateRange: e.target.value })}
-                className="bg-transparent focus:outline-none w-24 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="bg-transparent focus:outline-none w-24"
               />
             </div>
 
@@ -180,7 +180,7 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
               value={filters.category}
               onChange={(e) => setFilters({ ...filters, category: e.target.value })}
               aria-label="Filter by category"
-              className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 focus:outline-none focus:border-teal-500"
+              className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 bg-white focus:outline-none focus:border-teal-500"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat === 'All Categories' ? '' : cat}>
@@ -192,10 +192,10 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
         </div>
 
         {showFilters && (
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+          <div className="p-6 border-b border-gray-100 bg-gray-50">
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Price Range (per day)
                 </label>
                 <div className="flex items-center gap-4">
@@ -207,7 +207,7 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
                         setFilters({ ...filters, priceMin: Number(e.target.value) })
                       }
                       placeholder="Min"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
                     />
                   </div>
                   <span className="text-gray-400">-</span>
@@ -219,21 +219,21 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
                         setFilters({ ...filters, priceMax: Number(e.target.value) })
                       }
                       placeholder="Max"
-                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
                     />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Condition
                 </label>
                 <div className="flex items-center gap-2">
                   {['Any', 'New', 'Excellent', 'Good'].map((condition) => (
                     <button
                       key={condition}
-                      className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-sm text-gray-600 dark:text-gray-400 hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                      className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-600 hover:border-teal-500 hover:text-teal-600 transition-colors"
                      >
                       {condition}
                     </button>
@@ -247,8 +247,8 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
         <div className="max-h-[400px] overflow-y-auto">
           {!query && (
             <>
-              <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                   <Clock className="w-4 h-4" />
                   Recent Searches
                 </div>
@@ -257,9 +257,9 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
                     <button
                       key={index}
                       onClick={() => setQuery(search)}
-                      className="flex items-center justify-between w-full px-4 py-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
+                      className="flex items-center justify-between w-full px-4 py-3 rounded-xl hover:bg-gray-50 transition-colors text-left"
                     >
-                      <span className="text-gray-700 dark:text-gray-300">{search}</span>
+                      <span className="text-gray-700">{search}</span>
                       <ArrowRight className="w-4 h-4 text-gray-400" />
                     </button>
                   ))}
@@ -267,7 +267,7 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
               </div>
 
               <div className="p-6">
-                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                   <TrendingUp className="w-4 h-4" />
                   Trending Searches
                 </div>
@@ -276,11 +276,11 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
                     <button
                       key={index}
                       onClick={() => setQuery(item.query)}
-                      className="flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-left"
+                      className="flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-left"
                     >
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{item.query}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{item.count}</p>
+                        <p className="font-medium text-gray-900">{item.query}</p>
+                        <p className="text-sm text-gray-500">{item.count}</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-gray-400" />
                     </button>
@@ -300,7 +300,7 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
                       <li key={suggestion}>
                         <button
                           onClick={() => { onSearch(suggestion, filters); onClose(); }}
-                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm flex items-center gap-2"
+                          className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 text-sm flex items-center gap-2"
                         >
                           <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
                           {suggestion}
@@ -310,7 +310,7 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
                   </ul>
                 </div>
               )}
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-sm text-gray-500 mb-4">
                 Press Enter to search for "{query}"
               </p>
               <button
@@ -324,17 +324,17 @@ export default function SearchModal({ isOpen, onClose, onSearch }: SearchModalPr
           )}
         </div>
 
-        <div className="px-6 py-4 bg-gray-50 dark:bg-gray-800/80 border-t border-gray-100 dark:border-gray-700">
-          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <div className="flex items-center justify-between text-sm text-gray-500">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
-                <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-xs">
+                <kbd className="px-2 py-1 bg-white rounded border border-gray-200 text-xs">
                   Enter
                 </kbd>
                 to search
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600 text-xs">
+                <kbd className="px-2 py-1 bg-white rounded border border-gray-200 text-xs">
                   Esc
                 </kbd>
                 to close

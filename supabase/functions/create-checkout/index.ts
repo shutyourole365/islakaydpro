@@ -104,7 +104,7 @@ serve(async (req) => {
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
       {
         price_data: {
-          currency: 'aud',
+          currency: 'usd',
           product_data: {
             name: body.equipmentTitle,
             description: `${body.totalDays} day rental (${body.startDate} to ${body.endDate})`,
@@ -116,10 +116,10 @@ serve(async (req) => {
       },
       {
         price_data: {
-          currency: 'aud',
+          currency: 'usd',
           product_data: {
             name: 'Service Fee',
-            description: 'Platform service fee (10%)',
+            description: 'Platform service fee (12%)',
           },
           unit_amount: Math.round(body.serviceFee * 100),
         },
@@ -127,7 +127,7 @@ serve(async (req) => {
       },
       {
         price_data: {
-          currency: 'aud',
+          currency: 'usd',
           product_data: {
             name: 'Refundable Security Deposit',
             description: 'Returned after equipment is returned in good condition',
@@ -142,7 +142,7 @@ serve(async (req) => {
     if (body.insuranceAmount && body.insuranceAmount > 0) {
       lineItems.push({
         price_data: {
-          currency: 'aud',
+          currency: 'usd',
           product_data: {
             name: 'Rental Protection Insurance',
             description: 'Coverage for accidental damage during rental period',
@@ -156,7 +156,7 @@ serve(async (req) => {
     // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
-      payment_method_types: ['card', 'au_becs_debit'],
+      payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
       success_url: `${body.successUrl}?session_id={CHECKOUT_SESSION_ID}&booking_id=${body.bookingId}`,
@@ -178,7 +178,8 @@ serve(async (req) => {
         // Capture payment immediately
         capture_method: 'automatic',
       },
-      billing_address_collection: 'auto',
+      // Add billing address collection
+      billing_address_collection: 'required',
       // Add phone number collection
       phone_number_collection: {
         enabled: true,

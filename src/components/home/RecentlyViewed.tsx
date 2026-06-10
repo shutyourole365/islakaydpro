@@ -24,13 +24,13 @@ export default function RecentlyViewed({ onEquipmentClick, onFavoriteClick, favo
   if (items.length === 0) return null;
 
   return (
-    <section className="py-12 bg-white dark:bg-gray-950">
+    <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/40 rounded-lg flex items-center justify-center">
-            <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+            <Clock className="w-4 h-4 text-amber-600" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recently Viewed</h2>
+          <h2 className="text-xl font-bold text-gray-900">Recently Viewed</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {items.map(item => (

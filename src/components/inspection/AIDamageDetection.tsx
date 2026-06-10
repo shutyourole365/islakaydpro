@@ -1,4 +1,4 @@
- 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useRef, useCallback } from 'react';
 import {
   Camera,
@@ -16,8 +16,6 @@ import {
   Info,
 } from 'lucide-react';
 import ProgressBar from '../ui/ProgressBar';
-import { useToast } from '../ui/Toast';
-import { supabase } from '../../lib/supabase';
 
 interface AIDamageDetectionProps {
   equipmentId: string;
@@ -58,7 +56,6 @@ export default function AIDamageDetection({
   onComplete,
   onClose,
 }: AIDamageDetectionProps) {
-  const { addToast } = useToast();
   // equipmentTitle reserved for display in future enhancement
   const [photos, setPhotos] = useState<string[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
@@ -83,11 +80,7 @@ export default function AIDamageDetection({
       }
     } catch (err) {
       console.error('Camera error:', err);
-      addToast({
-        type: 'error',
-        title: 'Camera unavailable',
-        message: 'Could not access camera. Please upload photos instead.',
-      });
+      alert('Could not access camera. Please upload photos instead.');
     }
   };
 
@@ -134,53 +127,44 @@ export default function AIDamageDetection({
 
   const analyzePhotos = async () => {
     if (photos.length === 0) {
-      addToast({
-        type: 'warning',
-        title: 'No photos yet',
-        message: 'Please add at least one photo to analyze.',
-      });
+      alert('Please add at least one photo to analyze');
       return;
     }
 
     setAnalyzing(true);
 
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    // Simulate AI analysis
+    await new Promise(resolve => setTimeout(resolve, 3000));
 
-      const response = await fetch(`${supabaseUrl}/functions/v1/analyze-damage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session?.access_token ?? anonKey}`,
-          apikey: anonKey,
-        },
-        body: JSON.stringify({
-          photos,
-          equipmentTitle: _equipmentTitle,
-          type,
-        }),
-      });
+    // Generate mock damage detection results
+    const mockDamages: DetectedDamage[] = [
+      {
+        id: '1',
+        type: 'scratch',
+        severity: 'minor',
+        location: 'Front panel, upper right',
+        confidence: 0.94,
+        boundingBox: { x: 60, y: 20, width: 15, height: 8 },
+        estimatedCost: 45,
+        description: 'Surface scratch approximately 3cm in length. Does not affect functionality.',
+      },
+      {
+        id: '2',
+        type: 'wear',
+        severity: 'minor',
+        location: 'Handle grip',
+        confidence: 0.87,
+        boundingBox: { x: 10, y: 50, width: 20, height: 30 },
+        estimatedCost: 0,
+        description: 'Normal wear on handle grip consistent with regular use.',
+      },
+    ];
 
-      const payload = await response.json();
-      if (!response.ok || payload.error) {
-        throw new Error(payload.error || `Analysis failed (HTTP ${response.status})`);
-      }
-
-      const results: DetectedDamage[] = Array.isArray(payload.damages) ? payload.damages : [];
-      setDamages(results);
-      setAnalyzed(true);
-    } catch (err) {
-      console.error('Damage analysis error:', err);
-      addToast({
-        type: 'error',
-        title: 'Analysis failed',
-        message: err instanceof Error ? err.message : 'Please try again in a moment.',
-      });
-    } finally {
-      setAnalyzing(false);
-    }
+    // Randomly decide if there are damages
+    const hasDamages = Math.random() > 0.4;
+    setDamages(hasDamages ? mockDamages : []);
+    setAnalyzed(true);
+    setAnalyzing(false);
   };
 
   const generateReport = useCallback((): DamageReport => {
@@ -237,7 +221,7 @@ export default function AIDamageDetection({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-4xl my-8">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl my-8">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-orange-500 to-red-500 rounded-t-3xl text-white">
           <div className="flex items-center justify-between">
@@ -268,7 +252,7 @@ export default function AIDamageDetection({
             <>
               {/* Photo Capture Section */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Capture Equipment Photos
                 </h3>
                 
@@ -301,20 +285,20 @@ export default function AIDamageDetection({
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <button
                       onClick={startCamera}
-                      className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-700 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-600 hover:border-orange-300 hover:bg-orange-50 dark:hover:bg-gray-600 transition-colors"
+                      className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors"
                      >
                       <Camera className="w-12 h-12 text-gray-400 mb-3" />
-                      <span className="font-medium text-gray-700 dark:text-gray-300">Take Photo</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">Use camera</span>
+                      <span className="font-medium text-gray-700">Take Photo</span>
+                      <span className="text-sm text-gray-500">Use camera</span>
                     </button>
                     <button
-
+                     
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-700 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-600 hover:border-orange-300 hover:bg-orange-50 dark:hover:bg-gray-600 transition-colors"
+                      className="flex flex-col items-center justify-center p-8 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors"
                     >
                       <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                      <span className="font-medium text-gray-700 dark:text-gray-300">Upload Photos</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">From device</span>
+                      <span className="font-medium text-gray-700">Upload Photos</span>
+                      <span className="text-sm text-gray-500">From device</span>
                     </button>
                     <input
                       ref={fileInputRef}
@@ -352,7 +336,7 @@ export default function AIDamageDetection({
                     <button
                       aria-label="Add photos"
                       onClick={() => fileInputRef.current?.click()}
-                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-600 flex items-center justify-center text-gray-400 hover:border-orange-300 hover:text-orange-500 transition-colors"
+                      className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-orange-300 hover:text-orange-500 transition-colors"
                       title="Add photos"
                     >
                       <ImageIcon className="w-8 h-8" aria-hidden="true" />

@@ -97,7 +97,7 @@ export default function Safety({ onBack }: SafetyProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -108,7 +108,7 @@ export default function Safety({ onBack }: SafetyProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-red-600 to-red-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -129,20 +129,20 @@ export default function Safety({ onBack }: SafetyProps) {
             <div className="max-w-4xl mx-auto">
               {/* Safety Principles */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Safety Principles</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Safety Principles</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   {safetyPrinciples.map((principle, index) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6">
+                    <div key={index} className="bg-gray-50 rounded-lg p-6">
                       <div className="flex items-center mb-4">
-                        <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center mr-4">
+                        <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mr-4">
                           {principle.icon}
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{principle.title}</h3>
+                        <h3 className="text-xl font-semibold text-gray-900">{principle.title}</h3>
                       </div>
-                      <p className="text-gray-600 dark:text-gray-400 mb-4">{principle.description}</p>
+                      <p className="text-gray-600 mb-4">{principle.description}</p>
                       <ul className="space-y-2">
                         {principle.details.map((detail, idx) => (
-                          <li key={idx} className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                          <li key={idx} className="text-sm text-gray-600 flex items-center">
                             <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
                             {detail}
                           </li>
@@ -155,16 +155,16 @@ export default function Safety({ onBack }: SafetyProps) {
 
               {/* Safety Guidelines */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Safety Guidelines</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Safety Guidelines</h2>
                 <div className="space-y-8">
                   {safetyGuidelines.map((section, index) => (
-                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{section.category}</h3>
+                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4">{section.category}</h3>
                       <div className="grid md:grid-cols-2 gap-4">
                         {section.guidelines.map((guideline, idx) => (
                           <div key={idx} className="flex items-start">
                             <AlertTriangle className="w-5 h-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" />
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">{guideline}</p>
+                            <p className="text-gray-600 text-sm">{guideline}</p>
                           </div>
                         ))}
                       </div>
@@ -175,14 +175,14 @@ export default function Safety({ onBack }: SafetyProps) {
 
               {/* Equipment Safety Checklist */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Pre-Use Safety Checklist</h2>
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Pre-Use Safety Checklist</h2>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
                   <div className="flex items-center mb-4">
                     <Wrench className="w-6 h-6 text-yellow-600 mr-3" />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Before Using Any Equipment</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Before Using Any Equipment</h3>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                    <ul className="space-y-2 text-gray-700">
                       <li className="flex items-center">
                         <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
                         Inspect for visible damage or defects
@@ -200,7 +200,7 @@ export default function Safety({ onBack }: SafetyProps) {
                         Verify safety guards are in place
                       </li>
                     </ul>
-                    <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                    <ul className="space-y-2 text-gray-700">
                       <li className="flex items-center">
                         <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
                         Read and understand operating manual
@@ -224,25 +224,25 @@ export default function Safety({ onBack }: SafetyProps) {
 
               {/* Emergency Contacts */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Emergency Contacts</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Emergency Contacts</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   {emergencyContacts.map((contact, index) => (
-                    <div key={index} className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{contact.type}</h3>
-                      <p className="text-red-600 dark:text-red-400 font-medium text-lg mb-1">{contact.contact}</p>
-                      <p className="text-gray-600 dark:text-gray-400 mb-2">{contact.description}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Available: {contact.availability}</p>
+                    <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{contact.type}</h3>
+                      <p className="text-red-600 font-medium text-lg mb-1">{contact.contact}</p>
+                      <p className="text-gray-600 mb-2">{contact.description}</p>
+                      <p className="text-sm text-gray-500">Available: {contact.availability}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Safety Reporting */}
-              <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-8">
+              <div className="bg-red-50 rounded-lg p-8">
                 <div className="text-center mb-6">
                   <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Report Safety Concerns</h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Report Safety Concerns</h2>
+                  <p className="text-gray-600 mb-6">
                     If you encounter unsafe equipment, suspicious activity, or have safety concerns, please report them immediately.
                   </p>
                 </div>
@@ -254,7 +254,7 @@ export default function Safety({ onBack }: SafetyProps) {
                     View Safety Resources
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center">
+                <p className="text-sm text-gray-500 mt-4 text-center">
                   All reports are confidential and investigated promptly. Your safety concerns help make Islakayd safer for everyone.
                 </p>
               </div>

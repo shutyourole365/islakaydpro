@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   withRetry,
   RateLimiter,
@@ -17,67 +17,58 @@ describe('Network Utilities', () => {
     });
 
     it('should retry on failure and eventually succeed', async () => {
-      vi.useFakeTimers();
       const fn = vi.fn()
         .mockRejectedValueOnce(new Error('fail'))
         .mockResolvedValue('success');
 
-      const promise = withRetry(fn, {
-        maxRetries: 3,
-        baseDelay: 100,
-        retryOn: () => true,
+      const result = await withRetry(fn, { 
+        maxRetries: 3, 
+        baseDelay: 10, // Use small delay for tests
+        retryOn: () => true 
       });
-
-      await vi.runAllTimersAsync();
-      const result = await promise;
-
+      
       expect(result).toBe('success');
       expect(fn).toHaveBeenCalledTimes(2);
-      vi.useRealTimers();
     });
 
     it('should throw after max retries', async () => {
-      vi.useFakeTimers();
       const fn = vi.fn().mockRejectedValue(new Error('persistent error'));
 
-      const promise = withRetry(fn, {
-        maxRetries: 2,
-        baseDelay: 100,
-        retryOn: () => true,
-      });
-
-      await vi.runAllTimersAsync();
-      await expect(promise).rejects.toThrow('persistent error');
-      expect(fn).toHaveBeenCalledTimes(3);
-      vi.useRealTimers();
+      await expect(withRetry(fn, { 
+        maxRetries: 2, 
+        baseDelay: 10,
+        retryOn: () => true 
+      })).rejects.toThrow('persistent error');
+      
+      expect(fn).toHaveBeenCalledTimes(3); // initial + 2 retries
     });
 
     it('should not retry if retryOn returns false', async () => {
       const fn = vi.fn().mockRejectedValue(new Error('do not retry'));
 
-      await expect(withRetry(fn, {
-        maxRetries: 2,
-        retryOn: () => false,
+      await expect(withRetry(fn, { 
+        maxRetries: 2, 
+        retryOn: () => false 
       })).rejects.toThrow('do not retry');
-
+      
       expect(fn).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('RateLimiter', () => {
     it('should allow requests within limit', async () => {
-      const limiter = new RateLimiter({ maxRequests: 5, windowMs: 60000 });
-
+      const limiter = new RateLimiter({ maxRequests: 3, windowMs: 1000 });
+      
       await limiter.acquire();
       await limiter.acquire();
       await limiter.acquire();
-
-      // All should succeed immediately (tokens available)
+      
+      // All should succeed immediately
       expect(true).toBe(true);
     });
 
     it('should wrap functions with rate limiting', async () => {
-      const limiter = new RateLimiter({ maxRequests: 5, windowMs: 60000 });
+      const limiter = new RateLimiter({ maxRequests: 2, windowMs: 1000 });
       const fn = vi.fn().mockResolvedValue('result');
       const wrapped = limiter.wrap(fn);
 
@@ -121,7 +112,7 @@ describe('Network Utilities', () => {
     });
 
     it('should open after threshold failures', async () => {
-      const breaker = new CircuitBreaker(3, 60000);
+      const breaker = new CircuitBreaker(3, 1000);
       const fn = vi.fn().mockRejectedValue(new Error('fail'));
 
       for (let i = 0; i < 3; i++) {
@@ -132,7 +123,7 @@ describe('Network Utilities', () => {
     });
 
     it('should reject immediately when open', async () => {
-      const breaker = new CircuitBreaker(1, 60000);
+      const breaker = new CircuitBreaker(1, 1000);
       const fn = vi.fn().mockRejectedValue(new Error('fail'));
 
       await breaker.execute(fn).catch(() => {});
@@ -143,7 +134,7 @@ describe('Network Utilities', () => {
     });
 
     it('should reset on success', async () => {
-      const breaker = new CircuitBreaker(2, 60000);
+      const breaker = new CircuitBreaker(2, 1000);
       const failFn = vi.fn().mockRejectedValue(new Error('fail'));
       const successFn = vi.fn().mockResolvedValue('success');
 
@@ -155,26 +146,20 @@ describe('Network Utilities', () => {
   });
 
   describe('CacheWithTTL', () => {
-    beforeEach(() => {
-      vi.useFakeTimers();
-    });
-    afterEach(() => {
-      vi.useRealTimers();
-    });
-
     it('should store and retrieve values', () => {
       const cache = new CacheWithTTL();
       cache.set('key', 'value');
       expect(cache.get('key')).toBe('value');
     });
 
-    it('should expire values after TTL', () => {
-      const cache = new CacheWithTTL(50);
+    it('should expire values after TTL', async () => {
+      const cache = new CacheWithTTL(50); // 50ms TTL
       cache.set('key', 'value');
 
       expect(cache.get('key')).toBe('value');
 
-      vi.advanceTimersByTime(100);
+      // Wait for expiry
+      await new Promise(resolve => setTimeout(resolve, 60));
 
       expect(cache.get('key')).toBeUndefined();
     });
@@ -195,7 +180,7 @@ describe('Network Utilities', () => {
       const cache = new CacheWithTTL();
       cache.set('key1', 'value1');
       cache.set('key2', 'value2');
-
+      
       cache.clear();
 
       expect(cache.get('key1')).toBeUndefined();
@@ -206,7 +191,7 @@ describe('Network Utilities', () => {
       const cache = new CacheWithTTL();
       cache.set('key1', 'value1');
       cache.set('key2', 'value2');
-
+      
       cache.delete('key1');
 
       expect(cache.get('key1')).toBeUndefined();

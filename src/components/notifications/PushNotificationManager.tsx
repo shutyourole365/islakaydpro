@@ -1,224 +1,312 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Bell, BellOff, CheckCircle, XCircle, Loader } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/AuthContext';
-
-const VAPID_PUBLIC_KEY = 'BBjkO4vNGNtrQk0vucOPsrYVNGR9-lf1EY4NoYQDjwKooETldDqoeUEPFRLLm9sunv_Nm7G5f2xQ4b95TaMyCkA';
-
-function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
-  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray.buffer;
-}
+import { useState, useEffect } from 'react';
+import { Bell, BellOff, Settings, X } from 'lucide-react';
+import { Button } from '../ui/AccessibleComponents';
 
 interface PushNotificationManagerProps {
   className?: string;
-  compact?: boolean;
 }
 
-export default function PushNotificationManager({ className = '', compact = false }: PushNotificationManagerProps) {
-  const { user } = useAuth();
+export default function PushNotificationManager({ className = '' }: PushNotificationManagerProps) {
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
-  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   useEffect(() => {
-    if ('serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window) {
+    // Check if push notifications are supported
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
       setIsSupported(true);
       setPermission(Notification.permission);
-      checkSubscription();
+
+      // Check if already subscribed
+      checkSubscriptionStatus();
     }
   }, []);
 
-  const checkSubscription = useCallback(async () => {
+  const checkSubscriptionStatus = async () => {
     try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      setIsSubscribed(!!sub);
-    } catch {
-      // ignore
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      setIsSubscribed(!!subscription);
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
     }
-  }, []);
+  };
 
-  const subscribe = async () => {
-    if (!user) return;
+  const requestPermission = async () => {
+    try {
+      const result = await Notification.requestPermission();
+      setPermission(result);
+      return result === 'granted';
+    } catch (error) {
+      console.error('Error requesting permission:', error);
+      return false;
+    }
+  };
+
+  const subscribeToNotifications = async () => {
     setIsLoading(true);
-    setStatus('idle');
-
     try {
-      // Request permission
-      const perm = await Notification.requestPermission();
-      setPermission(perm);
-      if (perm !== 'granted') {
-        setStatus('error');
+      // Request permission first
+      const granted = await requestPermission();
+      if (!granted) {
+        alert('Notification permission denied. Please enable notifications in your browser settings.');
         return;
       }
 
-      // Register service worker if needed
-      let reg = await navigator.serviceWorker.ready;
-      if (!reg) {
-        reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-        await reg.update();
-      }
+      const registration = await navigator.serviceWorker.ready;
 
-      // Subscribe to push
-      const sub = await reg.pushManager.subscribe({
+      // You'll need to replace this with your actual VAPID public key
+      const vapidPublicKey = 'YOUR_VAPID_PUBLIC_KEY_HERE';
+
+      const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
       });
 
-      const subJson = sub.toJSON();
-
-      // Save subscription to Supabase via edge function
-      const { error } = await supabase.functions.invoke('push-notification', {
-        body: {
-          action: 'subscribe',
-          userId: user.id,
-          subscription: {
-            endpoint: subJson.endpoint,
-            keys: subJson.keys,
-          },
-          deviceInfo: {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-          },
-        },
-      });
-
-      if (error) throw error;
+      // Send subscription to your server
+      await sendSubscriptionToServer(subscription);
 
       setIsSubscribed(true);
-      setStatus('success');
-    } catch (err) {
-      console.error('Push subscribe error:', err);
-      setStatus('error');
+      alert('Successfully subscribed to notifications!');
+    } catch (error) {
+      console.error('Error subscribing to notifications:', error);
+      alert('Failed to subscribe to notifications. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const unsubscribe = async () => {
+  const unsubscribeFromNotifications = async () => {
     setIsLoading(true);
     try {
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.getSubscription();
-      if (sub) {
-        await supabase.functions.invoke('push-notification', {
-          body: { action: 'unsubscribe', endpoint: sub.endpoint },
-        });
-        await sub.unsubscribe();
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+
+      if (subscription) {
+        await subscription.unsubscribe();
+        await removeSubscriptionFromServer(subscription);
+        setIsSubscribed(false);
+        alert('Successfully unsubscribed from notifications.');
       }
-      setIsSubscribed(false);
-      setStatus('idle');
-    } catch (err) {
-      console.error('Push unsubscribe error:', err);
+    } catch (error) {
+      console.error('Error unsubscribing from notifications:', error);
+      alert('Failed to unsubscribe from notifications. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const sendSubscriptionToServer = async (subscription: PushSubscription) => {
+    // Send subscription to your backend
+    const response = await fetch('/api/push-subscription', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        subscription: subscription.toJSON(),
+        userId: 'current-user-id' // Replace with actual user ID
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to save subscription');
+    }
+  };
+
+  const removeSubscriptionFromServer = async (subscription: PushSubscription) => {
+    // Remove subscription from your backend
+    const response = await fetch('/api/push-subscription', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        endpoint: subscription.endpoint,
+        userId: 'current-user-id' // Replace with actual user ID
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to remove subscription');
+    }
+  };
+
+  const urlBase64ToUint8Array = (base64String: string) => {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
+
+  const testNotification = () => {
+    if (permission === 'granted') {
+      new Notification('Test Notification', {
+        body: 'This is a test notification from Islakayd!',
+        icon: '/icons/icon-192x192.png',
+        badge: '/icons/badge-72x72.png'
+      });
     }
   };
 
   if (!isSupported) {
-    return null; // Don't show if browser doesn't support it
-  }
-
-  if (compact) {
     return (
-      <button
-        onClick={isSubscribed ? unsubscribe : subscribe}
-        disabled={isLoading || permission === 'denied'}
-        title={
-          permission === 'denied'
-            ? 'Notifications blocked in browser settings'
-            : isSubscribed
-            ? 'Disable push notifications'
-            : 'Enable push notifications'
-        }
-        className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition-colors ${
-          isSubscribed
-            ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-700 dark:bg-green-900/20 dark:text-green-400'
-            : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
-        } disabled:opacity-50 ${className}`}
-      >
-        {isLoading ? (
-          <Loader className="w-4 h-4 animate-spin" />
-        ) : isSubscribed ? (
-          <Bell className="w-4 h-4" />
-        ) : (
-          <BellOff className="w-4 h-4" />
-        )}
-        {isSubscribed ? 'Notifications on' : 'Enable notifications'}
-      </button>
+      <div className={`bg-yellow-50 border border-yellow-200 rounded-lg p-4 ${className}`}>
+        <div className="flex items-center gap-3">
+          <BellOff className="w-5 h-5 text-yellow-600" />
+          <div>
+            <h3 className="font-medium text-yellow-800">Notifications Not Supported</h3>
+            <p className="text-sm text-yellow-700">
+              Push notifications are not supported in your browser.
+            </p>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm p-5 ${className}`}>
-      <div className="flex items-start gap-4">
-        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-          isSubscribed ? 'bg-green-100 dark:bg-green-900/30' : 'bg-gray-100 dark:bg-gray-700'
-        }`}>
-          {isSubscribed ? (
-            <Bell className="w-6 h-6 text-green-600" />
-          ) : (
-            <BellOff className="w-6 h-6 text-gray-400" />
-          )}
+    <div className={`space-y-4 ${className}`}>
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            {isSubscribed ? (
+              <Bell className="w-6 h-6 text-green-500" />
+            ) : (
+              <BellOff className="w-6 h-6 text-gray-400" />
+            )}
+            <div>
+              <h3 className="font-semibold text-gray-900">Push Notifications</h3>
+              <p className="text-sm text-gray-600">
+                {isSubscribed
+                  ? 'You\'re subscribed to notifications'
+                  : 'Get notified about bookings, messages, and updates'
+                }
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {isSubscribed && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={testNotification}
+                disabled={permission !== 'granted'}
+              >
+                Test
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSettings(true)}
+            >
+              <Settings className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
 
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Push Notifications</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-            {isSubscribed
-              ? "You'll get notified for bookings, messages, and more."
-              : 'Stay on top of booking requests, messages, and updates.'}
-          </p>
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            Status: <span className={`font-medium ${
+              isSubscribed ? 'text-green-600' : 'text-gray-500'
+            }`}>
+              {isSubscribed ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
 
-          {permission === 'denied' && (
-            <p className="text-xs text-red-600 mt-2">
-              Notifications are blocked. Enable them in your browser settings to continue.
-            </p>
-          )}
-
-          {status === 'success' && (
-            <div className="flex items-center gap-1 text-green-600 text-xs mt-2">
-              <CheckCircle className="w-3.5 h-3.5" />
-              Successfully enabled!
-            </div>
-          )}
-
-          {status === 'error' && (
-            <div className="flex items-center gap-1 text-red-600 text-xs mt-2">
-              <XCircle className="w-3.5 h-3.5" />
-              {permission === 'denied' ? 'Permission denied.' : 'Something went wrong. Please try again.'}
-            </div>
-          )}
+          <Button
+            variant={isSubscribed ? 'outline' : 'primary'}
+            size="sm"
+            onClick={isSubscribed ? unsubscribeFromNotifications : subscribeToNotifications}
+            disabled={isLoading}
+            isLoading={isLoading}
+          >
+            {isSubscribed ? 'Unsubscribe' : 'Subscribe'}
+          </Button>
         </div>
-
-        <button
-          onClick={isSubscribed ? unsubscribe : subscribe}
-          disabled={isLoading || permission === 'denied'}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 ${
-            isSubscribed
-              ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
-          }`}
-        >
-          {isLoading ? (
-            <Loader className="w-4 h-4 animate-spin" />
-          ) : isSubscribed ? (
-            'Turn off'
-          ) : (
-            'Enable'
-          )}
-        </button>
       </div>
+
+      {/* Notification Types Settings */}
+      {showSettings && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl max-w-md w-full">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-900">Notification Settings</h2>
+                <button
+                  aria-label="Close notification settings" onClick={() => setShowSettings(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="space-y-3">
+                <label className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Booking Updates</span>
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">New Messages</span>
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Equipment Available</span>
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                  />
+                </label>
+
+                <label className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Promotions</span>
+                  <input
+                    type="checkbox"
+                    className="rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                  />
+                </label>
+              </div>
+
+              <div className="pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-500">
+                  You can change these settings anytime. Notifications will respect your browser's do-not-disturb settings.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex justify-end">
+              <Button onClick={() => setShowSettings(false)}>
+                Save Settings
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

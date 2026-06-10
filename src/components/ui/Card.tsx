@@ -25,8 +25,8 @@ export function Card({
   return (
     <div
       onClick={onClick}
-      className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm ${paddings[padding]} ${
-        hover ? 'hover:shadow-xl hover:border-gray-200 dark:hover:border-gray-600 transition-all duration-300 cursor-pointer' : ''
+      className={`bg-white rounded-2xl border border-gray-100 shadow-sm ${paddings[padding]} ${
+        hover ? 'hover:shadow-xl hover:border-gray-200 transition-all duration-300 cursor-pointer' : ''
       } ${className}`}
     >
       {children}
@@ -55,7 +55,7 @@ interface CardTitleProps {
 }
 
 export function CardTitle({ children, className = '' }: CardTitleProps) {
-  return <h3 className={`text-lg font-semibold text-gray-900 dark:text-white ${className}`}>{children}</h3>;
+  return <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>{children}</h3>;
 }
 
 interface CardDescriptionProps {
@@ -64,7 +64,7 @@ interface CardDescriptionProps {
 }
 
 export function CardDescription({ children, className = '' }: CardDescriptionProps) {
-  return <p className={`text-sm text-gray-500 dark:text-gray-400 mt-1 ${className}`}>{children}</p>;
+  return <p className={`text-sm text-gray-500 mt-1 ${className}`}>{children}</p>;
 }
 
 interface CardContentProps {
@@ -83,7 +83,7 @@ interface CardFooterProps {
 
 export function CardFooter({ children, className = '' }: CardFooterProps) {
   return (
-    <div className={`flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-100 dark:border-gray-700 ${className}`}>
+    <div className={`flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-100 ${className}`}>
       {children}
     </div>
   );

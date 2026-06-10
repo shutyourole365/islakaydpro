@@ -14,9 +14,6 @@ import {
   UserPlus,
   RefreshCw,
 } from 'lucide-react';
-import { errorMonitoring } from '../../services/errorMonitoring';
-import { getPublicAppUrl } from '../../utils/publicUrl';
-import { useToast } from '../ui/Toast';
 
 interface SplitPaymentProps {
   bookingId: string;
@@ -58,7 +55,6 @@ export default function SplitPayment({
   onComplete,
   onClose,
 }: SplitPaymentProps) {
-  const { addToast } = useToast();
   const [participants, setParticipants] = useState<Participant[]>([
     { id: '1', name: 'You', email: 'you@example.com', avatarColor: avatarColors[0] },
   ]);
@@ -73,11 +69,7 @@ export default function SplitPayment({
 
   const addParticipant = () => {
     if (!newParticipant.name || !newParticipant.email) {
-      addToast({
-        type: 'warning',
-        title: 'Missing details',
-        message: 'Please enter both a name and an email.',
-      });
+      alert('Please enter name and email');
       return;
     }
 
@@ -158,10 +150,7 @@ export default function SplitPayment({
     // Simulate sending invites
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Use getPublicAppUrl() (VITE_APP_URL with origin fallback) so the
-    // link is externally reachable in every build — including Capacitor
-    // mobile, where window.location.origin would be capacitor://localhost.
-    const link = `${getPublicAppUrl()}/split/${bookingId}/${Date.now().toString(36)}`;
+    const link = `https://islakayd.com/split/${bookingId}/${Date.now().toString(36)}`;
     setShareLink(link);
 
     const finalSplits = calculateSplits();
@@ -174,21 +163,9 @@ export default function SplitPayment({
     }
   };
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(shareLink);
-      addToast({
-        type: 'success',
-        title: 'Link copied to clipboard',
-      });
-    } catch (err) {
-      console.error('Failed to copy split-payment link:', err);
-      addToast({
-        type: 'error',
-        title: 'Could not copy link',
-        message: 'Please copy it manually.',
-      });
-    }
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    alert('Link copied to clipboard!');
   };
 
   const shareNative = async () => {
@@ -199,16 +176,8 @@ export default function SplitPayment({
           text: `You've been invited to split the cost of renting ${equipmentTitle}`,
           url: shareLink,
         });
-      } catch (e) {
-        // AbortError == user dismissed the share sheet (expected, no
-        // signal). Anything else (invalid payload, OS-level error) is
-        // worth seeing — forward to Sentry.
-        if (!(e instanceof DOMException && e.name === 'AbortError')) {
-          errorMonitoring.captureException(
-            e instanceof Error ? e : new Error(String(e)),
-            { share: { source: 'SplitPayment.share' } }
-          );
-        }
+      } catch (err) {
+        console.log('Share cancelled');
       }
     }
   };
@@ -218,7 +187,7 @@ export default function SplitPayment({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-lg my-8">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg my-8">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-t-3xl text-white">
           <div className="flex items-center justify-between mb-4">
@@ -251,13 +220,13 @@ export default function SplitPayment({
           {!sent ? (
             <>
               {/* Split Type Toggle */}
-              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1 mb-6">
+              <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
                 <button
                   onClick={() => setSplitType('equal')}
                   className={`flex-1 py-2.5 rounded-lg font-medium transition-colors ${
                     splitType === 'equal'
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow'
-                      : 'text-gray-600 dark:text-gray-400'
+                      ? 'bg-white text-gray-900 shadow'
+                      : 'text-gray-600'
                   }`}
                 >
                   Split Equally
@@ -266,8 +235,8 @@ export default function SplitPayment({
                   onClick={() => setSplitType('custom')}
                   className={`flex-1 py-2.5 rounded-lg font-medium transition-colors ${
                     splitType === 'custom'
-                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow'
-                      : 'text-gray-600 dark:text-gray-400'
+                      ? 'bg-white text-gray-900 shadow'
+                      : 'text-gray-600'
                   }`}
                 >
                   Custom Amounts
@@ -279,27 +248,27 @@ export default function SplitPayment({
                 {participants.map((participant, index) => (
                   <div
                     key={participant.id}
-                    className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl"
                   >
                     <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${participant.avatarColor} flex items-center justify-center text-white font-semibold`}>
                       {participant.name.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 dark:text-white truncate">
+                      <p className="font-medium text-gray-900 truncate">
                         {participant.name}
                         {participant.id === '1' && (
                           <span className="ml-2 text-xs text-green-600">(You)</span>
                         )}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{participant.email}</p>
+                      <p className="text-sm text-gray-500 truncate">{participant.email}</p>
                     </div>
 
                     {splitType === 'equal' ? (
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900 dark:text-white">
+                        <p className="font-semibold text-gray-900">
                           ${currentSplits[index]?.amount.toFixed(2)}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500">
                           {(100 / participants.length).toFixed(1)}%
                         </p>
                       </div>
@@ -314,7 +283,7 @@ export default function SplitPayment({
                             parseFloat(e.target.value) || 0
                           )}
                           placeholder="0.00"
-                          className="w-24 px-3 py-2 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:outline-none focus:border-green-500 text-right"
+                          className="w-24 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-green-500 text-right"
                         />
                       </div>
                     )}
@@ -362,34 +331,34 @@ export default function SplitPayment({
 
               {/* Add Participant */}
               {showAddForm ? (
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-3">Add Participant</h4>
+                <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                  <h4 className="font-medium text-gray-900 mb-3">Add Participant</h4>
                   <div className="space-y-3">
                     <input
                       type="text"
                       value={newParticipant.name}
                       onChange={(e) => setNewParticipant({ ...newParticipant, name: e.target.value })}
                       placeholder="Name"
-                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-xl focus:outline-none focus:border-green-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500"
                     />
                     <input
                       type="email"
                       value={newParticipant.email}
                       onChange={(e) => setNewParticipant({ ...newParticipant, email: e.target.value })}
                       placeholder="Email"
-                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-xl focus:outline-none focus:border-green-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500"
                     />
                     <input
                       type="tel"
                       value={newParticipant.phone}
                       onChange={(e) => setNewParticipant({ ...newParticipant, phone: e.target.value })}
                       placeholder="Phone (optional)"
-                      className="w-full px-4 py-2.5 border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-xl focus:outline-none focus:border-green-500"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:border-green-500"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={() => setShowAddForm(false)}
-                        className="flex-1 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                        className="flex-1 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-100 transition-colors"
                       >
                         Cancel
                       </button>
@@ -413,9 +382,9 @@ export default function SplitPayment({
               )}
 
               {/* Preview */}
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
-                <h4 className="font-medium text-gray-900 dark:text-white mb-3">Split Preview</h4>
-                <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden flex">
+              <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                <h4 className="font-medium text-gray-900 mb-3">Split Preview</h4>
+                <div className="h-4 bg-gray-200 rounded-full overflow-hidden flex">
                   {currentSplits.map((split) => (
                     <div
                       key={split.participantId}
@@ -424,7 +393,7 @@ export default function SplitPayment({
                     />
                   ))}
                 </div>
-                <div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex justify-between mt-2 text-xs text-gray-500">
                   {currentSplits.map((split) => (
                     <span key={split.participantId}>
                       {split.participant.name}: {split.percentage.toFixed(1)}%
@@ -464,10 +433,10 @@ export default function SplitPayment({
               <div className="w-20 h-20 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <CheckCircle2 className="w-10 h-10 text-green-500" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
                 Payment Requests Sent!
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-600 mb-6">
                 We've notified everyone to pay their share
               </p>
 
@@ -476,15 +445,15 @@ export default function SplitPayment({
                 {splits.map((split) => (
                   <div
                     key={split.participantId}
-                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl"
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${split.participant.avatarColor} flex items-center justify-center text-white font-semibold`}>
                         {split.participant.name.charAt(0)}
                       </div>
                       <div className="text-left">
-                        <p className="font-medium text-gray-900 dark:text-white">{split.participant.name}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">${split.amount.toFixed(2)}</p>
+                        <p className="font-medium text-gray-900">{split.participant.name}</p>
+                        <p className="text-sm text-gray-500">${split.amount.toFixed(2)}</p>
                       </div>
                     </div>
                     <span className={`flex items-center gap-1 text-sm font-medium ${
@@ -502,26 +471,26 @@ export default function SplitPayment({
               </div>
 
               {/* Share Link */}
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Share payment link:</p>
+              <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                <p className="text-sm text-gray-600 mb-2">Share payment link:</p>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={shareLink}
                     readOnly
-                    className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300"
+                    className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600"
                   />
                   <button
                     onClick={copyLink}
-                    className="p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                   >
-                    <Copy className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <Copy className="w-5 h-5 text-gray-600" />
                   </button>
                   <button
                     onClick={shareNative}
-                    className="p-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                    className="p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                    >
-                    <Share2 className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    <Share2 className="w-5 h-5 text-gray-600" />
                   </button>
                 </div>
               </div>

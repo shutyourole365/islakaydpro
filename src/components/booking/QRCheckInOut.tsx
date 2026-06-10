@@ -16,8 +16,6 @@ import {
   AlertTriangle,
   Shield,
 } from 'lucide-react';
-import { errorMonitoring } from '../../services/errorMonitoring';
-import { useToast } from '../ui/Toast';
 
 interface QRCheckInOutProps {
   bookingId: string;
@@ -45,7 +43,6 @@ export default function QRCheckInOut({
   onComplete,
   onClose,
 }: QRCheckInOutProps) {
-  const { addToast } = useToast();
   const [scanning, setScanning] = useState(false);
   const [scanned, setScanned] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -55,7 +52,6 @@ export default function QRCheckInOut({
   const [qrData, setQrData] = useState<string>('');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     // Generate QR data
@@ -73,13 +69,12 @@ export default function QRCheckInOut({
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        () => { if (import.meta.env.DEV) console.log('Location not available'); }
+        () => console.log('Location not available')
       );
     }
 
     return () => {
       stopCamera();
-      if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
     };
   }, [bookingId, equipmentId, mode]);
 
@@ -112,35 +107,17 @@ export default function QRCheckInOut({
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
       tracks.forEach(track => track.stop());
     }
-    // Stop the scan poll too — otherwise the simulator keeps ticking
-    // and fires handleQRDetected() at the 2s mark even after the user
-    // has cancelled. handleQRDetected calls onComplete, so a cancelled
-    // scan would still trigger the completion callback.
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
-    }
     setScanning(false);
   };
 
   const scanQRCode = () => {
-    // Simulated QR scanning - in production, use a QR library like jsQR.
-    // Poll every 500ms; "find" the QR after ~2s of scanning.
-    // Re-entry guard: a previous scan may still be running (user stopped
-    // + restarted the camera). Clear it before starting a new poll.
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
-    }
-    const scanStartedAt = Date.now();
-    scanIntervalRef.current = setInterval(() => {
-      if (Date.now() - scanStartedAt >= 2000) {
-        if (scanIntervalRef.current) {
-          clearInterval(scanIntervalRef.current);
-          scanIntervalRef.current = null;
-        }
+    // Simulated QR scanning - in production, use a QR library like jsQR
+    const checkForQR = setInterval(() => {
+      // Simulate finding QR code after 2 seconds
+      setTimeout(() => {
+        clearInterval(checkForQR);
         handleQRDetected();
-      }
+      }, 2000);
     }, 500);
   };
 
@@ -220,11 +197,7 @@ export default function QRCheckInOut({
 
   const downloadQR = () => {
     // In production, generate actual downloadable QR image
-    addToast({
-      type: 'success',
-      title: 'QR code downloaded',
-      message: 'Saved to your device.',
-    });
+    alert('QR Code downloaded to your device!');
   };
 
   const shareQR = async () => {
@@ -234,29 +207,17 @@ export default function QRCheckInOut({
           title: `Equipment ${mode === 'check-in' ? 'Pickup' : 'Return'} QR Code`,
           text: `Scan this QR code to ${mode === 'check-in' ? 'pick up' : 'return'} ${equipmentTitle}`,
         });
-      } catch (e) {
-        // AbortError == user dismissed the share sheet (expected, no
-        // signal). Anything else (invalid payload, OS-level error) is
-        // worth seeing — forward to Sentry.
-        if (!(e instanceof DOMException && e.name === 'AbortError')) {
-          errorMonitoring.captureException(
-            e instanceof Error ? e : new Error(String(e)),
-            { share: { source: 'QRCheckInOut.share' } }
-          );
-        }
+      } catch (err) {
+        console.log('Share cancelled');
       }
     } else {
-      addToast({
-        type: 'warning',
-        title: 'Sharing unavailable',
-        message: 'Native sharing is not supported on this device.',
-      });
+      alert('Sharing not supported on this device');
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden">
         {/* Header */}
         <div className="p-6 bg-gradient-to-r from-teal-500 to-emerald-500 text-white">
           <div className="flex items-center justify-between mb-4">
@@ -274,7 +235,6 @@ export default function QRCheckInOut({
             </div>
             <button
               onClick={onClose}
-              aria-label="Close QR check-in"
               className="p-2 hover:bg-white/20 rounded-full transition-colors"
             >
               <XCircle className="w-6 h-6" />
@@ -292,12 +252,12 @@ export default function QRCheckInOut({
           {mode === 'generate' ? (
             // Generate QR Code View
             <div className="text-center">
-              <div className="inline-block p-4 bg-white dark:bg-gray-700 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-600 mb-6">
+              <div className="inline-block p-4 bg-white rounded-2xl shadow-lg border border-gray-100 mb-6">
                 {generateQRCodeSVG(qrData)}
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                   <Clock className="w-4 h-4" />
                   <span>Valid for 24 hours</span>
                 </div>
@@ -305,26 +265,26 @@ export default function QRCheckInOut({
                 <div className="flex items-center gap-3">
                   <button
                     onClick={downloadQR}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
                    >
                     <Download className="w-5 h-5" />
                     Download
                   </button>
                   <button
                     onClick={shareQR}
-                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
                    >
                     <Share2 className="w-5 h-5" />
                     Share
                   </button>
                 </div>
 
-                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+                <div className="p-4 bg-amber-50 rounded-xl">
                   <div className="flex items-start gap-3">
                     <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                     <div className="text-left">
-                      <p className="font-medium text-amber-800 dark:text-amber-300">Show this code at pickup</p>
-                      <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
+                      <p className="font-medium text-amber-800">Show this code at pickup</p>
+                      <p className="text-sm text-amber-600 mt-1">
                         The equipment owner will scan this QR code to verify your booking and release the equipment.
                       </p>
                     </div>
@@ -339,20 +299,20 @@ export default function QRCheckInOut({
                 <>
                   {!scanning ? (
                     <div className="text-center">
-                      <div className="w-32 h-32 bg-gray-100 dark:bg-gray-700 rounded-2xl mx-auto mb-6 flex items-center justify-center">
+                      <div className="w-32 h-32 bg-gray-100 rounded-2xl mx-auto mb-6 flex items-center justify-center">
                         <Scan className="w-16 h-16 text-gray-400" />
                       </div>
-
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                      
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
                         Ready to Scan
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400 mb-6">
+                      <p className="text-gray-600 mb-6">
                         Point your camera at the {mode === 'check-in' ? 'owner\'s' : 'renter\'s'} QR code to {mode === 'check-in' ? 'confirm pickup' : 'complete return'}
                       </p>
 
                       {error && (
-                        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl mb-4">
-                          <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+                        <div className="p-4 bg-red-50 rounded-xl mb-4">
+                          <p className="text-red-600 text-sm">{error}</p>
                         </div>
                       )}
 
@@ -389,11 +349,11 @@ export default function QRCheckInOut({
                         </div>
                       </div>
 
-                      <p className="text-gray-600 dark:text-gray-400 mb-4">Scanning for QR code...</p>
+                      <p className="text-gray-600 mb-4">Scanning for QR code...</p>
 
                       <button
                         onClick={stopCamera}
-                        className="w-full py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="w-full py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
                        >
                         Cancel
                       </button>
@@ -405,40 +365,40 @@ export default function QRCheckInOut({
                   {verifying ? (
                     <div className="py-8">
                       <div className="w-16 h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                      <p className="text-gray-600 dark:text-gray-400">Verifying booking...</p>
+                      <p className="text-gray-600">Verifying booking...</p>
                     </div>
                   ) : verified ? (
                     <div className="py-8">
                       <div className="w-20 h-20 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
                         <CheckCircle2 className="w-10 h-10 text-green-500" />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
                         {mode === 'check-in' ? 'Pickup Confirmed!' : 'Return Complete!'}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400 mb-6">
+                      <p className="text-gray-600 mb-6">
                         {mode === 'check-in'
                           ? 'Equipment has been released to you. Enjoy your rental!'
                           : 'Equipment has been returned successfully. Your deposit will be processed shortly.'}
                       </p>
 
-                      <div className="space-y-3 text-left bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
+                      <div className="space-y-3 text-left bg-gray-50 rounded-xl p-4 mb-6">
                         <div className="flex items-center gap-3">
                           <Clock className="w-5 h-5 text-gray-400" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                          <span className="text-sm text-gray-600">
                             {new Date().toLocaleString()}
                           </span>
                         </div>
                         {location && (
                           <div className="flex items-center gap-3">
                             <MapPin className="w-5 h-5 text-gray-400" />
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
+                            <span className="text-sm text-gray-600">
                               Location verified ✓
                             </span>
                           </div>
                         )}
                         <div className="flex items-center gap-3">
                           <Shield className="w-5 h-5 text-gray-400" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                          <span className="text-sm text-gray-600">
                             Transaction secured on blockchain
                           </span>
                         </div>
@@ -460,7 +420,7 @@ export default function QRCheckInOut({
 
         {/* Footer info */}
         <div className="px-6 pb-6">
-          <div className="flex items-center justify-center gap-4 text-xs text-gray-400 dark:text-gray-500">
+          <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
             <div className="flex items-center gap-1">
               <Shield className="w-3 h-3" />
               <span>Secure</span>

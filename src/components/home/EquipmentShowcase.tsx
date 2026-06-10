@@ -56,11 +56,9 @@ export default function EquipmentShowcase({
       return;
     }
 
-    let transitionTimeout: ReturnType<typeof setTimeout> | null = null;
-
     intervalRef.current = setInterval(() => {
       setIsTransitioning(true);
-      transitionTimeout = setTimeout(() => {
+      setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % equipment.length);
         setIsTransitioning(false);
       }, 300);
@@ -69,9 +67,6 @@ export default function EquipmentShowcase({
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
-      }
-      if (transitionTimeout) {
-        clearTimeout(transitionTimeout);
       }
     };
   }, [isAutoPlaying, equipment.length, autoPlayInterval]);

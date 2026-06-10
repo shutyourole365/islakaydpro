@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Star, ThumbsUp, Camera, Shield, Award, TrendingUp, MessageSquare } from 'lucide-react';
-import { useToast } from '../ui/Toast';
 
 interface EnhancedReviewSystemProps {
   equipmentId: string;
@@ -32,7 +31,6 @@ export default function EnhancedReviewSystem({
   onSubmit,
   onClose,
 }: EnhancedReviewSystemProps) {
-  const { addToast } = useToast();
   const [step, setStep] = useState<'rating' | 'aspects' | 'details' | 'photos'  >('rating');
   const [overallRating, setOverallRating] = useState(0);
   const [aspectRatings, setAspectRatings] = useState({
@@ -68,21 +66,13 @@ export default function EnhancedReviewSystem({
     const files = Array.from(e.target.files || []);
     
     if (files.length + selectedPhotos.length > 5) {
-      addToast({
-        type: 'warning',
-        title: 'Too many photos',
-        message: 'Maximum 5 photos per review.',
-      });
+      alert('Maximum 5 photos per review');
       return;
     }
 
     const validFiles = files.filter(file => {
       if (file.size > 5 * 1024 * 1024) {
-        addToast({
-          type: 'warning',
-          title: 'File too large',
-          message: `${file.name} exceeds the 5MB limit.`,
-        });
+        alert(`${file.name} is too large (max 5MB)`);
         return false;
       }
       return file.type.startsWith('image/');
@@ -99,20 +89,12 @@ export default function EnhancedReviewSystem({
 
   const handleSubmit = async () => {
     if (overallRating === 0) {
-      addToast({
-        type: 'warning',
-        title: 'Rating required',
-        message: 'Please select an overall rating.',
-      });
+      alert('Please select an overall rating');
       return;
     }
 
     if (!title.trim() || !comment.trim()) {
-      addToast({
-        type: 'warning',
-        title: 'Review incomplete',
-        message: 'Please provide both a title and a comment.',
-      });
+      alert('Please provide a title and comment');
       return;
     }
 
@@ -129,11 +111,7 @@ export default function EnhancedReviewSystem({
       onClose();
     } catch (error) {
       console.error('Failed to submit review:', error);
-      addToast({
-        type: 'error',
-        title: 'Submission failed',
-        message: 'Could not submit your review. Please try again.',
-      });
+      alert('Failed to submit review. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -173,7 +151,7 @@ export default function EnhancedReviewSystem({
               className={`${starSize} transition-colors ${
                 star <= (hover || value)
                   ? 'fill-amber-400 text-amber-400'
-                  : 'text-gray-300 dark:text-gray-600'
+                  : 'text-gray-300'
               }`}
             />
           </button>
@@ -186,9 +164,9 @@ export default function EnhancedReviewSystem({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative z-10 w-full max-w-2xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="relative z-10 w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden">
         {/* Progress Bar */}
-        <div className="h-1 bg-gray-200 dark:bg-gray-700">
+        <div className="h-1 bg-gray-200">
           <div 
             className="h-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300"
             style={{ width: `${((['rating', 'aspects', 'details', 'photos'].indexOf(step) + 1) / 4) * 100}%` }}
@@ -196,9 +174,9 @@ export default function EnhancedReviewSystem({
         </div>
 
         {/* Header */}
-        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Review Your Experience</h2>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">{equipmentTitle}</p>
+        <div className="px-6 py-5 border-b border-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900">Review Your Experience</h2>
+          <p className="text-gray-600 mt-1">{equipmentTitle}</p>
         </div>
 
         <div className="p-6 max-h-[600px] overflow-y-auto">
@@ -209,8 +187,8 @@ export default function EnhancedReviewSystem({
                 <Star className="w-10 h-10 text-white fill-white" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">How was your rental?</h3>
-                <p className="text-gray-600 dark:text-gray-400">Rate your overall experience</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">How was your rental?</h3>
+                <p className="text-gray-600">Rate your overall experience</p>
               </div>
               
               <div className="flex justify-center">
@@ -229,18 +207,18 @@ export default function EnhancedReviewSystem({
           {step === 'aspects' && (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Rate Specific Aspects</h3>
-                <p className="text-gray-600 dark:text-gray-400">Help others know what to expect</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Rate Specific Aspects</h3>
+                <p className="text-gray-600">Help others know what to expect</p>
               </div>
 
               {aspects.map((aspect) => (
-                <div key={aspect.key} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                <div key={aspect.key} className="p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-600 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                      <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-teal-600">
                         {aspect.icon}
                       </div>
-                      <span className="font-semibold text-gray-900 dark:text-white">{aspect.label}</span>
+                      <span className="font-semibold text-gray-900">{aspect.label}</span>
                     </div>
                     {aspectRatings[aspect.key] > 0 && (
                       <span className="text-sm font-semibold text-teal-600">
@@ -262,12 +240,12 @@ export default function EnhancedReviewSystem({
           {step === 'details' && (
             <div className="space-y-6">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Share Your Experience</h3>
-                <p className="text-gray-600 dark:text-gray-400">Help others make informed decisions</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Share Your Experience</h3>
+                <p className="text-gray-600">Help others make informed decisions</p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Review Title *
                 </label>
                 <input
@@ -276,28 +254,28 @@ export default function EnhancedReviewSystem({
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g., Great excavator, worked perfectly!"
                   aria-label="Review title"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100"
                   maxLength={80}
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{title.length}/80 characters</p>
+                <p className="text-xs text-gray-500 mt-1">{title.length}/80 characters</p>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Your Review *
                 </label>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Tell us about your experience with this equipment..."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100 resize-none"
                   rows={6}
                   maxLength={1000}
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{comment.length}/1000 characters</p>
+                <p className="text-xs text-gray-500 mt-1">{comment.length}/1000 characters</p>
               </div>
 
-              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+              <div className="p-4 bg-blue-50 rounded-xl">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -306,11 +284,11 @@ export default function EnhancedReviewSystem({
                     className="mt-1 w-5 h-5 text-teal-500 rounded focus:ring-2 focus:ring-teal-400"
                   />
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                      <ThumbsUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                    <p className="font-semibold text-gray-900 flex items-center gap-2">
+                      <ThumbsUp className="w-5 h-5 text-blue-600" />
                       I would recommend this equipment
                     </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-600 mt-1">
                       Help others find quality equipment they can trust
                     </p>
                   </div>
@@ -326,8 +304,8 @@ export default function EnhancedReviewSystem({
                 <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center mb-4">
                   <Camera className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Add Photos (Optional)</h3>
-                <p className="text-gray-600 dark:text-gray-400">Show others what to expect</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Add Photos (Optional)</h3>
+                <p className="text-gray-600">Show others what to expect</p>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -352,9 +330,9 @@ export default function EnhancedReviewSystem({
                 ))}
                 
                 {photoUrls.length < 5 && (
-                  <label className="aspect-square border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all cursor-pointer flex flex-col items-center justify-center">
-                    <Camera className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2" />
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Add Photo</span>
+                  <label className="aspect-square border-2 border-dashed border-gray-300 rounded-xl hover:border-teal-400 hover:bg-teal-50 transition-all cursor-pointer flex flex-col items-center justify-center">
+                    <Camera className="w-8 h-8 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-600">Add Photo</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -366,9 +344,9 @@ export default function EnhancedReviewSystem({
                 )}
               </div>
 
-              <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl flex items-start gap-3">
-                <Camera className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-                <div className="text-sm text-amber-800 dark:text-amber-300">
+              <div className="p-4 bg-amber-50 rounded-xl flex items-start gap-3">
+                <Camera className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-amber-800">
                   <p className="font-semibold mb-1">Photo Guidelines</p>
                   <ul className="list-disc list-inside space-y-1">
                     <li>Show equipment condition clearly</li>

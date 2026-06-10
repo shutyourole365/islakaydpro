@@ -106,23 +106,23 @@ export default function EquipmentRequestBoard({ onBack }: EquipmentRequestBoardP
   const categories = [...new Set(requests.map(r => r.category))].sort();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 pb-16">
+    <div className="min-h-screen bg-gray-50 pt-24 pb-16">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           {onBack && (
-            <button onClick={onBack} className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
-              <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            <button onClick={onBack} className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
             </button>
           )}
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
                 <Megaphone className="w-5 h-5 text-teal-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Equipment Wanted Board</h1>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Renters post what they need — owners respond</p>
+                <h1 className="text-2xl font-bold text-gray-900">Equipment Wanted Board</h1>
+                <p className="text-sm text-gray-500">Renters post what they need — owners respond</p>
               </div>
             </div>
           </div>
@@ -144,13 +144,13 @@ export default function EquipmentRequestBoard({ onBack }: EquipmentRequestBoardP
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search requests…"
-              className="w-full pl-9 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white dark:bg-gray-700 dark:text-white"
+              className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
             />
           </div>
           <select
             value={selectedCategory}
             onChange={e => setSelectedCategory(e.target.value)}
-            className="px-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white dark:bg-gray-700 dark:text-white"
+            className="px-3 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-white"
           >
             <option value="">All Categories</option>
             {categories.map(c => <option key={c} value={c}>{c}</option>)}
@@ -159,7 +159,7 @@ export default function EquipmentRequestBoard({ onBack }: EquipmentRequestBoardP
 
         {/* Requests list */}
         {filtered.length === 0 ? (
-          <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+          <div className="text-center py-16 text-gray-400">
             <Megaphone className="w-12 h-12 mx-auto mb-3 opacity-40" />
             <p className="font-medium">No requests found</p>
             <p className="text-sm mt-1">Be the first to post what you need!</p>
@@ -167,18 +167,18 @@ export default function EquipmentRequestBoard({ onBack }: EquipmentRequestBoardP
         ) : (
           <div className="space-y-4">
             {filtered.map(req => (
-              <div key={req.id} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:border-teal-300 dark:hover:border-teal-600 hover:shadow-md transition-all">
+              <div key={req.id} className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-teal-300 hover:shadow-md transition-all">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 text-xs font-medium rounded-full">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-teal-50 text-teal-700 text-xs font-medium rounded-full">
                         <Tag className="w-3 h-3" />
                         {req.category}
                       </span>
-                      <span className="text-xs text-gray-400 dark:text-gray-500">{timeAgo(req.postedAt)}</span>
+                      <span className="text-xs text-gray-400">{timeAgo(req.postedAt)}</span>
                     </div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{req.title}</h3>
-                    <div className="flex flex-wrap gap-3 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    <h3 className="font-semibold text-gray-900 mb-2">{req.title}</h3>
+                    <div className="flex flex-wrap gap-3 text-sm text-gray-500 mb-2">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5" /> {req.location}
                       </span>
@@ -195,12 +195,12 @@ export default function EquipmentRequestBoard({ onBack }: EquipmentRequestBoardP
                       )}
                     </div>
                     {req.description && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{req.description}</p>
+                      <p className="text-sm text-gray-500 line-clamp-2">{req.description}</p>
                     )}
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mb-2">Posted by</p>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{req.contactName}</p>
+                    <p className="text-xs text-gray-400 mb-2">Posted by</p>
+                    <p className="text-sm font-medium text-gray-700">{req.contactName}</p>
                   </div>
                 </div>
               </div>

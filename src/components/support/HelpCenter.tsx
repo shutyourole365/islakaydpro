@@ -82,7 +82,7 @@ export default function HelpCenter({ onBack }: HelpCenterProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -93,7 +93,7 @@ export default function HelpCenter({ onBack }: HelpCenterProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -108,7 +108,7 @@ export default function HelpCenter({ onBack }: HelpCenterProps) {
                 <input
                   type="text"
                   placeholder="Search for help..."
-                  className="w-full pl-10 pr-4 py-3 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full pl-10 pr-4 py-3 rounded-lg text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -118,11 +118,11 @@ export default function HelpCenter({ onBack }: HelpCenterProps) {
             <div className="max-w-4xl mx-auto">
               {/* Popular Articles */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Popular Articles</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8">Popular Articles</h2>
                 <div className="grid md:grid-cols-2 gap-4">
                   {popularArticles.map((article, index) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors">
-                      <h3 className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">{article}</h3>
+                    <div key={index} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 cursor-pointer transition-colors">
+                      <h3 className="font-medium text-gray-900 hover:text-blue-600">{article}</h3>
                     </div>
                   ))}
                 </div>
@@ -130,15 +130,15 @@ export default function HelpCenter({ onBack }: HelpCenterProps) {
 
               {/* Help Categories */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Browse by Category</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8">Browse by Category</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {categories.map((category, index) => (
-                    <div key={index} className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6 hover:shadow-md transition-shadow">
-                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{category.title}</h3>
-                      <p className="text-gray-600 dark:text-gray-400 mb-4">{category.description}</p>
+                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-3">{category.title}</h3>
+                      <p className="text-gray-600 mb-4">{category.description}</p>
                       <ul className="space-y-2">
                         {category.articles.map((article, idx) => (
-                          <li key={idx} className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer">
+                          <li key={idx} className="text-sm text-blue-600 hover:text-blue-800 cursor-pointer">
                             {article}
                           </li>
                         ))}
@@ -153,16 +153,16 @@ export default function HelpCenter({ onBack }: HelpCenterProps) {
 
               {/* Contact Options */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Contact Support</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Contact Support</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {contactOptions.map((option, index) => (
-                    <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                      <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <div key={index} className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                         {option.icon}
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{option.title}</h3>
-                      <p className="text-gray-600 dark:text-gray-400 mb-3">{option.description}</p>
-                      <p className="text-sm text-green-600 dark:text-green-400 mb-4">{option.availability}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{option.title}</h3>
+                      <p className="text-gray-600 mb-3">{option.description}</p>
+                      <p className="text-sm text-green-600 mb-4">{option.availability}</p>
                       <Button className="w-full bg-blue-600 hover:bg-blue-700">
                         {option.action}
                       </Button>
@@ -172,29 +172,29 @@ export default function HelpCenter({ onBack }: HelpCenterProps) {
               </div>
 
               {/* Support Hours */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-8">
+              <div className="bg-blue-50 rounded-lg p-8">
                 <div className="text-center mb-6">
-                  <Clock className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Support Hours</h2>
+                  <Clock className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">Support Hours</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-6 text-center">
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Live Chat</h3>
-                    <p className="text-gray-600 dark:text-gray-400">24 hours a day, 7 days a week</p>
+                    <h3 className="font-semibold text-gray-900 mb-2">Live Chat</h3>
+                    <p className="text-gray-600">24 hours a day, 7 days a week</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Email Support</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Monday - Friday, 9:00 AM - 6:00 PM EST</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Response within 24 hours</p>
+                    <h3 className="font-semibold text-gray-900 mb-2">Email Support</h3>
+                    <p className="text-gray-600">Monday - Friday, 9:00 AM - 6:00 PM EST</p>
+                    <p className="text-sm text-gray-500">Response within 24 hours</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Phone Support</h3>
-                    <p className="text-gray-600 dark:text-gray-400">Monday - Friday, 9:00 AM - 6:00 PM EST</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">For urgent issues only</p>
+                    <h3 className="font-semibold text-gray-900 mb-2">Phone Support</h3>
+                    <p className="text-gray-600">Monday - Friday, 9:00 AM - 6:00 PM EST</p>
+                    <p className="text-sm text-gray-500">For urgent issues only</p>
                   </div>
                 </div>
                 <div className="mt-6 text-center">
-                  <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  <p className="text-gray-600 mb-4">
                     Can't find what you're looking for? Our support team is here to help.
                   </p>
                   <Button className="bg-blue-600 hover:bg-blue-700">

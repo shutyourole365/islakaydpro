@@ -54,9 +54,6 @@ export {
 // Supabase hooks
 export { useSupabaseStatus } from './useSupabaseStatus';
 
-// Booking updates hooks
-export { useBookingUpdates, useOwnerBookingUpdates } from './useBookingUpdates';
-
 // Theme hook
 export { useTheme } from './useTheme';
 

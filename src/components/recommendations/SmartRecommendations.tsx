@@ -89,7 +89,7 @@ export default function SmartRecommendations({
         type: 'trending',
         label: 'Trending',
         icon: <TrendingUp className="w-3 h-3" />,
-        color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+        color: 'bg-orange-100 text-orange-700',
       });
     }
 
@@ -101,7 +101,7 @@ export default function SmartRecommendations({
           type: 'nearby',
           label: `${distance.toFixed(1)} mi away`,
           icon: <MapPin className="w-3 h-3" />,
-          color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+          color: 'bg-blue-100 text-blue-700',
         });
       }
     }
@@ -112,7 +112,7 @@ export default function SmartRecommendations({
         type: 'viewed',
         label: 'Based on views',
         icon: <Eye className="w-3 h-3" />,
-        color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+        color: 'bg-purple-100 text-purple-700',
       });
     }
 
@@ -122,7 +122,7 @@ export default function SmartRecommendations({
         type: 'popular',
         label: 'Top Rated',
         icon: <Star className="w-3 h-3" />,
-        color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+        color: 'bg-amber-100 text-amber-700',
       });
     }
 
@@ -133,7 +133,7 @@ export default function SmartRecommendations({
         type: 'new',
         label: 'New Listing',
         icon: <Zap className="w-3 h-3" />,
-        color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+        color: 'bg-green-100 text-green-700',
       });
     }
 
@@ -143,7 +143,7 @@ export default function SmartRecommendations({
         type: 'deal',
         label: 'Great Value',
         icon: <Target className="w-3 h-3" />,
-        color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+        color: 'bg-red-100 text-red-700',
       });
     }
 
@@ -212,10 +212,8 @@ export default function SmartRecommendations({
     if (!isPositive) {
       setDismissedIds(prev => new Set([...prev, equipmentId]));
     }
-    // TODO: send feedback to backend for ML training. DEV-only trace for now.
-    if (import.meta.env.DEV) {
-      console.log(`Feedback for ${equipmentId}: ${isPositive ? 'positive' : 'negative'}`);
-    }
+    // In production, send feedback to backend for ML training
+    console.log(`Feedback for ${equipmentId}: ${isPositive ? 'positive' : 'negative'}`);
   };
 
   const tabs = [
@@ -235,15 +233,15 @@ export default function SmartRecommendations({
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Smart Recommendations</h2>
-              <p className="text-gray-500 dark:text-gray-400">Personalized picks powered by AI</p>
+              <h2 className="text-2xl font-bold text-gray-900">Smart Recommendations</h2>
+              <p className="text-gray-500">Personalized picks powered by AI</p>
             </div>
           </div>
 
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
            >
             <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -259,7 +257,7 @@ export default function SmartRecommendations({
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -274,7 +272,7 @@ export default function SmartRecommendations({
             {filteredEquipment.slice(0, 8).map(({ equipment: eq, reasons }, index) => (
               <div
                 key={eq.id}
-                className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 style={{
                   animation: 'fadeInUp 0.5s ease-out forwards',
                   animationDelay: `${index * 0.1}s`,
@@ -333,9 +331,9 @@ export default function SmartRecommendations({
 
                 {/* Content */}
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1 truncate">{eq.title}</h3>
-
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <h3 className="font-semibold text-gray-900 mb-1 truncate">{eq.title}</h3>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                       <span>{eq.rating.toFixed(1)}</span>
@@ -346,8 +344,8 @@ export default function SmartRecommendations({
 
                   <div className="flex items-end justify-between">
                     <div>
-                      <span className="text-2xl font-bold text-gray-900 dark:text-white">${eq.daily_rate}</span>
-                      <span className="text-gray-500 dark:text-gray-400">/day</span>
+                      <span className="text-2xl font-bold text-gray-900">${eq.daily_rate}</span>
+                      <span className="text-gray-500">/day</span>
                     </div>
 
                     {/* Feedback buttons */}
@@ -387,8 +385,8 @@ export default function SmartRecommendations({
         ) : (
           <div className="text-center py-16">
             <Filter className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No recommendations found</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">Try adjusting your filters or check back later</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No recommendations found</h3>
+            <p className="text-gray-500 mb-6">Try adjusting your filters or check back later</p>
             <button
               onClick={() => setActiveTab('for-you')}
               className="px-6 py-3 bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-xl font-medium hover:shadow-lg transition-all"
@@ -401,7 +399,7 @@ export default function SmartRecommendations({
         {/* View all link */}
         {filteredEquipment.length > 8 && (
           <div className="text-center mt-8">
-            <button className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+            <button className="inline-flex items-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors">
               View All {filteredEquipment.length} Recommendations
               <ArrowRight className="w-4 h-4" />
             </button>

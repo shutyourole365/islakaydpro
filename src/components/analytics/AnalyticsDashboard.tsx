@@ -15,7 +15,6 @@ import {
 import type { Equipment, Booking, UserAnalytics } from '../../types';
 import { getUserAnalytics, getBookings, getEquipment } from '../../services/database';
 import { useAuth } from '../../contexts/AuthContext';
-import { useToast } from '../ui/Toast';
 
 interface AnalyticsDashboardProps {
   className?: string;
@@ -38,7 +37,6 @@ interface ChartData {
 
 export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboardProps) {
   const { user } = useAuth();
-  const { addToast } = useToast();
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -61,11 +59,6 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
         setEquipment(equipmentData.data);
       } catch (error) {
         console.error('Failed to load analytics:', error);
-        addToast({
-          type: 'error',
-          title: 'Could not load analytics',
-          message: error instanceof Error ? error.message : 'Please try again.',
-        });
       } finally {
         setLoading(false);
       }
@@ -168,21 +161,21 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
       <div className={`animate-pulse ${className}`}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
-              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+            <div key={i} className="bg-white rounded-xl p-6 border border-gray-100">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/4"></div>
             </div>
           ))}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl p-6 border border-gray-100">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
           </div>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700">
-            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-4"></div>
-            <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="bg-white rounded-xl p-6 border border-gray-100">
+            <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+            <div className="h-64 bg-gray-200 rounded"></div>
           </div>
         </div>
       </div>
@@ -193,7 +186,7 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
     <div className={className}>
       {/* Time Range Selector */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h2>
         <div className="flex items-center gap-2">
           {(['7d', '30d', '90d', '1y'] as const).map((range) => (
             <button
@@ -202,8 +195,8 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
               aria-label={`Set time range ${range}`}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 timeRange === range
-                  ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-teal-100 text-teal-700'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               {range === '7d' ? '7 Days' :
@@ -219,9 +212,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
         {metrics.map((metric, index) => {
           const Icon = metric.icon;
           return (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
+            <div key={index} className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-2 rounded-lg bg-gray-50 dark:bg-gray-700`}>
+                <div className={`p-2 rounded-lg bg-gray-50`}>
                   <Icon className={`w-6 h-6 ${metric.color}`} />
                 </div>
                 <div className={`flex items-center gap-1 text-sm ${
@@ -236,9 +229,9 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                 </div>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-gray-600 dark:text-gray-400">{metric.title}</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{metric.value}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-500">{metric.changeLabel}</p>
+                <p className="text-sm text-gray-600">{metric.title}</p>
+                <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
+                <p className="text-xs text-gray-500">{metric.changeLabel}</p>
               </div>
             </div>
           );
@@ -248,10 +241,10 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
           <div className="flex items-center gap-2 mb-6">
             <BarChart3 className="w-5 h-5 text-teal-600" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Revenue Trends</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Revenue Trends</h3>
           </div>
           <div className="h-64 flex items-end justify-between gap-2">
             {revenueData.slice(-6).map((data, index) => (
@@ -263,17 +256,17 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                     minHeight: '4px'
                   }}
                 ></div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{data.name}</p>
+                <p className="text-xs text-gray-500 mt-2">{data.name}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Category Distribution */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
           <div className="flex items-center gap-2 mb-6">
             <PieChart className="w-5 h-5 text-purple-600" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Bookings by Category</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Bookings by Category</h3>
           </div>
           <div className="space-y-4">
             {categoryData.map((data, index) => (
@@ -283,10 +276,10 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: data.color }}
                   ></div>
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{data.name}</span>
+                  <span className="text-sm text-gray-700">{data.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-20 bg-gray-200 rounded-full h-2">
                     <div
                       className="h-2 rounded-full"
                       style={{
@@ -295,7 +288,7 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
                       }}
                     ></div>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">{data.value}</span>
+                  <span className="text-sm font-medium text-gray-900">{data.value}</span>
                 </div>
               </div>
             ))}
@@ -310,30 +303,30 @@ export default function AnalyticsDashboard({ className = '' }: AnalyticsDashboar
           <h3 className="text-lg font-semibold text-gray-900">AI Insights</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <div className="p-4 bg-blue-50 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Target className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-800 dark:text-blue-300">Optimization Opportunity</span>
+              <span className="text-sm font-medium text-blue-800">Optimization Opportunity</span>
             </div>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+            <p className="text-sm text-blue-700">
               Increase prices by 5-10% for high-demand equipment during peak seasons.
             </p>
           </div>
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+          <div className="p-4 bg-green-50 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-4 h-4 text-green-600" />
-              <span className="text-sm font-medium text-green-800 dark:text-green-300">Growth Trend</span>
+              <span className="text-sm font-medium text-green-800">Growth Trend</span>
             </div>
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <p className="text-sm text-green-700">
               Construction equipment bookings are up 15% this month.
             </p>
           </div>
-          <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <div className="p-4 bg-purple-50 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
               <Users className="w-4 h-4 text-purple-600" />
-              <span className="text-sm font-medium text-purple-800 dark:text-purple-300">Customer Insight</span>
+              <span className="text-sm font-medium text-purple-800">Customer Insight</span>
             </div>
-            <p className="text-sm text-purple-700 dark:text-purple-300">
+            <p className="text-sm text-purple-700">
               70% of customers return within 3 months for additional rentals.
             </p>
           </div>

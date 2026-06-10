@@ -20,8 +20,6 @@ import {
   Grid3X3,
   List,
 } from 'lucide-react';
-import { getPublicAppUrl } from '../../utils/publicUrl';
-import { useToast } from '../ui/Toast';
 
 interface Equipment {
   id: string;
@@ -87,13 +85,12 @@ export default function WishlistCollections({
   onCreateCollection,
   onDeleteCollection,
   onUpdateCollection,
-   
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onAddToCollection: _onAddToCollection,
   onRemoveFromCollection,
   onEquipmentClick,
   className = '',
 }: WishlistCollectionsProps) {
-  const { addToast } = useToast();
   const [selectedCollection, setSelectedCollection] = useState<WishlistCollection | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
@@ -153,26 +150,10 @@ export default function WishlistCollections({
     setMenuOpen(null);
   };
 
-  const shareCollection = async (collection: WishlistCollection) => {
-    // getPublicAppUrl() falls back to window.location.origin; swap is so
-    // the link works in Capacitor builds where origin would be
-    // capacitor://localhost.
-    const url = `${getPublicAppUrl()}/wishlist/${collection.id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      addToast({
-        type: 'success',
-        title: 'Collection link copied',
-        message: 'Share it with anyone.',
-      });
-    } catch (err) {
-      console.error('Failed to copy collection link:', err);
-      addToast({
-        type: 'error',
-        title: 'Could not copy link',
-        message: 'Please copy it manually.',
-      });
-    }
+  const shareCollection = (collection: WishlistCollection) => {
+    const url = `${window.location.origin}/wishlist/${collection.id}`;
+    navigator.clipboard.writeText(url);
+    alert('Collection link copied to clipboard!');
     setMenuOpen(null);
   };
 

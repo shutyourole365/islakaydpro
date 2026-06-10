@@ -13,11 +13,11 @@ export function Skeleton({
   height,
   animation = 'pulse',
 }: SkeletonProps) {
-  const baseStyles = 'bg-gray-200 dark:bg-gray-700';
-
+  const baseStyles = 'bg-gray-200';
+  
   const animations = {
     pulse: 'animate-pulse',
-    wave: 'animate-shimmer bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 bg-[length:200%_100%]',
+    wave: 'animate-shimmer bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%]',
     none: '',
   };
 
@@ -59,7 +59,7 @@ export function SkeletonCircle({ size = 48, className = '' }: { size?: number; c
 
 export function SkeletonCard({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-2xl border border-gray-100 overflow-hidden ${className}`}>
       <Skeleton height={200} variant="rectangular" className="rounded-none" />
       <div className="p-5 space-y-3">
         <Skeleton variant="text" width="70%" height={20} />
@@ -93,8 +93,8 @@ export function SkeletonAvatar({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
 
 export function SkeletonTable({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-      <div className="grid gap-4 p-4 border-b border-gray-100 dark:border-gray-700" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="grid gap-4 p-4 border-b border-gray-100" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>
         {Array.from({ length: columns }).map((_, i) => (
           <Skeleton key={i} variant="text" height={16} />
         ))}
@@ -102,7 +102,7 @@ export function SkeletonTable({ rows = 5, columns = 4 }: { rows?: number; column
       {Array.from({ length: rows }).map((_, rowIdx) => (
         <div
           key={rowIdx}
-          className="grid gap-4 p-4 border-b border-gray-50 dark:border-gray-700"
+          className="grid gap-4 p-4 border-b border-gray-50"
           style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
         >
           {Array.from({ length: columns }).map((_, colIdx) => (

@@ -16,13 +16,13 @@ export function Badge({
   className = '',
 }: BadgeProps) {
   const variants = {
-    default: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-    primary: 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300',
+    default: 'bg-gray-100 text-gray-700',
+    primary: 'bg-teal-50 text-teal-700',
     secondary: 'bg-gray-900 text-white',
-    success: 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-    warning: 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-    danger: 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300',
-    info: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    success: 'bg-green-50 text-green-700',
+    warning: 'bg-amber-50 text-amber-700',
+    danger: 'bg-red-50 text-red-700',
+    info: 'bg-blue-50 text-blue-700',
   };
 
   const sizes = {

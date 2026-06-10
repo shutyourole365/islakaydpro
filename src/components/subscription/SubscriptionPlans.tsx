@@ -210,7 +210,7 @@ export default function SubscriptionPlans({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden">
+    <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
       {/* Header */}
       <div className="p-6 bg-gradient-to-r from-violet-600 to-purple-600 text-white">
         <div className="flex items-center justify-between mb-6">
@@ -277,7 +277,7 @@ export default function SubscriptionPlans({
                     ? 'border-purple-500 shadow-lg shadow-purple-500/20'
                     : isSelected
                     ? 'border-purple-500'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 {plan.badge && (
@@ -291,18 +291,18 @@ export default function SubscriptionPlans({
                   {getTierIcon(plan.tier)}
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{plan.name}</h3>
-
+                <h3 className="text-xl font-bold text-gray-900 mb-1">{plan.name}</h3>
+                
                 <div className="mb-4">
                   {plan.monthlyPrice === 0 ? (
-                    <div className="text-3xl font-bold text-gray-900 dark:text-white">Free</div>
+                    <div className="text-3xl font-bold text-gray-900">Free</div>
                   ) : (
                     <>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                        <span className="text-3xl font-bold text-gray-900">
                           ${getMonthlyEquivalent(plan).toFixed(2)}
                         </span>
-                        <span className="text-gray-500 dark:text-gray-400">/mo</span>
+                        <span className="text-gray-500">/mo</span>
                       </div>
                       {billingCycle === 'yearly' && savings > 0 && (
                         <p className="text-sm text-green-600 font-medium">
@@ -315,17 +315,17 @@ export default function SubscriptionPlans({
 
                 {/* Key Limits */}
                 <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 text-center">
-                    <div className="font-semibold text-gray-900 dark:text-white">
+                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                    <div className="font-semibold text-gray-900">
                       {plan.limits.monthlyBookings === 'unlimited' ? '∞' : plan.limits.monthlyBookings}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Bookings/mo</div>
+                    <div className="text-xs text-gray-500">Bookings/mo</div>
                   </div>
-                  <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 text-center">
-                    <div className="font-semibold text-gray-900 dark:text-white">
+                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                    <div className="font-semibold text-gray-900">
                       {plan.limits.discountPercent}%
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Discount</div>
+                    <div className="text-xs text-gray-500">Discount</div>
                   </div>
                 </div>
 
@@ -338,9 +338,9 @@ export default function SubscriptionPlans({
                           feature.highlight ? 'text-purple-500' : 'text-green-500'
                         }`} />
                       ) : (
-                        <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-300 dark:text-gray-600" />
+                        <XCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-300" />
                       )}
-                      <span className={feature.included ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'}>
+                      <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>
                         {feature.text}
                       </span>
                     </li>
@@ -352,14 +352,14 @@ export default function SubscriptionPlans({
                   disabled={isCurrent}
                   className={`w-full py-3 rounded-xl font-medium transition-all ${
                     isCurrent
-                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-default'
+                      ? 'bg-gray-100 text-gray-500 cursor-default'
                       : plan.popular
                       ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg'
-                      : 'bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200'
+                      : 'bg-gray-900 text-white hover:bg-gray-800'
                   }`}
                 >
-                  {isCurrent ? 'Current Plan' :
-                   plan.monthlyPrice === 0 ? 'Get Started' :
+                  {isCurrent ? 'Current Plan' : 
+                   plan.monthlyPrice === 0 ? 'Get Started' : 
                    plan.id === 'enterprise' ? 'Contact Sales' : 'Upgrade'}
                 </button>
               </div>
@@ -368,46 +368,46 @@ export default function SubscriptionPlans({
         </div>
 
         {/* Benefits Overview */}
-        <div className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl p-6">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+        <div className="mt-8 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
             <Gift className="w-5 h-5 text-purple-500" />
             Member Benefits
           </h3>
           <div className="grid md:grid-cols-4 gap-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
                 <Percent className="w-5 h-5 text-purple-500" />
               </div>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Up to 25% Off</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">On all rentals</p>
+                <p className="font-medium text-gray-900">Up to 25% Off</p>
+                <p className="text-sm text-gray-600">On all rentals</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
                 <Truck className="w-5 h-5 text-purple-500" />
               </div>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Free Delivery</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">On qualifying orders</p>
+                <p className="font-medium text-gray-900">Free Delivery</p>
+                <p className="text-sm text-gray-600">On qualifying orders</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
                 <Shield className="w-5 h-5 text-purple-500" />
               </div>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Insurance Savings</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Up to 20% off coverage</p>
+                <p className="font-medium text-gray-900">Insurance Savings</p>
+                <p className="text-sm text-gray-600">Up to 20% off coverage</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
                 <HeadphonesIcon className="w-5 h-5 text-purple-500" />
               </div>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Priority Support</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Fast response times</p>
+                <p className="font-medium text-gray-900">Priority Support</p>
+                <p className="text-sm text-gray-600">Fast response times</p>
               </div>
             </div>
           </div>
@@ -415,7 +415,7 @@ export default function SubscriptionPlans({
 
         {/* FAQ Link */}
         <div className="mt-6 text-center">
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             Questions? Check our{' '}
             <a href="#" className="text-purple-600 font-medium hover:underline">
               Membership FAQ

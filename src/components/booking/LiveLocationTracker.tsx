@@ -124,7 +124,7 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-4 text-white">
         <div className="flex items-center justify-between">
@@ -153,19 +153,19 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
 
       <div className="p-4 space-y-4">
         {/* Equipment Location */}
-        <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
-          <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-            <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-300" />
+        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+          <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <MapPin className="w-5 h-5 text-teal-600" />
           </div>
           <div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Pickup Location</div>
-            <div className="font-medium text-gray-900 dark:text-white">{equipmentLocation.address}</div>
+            <div className="text-sm text-gray-500">Pickup Location</div>
+            <div className="font-medium text-gray-900">{equipmentLocation.address}</div>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl">
+          <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl">
             <AlertCircle className="w-5 h-5" />
             <span className="text-sm">{error}</span>
           </div>
@@ -176,38 +176,38 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
           <>
             {/* Distance & ETA Summary */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              <div className="bg-blue-50 rounded-xl p-4 text-center">
+                <div className="text-3xl font-bold text-blue-600">
                   {distance ? distance.toFixed(1) : '--'}
                 </div>
-                <div className="text-sm text-blue-500 dark:text-blue-400">miles away</div>
+                <div className="text-sm text-blue-500">miles away</div>
               </div>
-              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 text-center">
-                <div className="text-3xl font-bold text-green-600 dark:text-green-400">{eta || '--:--'}</div>
-                <div className="text-sm text-green-500 dark:text-green-400">ETA (driving)</div>
+              <div className="bg-green-50 rounded-xl p-4 text-center">
+                <div className="text-3xl font-bold text-green-600">{eta || '--:--'}</div>
+                <div className="text-sm text-green-500">ETA (driving)</div>
               </div>
             </div>
 
             {/* Travel Mode Options */}
             <div className="space-y-2">
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Travel Options</div>
+              <div className="text-sm font-medium text-gray-700">Travel Options</div>
               {travelEstimates.map((estimate) => (
                 <div
                   key={estimate.mode}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
                   onClick={openNavigation}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center shadow-sm">
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
                       {getModeIcon(estimate.mode)}
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900 dark:text-white capitalize">{estimate.mode}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">{estimate.distance.toFixed(1)} miles</div>
+                      <div className="font-medium text-gray-900 capitalize">{estimate.mode}</div>
+                      <div className="text-sm text-gray-500">{estimate.distance.toFixed(1)} miles</div>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-semibold text-gray-900 dark:text-white">{formatDuration(estimate.duration)}</div>
+                    <div className="font-semibold text-gray-900">{formatDuration(estimate.duration)}</div>
                   </div>
                 </div>
               ))}
@@ -215,10 +215,10 @@ export default function LiveLocationTracker({ equipmentLocation, pickupTime }: L
 
             {/* Pickup Time Warning */}
             {pickupTime && distance && (
-              <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                  <span className="text-sm text-amber-700 dark:text-amber-400">
+                  <Clock className="w-5 h-5 text-amber-600" />
+                  <span className="text-sm text-amber-700">
                     Pickup scheduled for {pickupTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     {travelEstimates[0] && (
                       <span className="font-medium">

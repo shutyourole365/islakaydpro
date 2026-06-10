@@ -198,20 +198,20 @@ export default function SecurityCenter({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         {onBack && (
           <div className="flex items-center gap-4 mb-8">
             <button
               onClick={onBack}
-              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
             >
               <ChevronRight className="w-6 h-6 text-gray-600 rotate-180" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Security Center</h1>
-              <p className="text-gray-600 dark:text-gray-400">Manage your account security settings</p>
+              <h1 className="text-2xl font-bold text-gray-900">Security Center</h1>
+              <p className="text-gray-600">Manage your account security settings</p>
             </div>
           </div>
         )}
@@ -272,7 +272,7 @@ export default function SecurityCenter({
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-700 rounded-xl">
+      <div className="flex gap-2 p-1 bg-gray-100 rounded-xl">
         {[
           { id: 'overview', label: 'Overview', icon: Shield },
           { id: 'sessions', label: 'Sessions', icon: Monitor },
@@ -284,8 +284,8 @@ export default function SecurityCenter({
             onClick={() =>  setActiveSection(tab.id as typeof activeSection)}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
               activeSection === tab.id
-                ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -331,7 +331,7 @@ export default function SecurityCenter({
             action={
               <button
                 onClick={onChangePassword}
-                className="px-4 py-2 rounded-lg font-medium text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                className="px-4 py-2 rounded-lg font-medium text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
                >
                 Change Password
               </button>
@@ -365,7 +365,7 @@ export default function SecurityCenter({
             action={
               <button
                 onClick={onVerifyPhone}
-                className="px-4 py-2 rounded-lg font-medium text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all"
+                className="px-4 py-2 rounded-lg font-medium text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all"
                >
                 {phoneVerified ? 'Update' : 'Add Phone'}
               </button>
@@ -391,7 +391,7 @@ export default function SecurityCenter({
       {activeSection === 'sessions' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 dark:text-white">Active Sessions</h3>
+            <h3 className="font-semibold text-gray-900">Active Sessions</h3>
             <button
               onClick={onRevokeAllSessions}
               className="text-sm text-red-600 hover:text-red-700 font-medium"
@@ -404,25 +404,25 @@ export default function SecurityCenter({
             <div
               key={session.id}
               className={`p-4 rounded-xl border ${
-                session.isCurrent ? 'border-teal-200 bg-teal-50 dark:border-teal-700 dark:bg-teal-900/20' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+                session.isCurrent ? 'border-teal-200 bg-teal-50' : 'border-gray-200 bg-white'
               }`}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${session.isCurrent ? 'bg-teal-100 dark:bg-teal-800/40' : 'bg-gray-100 dark:bg-gray-700'}`}>
-                    <Monitor className={`w-5 h-5 ${session.isCurrent ? 'text-teal-600' : 'text-gray-600 dark:text-gray-400'}`} />
+                  <div className={`p-2 rounded-lg ${session.isCurrent ? 'bg-teal-100' : 'bg-gray-100'}`}>
+                    <Monitor className={`w-5 h-5 ${session.isCurrent ? 'text-teal-600' : 'text-gray-600'}`} />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900 dark:text-white">{session.device}</span>
+                      <span className="font-medium text-gray-900">{session.device}</span>
                       {session.isCurrent && (
                         <span className="px-2 py-0.5 bg-teal-500 text-white text-xs rounded-full">Current</span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <div className="text-sm text-gray-500 mt-1">
                       {session.browser} • {session.location}
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
                       <Globe className="w-3 h-3" />
                       {session.ip} • Active {formatTimeAgo(session.lastActive)}
                     </div>
@@ -431,7 +431,7 @@ export default function SecurityCenter({
                 {!session.isCurrent && (
                   <button
                     onClick={() =>  onRevokeSession(session.id)}
-                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                   </button>
@@ -444,15 +444,15 @@ export default function SecurityCenter({
 
       {activeSection === 'activity' && (
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Recent Security Activity</h3>
+          <h3 className="font-semibold text-gray-900">Recent Security Activity</h3>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
+          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             {activityLog.map((event) => (
               <div key={event.id} className="p-4 flex items-start gap-3">
                 {getEventIcon(event.type, event.success)}
                 <div className="flex-1">
-                  <p className="text-gray-900 dark:text-white text-sm">{event.description}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  <p className="text-gray-900 text-sm">{event.description}</p>
+                  <div className="flex items-center gap-2 text-xs text-gray-400 mt-1">
                     <Clock className="w-3 h-3" />
                     {formatTimeAgo(event.timestamp)} • {event.ip}
                   </div>
@@ -470,35 +470,35 @@ export default function SecurityCenter({
 
       {activeSection === 'privacy' && (
         <div className="space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white">Privacy & Data</h3>
+          <h3 className="font-semibold text-gray-900">Privacy & Data</h3>
 
-          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
+          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-100">
             <button
               onClick={onDownloadData}
-              className="w-full p-4 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              className="w-full p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors"
              >
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <div className="p-2 bg-blue-100 rounded-lg">
                 <Download className="w-5 h-5 text-blue-600" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium text-gray-900 dark:text-white">Download Your Data</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Get a copy of all your data</p>
+                <p className="font-medium text-gray-900">Download Your Data</p>
+                <p className="text-sm text-gray-500">Get a copy of all your data</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </button>
 
             <button
               onClick={onDeleteAccount}
-              className="w-full p-4 flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              className="w-full p-4 flex items-center gap-3 hover:bg-red-50 transition-colors"
              >
-              <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <div className="p-2 bg-red-100 rounded-lg">
                 <Trash2 className="w-5 h-5 text-red-600" />
               </div>
               <div className="flex-1 text-left">
                 <p className="font-medium text-red-600">Delete Account</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Permanently delete your account and data</p>
+                <p className="text-sm text-gray-500">Permanently delete your account and data</p>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </button>
           </div>
 
@@ -575,16 +575,16 @@ function SecurityCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
       <div className="flex items-start gap-4">
-        <div className={`p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700 ${statusColors[status]}`}>
+        <div className={`p-2.5 rounded-xl bg-gray-100 ${statusColors[status]}`}>
           {icon}
         </div>
         <div className="flex-1">
           <div className="flex items-start justify-between">
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-white">{title}</h4>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{description}</p>
+              <h4 className="font-semibold text-gray-900">{title}</h4>
+              <p className="text-sm text-gray-500 mt-0.5">{description}</p>
             </div>
             <div className={`flex items-center gap-2 ${statusColors[status]}`}>
               {statusIcons[status]}

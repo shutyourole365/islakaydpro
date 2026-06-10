@@ -3,33 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Default color variables */
-    --color-primary: #3b82f6;
-    --color-secondary: #8b5cf6;
-    --color-accent: #ec4899;
-    --color-background: #ffffff;
-    --color-foreground: #1f2937;
-    --color-border: #e5e7eb;
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-error: #ef4444;
-    --color-info: #0ea5e9;
-  }
-
-  :root.dark {
-    --color-primary: #60a5fa;
-    --color-secondary: #a78bfa;
-    --color-accent: #f472b6;
-    --color-background: #111827;
-    --color-foreground: #f3f4f6;
-    --color-border: #374151;
-    --color-success: #34d399;
-    --color-warning: #fbbf24;
-    --color-error: #f87171;
-    --color-info: #38bdf8;
-  }
-
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
@@ -40,42 +13,6 @@
     @apply antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
     font-feature-settings: "cv11", "ss01", "ss03";
     text-rendering: optimizeLegibility;
-  }
-
-  /* Accessibility modes */
-  html.high-contrast-mode {
-    --color-primary: #0000ff;
-    --color-border: #000000;
-    --color-foreground: #000000;
-    --color-background: #ffffff;
-  }
-
-  html.high-contrast-mode.dark {
-    --color-primary: #ffff00;
-    --color-border: #ffffff;
-    --color-foreground: #ffffff;
-    --color-background: #000000;
-  }
-
-  html.reduced-motion-mode * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  html.dyslexia-friendly-mode {
-    font-family: 'OpenDyslexic', 'Atkinson Hyperlegible', 'Comic Sans MS', sans-serif;
-    letter-spacing: 0.05em;
-    word-spacing: 0.1em;
-    line-height: 1.8;
-  }
-
-  html.dyslexia-friendly-mode body {
-    background-color: #fffacd;
-  }
-
-  html.dyslexia-friendly-mode.dark body {
-    background-color: #2d2d00;
   }
 
   ::selection {

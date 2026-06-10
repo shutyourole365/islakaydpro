@@ -142,7 +142,7 @@ export default function PriceAlerts({
   const triggeredAlertsCount = alerts.filter(a => a.triggered).length;
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-2xl shadow-lg overflow-hidden ${className}`}>
       {/* Header */}
       <div className="bg-gradient-to-r from-orange-500 to-red-500 text-white p-6">
         <div className="flex items-center justify-between mb-4">
@@ -187,12 +187,12 @@ export default function PriceAlerts({
 
       {/* Success notification */}
       {showSuccess && (
-        <div className="mx-4 mt-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <div className="mx-4 mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
             <Check className="w-5 h-5 text-green-600" />
           </div>
           <div>
-            <p className="font-medium text-green-900 dark:text-green-100">Alert Created!</p>
+            <p className="font-medium text-green-900">Alert Created!</p>
             <p className="text-sm text-green-600">We'll notify you when the price drops</p>
           </div>
         </div>
@@ -200,8 +200,8 @@ export default function PriceAlerts({
 
       {/* Create new alert form */}
       {isCreating && equipment && (
-        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+        <div className="p-4 border-b border-gray-100">
+          <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-start gap-4 mb-4">
               <img
                 src={equipment.images[0]}
@@ -209,10 +209,10 @@ export default function PriceAlerts({
                 className="w-20 h-20 rounded-xl object-cover"
               />
               <div className="flex-1">
-                <h3 className="font-semibold text-gray-900 dark:text-white">{equipment.title}</h3>
+                <h3 className="font-semibold text-gray-900">{equipment.title}</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-lg font-bold text-gray-900 dark:text-white">${equipment.daily_rate}</span>
-                  <span className="text-gray-500 dark:text-gray-400">/day</span>
+                  <span className="text-lg font-bold text-gray-900">${equipment.daily_rate}</span>
+                  <span className="text-gray-500">/day</span>
                 </div>
               </div>
             </div>
@@ -220,11 +220,11 @@ export default function PriceAlerts({
             {/* Target price slider */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="target-price-range" className="text-sm font-medium text-gray-700 dark:text-gray-300">Target Price</label>
+                <label htmlFor="target-price-range" className="text-sm font-medium text-gray-700">Target Price</label>
                 <div className="flex items-center gap-2">
                   <span className="text-2xl font-bold text-orange-600">${newAlert.targetPrice}</span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">/day</span>
-                  <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-xs font-medium">
+                  <span className="text-sm text-gray-500">/day</span>
+                  <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                     {getDropPercentage(equipment.daily_rate, newAlert.targetPrice)}% off
                   </span>
                 </div>
@@ -236,11 +236,11 @@ export default function PriceAlerts({
                 max={equipment.daily_rate - 1}
                 value={newAlert.targetPrice}
                 onChange={(e) => setNewAlert(prev => ({ ...prev, targetPrice: Number(e.target.value) }))}
-                className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full appearance-none cursor-pointer accent-orange-500"
+                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer accent-orange-500"
                 aria-label="Target price slider"
                 title="Adjust target price"
               />
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
                 <span>50% off (${Math.floor(equipment.daily_rate * 0.5)})</span>
                 <span>Current (${equipment.daily_rate})</span>
               </div>
@@ -255,7 +255,7 @@ export default function PriceAlerts({
                   onChange={(e) => setNewAlert(prev => ({ ...prev, notifyEmail: e.target.checked }))}
                   className="w-4 h-4 text-orange-500 rounded border-gray-300 focus:ring-orange-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Email</span>
+                <span className="text-sm text-gray-700">Email</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -264,7 +264,7 @@ export default function PriceAlerts({
                   onChange={(e) => setNewAlert(prev => ({ ...prev, notifyPush: e.target.checked }))}
                   className="w-4 h-4 text-orange-500 rounded border-gray-300 focus:ring-orange-500"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Push Notification</span>
+                <span className="text-sm text-gray-700">Push Notification</span>
               </label>
             </div>
 
@@ -279,7 +279,7 @@ export default function PriceAlerts({
               </button>
               <button
                 onClick={() => setIsCreating(false)}
-                className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -289,13 +289,13 @@ export default function PriceAlerts({
       )}
 
       {/* Alerts list */}
-      <div className="divide-y divide-gray-100 dark:divide-gray-700">
+      <div className="divide-y divide-gray-100">
         {alerts.length > 0 ? (
           alerts.map(alert => (
             <div
               key={alert.id}
               className={`p-4 flex items-center gap-4 transition-colors ${
-                alert.triggered ? 'bg-green-50 dark:bg-green-900/20' : alert.isActive ? '' : 'bg-gray-50 dark:bg-gray-700/30 opacity-60'
+                alert.triggered ? 'bg-green-50' : alert.isActive ? '' : 'bg-gray-50 opacity-60'
               }`}
             >
               <div className="relative">
@@ -312,7 +312,7 @@ export default function PriceAlerts({
               </div>
 
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-gray-900 dark:text-white truncate">{alert.equipmentTitle}</h4>
+                <h4 className="font-medium text-gray-900 truncate">{alert.equipmentTitle}</h4>
                 
                 <div className="flex items-center gap-3 mt-1">
                   <div className="flex items-center gap-1">
@@ -323,7 +323,7 @@ export default function PriceAlerts({
                       ${alert.targetPrice}
                     </span>
                   </div>
-                  <span className="px-2 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 rounded-full text-xs font-medium">
+                  <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded-full text-xs font-medium">
                     {getDropPercentage(alert.currentPrice, alert.targetPrice)}% off
                   </span>
                 </div>
@@ -342,7 +342,7 @@ export default function PriceAlerts({
                   className={`p-2 rounded-lg transition-colors ${
                     alert.isActive
                       ? 'bg-orange-100 text-orange-600 hover:bg-orange-200'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
                   }`}
                   title={alert.isActive ? 'Pause alert' : 'Activate alert'}
                 >
@@ -350,7 +350,7 @@ export default function PriceAlerts({
                 </button>
                 <button
                   onClick={() => handleDeleteAlert(alert.id)}
-                  className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors"
+                  className="p-2 rounded-lg bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600 transition-colors"
                   title="Delete alert"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -360,11 +360,11 @@ export default function PriceAlerts({
           ))
         ) : (
           <div className="py-12 text-center">
-            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Bell className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No price alerts yet</h3>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">Create alerts to get notified when prices drop</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No price alerts yet</h3>
+            <p className="text-gray-500 mb-4">Create alerts to get notified when prices drop</p>
             <button
               onClick={() => setIsCreating(true)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-medium rounded-xl hover:shadow-lg transition-all"
@@ -378,14 +378,14 @@ export default function PriceAlerts({
 
       {/* Pro tip */}
       {alerts.length > 0 && (
-        <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-t border-orange-100 dark:border-orange-800">
+        <div className="p-4 bg-gradient-to-r from-orange-50 to-red-50 border-t border-orange-100">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+            <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-4 h-4 text-orange-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-900 dark:text-white">Pro Tip</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm font-medium text-gray-900">Pro Tip</p>
+              <p className="text-sm text-gray-600">
                 Set alerts for 15-25% below current prices for the best chance of getting notified about genuine deals.
               </p>
             </div>

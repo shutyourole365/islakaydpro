@@ -1,11 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Fingerprint, Smartphone, ShieldCheck, AlertCircle } from 'lucide-react';
-import {
-  isPlatformAuthenticatorAvailable,
-  hasRegisteredPasskey,
-  registerPasskey,
-  authenticatePasskey,
-} from '../../utils/webauthn';
 
 interface BiometricAuthProps {
   onSuccess: () => void;
@@ -26,13 +20,14 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
   const [isRegistered, setIsRegistered] = useState(false);
 
   const checkBiometricCapabilities = useCallback(async () => {
-    const platformAuth = await isPlatformAuthenticatorAvailable();
-    if (!platformAuth) {
+    if (!window.PublicKeyCredential) {
       setCapabilities({ available: false, type: 'unknown', platformAuthenticator: false });
       return;
     }
 
     try {
+      const platformAuth = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+      
       // Detect biometric type (simplified detection)
       const userAgent = navigator.userAgent.toLowerCase();
       let type: BiometricCapabilities['type'] = 'unknown';
@@ -58,7 +53,9 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
   }, []);
 
   const checkIfRegistered = useCallback(() => {
-    setIsRegistered(userId ? hasRegisteredPasskey(userId) : false);
+    // Check localStorage for registered credentials
+    const stored = localStorage.getItem(`biometric_${userId}`);
+    setIsRegistered(!!stored);
   }, [userId]);
 
   useEffect(() => {
@@ -72,9 +69,45 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
     setIsRegistering(true);
 
     try {
-      await registerPasskey(userId);
-      setIsRegistered(true);
-      onSuccess();
+      // Generate challenge (in production, this should come from server)
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+
+      const publicKeyCredentialCreationOptions: PublicKeyCredentialCreationOptions = {
+        challenge,
+        rp: {
+          name: 'Islakayd',
+          id: window.location.hostname,
+        },
+        user: {
+          id: new TextEncoder().encode(userId),
+          name: userId,
+          displayName: 'Islakayd User',
+        },
+        pubKeyCredParams: [
+          { alg: -7, type: 'public-key' }, // ES256
+          { alg: -257, type: 'public-key' }, // RS256
+        ],
+        authenticatorSelection: {
+          authenticatorAttachment: 'platform',
+          userVerification: 'required',
+          residentKey: 'preferred',
+        },
+        timeout: 60000,
+        attestation: 'none',
+      };
+
+      const credential = await navigator.credentials.create({
+        publicKey: publicKeyCredentialCreationOptions,
+      }) as PublicKeyCredential;
+
+      if (credential) {
+        // Store credential ID (in production, send to server)
+        const credentialId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+        localStorage.setItem(`biometric_${userId}`, credentialId);
+        setIsRegistered(true);
+        onSuccess();
+      }
     } catch (error) {
       console.error('Biometric registration error:', error);
       onError('Biometric registration failed. Please try again.');
@@ -89,8 +122,38 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
     setIsAuthenticating(true);
 
     try {
-      await authenticatePasskey(userId);
-      onSuccess();
+      const storedCredentialId = localStorage.getItem(`biometric_${userId}`);
+      if (!storedCredentialId) {
+        onError('No biometric credential found. Please register first.');
+        setIsAuthenticating(false);
+        return;
+      }
+
+      // Generate challenge
+      const challenge = new Uint8Array(32);
+      crypto.getRandomValues(challenge);
+
+      // Convert stored credential ID back to ArrayBuffer
+      const credentialIdArray = Uint8Array.from(atob(storedCredentialId), c => c.charCodeAt(0));
+
+      const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
+        challenge,
+        allowCredentials: [{
+          id: credentialIdArray,
+          type: 'public-key',
+          transports: ['internal'],
+        }],
+        userVerification: 'required',
+        timeout: 60000,
+      };
+
+      const assertion = await navigator.credentials.get({
+        publicKey: publicKeyCredentialRequestOptions,
+      });
+
+      if (assertion) {
+        onSuccess();
+      }
     } catch (error) {
       console.error('Biometric authentication error:', error);
       onError('Biometric authentication failed. Please try again or use password.');
@@ -134,8 +197,8 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
 
   if (!capabilities?.available) {
     return (
-      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
+      <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <div className="flex items-center gap-3 text-gray-500">
           <AlertCircle className="w-5 h-5" />
           <p className="text-sm">Biometric authentication is not available on this device.</p>
         </div>
@@ -145,15 +208,15 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
 
   return (
     <div className="space-y-4">
-      <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 rounded-2xl border border-teal-100 dark:border-teal-800">
+      <div className="p-6 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl border border-teal-100">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center text-white">
               {getBiometricIcon()}
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white">{getBiometricName()}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <h3 className="font-semibold text-gray-900">{getBiometricName()}</h3>
+              <p className="text-sm text-gray-600">
                 {isRegistered ? 'Ready to use' : 'Not set up'}
               </p>
             </div>
@@ -185,7 +248,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
           <button
             onClick={registerBiometric}
             disabled={isRegistering}
-            className="w-full py-4 bg-white dark:bg-gray-800 border-2 border-teal-500 text-teal-600 dark:text-teal-400 font-semibold rounded-xl hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+            className="w-full py-4 bg-white border-2 border-teal-500 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
            >
             {isRegistering ? (
               <>
@@ -202,7 +265,7 @@ export default function BiometricAuth({ onSuccess, onError, userId }: BiometricA
         )}
       </div>
 
-      <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex items-start gap-2 text-xs text-gray-500">
         <ShieldCheck className="w-4 h-4 mt-0.5 flex-shrink-0" />
         <p>
           Your biometric data never leaves your device. We only store a secure cryptographic key that verifies your identity.

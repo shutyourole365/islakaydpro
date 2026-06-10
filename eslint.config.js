@@ -16,8 +16,6 @@ export default tseslint.config(
     rules: {
       // Disable problematic rule that has compatibility issues with ESLint v9
       '@typescript-eslint/no-unused-expressions': 'off',
-      // Allow underscore-prefixed parameters to be unused (e.g. _dailyRate)
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   }
 );

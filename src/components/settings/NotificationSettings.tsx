@@ -211,8 +211,8 @@ export default function NotificationSettings() {
         <div
           className={`p-4 rounded-xl flex items-center gap-3 ${
             message.type === 'success'
-              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-              : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+              ? 'bg-green-50 text-green-700'
+              : 'bg-red-50 text-red-700'
           }`}
         >
           {message.type === 'success' ? (
@@ -280,18 +280,18 @@ export default function NotificationSettings() {
       </div>
 
       {/* Notification Types */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
-          <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900 flex items-center gap-2">
             <Smartphone className="w-5 h-5 text-teal-500" />
             Notification Types
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-sm text-gray-500 mt-1">
             Choose which notifications you want to receive
           </p>
         </div>
 
-        <div className="divide-y divide-gray-100 dark:divide-gray-700">
+        <div className="divide-y divide-gray-100">
           {[
             {
               key: 'push_booking_requests',
@@ -338,15 +338,15 @@ export default function NotificationSettings() {
           ].map(({ key, icon: Icon, label, description }) => (
             <label
               key={key}
-              className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-gray-600" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{label}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
+                  <p className="font-medium text-gray-900">{label}</p>
+                  <p className="text-sm text-gray-500">{description}</p>
                 </div>
               </div>
               <div className="relative">
@@ -356,7 +356,7 @@ export default function NotificationSettings() {
                   onChange={(e) => updatePreference(key as keyof NotificationPreferences, e.target.checked)}
                   disabled={subscriptionStatus !== 'subscribed' || isSaving}                aria-label={label}                  className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500 peer-disabled:opacity-50"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500 peer-disabled:opacity-50"></div>
               </div>
             </label>
           ))}
@@ -364,14 +364,14 @@ export default function NotificationSettings() {
       </div>
 
       {/* Quiet Hours */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Moon className="w-5 h-5 text-teal-500" />
               <div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Quiet Hours</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h3 className="font-semibold text-gray-900">Quiet Hours</h3>
+                <p className="text-sm text-gray-500">
                   Pause notifications during specific hours
                 </p>
               </div>
@@ -385,7 +385,7 @@ export default function NotificationSettings() {
                 aria-label="Enable quiet hours"
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
             </label>
           </div>
         </div>
@@ -394,7 +394,7 @@ export default function NotificationSettings() {
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Start Time
                 </label>
                 <input
@@ -402,11 +402,11 @@ export default function NotificationSettings() {
                   value={preferences.quiet_hours_start}
                   onChange={(e) => updatePreference('quiet_hours_start', e.target.value)}
                   title="Quiet hours start time"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   End Time
                 </label>
                 <input
@@ -414,13 +414,13 @@ export default function NotificationSettings() {
                   value={preferences.quiet_hours_end}
                   onChange={(e) => updatePreference('quiet_hours_end', e.target.value)}
                   title="Quiet hours end time"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-2">
                 <Globe className="w-4 h-4" />
                 Timezone
               </label>
@@ -428,7 +428,7 @@ export default function NotificationSettings() {
                 value={preferences.timezone}
                 onChange={(e) => updatePreference('timezone', e.target.value)}
                 aria-label="Timezone"
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
               >
                 <option value="America/Los_Angeles">Pacific Time (PT)</option>
                 <option value="America/Denver">Mountain Time (MT)</option>
@@ -442,7 +442,7 @@ export default function NotificationSettings() {
               </select>
             </div>
 
-            <p className="text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+            <p className="text-sm text-gray-500 bg-gray-50 rounded-lg p-3">
               📱 During quiet hours, notifications will be silently delivered and won't wake your device.
             </p>
           </div>

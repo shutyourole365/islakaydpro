@@ -37,9 +37,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       primary: 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:shadow-lg focus:ring-teal-500',
-      secondary: 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-gray-500',
-      outline: 'border-2 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-gray-500',
-      ghost: 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-gray-500',
+      secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
+      outline: 'border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 focus:ring-gray-500',
+      ghost: 'text-gray-600 hover:bg-gray-100 focus:ring-gray-500',
       danger: 'bg-red-500 text-white hover:bg-red-600 focus:ring-red-500',
     };
 
@@ -113,7 +113,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+            className="block text-sm font-medium text-gray-700 mb-1.5"
           >
             {label}
             {props.required && <span className="text-red-500 ml-1" aria-hidden="true">*</span>}
@@ -129,13 +129,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             id={inputId}
             className={`
-              w-full px-4 py-3 bg-white dark:bg-gray-700 border rounded-xl text-gray-900 dark:text-white
-              placeholder:text-gray-400 dark:placeholder:text-gray-400
+              w-full px-4 py-3 bg-white border rounded-xl text-gray-900
+              placeholder:text-gray-400
               focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent
-              disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed
+              disabled:bg-gray-100 disabled:cursor-not-allowed
               ${leftIcon ? 'pl-10' : ''}
               ${rightIcon ? 'pr-10' : ''}
-              ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-600'}
+              ${error ? 'border-red-500 focus:ring-red-500' : 'border-gray-200'}
               ${className}
             `}
             aria-invalid={error ? 'true' : 'false'}
@@ -149,7 +149,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
         {hint && !error && (
-          <p id={hintId} className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">
+          <p id={hintId} className="mt-1.5 text-sm text-gray-500">
             {hint}
           </p>
         )}
@@ -323,8 +323,8 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   ) => {
     const variants = {
       primary: 'bg-teal-500 text-white hover:bg-teal-600 focus:ring-teal-500',
-      secondary: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-gray-500',
-      ghost: 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-gray-500',
+      secondary: 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500',
+      ghost: 'text-gray-600 hover:bg-gray-100 focus:ring-gray-500',
       danger: 'text-red-600 hover:bg-red-50 focus:ring-red-500',
     };
 
@@ -417,11 +417,11 @@ interface BadgeProps {
 
 export function Badge({ children, variant = 'default', size = 'md' }: BadgeProps) {
   const variants = {
-    default: 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300',
-    success: 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400',
-    warning: 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400',
-    error: 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400',
-    info: 'bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
+    default: 'bg-gray-100 text-gray-700',
+    success: 'bg-green-100 text-green-700',
+    warning: 'bg-yellow-100 text-yellow-700',
+    error: 'bg-red-100 text-red-700',
+    info: 'bg-blue-100 text-blue-700',
   };
 
   const sizes = {
@@ -482,12 +482,12 @@ export function ProgressBar({
     <div className="w-full">
       {(label || showValue) && (
         <div className="flex justify-between mb-1.5">
-          {label && <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>}
-          {showValue && <span className="text-sm text-gray-500 dark:text-gray-400">{Math.round(percentage)}%</span>}
+          {label && <span className="text-sm font-medium text-gray-700">{label}</span>}
+          {showValue && <span className="text-sm text-gray-500">{Math.round(percentage)}%</span>}
         </div>
       )}
       <div
-        className={`w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${sizes[size]}`}
+        className={`w-full bg-gray-200 rounded-full overflow-hidden ${sizes[size]}`}
         role="progressbar"
         aria-valuenow={value}
         aria-valuemin={0}
@@ -527,7 +527,7 @@ export function Card({
   const cardContent = (
     <Component
       className={`
-        bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm
+        bg-white rounded-xl border border-gray-100 shadow-sm
         ${isClickable ? 'cursor-pointer hover:shadow-md transition-shadow focus-within:ring-2 focus-within:ring-teal-500 focus-within:ring-offset-2' : ''}
         ${className}
       `}
@@ -576,10 +576,10 @@ export function Alert({
   onDismiss,
 }: AlertProps) {
   const variants = {
-    info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/30 text-blue-800 dark:text-blue-300',
-    success: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800/30 text-green-800 dark:text-green-300',
-    warning: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800/30 text-yellow-800 dark:text-yellow-300',
-    error: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800/30 text-red-800 dark:text-red-300',
+    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    success: 'bg-green-50 border-green-200 text-green-800',
+    warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
+    error: 'bg-red-50 border-red-200 text-red-800',
   };
 
   const icons = {

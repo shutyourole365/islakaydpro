@@ -7,7 +7,6 @@ import {
   ChevronRight,
   Star,
 } from 'lucide-react';
-import { getEquipmentAvailability } from '../../services/database';
 
 interface SmartSchedulerProps {
   equipmentId: string;
@@ -36,7 +35,6 @@ interface AIRecommendation {
 }
 
 export default function SmartScheduler({
-  equipmentId,
   equipmentTitle,
   dailyRate,
   onSelectDates,
@@ -55,64 +53,50 @@ export default function SmartScheduler({
 
   const loadSmartData = async () => {
     setLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 800));
 
+    // Generate smart time slots
+    const slots: TimeSlot[] = [];
     const startOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
     const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Fetch real blocked/booked dates from database
-    let bookedRanges: { start_date: string; end_date: string }[] = [];
-    try {
-      const availability = await getEquipmentAvailability(
-        equipmentId,
-        startOfMonth.toISOString().split('T')[0],
-        endOfMonth.toISOString().split('T')[0]
-      );
-      bookedRanges = availability.map(a => ({ start_date: a.start_date, end_date: a.end_date }));
-    } catch (e) {
-      console.error('Failed to load availability:', e);
-    }
-
-    const isDateBlocked = (date: Date): boolean => {
-      const dateStr = date.toISOString().split('T')[0];
-      return bookedRanges.some(r => dateStr >= r.start_date && dateStr <= r.end_date);
-    };
-
-    // Generate smart time slots based on real availability
-    const slots: TimeSlot[] = [];
+    
     for (let d = new Date(startOfMonth); d <= endOfMonth; d.setDate(d.getDate() + 1)) {
       const dayOfWeek = d.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const dayOfMonth = d.getDate();
-      const isPast = d < today;
-      const isBooked = isDateBlocked(new Date(d));
-      const available = !isPast && !isBooked;
-
+      
+      // Simulate demand patterns
       let demand: TimeSlot['demand'] = 'medium';
       let discount = 0;
       let recommended = false;
       let reason: string | undefined;
-
-      if (available) {
-        if (!isWeekend) {
-          demand = 'low';
-          discount = 15;
-          if (dayOfWeek === 2 || dayOfWeek === 3) {
-            discount = 20;
-            recommended = true;
-            reason = 'Mid-week — 20% off';
-          }
-        } else {
-          demand = 'high';
-        }
-        if (dayOfMonth >= 25 && !isWeekend) {
-          discount = Math.max(discount, 10);
+      
+      // Weekdays generally lower demand
+      if (!isWeekend) {
+        demand = 'low';
+        discount = 15;
+        if (dayOfWeek === 2 || dayOfWeek === 3) { // Tue/Wed best
+          discount = 20;
           recommended = true;
-          reason = reason || 'End of month deal';
+          reason = 'Best day of the week - 20% off';
+        }
+      } else {
+        demand = 'high';
+        discount = 0;
+      }
+      
+      // End of month often less busy
+      if (dayOfMonth >= 25) {
+        discount = Math.max(discount, 10);
+        if (!isWeekend) {
+          recommended = true;
+          reason = 'End of month special';
         }
       }
-
+      
+      // Future dates only
+      const available = d >= new Date();
+      
       slots.push({
         date: new Date(d),
         available,
@@ -124,29 +108,30 @@ export default function SmartScheduler({
       });
     }
 
-    // Build smart recommendations from available stretches
-    const availableSlots = slots.filter(s => s.available && s.discount > 0);
-    const recs: AIRecommendation[] = [];
-    if (availableSlots.length >= 3) {
-      const best = availableSlots.slice(0, 3);
-      recs.push({
-        startDate: best[0].date,
-        endDate: best[2].date,
-        totalSavings: Math.round(best.reduce((sum, s) => sum + (dailyRate - s.price), 0)),
-        reason: 'Best available dates with lowest demand pricing.',
-        confidence: 92,
-      });
-    }
-    if (availableSlots.length >= 6) {
-      const mid = availableSlots.slice(3, 6);
-      recs.push({
-        startDate: mid[0].date,
-        endDate: mid[2].date,
-        totalSavings: Math.round(mid.reduce((sum, s) => sum + (dailyRate - s.price), 0)),
-        reason: 'Good availability window with discount pricing.',
-        confidence: 78,
-      });
-    }
+    // Generate AI recommendations
+    const recs: AIRecommendation[] = [
+      {
+        startDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 15),
+        endDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 18),
+        totalSavings: 85,
+        reason: 'Mid-week booking with 20% discount. Lowest demand period.',
+        confidence: 95,
+      },
+      {
+        startDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 27),
+        endDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1),
+        totalSavings: 120,
+        reason: 'End of month pricing + weekend rates. Great value!',
+        confidence: 88,
+      },
+      {
+        startDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 8),
+        endDate: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 10),
+        totalSavings: 45,
+        reason: 'Popular dates but still 15% off for weekday portion.',
+        confidence: 75,
+      },
+    ];
 
     setTimeSlots(slots);
     setRecommendations(recs);
@@ -216,15 +201,15 @@ export default function SmartScheduler({
 
   if (loading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 text-center">
+      <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
         <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">Analyzing best times to book...</p>
+        <p className="text-gray-600">Analyzing best times to book...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden max-w-2xl w-full">
+    <div className="bg-white rounded-3xl shadow-xl overflow-hidden max-w-2xl w-full">
       {/* Header */}
       <div className="p-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
         <div className="flex items-center justify-between mb-4">
@@ -269,23 +254,23 @@ export default function SmartScheduler({
       {viewMode === 'calendar' ? (
         <>
           {/* Calendar Navigation */}
-          <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+          <div className="p-4 border-b border-gray-100 flex items-center justify-between">
             <button
               onClick={prevMonth}
               aria-label="Previous month"
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
             </button>
-            <h3 className="font-semibold text-gray-900 dark:text-white">
+            <h3 className="font-semibold text-gray-900">
               {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </h3>
             <button
               onClick={nextMonth}
               aria-label="Next month"
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <ChevronRight className="w-5 h-5 text-gray-600" />
             </button>
           </div>
 
@@ -293,7 +278,7 @@ export default function SmartScheduler({
           <div className="p-4">
             <div className="grid grid-cols-7 gap-1 mb-2">
               {dayNames.map((day) => (
-                <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2">
+                <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
                   {day}
                 </div>
               ))}
@@ -321,7 +306,7 @@ export default function SmartScheduler({
                       ${!slot.available ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer'}
                       ${isStart || isEnd ? 'bg-indigo-600 text-white' : ''}
                       ${inRange && !isStart && !isEnd ? 'bg-indigo-100 text-indigo-700' : ''}
-                      ${!inRange && slot.available ? 'hover:bg-gray-100 dark:hover:bg-gray-700' : ''}
+                      ${!inRange && slot.available ? 'hover:bg-gray-100' : ''}
                       ${slot.recommended && !inRange ? 'ring-2 ring-green-400 ring-offset-1' : ''}
                     `}
                   >
@@ -340,7 +325,7 @@ export default function SmartScheduler({
             </div>
 
             {/* Legend */}
-            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500">
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 bg-green-100 rounded border border-green-400" />
                 Low demand
@@ -363,7 +348,7 @@ export default function SmartScheduler({
       ) : (
         /* AI Recommendations */
         <div className="p-4 max-h-80 overflow-y-auto">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-600 mb-4">
             Based on demand patterns and pricing, here are the best times to book:
           </p>
           <div className="space-y-3">
@@ -382,14 +367,14 @@ export default function SmartScheduler({
                         Save ${rec.totalSavings}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{rec.reason}</p>
+                    <p className="text-sm text-gray-600 mt-1">{rec.reason}</p>
                   </div>
                   <div className="text-right">
                     <div className="flex items-center gap-1 text-green-600">
                       <Zap className="w-4 h-4" />
                       <span className="font-medium">{rec.confidence}%</span>
                     </div>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">confidence</span>
+                    <span className="text-xs text-gray-500">confidence</span>
                   </div>
                 </div>
                 <button
@@ -406,20 +391,20 @@ export default function SmartScheduler({
 
       {/* Selection Summary */}
       {totals && (
-        <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
+        <div className="p-4 border-t border-gray-100 bg-gray-50">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600">
                 {selectedStart?.toLocaleDateString()} - {selectedEnd?.toLocaleDateString()}
               </p>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">
+              <p className="text-lg font-bold text-gray-900">
                 {totals.days} days • ${totals.total} total
               </p>
             </div>
             {totals.savings > 0 && (
               <div className="text-right">
                 <p className="text-green-600 font-semibold">You save ${totals.savings}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Avg {totals.avgDiscount}% off</p>
+                <p className="text-xs text-gray-500">Avg {totals.avgDiscount}% off</p>
               </div>
             )}
           </div>

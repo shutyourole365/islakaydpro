@@ -155,9 +155,12 @@ class Analytics {
   }
 }
 
-// Singleton instance. Initialization is gated by main.tsx and the
-// cookie-consent hook (useCookieConsent) — importing this module on its
-// own MUST NOT load the GA script. See src/utils/consent.ts.
+// Singleton instance
 export const analytics = new Analytics();
+
+// Initialize analytics if measurement ID is available
+if (typeof window !== 'undefined' && import.meta.env.VITE_GA_MEASUREMENT_ID) {
+  analytics.initialize();
+}
 
 export default analytics;

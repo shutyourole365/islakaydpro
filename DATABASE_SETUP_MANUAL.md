@@ -137,8 +137,8 @@ Then test:
 
 Already configured in `.env.local`:
 ```
-VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
+VITE_SUPABASE_URL=https://ialxlykysbqyiejepzkx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGc...
 ```
 
 ✅ You're all set! No changes needed.

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { X, Check, Minus, Star, Share2 } from 'lucide-react';
 import type { Equipment } from '../../types';
-import { useToast } from '../ui/Toast';
 
 interface DetailedComparisonProps {
   items: Equipment[];
@@ -11,7 +10,6 @@ interface DetailedComparisonProps {
 }
 
 export default function DetailedComparison({ items, onClose, onRemove, onBook }: DetailedComparisonProps) {
-  const { addToast } = useToast();
   const [viewMode, setViewMode] = useState<'overview' | 'pricing' | 'specifications'>('overview');
 
   const comparisonRows = [
@@ -112,47 +110,44 @@ export default function DetailedComparison({ items, onClose, onRemove, onBook }:
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-purple-50 to-indigo-50">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Equipment Comparison</h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Compare {items.length} items side-by-side</p>
+            <h2 className="text-2xl font-bold text-gray-900">Equipment Comparison</h2>
+            <p className="text-sm text-gray-600">Compare {items.length} items side-by-side</p>
           </div>
           <div className="flex items-center gap-2">
             <button
-
+             
               onClick={() => {
                 // Share comparison logic
-                addToast({
-                  type: 'success',
-                  title: 'Comparison link copied',
-                });
+                alert('Share comparison link copied!');
               }}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <Share2 className="w-4 h-4" />
               Share
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
             >
-              <X className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+              <X className="w-6 h-6 text-gray-500" />
             </button>
           </div>
         </div>
 
         {/* View Mode Tabs */}
-        <div className="flex border-b border-gray-100 dark:border-gray-700 px-6 bg-gray-50 dark:bg-gray-900">
+        <div className="flex border-b border-gray-100 px-6 bg-gray-50">
           {['overview', 'pricing', 'specifications'].map((mode) => (
             <button
               key={mode}
               onClick={() => setViewMode(mode as typeof viewMode)}
               className={`px-6 py-3 font-medium transition-colors relative ${
                 viewMode === mode
-                  ? 'text-purple-600 dark:text-purple-400'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  ? 'text-purple-600'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
@@ -166,9 +161,9 @@ export default function DetailedComparison({ items, onClose, onRemove, onBook }:
         {/* Comparison Table */}
         <div className="flex-1 overflow-auto">
           <table className="w-full">
-            <thead className="sticky top-0 bg-white dark:bg-gray-800 z-10 shadow-sm">
+            <thead className="sticky top-0 bg-white z-10 shadow-sm">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-700 dark:text-gray-300 w-48">
+                <th className="px-4 py-3 text-left font-medium text-gray-700 w-48">
                   {/* Empty corner cell */}
                 </th>
                 {items.map((item) => (
@@ -188,15 +183,15 @@ export default function DetailedComparison({ items, onClose, onRemove, onBook }:
                         </button>
                       </div>
                       <div className="text-left">
-                        <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2">
+                        <h3 className="font-semibold text-gray-900 line-clamp-2">
                           {item.title}
                         </h3>
                         <div className="flex items-center gap-1 mt-1">
                           <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          <span className="text-sm font-medium text-gray-900">
                             {item.rating.toFixed(1)}
                           </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                          <span className="text-sm text-gray-500">
                             ({item.total_reviews})
                           </span>
                         </div>
@@ -215,14 +210,14 @@ export default function DetailedComparison({ items, onClose, onRemove, onBook }:
             <tbody>
               {viewMode === 'overview' && comparisonRows.map((section) => (
                 <>
-                  <tr key={section.category} className="bg-gray-50 dark:bg-gray-700/50">
-                    <td colSpan={items.length + 1} className="px-4 py-3 font-semibold text-gray-900 dark:text-white">
+                  <tr key={section.category} className="bg-gray-50">
+                    <td colSpan={items.length + 1} className="px-4 py-3 font-semibold text-gray-900">
                       {section.category}
                     </td>
                   </tr>
                   {section.rows.map((row) => (
-                    <tr key={row.label} className="border-b border-gray-100 dark:border-gray-700">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <tr key={row.label} className="border-b border-gray-100">
+                      <td className="px-4 py-3 text-sm font-medium text-gray-700">
                         {row.label}
                       </td>
                       {items.map((item) => {
@@ -233,8 +228,8 @@ export default function DetailedComparison({ items, onClose, onRemove, onBook }:
                             key={item.id}
                             className={`px-4 py-3 text-sm ${
                               isHighlighted
-                                ? 'bg-green-50 dark:bg-green-900/20 font-semibold text-green-700 dark:text-green-400'
-                                : 'text-gray-900 dark:text-white'
+                                ? 'bg-green-50 font-semibold text-green-700'
+                                : 'text-gray-900'
                             }`}
                           >
                             {value}

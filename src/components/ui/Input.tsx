@@ -38,7 +38,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     const getInputStyles = () => {
-      let styles = `w-full rounded-xl border bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-4 ${sizes[size]}`;
+      let styles = `w-full rounded-xl border bg-white transition-all duration-200 focus:outline-none focus:ring-4 ${sizes[size]}`;
       
       if (leftIcon) styles += ' pl-11';
       else styles += ' pl-4';
@@ -51,7 +51,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       } else if (success) {
         styles += ' border-green-300 focus:border-green-500 focus:ring-green-500/10';
       } else {
-        styles += ' border-gray-200 dark:border-gray-600 focus:border-teal-500 focus:ring-teal-500/10';
+        styles += ' border-gray-200 focus:border-teal-500 focus:ring-teal-500/10';
       }
 
       return styles;
@@ -60,7 +60,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={`${fullWidth ? 'w-full' : ''} ${className}`}>
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1.5">
             {label}
           </label>
         )}
@@ -114,14 +114,14 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const inputId = id || `textarea-${Math.random().toString(36).substr(2, 9)}`;
 
     const getTextareaStyles = () => {
-      let styles = 'w-full px-4 py-3 rounded-xl border bg-white dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-4 resize-none';
+      let styles = 'w-full px-4 py-3 rounded-xl border bg-white transition-all duration-200 focus:outline-none focus:ring-4 resize-none';
 
       if (error) {
         styles += ' border-red-300 focus:border-red-500 focus:ring-red-500/10';
       } else if (success) {
         styles += ' border-green-300 focus:border-green-500 focus:ring-green-500/10';
       } else {
-        styles += ' border-gray-200 dark:border-gray-600 focus:border-teal-500 focus:ring-teal-500/10';
+        styles += ' border-gray-200 focus:border-teal-500 focus:ring-teal-500/10';
       }
 
       return styles;
@@ -130,7 +130,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className={`${fullWidth ? 'w-full' : ''} ${className}`}>
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1.5">
             {label}
           </label>
         )}
@@ -164,12 +164,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const inputId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
     const getSelectStyles = () => {
-      let styles = 'w-full px-4 py-3 rounded-xl border bg-white dark:bg-gray-700 dark:text-white transition-all duration-200 focus:outline-none focus:ring-4 appearance-none';
+      let styles = 'w-full px-4 py-3 rounded-xl border bg-white transition-all duration-200 focus:outline-none focus:ring-4 appearance-none';
 
       if (error) {
         styles += ' border-red-300 focus:border-red-500 focus:ring-red-500/10';
       } else {
-        styles += ' border-gray-200 dark:border-gray-600 focus:border-teal-500 focus:ring-teal-500/10';
+        styles += ' border-gray-200 focus:border-teal-500 focus:ring-teal-500/10';
       }
 
       return styles;
@@ -178,7 +178,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className={`${fullWidth ? 'w-full' : ''} ${className}`}>
         {label && (
-          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-1.5">
             {label}
           </label>
         )}

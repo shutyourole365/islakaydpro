@@ -142,26 +142,24 @@ export default function BookingCalendar({
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden ${className}`}>
-      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+    <div className={`bg-white rounded-2xl border border-gray-200 overflow-hidden ${className}`}>
+      <div className="p-4 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <button
             onClick={prevMonth}
-            aria-label="Previous month"
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={currentMonth <= new Date(today.getFullYear(), today.getMonth(), 1)}
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
           </button>
-          <h3 className="font-semibold text-gray-900 dark:text-white">
+          <h3 className="font-semibold text-gray-900">
             {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </h3>
           <button
             onClick={nextMonth}
-            aria-label="Next month"
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
            >
-            <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <ChevronRight className="w-5 h-5 text-gray-600" />
           </button>
         </div>
       </div>
@@ -171,7 +169,7 @@ export default function BookingCalendar({
           {dayNames.map((day) => (
             <div
               key={day}
-              className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2"
+              className="text-center text-xs font-medium text-gray-500 py-2"
             >
               {day}
             </div>
@@ -200,10 +198,10 @@ export default function BookingCalendar({
                 className={`
                   aspect-square flex items-center justify-center rounded-full text-sm font-medium
                   transition-all duration-200
-                  ${disabled ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed line-through' : 'cursor-pointer'}
+                  ${disabled ? 'text-gray-300 cursor-not-allowed line-through' : 'cursor-pointer'}
                   ${selected ? 'bg-teal-500 text-white shadow-lg' : ''}
-                  ${inRange && !selected ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300' : ''}
-                  ${!disabled && !selected && !inRange ? 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white' : ''}
+                  ${inRange && !selected ? 'bg-teal-100 text-teal-700' : ''}
+                  ${!disabled && !selected && !inRange ? 'hover:bg-gray-100 text-gray-900' : ''}
                   ${isToday && !selected ? 'ring-2 ring-teal-500 ring-offset-2' : ''}
                 `}
               >
@@ -216,12 +214,12 @@ export default function BookingCalendar({
 
       {(selectedStart || selectedEnd) && (
         <div className="px-4 pb-4">
-          <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
             <div className="flex items-center gap-3">
               <Calendar className="w-5 h-5 text-teal-500" />
               <div>
                 {selectedStart && (
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  <span className="text-sm font-medium text-gray-900">
                     {selectedStart.toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -230,8 +228,8 @@ export default function BookingCalendar({
                 )}
                 {selectedEnd && (
                   <>
-                    <span className="text-gray-400 dark:text-gray-500 mx-2">-</span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                    <span className="text-gray-400 mx-2">-</span>
+                    <span className="text-sm font-medium text-gray-900">
                       {selectedEnd.toLocaleDateString('en-US', {
                         month: 'short',
                         day: 'numeric',
@@ -243,19 +241,19 @@ export default function BookingCalendar({
             </div>
             <button
               onClick={clearDates}
-              className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              className="p-1 rounded-full hover:bg-gray-200 transition-colors"
             >
-              <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
 
           {rentalDays > 0 && (
-            <div className="mt-3 p-3 bg-teal-50 dark:bg-teal-900/20 rounded-xl">
+            <div className="mt-3 p-3 bg-teal-50 rounded-xl">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600 dark:text-gray-300">
+                <span className="text-gray-600">
                   ${dailyRate} x {rentalDays} day{rentalDays > 1 ? 's' : ''}
                 </span>
-                <span className="font-semibold text-teal-700 dark:text-teal-300">
+                <span className="font-semibold text-teal-700">
                   ${totalPrice.toLocaleString()}
                 </span>
               </div>
@@ -265,17 +263,17 @@ export default function BookingCalendar({
       )}
 
       <div className="px-4 pb-4">
-        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-full bg-teal-500" />
             <span>Selected</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-teal-100 dark:bg-teal-900/40" />
+            <div className="w-3 h-3 rounded-full bg-teal-100" />
             <span>In range</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-gray-200 dark:bg-gray-700 line-through" />
+            <div className="w-3 h-3 rounded-full bg-gray-200 line-through" />
             <span>Unavailable</span>
           </div>
         </div>

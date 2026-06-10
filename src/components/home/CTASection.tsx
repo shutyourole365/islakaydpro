@@ -24,18 +24,18 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
   ];
 
   return (
-    <section className="py-24 bg-surface-muted dark:bg-gray-900">
+    <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-sm font-semibold mb-6 border border-primary-100 dark:border-primary-800">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium mb-6">
               <Package className="w-4 h-4" />
               List Your Equipment
             </span>
-            <h2 className="font-display text-4xl lg:text-5xl font-bold text-ink dark:text-white mb-6 leading-tight">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
               Turn Your Equipment Into a Business
             </h2>
-            <p className="text-xl text-ink-muted dark:text-gray-400 mb-8">
+            <p className="text-xl text-gray-600 mb-8">
               Join thousands of equipment owners who are earning money by sharing their
               tools when they're not in use. Set your own prices, availability, and rules.
             </p>
@@ -43,12 +43,12 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
             <div className="space-y-6 mb-10">
               {ownerBenefits.map((benefit, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/40 dark:to-emerald-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center text-teal-600 flex-shrink-0">
                     {benefit.icon}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{benefit.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400">{benefit.description}</p>
+                    <h3 className="font-semibold text-gray-900 mb-1">{benefit.title}</h3>
+                    <p className="text-gray-600">{benefit.description}</p>
                   </div>
                 </div>
               ))}
@@ -57,14 +57,14 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <button
                 onClick={onGetStarted}
-                className="flex items-center gap-2 px-8 py-4 bg-brand-gradient text-white font-semibold rounded-full hover:opacity-90 transition-all shadow-pop"
+                className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-full hover:shadow-xl transition-all"
                >
                 Start Listing Today
                 <ArrowRight className="w-5 h-5" />
               </button>
               <a
                 href="#"
-                className="flex items-center gap-2 px-8 py-4 text-gray-700 dark:text-gray-300 font-semibold hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+                className="flex items-center gap-2 px-8 py-4 text-gray-700 font-semibold hover:text-teal-600 transition-colors"
               >
                 Learn More
               </a>

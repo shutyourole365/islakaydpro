@@ -1,0 +1,6 @@
+verify-migration.cjs
+execute-migration.cjs
+run-migration.cjs
+run-migration-psql.sh
+run-migration-now.sh
+test-supabase.js

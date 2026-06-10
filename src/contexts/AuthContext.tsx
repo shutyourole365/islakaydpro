@@ -2,16 +2,13 @@ import { createContext, useContext, useEffect, useState, useCallback, type React
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Profile, UserAnalytics } from '../types';
-import { getProfile, getUserAnalytics, getUnreadNotificationCount, getUnreadMessageCount, subscribeToNotifications, logAuditEvent } from '../services/database';
-import { errorMonitoring } from '../services/errorMonitoring';
-import {
-  signInWithRetry,
+import { getProfile, getUserAnalytics, getUnreadNotificationCount, subscribeToNotifications, logAuditEvent } from '../services/database';
+import { 
+  signInWithRetry, 
   signUpWithRetry,
   getAuthErrorMessage,
   isEmailConfirmationRequired,
 } from '../services/authHelpers';
-import { captureReferralFromUrl, peekPendingReferralCode, clearPendingReferralCode } from '../services/referrals';
-import { enforceMaxLength } from '../utils/validation';
 
 interface AuthState {
   user: User | null;
@@ -21,7 +18,6 @@ interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   unreadNotifications: number;
-  unreadMessages: number;
 }
 
 interface AuthContextType extends AuthState {
@@ -33,7 +29,6 @@ interface AuthContextType extends AuthState {
   updatePassword: (password: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
   refreshNotifications: () => Promise<void>;
-  refreshMessages: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -47,16 +42,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: true,
     isAuthenticated: false,
     unreadNotifications: 0,
-    unreadMessages: 0,
   });
 
   const loadUserData = useCallback(async (userId: string) => {
     try {
-      const [profile, analytics, unreadCount, unreadMsgCount] = await Promise.all([
+      const [profile, analytics, unreadCount] = await Promise.all([
         getProfile(userId),
         getUserAnalytics(userId),
         getUnreadNotificationCount(userId),
-        getUnreadMessageCount(userId),
       ]);
 
       setState(prev => ({
@@ -64,7 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         analytics,
         unreadNotifications: unreadCount,
-        unreadMessages: unreadMsgCount,
       }));
 
       // sync server-side AI preference to local storage so UI toggles reflect user's saved preference
@@ -84,12 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { analytics: analyticsService } = await import('../services/analytics');
         analyticsService.trackError(`Auth data load failed: ${(error as Error).message}`, false);
       }
-      // Send to Sentry if configured. Nest under a single key so the
-      // Sentry.setContext call inside captureException receives an object
-      // value (it rejects primitives — same convention as the
-      // ErrorBoundary wiring).
+      // Send to Sentry if configured
+      const { errorMonitoring } = await import('../services/errorMonitoring');
       errorMonitoring.captureException(error as Error, {
-        auth: { source: 'AuthContext.loadUserData', userId },
+        context: 'AuthContext.loadUserData',
+        userId,
       });
     }
   }, []);
@@ -101,18 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [state.user]);
 
-  const refreshMessages = useCallback(async () => {
-    if (!state.user) return;
-    try {
-      const count = await getUnreadMessageCount(state.user.id);
-      setState(prev => ({ ...prev, unreadMessages: count }));
-    } catch (e) {
-      errorMonitoring.captureException(e as Error, {
-        auth: { source: 'AuthContext.refreshMessages', userId: state.user.id },
-      });
-    }
-  }, [state.user]);
-
   const refreshNotifications = useCallback(async () => {
     if (state.user) {
       const count = await getUnreadNotificationCount(state.user.id);
@@ -121,7 +100,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [state.user]);
 
   useEffect(() => {
-    captureReferralFromUrl();
     supabase.auth.getSession().then(({ data: { session } }) => {
       setState(prev => ({
         ...prev,
@@ -192,43 +170,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           analytics.setUserId(data.user.id);
         }
         // Set user context in error monitoring
+        const { errorMonitoring } = await import('../services/errorMonitoring');
         errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
       }
     } catch (error) {
-      // Capture the original (pre-friendly-message) error for triage.
-      // Sentry's ignoreErrors config already filters common network noise.
-      errorMonitoring.captureException(error as Error, {
-        auth: { source: 'AuthContext.signIn' },
-      });
       const message = getAuthErrorMessage(error as Error);
       throw new Error(message);
     }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    // Service-layer DoS guard — signUp ends up doing a direct
-    // supabase.from('profiles').upsert below, bypassing updateProfile.
-    // Apply the same cap here so an oversized name can't reach the DB.
-    enforceMaxLength(fullName, 'fullName', 'Full name');
-
-    // Peek (don't consume) so a failed signup retry can still attribute
-    // the referral. Cleared only on success below.
-    const referralCode = peekPendingReferralCode();
     try {
-      const metadata: Record<string, unknown> = { full_name: fullName };
-      if (referralCode) metadata.referral_code = referralCode;
-
       const data = await signUpWithRetry(
-        email,
-        password,
-        metadata,
+        email, 
+        password, 
+        { full_name: fullName },
         { maxAttempts: 3, delayMs: 1000 }
       );
-      // Supabase returns a user with an empty identities array when the
-      // email is already registered (anti-enumeration). Only clear the
-      // pending referral code if a new account was actually created.
-      const isNewSignup = (data?.user?.identities?.length ?? 0) > 0;
-      if (isNewSignup && referralCode) clearPendingReferralCode();
 
       if (data.user) {
         // Create profile (may fail if email confirmation required)
@@ -256,6 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           analytics.setUserId(data.user.id);
         }
         // Set user context in error monitoring
+        const { errorMonitoring } = await import('../services/errorMonitoring');
         errorMonitoring.setUser({ id: data.user.id, email: data.user.email });
 
         // Check if email confirmation is required
@@ -267,13 +226,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       const errorMsg = (error as Error).message;
       if (errorMsg === 'EMAIL_CONFIRMATION_REQUIRED') {
-        // Expected control-flow signal, not a real failure — don't capture.
         throw new Error('Please check your email to confirm your account before signing in.');
       }
-      // Capture the original for triage before throwing the friendly message.
-      errorMonitoring.captureException(error as Error, {
-        auth: { source: 'AuthContext.signUp' },
-      });
       const message = getAuthErrorMessage(error as Error);
       throw new Error(message);
     }
@@ -305,6 +259,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Clear user context from error monitoring
+    const { errorMonitoring } = await import('../services/errorMonitoring');
     errorMonitoring.clearUser();
 
     const { error } = await supabase.auth.signOut();
@@ -318,7 +273,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
       isAuthenticated: false,
       unreadNotifications: 0,
-    unreadMessages: 0,
     });
   };
 
@@ -353,7 +307,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         updatePassword,
         refreshProfile,
         refreshNotifications,
-      refreshMessages,
       }}
     >
       {children}
@@ -368,5 +321,3 @@ export function useAuth() {
   }
   return context;
 }
-
-

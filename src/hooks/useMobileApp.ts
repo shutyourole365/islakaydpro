@@ -50,16 +50,16 @@ export function useMobileApp() {
 
           // Handle app state changes
           App.addListener('appStateChange', ({ isActive }) => {
-            if (import.meta.env.DEV) {
-              console.log(isActive ? 'App became active' : 'App became inactive');
+            if (isActive) {
+              console.log('App became active');
+            } else {
+              console.log('App became inactive');
             }
           });
 
           // Handle deep links
           App.addListener('appUrlOpen', (data) => {
-            if (import.meta.env.DEV) {
-              console.log('App opened with URL:', data.url);
-            }
+            console.log('App opened with URL:', data.url);
             // Handle deep link navigation here
             const path = new URL(data.url).pathname;
             if (path) {

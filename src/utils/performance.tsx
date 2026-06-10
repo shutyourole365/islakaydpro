@@ -224,7 +224,7 @@ interface LazyImageProps {
   placeholder?: string;
 }
 
- 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function LazyImage({ src, alt, className = '', placeholder: _placeholder }: LazyImageProps) {
   const imgRef = useRef<HTMLImageElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);

@@ -53,7 +53,6 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     env:
       TMPDIR: ${{ github.workspace }}/.vitest_tmp
     steps:
@@ -73,21 +72,17 @@ jobs:
         run: mkdir -p "$TMPDIR"
 
       - name: Run tests
-        timeout-minutes: 8
-        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose
+        run: TMPDIR="$TMPDIR" npm test -- --run --reporter=verbose --coverage
         env:
           CI: true
 
       - name: Upload coverage reports
-        if: always() && env.CODECOV_TOKEN != ''
         uses: codecov/codecov-action@v4
-        continue-on-error: true
+        if: always()
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   # E2E Tests
   e2e:
@@ -130,7 +125,6 @@ jobs:
           CI: true
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_VAPID_PUBLIC_KEY: BNhbaBf4-27CKT0CoRG7w-EM3zSlqUxQC3pmlpS6rWRcEWRc_CjHFkR34cm7iRgzuA0RCAwi-t6K_d2GZLynzCQ
 
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
@@ -163,7 +157,6 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_VAPID_PUBLIC_KEY: BNhbaBf4-27CKT0CoRG7w-EM3zSlqUxQC3pmlpS6rWRcEWRc_CjHFkR34cm7iRgzuA0RCAwi-t6K_d2GZLynzCQ
           VITE_ENABLE_ANALYTICS: 'false'
           NODE_ENV: production
 
@@ -259,7 +252,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
@@ -297,12 +290,16 @@ jobs:
 
       - name: Deploy to Vercel
         id: deploy
-        run: |
-          DEPLOY_URL=$(npx vercel --prod --token="${{ secrets.VERCEL_TOKEN }}" --yes 2>&1 | tail -1)
-          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+        uses: amondnet/vercel-action@v25
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
+          vercel-args: '--prod'
 
   # Preview deployment for PRs
   preview:
@@ -322,12 +319,15 @@ jobs:
 
       - name: Deploy Preview to Vercel
         id: preview-deploy
-        run: |
-          DEPLOY_URL=$(npx vercel --token="${{ secrets.VERCEL_TOKEN }}" --yes 2>&1 | tail -1)
-          echo "preview-url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+        uses: amondnet/vercel-action@v25
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./
 
       - name: Comment PR with preview URL
         uses: actions/github-script@v7

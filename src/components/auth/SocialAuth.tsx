@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { useToast } from '../ui/Toast';
 
 interface SocialAuthProps {
   onError: (error: string) => void;
   onLoading: (loading: boolean) => void;
   mode: 'signin' | 'signup';
-  isAge18Plus?: boolean;
-  agreeToTerms?: boolean;
 }
 
 interface SocialProvider {
@@ -19,25 +16,9 @@ interface SocialProvider {
   hoverColor: string;
 }
 
-export default function SocialAuth({ onError, onLoading, mode, isAge18Plus = false, agreeToTerms = false }: SocialAuthProps) {
+export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps) {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const { signInWithGoogle } = useAuth();
-  const { addToast } = useToast();
-
-  // Validate age/terms for signup paths
-  const validateSignupRequirements = (): boolean => {
-    if (mode === 'signup') {
-      if (!isAge18Plus) {
-        onError('You must be 18 years or older to use IslaKayd.');
-        return false;
-      }
-      if (!agreeToTerms) {
-        onError('You must agree to the Terms of Service and Privacy Policy.');
-        return false;
-      }
-    }
-    return true;
-  };
 
   // TEMPORARILY DISABLED: Google OAuth needs to be configured in Supabase
   // To enable: Follow instructions in API_INTEGRATION_GUIDE.md
@@ -59,8 +40,6 @@ export default function SocialAuth({ onError, onLoading, mode, isAge18Plus = fal
   ];
 
   const handleSocialLogin = async (providerId: SocialProvider['id']) => {
-    if (!validateSignupRequirements()) return;
-
     setLoadingProvider(providerId);
     onLoading(true);
     onError('');
@@ -120,8 +99,6 @@ export default function SocialAuth({ onError, onLoading, mode, isAge18Plus = fal
       {/* Magic Link Option */}
       <button
         onClick={async () => {
-          if (!validateSignupRequirements()) return;
-
           const email = prompt('Enter your email for passwordless login:');
           if (!email) return;
           onLoading(true);
@@ -136,15 +113,11 @@ export default function SocialAuth({ onError, onLoading, mode, isAge18Plus = fal
           if (error) {
             onError(error.message);
           } else {
-            addToast({
-              type: 'success',
-              title: 'Magic link sent',
-              message: 'Check your email to finish signing in.',
-            });
+            alert('Check your email for the magic link!');
           }
         }}
         aria-label="Send magic link"
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
           <path d="M15 7h2a5 5 0 010 10h-2m-6 0H7A5 5 0 017 7h2"/>

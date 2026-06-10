@@ -37,13 +37,10 @@ import {
   Building,
   RefreshCw,
   Users,
-  Sparkles,
-  Gift,
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
-import { useBookingUpdates, useOwnerBookingUpdates } from '../../hooks/useBookingUpdates';
 import {
   getBookings,
   getEquipment,
@@ -59,22 +56,12 @@ import {
   updateProfile,
   updateBookingStatus,
   logAuditEvent,
-  submitReview,
-  getReviewedBookingIds,
 } from '../../services/database';
-import { sendBookingApproved, sendBookingDeclined } from '../../services/email';
-import { supabase } from '../../lib/supabase';
 import ReferralProgram from '../referral/ReferralProgram';
 
 // Lazy load components for better performance
 const AnalyticsCharts = lazy(() => import('./AnalyticsCharts'));
 const NotificationSettings = lazy(() => import('../settings/NotificationSettings'));
-const RenterTrustScore = lazy(() => import('../trust/RenterTrustScore'));
-const EnhancedReviewSystem = lazy(() => import('../reviews/EnhancedReviewSystem'));
-const BookingStatusTracker = lazy(() => import('../booking/BookingStatusTracker'));
-const SmartRecommendationsPanel = lazy(() => import('../recommendations/SmartRecommendationsPanel'));
-const DynamicPricingManager = lazy(() => import('../pricing/DynamicPricingManager'));
-const LoyaltyProgramPanel = lazy(() => import('../loyalty/LoyaltyProgramPanel'));
 
 interface DashboardProps {
   onBack: () => void;
@@ -83,7 +70,7 @@ interface DashboardProps {
   onNavigate?: (page: string) => void;
 }
 
-type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings' | 'referral' | 'recommendations' | 'pricing' | 'loyalty';
+type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings' | 'referral';
 type BookingFilter = 'all' | 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
 
 export default function Dashboard({
@@ -97,8 +84,6 @@ export default function Dashboard({
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [reviewedBookingIds, setReviewedBookingIds] = useState<Set<string>>(new Set());
-  const [activeReviewBooking, setActiveReviewBooking] = useState<Booking | null>(null);
   const [myListings, setMyListings] = useState<Equipment[]>([]);
   const [favorites, setFavorites] = useState<Equipment[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -115,8 +100,6 @@ export default function Dashboard({
   });
   const [saving, setSaving] = useState(false);
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
-  const [renterTrustScores, setRenterTrustScores] = useState<Record<string, number>>({});
-  const [viewingTrustUserId, setViewingTrustUserId] = useState<string | null>(null);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   // Use transition for non-urgent updates
@@ -136,12 +119,6 @@ export default function Dashboard({
         getNotifications(user.id),
         getConversations(user.id),
       ]);
-
-      // Load reviewed booking IDs (async, must be outside startTransition)
-      if (user?.id) {
-        const reviewed = await getReviewedBookingIds(user.id);
-        setReviewedBookingIds(reviewed);
-      }
 
       // Use startTransition for non-urgent state updates
       startTransition(() => {
@@ -163,36 +140,6 @@ export default function Dashboard({
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData]);
-
-  // Subscribe to live renter booking updates
-  useBookingUpdates(user?.id || null, {
-    onUpdate: (updatedBooking) => {
-      setBookings(prev =>
-        prev.map(b => b.id === updatedBooking.id ? updatedBooking : b)
-      );
-    },
-    onStatusChange: (bookingId, oldStatus, newStatus) => {
-      // Log the status change for analytics
-      if (import.meta.env.DEV) {
-        console.log(`Booking ${bookingId} status changed: ${oldStatus} → ${newStatus}`);
-      }
-    },
-  });
-
-  // Subscribe to live owner booking updates
-  useOwnerBookingUpdates(user?.id || null, {
-    onUpdate: (updatedBooking) => {
-      setOwnerBookings(prev =>
-        prev.map(b => b.id === updatedBooking.id ? updatedBooking : b)
-      );
-    },
-    onStatusChange: (bookingId, oldStatus, newStatus) => {
-      // Log the status change for analytics
-      if (import.meta.env.DEV) {
-        console.log(`Owner booking ${bookingId} status changed: ${oldStatus} → ${newStatus}`);
-      }
-    },
-  });
 
   useEffect(() => {
     if (profile) {
@@ -234,7 +181,7 @@ export default function Dashboard({
     const conversation = conversations.find(c => c.id === selectedConversation);
     if (!conversation) return;
 
-    const receiverId = conversation.participants?.find((p: string) => p !== user.id);
+    const receiverId = conversation.participants?.find(p => p.user_id !== user.id)?.user_id;
     if (!receiverId) return;
 
     const message = await sendMessage({
@@ -265,87 +212,18 @@ export default function Dashboard({
 
   const handleBookingAction = async (bookingId: string, action: 'confirm' | 'cancel') => {
     const status = action === 'confirm' ? 'confirmed' : 'cancelled';
-    const updated = await updateBookingStatus(bookingId, status);
+    await updateBookingStatus(bookingId, status);
     setOwnerBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b));
     if (user) logAuditEvent({ userId: user.id, action: `booking_${action}`, metadata: { bookingId } }).catch(() => {});
-
-    // Fire email notification to the renter
-    const renter = updated.renter as { email?: string; full_name?: string } | undefined;
-    const equipment = updated.equipment as { title?: string; location?: string } | undefined;
-    if (renter?.email && equipment?.title) {
-      if (action === 'confirm') {
-        sendBookingApproved(renter.email, {
-          renterName: renter.full_name || 'there',
-          equipmentTitle: equipment.title,
-          startDate: updated.start_date,
-          endDate: updated.end_date,
-          totalDays: updated.total_days,
-          totalAmount: updated.total_amount,
-          pickupLocation: equipment.location || 'To be confirmed',
-          bookingId: updated.id,
-        }).catch(() => {});
-      } else {
-        sendBookingDeclined(renter.email, {
-          renterName: renter.full_name || 'there',
-          equipmentTitle: equipment.title,
-          startDate: updated.start_date,
-          endDate: updated.end_date,
-          bookingId: updated.id,
-        }).catch(() => {});
-      }
-    }
   };
 
   const filteredBookings = bookings.filter(b => bookingFilter === 'all' || b.status === bookingFilter);
   const pendingOwnerBookings = ownerBookings.filter(b => b.status === 'pending');
 
-  // Fetch trust scores for all pending renters (non-blocking)
-  useEffect(() => {
-    if (pendingOwnerBookings.length === 0) return;
-    const renterIds = [...new Set(pendingOwnerBookings.map(b => b.renter_id as string).filter(Boolean))];
-    
-    Promise.all(
-      renterIds.map(async (renterId) => {
-        try {
-          const [profileRes, bookingsRes, reviewsRes] = await Promise.all([
-            supabase.from('profiles').select('is_verified, email_verified, phone_verified, identity_verified, two_factor_enabled, rating, total_reviews').eq('id', renterId).single(),
-            supabase.from('bookings').select('status').eq('renter_id', renterId),
-            supabase.from('reviews').select('rating').eq('reviewee_id', renterId),
-          ]);
-          const p = profileRes.data;
-          const bk = bookingsRes.data ?? [];
-          const rv = reviewsRes.data ?? [];
-          const completed = bk.filter(b => b.status === 'completed').length;
-          const cancelled = bk.filter(b => b.status === 'cancelled').length;
-          const avgRating = rv.length > 0 ? rv.reduce((s: number, r: { rating: number }) => s + r.rating, 0) / rv.length : 0;
-          let score = 0;
-          if (p?.email_verified) score += 5;
-          if (p?.phone_verified) score += 5;
-          if (p?.is_verified) score += 5;
-          if (p?.identity_verified) score += 5;
-          score += Math.min(25, completed * 3);
-          score += rv.length > 0 ? Math.min(25, Math.round(((avgRating - 1) / 4) * 25)) : 0;
-          score += Math.min(10, cancelled === 0 ? 10 : Math.max(0, 10 - cancelled * 3));
-          if (p?.two_factor_enabled) score += 5;
-          return { renterId, score };
-        } catch {
-          return { renterId, score: 0 };
-        }
-      })
-    ).then(results => {
-      const scores: Record<string, number> = {};
-      results.forEach(r => { scores[r.renterId] = r.score; });
-      setRenterTrustScores(scores);
-    });
-  }, [pendingOwnerBookings]);
-
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'recommendations', label: 'Recommendations', icon: Sparkles },
     { id: 'bookings', label: 'My Bookings', icon: Calendar, badge: bookings.filter(b => b.status === 'pending').length },
     { id: 'listings', label: 'My Listings', icon: Package, badge: pendingOwnerBookings.length },
-    { id: 'pricing', label: 'Dynamic Pricing', icon: DollarSign },
-    { id: 'loyalty', label: 'Loyalty Program', icon: Gift },
     { id: 'favorites', label: 'Favorites', icon: Heart, badge: favorites.length },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'notifications', label: 'Notifications', icon: Activity, badge: notifications.filter(n => !n.is_read).length },
@@ -391,33 +269,33 @@ export default function Dashboard({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 pt-20 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
-          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <p className="text-gray-600">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center gap-4 mb-8">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-400">Manage your rentals, listings, and account</p>
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600">Manage your rentals, listings, and account</p>
           </div>
           <button
             onClick={loadDashboardData}
-            className="p-2 text-gray-500 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             aria-label="Reload dashboard data"
           >
             <RefreshCw className="w-5 h-5" />
@@ -426,14 +304,14 @@ export default function Dashboard({
 
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-64 flex-shrink-0">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 mb-6">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white text-2xl font-bold">
                   {profile?.full_name?.charAt(0) || user?.email?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 dark:text-white truncate">{profile?.full_name || 'User'}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Member since {new Date(profile?.created_at || '').getFullYear()}</p>
+                  <p className="font-semibold text-gray-900 truncate">{profile?.full_name || 'User'}</p>
+                  <p className="text-sm text-gray-500">Member since {new Date(profile?.created_at || '').getFullYear()}</p>
                 </div>
               </div>
               <div className="space-y-2">
@@ -450,15 +328,15 @@ export default function Dashboard({
               </div>
             </div>
 
-            <nav className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+            <nav className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as TabType)}
                   className={`w-full flex items-center justify-between px-6 py-4 text-left transition-colors ${
                     activeTab === tab.id
-                      ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 border-l-4 border-teal-500'
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 border-l-4 border-transparent'
+                      ? 'bg-teal-50 text-teal-700 border-l-4 border-teal-500'
+                      : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -482,10 +360,10 @@ export default function Dashboard({
                 {onNavigate && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {[
-                      { label: 'Earnings', icon: DollarSign, page: 'earnings', color: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30' },
-                      { label: 'Disputes', icon: AlertCircle, page: 'disputes', color: 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30' },
-                      { label: 'Verify ID', icon: Shield, page: 'id-verification', color: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30' },
-                        { label: 'Recurring', icon: RefreshCw, page: 'recurring-rentals', color: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/30' },
+                      { label: 'Earnings', icon: DollarSign, page: 'earnings', color: 'bg-green-50 text-green-700 hover:bg-green-100' },
+                      { label: 'Disputes', icon: AlertCircle, page: 'disputes', color: 'bg-red-50 text-red-700 hover:bg-red-100' },
+                      { label: 'Verify ID', icon: Shield, page: 'id-verification', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
+                        { label: 'Recurring', icon: RefreshCw, page: 'recurring-rentals', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100' },
                     ].map(action => (
                       <button key={action.page} onClick={() => onNavigate(action.page)} className={`flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent transition-colors ${action.color}`}>
                         <action.icon className="w-5 h-5" />
@@ -524,78 +402,79 @@ export default function Dashboard({
 
                 {/* Enhanced Analytics Charts - NEW */}
                 <Suspense fallback={
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center justify-center h-64">
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex items-center justify-center h-64">
                     <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
                   </div>
                 }>
                   <AnalyticsCharts
                     userId={user?.id || ''}
+                    analytics={undefined}
                   />
                 </Suspense>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Performance Overview</h2>
-                      <select aria-label="Select time range" className="text-sm border-0 text-gray-500 dark:text-gray-400 focus:ring-0 bg-white dark:bg-gray-700">
+                      <h2 className="text-lg font-semibold text-gray-900">Performance Overview</h2>
+                      <select aria-label="Select time range" className="text-sm border-0 text-gray-500 focus:ring-0">
                         <option>Last 30 days</option>
                         <option>Last 90 days</option>
                         <option>This year</option>
                       </select>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Eye className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Profile Views</span>
+                          <Eye className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-500">Profile Views</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.profile_views || 0}</p>
+                        <p className="text-2xl font-bold text-gray-900">{analytics?.profile_views || 0}</p>
                       </div>
-                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Total Rentals</span>
+                          <Users className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-500">Total Rentals</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.total_rentals || 0}</p>
+                        <p className="text-2xl font-bold text-gray-900">{analytics?.total_rentals || 0}</p>
                       </div>
-                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Star className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Reviews Given</span>
+                          <Star className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-500">Reviews Given</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.reviews_given || 0}</p>
+                        <p className="text-2xl font-bold text-gray-900">{analytics?.reviews_given || 0}</p>
                       </div>
-                      <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                      <div className="p-4 bg-gray-50 rounded-xl">
                         <div className="flex items-center gap-2 mb-2">
-                          <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                          <span className="text-sm text-gray-500 dark:text-gray-400">Avg Response</span>
+                          <Clock className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-500">Avg Response</span>
                         </div>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{analytics?.avg_response_time_hours || 0}h</p>
+                        <p className="text-2xl font-bold text-gray-900">{analytics?.avg_response_time_hours || 0}h</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Bookings</h2>
+                      <h2 className="text-lg font-semibold text-gray-900">Recent Bookings</h2>
                       <button
                         onClick={() => setActiveTab('bookings')}
-                        className="text-teal-600 dark:text-teal-400 text-sm font-medium hover:text-teal-700 dark:hover:text-teal-300"
+                        className="text-teal-600 text-sm font-medium hover:text-teal-700"
                       >
                         View All
                       </button>
                     </div>
                     {bookings.length === 0 ? (
                       <div className="text-center py-8">
-                        <Calendar className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                        <p className="text-gray-500 dark:text-gray-400">No bookings yet</p>
+                        <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500">No bookings yet</p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         {bookings.slice(0, 3).map((booking) => (
                           <div
                             key={booking.id}
-                            className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-xl"
+                            className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl"
                           >
                             <img
                               src={booking.equipment?.images[0] || 'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg'}
@@ -603,8 +482,8 @@ export default function Dashboard({
                               className="w-12 h-12 rounded-lg object-cover"
                             />
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-gray-900 dark:text-white truncate">{booking.equipment?.title}</p>
-                              <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(booking.start_date)}</p>
+                              <p className="font-medium text-gray-900 truncate">{booking.equipment?.title}</p>
+                              <p className="text-sm text-gray-500">{formatDate(booking.start_date)}</p>
                             </div>
                             {getStatusBadge(booking.status)}
                           </div>
@@ -615,19 +494,19 @@ export default function Dashboard({
                 </div>
 
                 {pendingOwnerBookings.length > 0 && (
-                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-6">
+                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/40 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-500" aria-hidden="true" />
+                      <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <AlertCircle className="w-6 h-6 text-amber-600" aria-hidden="true" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-amber-900 dark:text-amber-300 mb-1">Pending Booking Requests</h3>
-                        <p className="text-amber-700 dark:text-amber-200 text-sm mb-4">
+                        <h3 className="font-semibold text-amber-900 mb-1">Pending Booking Requests</h3>
+                        <p className="text-amber-700 text-sm mb-4">
                           You have {pendingOwnerBookings.length} booking request{pendingOwnerBookings.length > 1 ? 's' : ''} waiting for your approval.
                         </p>
                         <button
                           onClick={() => setActiveTab('listings')}
-                          className="px-4 py-2 bg-amber-600 dark:bg-amber-700 text-white font-medium rounded-lg hover:bg-amber-700 dark:hover:bg-amber-600 transition-colors"
+                          className="px-4 py-2 bg-amber-600 text-white font-medium rounded-lg hover:bg-amber-700 transition-colors"
                         >
                           Review Requests
                         </button>
@@ -655,13 +534,13 @@ export default function Dashboard({
             {activeTab === 'bookings' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Bookings</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">My Bookings</h2>
                   <div className="flex items-center gap-2">
                     <select
                       aria-label="Filter bookings"
                       value={bookingFilter}
                       onChange={(e) => setBookingFilter(e.target.value as BookingFilter)}
-                      className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl text-sm focus:outline-none focus:border-teal-500 dark:focus:border-teal-400 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                      className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-teal-500"
                     >
                       <option value="all">All Bookings</option>
                       <option value="pending">Pending</option>
@@ -674,10 +553,10 @@ export default function Dashboard({
                 </div>
 
                 {filteredBookings.length === 0 ? (
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-sm border border-gray-100 dark:border-gray-700 text-center">
-                    <Calendar className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No bookings found</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6">Start renting equipment to see your bookings here.</p>
+                  <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+                    <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No bookings found</h3>
+                    <p className="text-gray-600 mb-6">Start renting equipment to see your bookings here.</p>
                     <button
                       onClick={onBack}
                       className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
@@ -686,7 +565,7 @@ export default function Dashboard({
                     </button>
                   </div>
                 ) : (
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100">
                     {filteredBookings.map((booking) => (
                       <div key={booking.id} className="p-6">
                         <div className="flex items-start gap-4">
@@ -698,15 +577,15 @@ export default function Dashboard({
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between mb-2">
                               <div>
-                                <h3 className="font-semibold text-gray-900 dark:text-white">{booking.equipment?.title}</h3>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                                <h3 className="font-semibold text-gray-900">{booking.equipment?.title}</h3>
+                                <p className="text-sm text-gray-500 flex items-center gap-1.5">
                                   <MapPin className="w-4 h-4" aria-hidden="true" />
                                   {booking.equipment?.location}
                                 </p>
                               </div>
                               {getStatusBadge(booking.status)}
                             </div>
-                            <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
                               <span className="flex items-center gap-1.5">
                                 <Calendar className="w-4 h-4" aria-hidden="true" />
                                 {formatDate(booking.start_date)} - {formatDate(booking.end_date)}
@@ -716,36 +595,16 @@ export default function Dashboard({
                                 {booking.total_days} days
                               </span>
                             </div>
-                            <Suspense fallback={null}>
-                              <BookingStatusTracker booking={booking} isLive compact showLabel={false} />
-                            </Suspense>
-                            <div className="flex items-center justify-between mt-4">
-                              <p className="text-lg font-semibold text-gray-900 dark:text-white">${booking.total_amount.toFixed(2)}</p>
-                              <div className="flex items-center gap-2">
-                                {booking.status === 'completed' && !reviewedBookingIds.has(booking.id) && (
-                                  <button
-                                    onClick={() => setActiveReviewBooking(booking)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 font-medium hover:bg-amber-100 dark:hover:bg-amber-900/30 rounded-xl transition-colors border border-amber-200 dark:border-amber-800"
-                                  >
-                                    <Star className="w-4 h-4" />
-                                    Leave a Review
-                                  </button>
-                                )}
-                                {booking.status === 'completed' && reviewedBookingIds.has(booking.id) && (
-                                  <span className="flex items-center gap-1.5 px-3 py-2 text-sm text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-200 dark:border-green-800">
-                                    <CheckCircle2 className="w-4 h-4" />
-                                    Reviewed
-                                  </span>
-                                )}
-                                <button
-
-                                  onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
-                                  className="flex items-center gap-2 px-4 py-2 text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-xl transition-colors"
-                                >
-                                  View Details
-                                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                                </button>
-                              </div>
+                            <div className="flex items-center justify-between">
+                              <p className="text-lg font-semibold text-gray-900">${booking.total_amount.toFixed(2)}</p>
+                              <button
+                               
+                                onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
+                                className="flex items-center gap-2 px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-xl transition-colors"
+                              >
+                                View Details
+                                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                              </button>
                             </div>
                           </div>
                         </div>
@@ -759,7 +618,7 @@ export default function Dashboard({
             {activeTab === 'listings' && (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">My Listings ({myListings.length})</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">My Listings ({myListings.length})</h2>
                   <button
                     onClick={onListEquipment}
                     className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors"
@@ -770,100 +629,54 @@ export default function Dashboard({
                 </div>
 
                 {pendingOwnerBookings.length > 0 && (
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-                      <h3 className="font-semibold text-gray-900 dark:text-white">Pending Requests ({pendingOwnerBookings.length})</h3>
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+                    <div className="p-4 border-b border-gray-100">
+                      <h3 className="font-semibold text-gray-900">Pending Requests ({pendingOwnerBookings.length})</h3>
                     </div>
-                    <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                      {pendingOwnerBookings.map((booking) => {
-                        const renterId = booking.renter_id as string;
-                        const trustScore = renterTrustScores[renterId];
-                        const trustLevel = trustScore !== undefined
-                          ? trustScore >= 90 ? 'excellent' : trustScore >= 75 ? 'good' : trustScore >= 50 ? 'fair' : trustScore >= 25 ? 'building' : 'new'
-                          : null;
-                        const trustColorMap: Record<string, string> = {
-                          excellent: 'text-emerald-600 bg-emerald-50 ring-emerald-200',
-                          good:      'text-teal-600 bg-teal-50 ring-teal-200',
-                          fair:      'text-blue-600 bg-blue-50 ring-blue-200',
-                          building:  'text-amber-600 bg-amber-50 ring-amber-200',
-                          new:       'text-gray-500 bg-gray-50 ring-gray-200',
-                        };
-                        const trustLabelMap: Record<string, string> = {
-                          excellent: 'Trusted', good: 'Good', fair: 'Fair', building: 'Building', new: 'New',
-                        };
-                        return (
-                          <div key={booking.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                            <div className="flex items-start gap-4">
-                              <img
-                                src={booking.equipment?.images[0] || ''}
-                                alt={booking.equipment?.title || 'Equipment image'}
-                                className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-gray-900 dark:text-white truncate">{booking.equipment?.title}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                                  {formatDate(booking.start_date)} → {formatDate(booking.end_date)} · {booking.total_days} days
-                                </p>
-                                <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">${booking.total_amount.toFixed(2)}</p>
-
-                                {/* Renter trust badge */}
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  {trustScore !== undefined && trustLevel ? (
-                                    <button
-                                      onClick={() => setViewingTrustUserId(renterId)}
-                                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ring-1 transition-opacity hover:opacity-80 ${trustColorMap[trustLevel]}`}
-                                    >
-                                      <Shield className="w-3 h-3" />
-                                      {trustScore} · {trustLabelMap[trustLevel]}
-                                    </button>
-                                  ) : (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-600">
-                                      <Shield className="w-3 h-3" />Checking score…
-                                    </span>
-                                  )}
-                                  {trustScore !== undefined && trustScore < 50 && (
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-200 dark:ring-amber-800">
-                                      <AlertCircle className="w-3 h-3" />Low trust
-                                    </span>
-                                  )}
-                                  {booking.renter && (
-                                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                                      {(booking.renter as { full_name?: string }).full_name || 'Renter'}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Actions */}
-                              <div className="flex flex-col gap-2 shrink-0">
-                                <button
-                                  onClick={() => handleBookingAction(booking.id, 'confirm')}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors text-sm font-medium"
-                                  aria-label="Approve request"
-                                >
-                                  <Check className="w-4 h-4" />Approve
-                                </button>
-                                <button
-                                  onClick={() => handleBookingAction(booking.id, 'cancel')}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium"
-                                  aria-label="Reject request"
-                                >
-                                  <X className="w-4 h-4" />Decline
-                                </button>
-                              </div>
+                    <div className="divide-y divide-gray-100">
+                      {pendingOwnerBookings.map((booking) => (
+                        <div key={booking.id} className="p-4">
+                          <div className="flex items-center gap-4">
+                            <img
+                              src={booking.equipment?.images[0] || ''}
+                              alt={booking.equipment?.title || 'Equipment image'}
+                              className="w-16 h-16 rounded-lg object-cover"
+                            />
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{booking.equipment?.title}</p>
+                              <p className="text-sm text-gray-500">
+                                {formatDate(booking.start_date)} - {formatDate(booking.end_date)} ({booking.total_days} days)
+                              </p>
+                              <p className="text-sm font-medium text-gray-900">${booking.total_amount.toFixed(2)}</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleBookingAction(booking.id, 'confirm')}
+                                className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors"
+                                aria-label="Approve request"
+                              >
+                                <Check className="w-5 h-5" aria-hidden="true" />
+                              </button>
+                              <button
+                                onClick={() => handleBookingAction(booking.id, 'cancel')}
+                                className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                                aria-label="Reject request"
+                              >
+                                <X className="w-5 h-5" aria-hidden="true" />
+                              </button>
                             </div>
                           </div>
-                        );
-                      })}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
                 {myListings.length === 0 ? (
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-sm border border-gray-100 dark:border-gray-700 text-center">
-                    <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" aria-hidden="true" />
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No listings yet</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                  <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+                    <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" aria-hidden="true" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No listings yet</h3>
+                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
                       Start earning money by listing your equipment. It's free to list and you set your own prices.
                     </p>
                     <button
@@ -877,7 +690,7 @@ export default function Dashboard({
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {myListings.map((item) => (
-                      <div key={item.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
                         <div className="relative">
                           <img
                             src={item.images[0]}
@@ -893,11 +706,11 @@ export default function Dashboard({
                           </div>
                         </div>
                         <div className="p-4">
-                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{item.title}</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{item.location}</p>
+                          <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                          <p className="text-sm text-gray-500 mb-3">{item.location}</p>
                           <div className="flex items-center justify-between mb-4">
-                            <p className="font-semibold text-gray-900 dark:text-white">${item.daily_rate}/day</p>
-                            <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                            <p className="font-semibold text-gray-900">${item.daily_rate}/day</p>
+                            <div className="flex items-center gap-1 text-sm text-gray-500">
                               <Eye className="w-4 h-4" />
                               <span>{item.total_bookings} bookings</span>
                             </div>
@@ -909,10 +722,10 @@ export default function Dashboard({
                             >
                               View
                             </button>
-                            <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Edit booking">
+                            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" aria-label="Edit booking">
                               <Edit className="w-5 h-5" />
                             </button>
-                            <button aria-label="Delete item" className="p-2 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                            <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -926,13 +739,13 @@ export default function Dashboard({
 
             {activeTab === 'favorites' && (
               <div className="space-y-6">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Saved Equipment ({favorites.length})</h2>
+                <h2 className="text-lg font-semibold text-gray-900">Saved Equipment ({favorites.length})</h2>
 
                 {favorites.length === 0 ? (
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 shadow-sm border border-gray-100 dark:border-gray-700 text-center">
-                    <Heart className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No favorites yet</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-6">Save equipment you're interested in to easily find them later</p>
+                  <div className="bg-white rounded-2xl p-12 shadow-sm border border-gray-100 text-center">
+                    <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No favorites yet</h3>
+                    <p className="text-gray-600 mb-6">Save equipment you're interested in to easily find them later</p>
                     <button
                       onClick={onBack}
                       className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
@@ -943,12 +756,12 @@ export default function Dashboard({
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {favorites.map((item) => (
-                      <div key={item.id} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 flex">
+                      <div key={item.id} className="bg-white rounded-2xl overflow-hidden border border-gray-100 flex">
                         <img src={item.images[0]} alt={item.title} className="w-32 h-32 object-cover" />
                         <div className="flex-1 p-4">
-                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{item.title}</h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">{item.location}</p>
-                          <p className="font-semibold text-gray-900 dark:text-white mb-3">${item.daily_rate}/day</p>
+                          <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
+                          <p className="text-sm text-gray-500 mb-2">{item.location}</p>
+                          <p className="font-semibold text-gray-900 mb-3">${item.daily_rate}/day</p>
                           <div className="flex items-center gap-2">
                             <button
                               onClick={() => onEquipmentClick(item)}
@@ -958,7 +771,7 @@ export default function Dashboard({
                             </button>
                             <button
                               onClick={() => handleRemoveFavorite(item.id)}
-                              className="px-4 py-2 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                              className="px-4 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                             >
                               Remove
                             </button>
@@ -1007,10 +820,10 @@ export default function Dashboard({
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-gray-900 truncate">
-                                  {'Conversation'}
+                                  {conv.equipment?.title || 'Conversation'}
                                 </p>
                                 <p className="text-sm text-gray-500 truncate">
-                                  {conv.last_message || 'No messages'}
+                                  {conv.last_message?.content || 'No messages'}
                                 </p>
                               </div>
                               {conv.unread_count && conv.unread_count > 0 && (
@@ -1409,66 +1222,9 @@ export default function Dashboard({
                 />
               </div>
             )}
-
-            {activeTab === 'recommendations' && (
-              <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-teal-500" /></div>}>
-                <SmartRecommendationsPanel />
-              </Suspense>
-            )}
-
-            {activeTab === 'pricing' && (
-              <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-teal-500" /></div>}>
-                <DynamicPricingManager />
-              </Suspense>
-            )}
-
-            {activeTab === 'loyalty' && (
-              <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-teal-500" /></div>}>
-                <LoyaltyProgramPanel />
-              </Suspense>
-            )}
           </div>
         </div>
       </div>
-
-      {/* Renter Trust Score Modal */}
-      {viewingTrustUserId && (
-        <Suspense fallback={null}>
-          <RenterTrustScore
-            userId={viewingTrustUserId}
-            viewMode="full"
-            onClose={() => setViewingTrustUserId(null)}
-          />
-        </Suspense>
-      )}
-      {/* Review Modal */}
-      {activeReviewBooking && (
-        <Suspense fallback={null}>
-          <EnhancedReviewSystem
-            equipmentId={activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || ''}
-            equipmentTitle={activeReviewBooking.equipment?.title || 'Equipment'}
-            bookingId={activeReviewBooking.id}
-            onSubmit={async (reviewData) => {
-              if (!user) return;
-              await submitReview({
-                bookingId: activeReviewBooking.id,
-                equipmentId: activeReviewBooking.equipment_id || activeReviewBooking.equipment?.id || '',
-                reviewerId: user.id,
-                revieweeId: activeReviewBooking.owner_id || '',
-                rating: reviewData.rating,
-                title: reviewData.title,
-                comment: reviewData.comment,
-                aspectRatings: reviewData.aspectRatings,
-                photos: reviewData.photos,
-                wouldRecommend: reviewData.wouldRecommend,
-              });
-              setReviewedBookingIds(prev => new Set([...prev, activeReviewBooking.id]));
-              setActiveReviewBooking(null);
-            }}
-            onClose={() => setActiveReviewBooking(null)}
-          />
-        </Suspense>
-      )}
     </div>
   );
 }
@@ -1535,4 +1291,3 @@ function VerificationItem({ icon: Icon, title, description, verified }: {
     </div>
   );
 }
-

@@ -1,28 +1,8 @@
 // Service Worker Registration and Utilities
 
-import { errorMonitoring } from '../services/errorMonitoring';
-
-// Forwards a caught error to Sentry without altering the return-shape of
-// the calling function. errorMonitoring.captureException is the single
-// source of console logging: in PROD it ships to Sentry; in DEV it
-// prints "Error (not sent to Sentry):" with the same payload. We do NOT
-// also call console.error from each catch site — that would double-log
-// in DEV / misconfigured environments. Context is nested under a single
-// key so Sentry.setContext gets an object value (the API rejects
-// primitives — same convention as the ErrorBoundary wiring fix).
-function reportServiceWorkerError(
-  scope: 'register' | 'unregister' | 'push_subscribe' | 'push_unsubscribe',
-  error: unknown
-): void {
-  errorMonitoring.captureException(
-    error instanceof Error ? error : new Error(String(error)),
-    { serviceWorker: { scope } }
-  );
-}
-
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!('serviceWorker' in navigator)) {
-    if (import.meta.env.DEV) console.log('Service Worker not supported');
+    console.log('Service Worker not supported');
     return null;
   }
 
@@ -31,7 +11,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
       scope: '/',
     });
 
-    if (import.meta.env.DEV) console.log('Service Worker registered:', registration.scope);
+    console.log('Service Worker registered:', registration.scope);
 
     // Check for updates periodically
     setInterval(() => {
@@ -53,7 +33,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
 
     return registration;
   } catch (error) {
-    reportServiceWorkerError('register', error);
+    console.error('Service Worker registration failed:', error);
     return null;
   }
 }
@@ -67,7 +47,7 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     const registration = await navigator.serviceWorker.ready;
     return await registration.unregister();
   } catch (error) {
-    reportServiceWorkerError('unregister', error);
+    console.error('Service Worker unregistration failed:', error);
     return false;
   }
 }
@@ -75,7 +55,7 @@ export async function unregisterServiceWorker(): Promise<boolean> {
 // Push Notification utilities
 export async function requestNotificationPermission(): Promise<NotificationPermission> {
   if (!('Notification' in window)) {
-    if (import.meta.env.DEV) console.log('Notifications not supported');
+    console.log('Notifications not supported');
     return 'denied';
   }
 
@@ -101,10 +81,10 @@ export async function subscribeToPushNotifications(
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as BufferSource,
     });
 
-    if (import.meta.env.DEV) console.log('Push subscription:', subscription);
+    console.log('Push subscription:', subscription);
     return subscription;
   } catch (error) {
-    reportServiceWorkerError('push_subscribe', error);
+    console.error('Push subscription failed:', error);
     return null;
   }
 }
@@ -119,7 +99,7 @@ export async function unsubscribeFromPushNotifications(
     }
     return true;
   } catch (error) {
-    reportServiceWorkerError('push_unsubscribe', error);
+    console.error('Push unsubscription failed:', error);
     return false;
   }
 }
@@ -132,7 +112,7 @@ export async function showLocalNotification(
   const permission = await requestNotificationPermission();
   
   if (permission !== 'granted') {
-    if (import.meta.env.DEV) console.log('Notification permission denied');
+    console.log('Notification permission denied');
     return;
   }
 
@@ -186,7 +166,7 @@ export async function clearAppCache(): Promise<void> {
   if ('caches' in window) {
     const cacheNames = await caches.keys();
     await Promise.all(cacheNames.map((name) => caches.delete(name)));
-    if (import.meta.env.DEV) console.log('All caches cleared');
+    console.log('All caches cleared');
   }
 }
 

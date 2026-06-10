@@ -1,6 +1,5 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import { errorMonitoring } from '../../services/errorMonitoring';
 
 interface Props {
   children: ReactNode;
@@ -35,15 +34,10 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Nest under a single key — errorMonitoring.captureException iterates
-    // Object.entries(context) and calls Sentry.setContext(key, value), which
-    // expects each value to be an object, not a primitive string.
-    errorMonitoring.captureException(error, {
-      errorBoundary: {
-        source: 'ErrorBoundary',
-        componentStack: errorInfo.componentStack ?? '',
-      },
-    });
+    // Log to error tracking service (e.g., Sentry)
+    // if (window.Sentry) {
+    //   window.Sentry.captureException(error, { extra: errorInfo });
+    // }
   }
 
   handleReset = () => {
@@ -66,19 +60,19 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-          <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8">
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="max-w-2xl w-full bg-white rounded-3xl shadow-xl p-8">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+              <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center">
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white text-center mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 text-center mb-4">
               Oops! Something went wrong
             </h1>
 
-            <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
+            <p className="text-gray-600 text-center mb-8">
               We're sorry for the inconvenience. An unexpected error occurred while loading this page.
             </p>
 
@@ -105,7 +99,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={this.handleGoHome}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-colors"
                >
                 <Home className="w-5 h-5" />
                 Go to Homepage

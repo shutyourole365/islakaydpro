@@ -1,13 +1,4 @@
-// Performance monitoring utilities.
-//
-// Forwards Web Vitals + slow-operation traces to Sentry via
-// errorMonitoring.captureMessage so the observations actually reach
-// triage. In DEV we keep the verbose console output that engineers
-// expect during local work; in PROD we only emit a Sentry message
-// when a metric crosses Google's "poor" threshold so we don't flood
-// the project with every page-load observation.
-
-import { errorMonitoring } from '../services/errorMonitoring';
+// Performance monitoring utilities
 
 // Type definitions for performance entries
 interface PerformanceEntryWithProcessing extends PerformanceEntry {
@@ -23,44 +14,6 @@ interface PerformanceMemory {
   usedJSHeapSize: number;
   totalJSHeapSize: number;
   jsHeapSizeLimit: number;
-}
-
-// Google's "poor" thresholds — anything worse fires a Sentry warning.
-// Sources:
-//   LCP > 4000ms  https://web.dev/lcp/
-//   FID > 300ms   https://web.dev/fid/
-//   CLS > 0.25    https://web.dev/cls/
-const POOR = { LCP: 4000, FID: 300, CLS: 0.25 } as const;
-const SLOW_OP_MS = 1000;
-
-// CLS is a running total: once it crosses 0.25, every subsequent
-// layout-shift would re-fire reportWebVital. Track per-vital reporting
-// so each metric only emits ONE Sentry warning per page lifetime.
-// Exposed for tests via __resetWebVitalReported.
-const reportedVitals: Record<'LCP' | 'FID' | 'CLS', boolean> = {
-  LCP: false,
-  FID: false,
-  CLS: false,
-};
-
-/** @internal — test-only helper to reset the per-page dedupe state. */
-export function __resetWebVitalReported(): void {
-  reportedVitals.LCP = false;
-  reportedVitals.FID = false;
-  reportedVitals.CLS = false;
-}
-
-export function reportWebVital(name: 'LCP' | 'FID' | 'CLS', value: number): void {
-  if (import.meta.env.DEV) {
-    console.log(`${name}:`, value);
-  }
-  if (value > POOR[name] && !reportedVitals[name]) {
-    reportedVitals[name] = true;
-    errorMonitoring.captureMessage(
-      `Poor web vital ${name}=${value.toFixed(2)}`,
-      'warning'
-    );
-  }
 }
 
 export class PerformanceMonitor {
@@ -79,29 +32,20 @@ export class PerformanceMonitor {
     this.marks.set(name, performance.now());
   }
 
-  // Measure time since mark. A missing mark is a programmer error, so
-  // we still log it (DEV only). A slow operation in PROD gets forwarded
-  // to Sentry as a warning so we see it without local repro.
+  // Measure time since mark
   measure(name: string): number {
     const startTime = this.marks.get(name);
     if (!startTime) {
-      if (import.meta.env.DEV) {
-        console.warn(`No mark found for: ${name}`);
-      }
+      console.warn(`No mark found for: ${name}`);
       return 0;
     }
 
     const duration = performance.now() - startTime;
     this.marks.delete(name);
-
-    if (duration > SLOW_OP_MS) {
-      if (import.meta.env.DEV) {
-        console.warn(`Slow operation detected: ${name} took ${duration.toFixed(2)}ms`);
-      }
-      errorMonitoring.captureMessage(
-        `Slow operation: ${name} took ${duration.toFixed(2)}ms`,
-        'warning'
-      );
+    
+    // Log slow operations
+    if (duration > 1000) {
+      console.warn(`Slow operation detected: ${name} took ${duration.toFixed(2)}ms`);
     }
 
     return duration;
@@ -114,7 +58,7 @@ export class PerformanceMonitor {
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         const lastEntry = entries[entries.length - 1];
-        reportWebVital('LCP', lastEntry.startTime);
+        console.log('LCP:', lastEntry.startTime);
       }).observe({ entryTypes: ['largest-contentful-paint'] });
 
       // First Input Delay (FID)
@@ -123,11 +67,11 @@ export class PerformanceMonitor {
         entries.forEach((entry) => {
           const fidEntry = entry as PerformanceEntryWithProcessing;
           const fid = fidEntry.processingStart - fidEntry.startTime;
-          reportWebVital('FID', fid);
+          console.log('FID:', fid);
         });
       }).observe({ entryTypes: ['first-input'] });
 
-      // Cumulative Layout Shift (CLS) — running total.
+      // Cumulative Layout Shift (CLS)
       let clsScore = 0;
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
@@ -137,13 +81,12 @@ export class PerformanceMonitor {
             clsScore += clsEntry.value;
           }
         });
-        reportWebVital('CLS', clsScore);
+        console.log('CLS:', clsScore);
       }).observe({ entryTypes: ['layout-shift'] });
     }
   }
 
-  // Report navigation timing. Returns the metrics so callers can ship
-  // them somewhere; DEV gets a console.table for local visibility.
+  // Report navigation timing
   static reportNavigationTiming() {
     if ('performance' in window && 'timing' in performance) {
       const timing = performance.timing;
@@ -159,9 +102,7 @@ export class PerformanceMonitor {
         loadComplete: timing.loadEventEnd - navigationStart,
       };
 
-      if (import.meta.env.DEV) {
-        console.table(metrics);
-      }
+      console.table(metrics);
       return metrics;
     }
   }

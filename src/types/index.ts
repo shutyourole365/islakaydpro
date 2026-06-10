@@ -16,8 +16,6 @@ export interface Profile {
   last_login: string | null;
   account_status: 'active' | 'suspended' | 'banned';
   ai_assistant_enabled?: boolean; // user preference persisted server-side
-  referral_code?: string | null;
-  referred_by?: string | null;
   rating: number;
   total_reviews: number;
   total_rentals?: number;
@@ -79,7 +77,6 @@ export interface Equipment {
   total_bookings: number;
   is_featured: boolean;
   is_active: boolean;
-  is_verified?: boolean;
   created_at: string;
   updated_at: string;
   owner?: Profile;
@@ -89,7 +86,6 @@ export interface Equipment {
 export interface Booking {
   id: BookingId;
   equipment_id: EquipmentId;
-  listing_id?: string | null; // legacy field, optional
   renter_id: UserId;
   owner_id: UserId;
   start_date: string;
@@ -156,28 +152,34 @@ export interface Message {
   id: string;
   conversation_id: string | null;
   sender_id: string;
+  receiver_id: string;
+  equipment_id: string | null;
   content: string;
   is_read: boolean;
-  type?: string;
-  metadata?: Record<string, unknown>;
   created_at: string;
   sender?: Profile;
+  receiver?: Profile;
 }
 
 export interface Conversation {
   id: string;
-  participants: string[];
-  last_message?: string | null;
-  last_message_at?: string | null;
+  equipment_id: string | null;
+  booking_id: string | null;
   created_at: string;
+  updated_at: string;
+  participants?: ConversationParticipant[];
+  messages?: Message[];
+  equipment?: Equipment;
+  last_message?: Message;
   unread_count?: number;
 }
 
-// ConversationParticipant: participants are stored as uuid[] on conversations table
 export interface ConversationParticipant {
   id: string;
   conversation_id: string;
   user_id: string;
+  last_read_at: string;
+  joined_at: string;
   user?: Profile;
 }
 

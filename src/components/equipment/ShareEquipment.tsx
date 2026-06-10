@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
-import { getPublicAppUrl } from '../../utils/publicUrl';
 
 interface ShareEquipmentProps {
   equipmentId: string;
@@ -30,12 +29,12 @@ export default function ShareEquipment({
   isOpen,
   onClose,
 }: ShareEquipmentProps) {
-  const { success, error } = useToast();
+  const { success } = useToast();
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
 
-  const shareUrl = `${getPublicAppUrl()}/equipment/${equipmentId}`;
+  const shareUrl = `${window.location.origin}/equipment/${equipmentId}`;
   const shareText = `Check out this equipment for rent: ${equipmentTitle}`;
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedText = encodeURIComponent(shareText);
@@ -102,15 +101,10 @@ export default function ShareEquipment({
     {
       name: 'Instagram',
       icon: Instagram,
-      action: async () => {
+      action: () => {
         // Instagram doesn't support direct sharing, so we'll copy to clipboard
-        try {
-          await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
-          success('Content copied! You can now paste it in Instagram.');
-        } catch (err) {
-          console.error('Failed to copy Instagram share content:', err);
-          error('Could not copy content. Please try again.');
-        }
+        navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+        success('Content copied! You can now paste it in Instagram.');
       },
       color: 'bg-pink-100 hover:bg-pink-200 text-pink-700',
     },
@@ -118,11 +112,11 @@ export default function ShareEquipment({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
-        <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center space-x-2">
             <Share2 className="h-6 w-6 text-teal-600" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Share Equipment</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Share Equipment</h2>
           </div>
           <button
             onClick={onClose}
@@ -134,7 +128,7 @@ export default function ShareEquipment({
 
         <div className="p-6">
           {/* Equipment Preview */}
-          <div className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+          <div className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 rounded-lg">
             {equipmentImage && (
               <img
                 src={equipmentImage}
@@ -143,14 +137,14 @@ export default function ShareEquipment({
               />
             )}
             <div className="flex-1">
-              <h3 className="font-medium text-gray-900 dark:text-white text-sm">{equipmentTitle}</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Available for rent on Islakayd</p>
+              <h3 className="font-medium text-gray-900 text-sm">{equipmentTitle}</h3>
+              <p className="text-xs text-gray-500">Available for rent on Islakayd</p>
             </div>
           </div>
 
           {/* Share URL */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Share Link
             </label>
             <div className="flex space-x-2">
@@ -158,7 +152,7 @@ export default function ShareEquipment({
                 type="text"
                 value={shareUrl}
                 readOnly
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
               />
               <Button
                 onClick={async () => {
@@ -183,7 +177,7 @@ export default function ShareEquipment({
 
           {/* Share Options */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-3">
               Share via
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -192,7 +186,7 @@ export default function ShareEquipment({
                   key={option.name}
                   onClick={option.action}
                   aria-label={option.name}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 text-left hover:border-gray-300 dark:hover:border-gray-500 ${option.color}`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-left hover:border-gray-300 ${option.color}`}
                 >
                   <option.icon className="w-5 h-5" />
                   <span className="text-sm font-medium">{option.name}</span>
@@ -202,7 +196,7 @@ export default function ShareEquipment({
           </div>
 
           {/* Additional Actions */}
-          <div className="mt-6 pt-4 border-t dark:border-gray-700">
+          <div className="mt-6 pt-4 border-t">
             <button
               onClick={() => window.open(shareUrl, '_blank')}
               className="flex items-center space-x-2 text-teal-600 hover:text-teal-700 text-sm font-medium"

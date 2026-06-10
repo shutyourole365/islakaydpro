@@ -69,7 +69,7 @@ export default function QuickBook({
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       
-      <div className="relative w-full max-w-2xl bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="px-6 py-4 bg-gradient-to-r from-teal-500 to-emerald-500">
           <div className="flex items-center gap-3">
@@ -88,17 +88,17 @@ export default function QuickBook({
         {/* Content */}
         <div className="p-6 space-y-6">
           {/* Equipment Card */}
-          <div className="flex gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
+          <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl">
             <img
               src={equipment.images[0]}
               alt={equipment.title}
               className="w-24 h-24 rounded-xl object-cover"
             />
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+              <h3 className="font-semibold text-gray-900 mb-1">
                 {equipment.title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1 mb-2">
+              <p className="text-sm text-gray-600 flex items-center gap-1 mb-2">
                 <MapPin className="w-4 h-4" />
                 {equipment.location}
               </p>
@@ -110,57 +110,57 @@ export default function QuickBook({
 
           {/* Quick Features */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800">
+            <div className="flex items-center gap-2 p-3 bg-green-50 rounded-xl border border-green-100">
               <Check className="w-5 h-5 text-green-600" />
               <div>
                 <p className="text-xs text-green-600">Verified Owner</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">Trusted</p>
+                <p className="text-sm font-semibold text-gray-900">Trusted</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+            <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-xl border border-blue-100">
               <Clock className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="text-xs text-blue-600">Response Time</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">&lt; 2 hours</p>
+                <p className="text-sm font-semibold text-gray-900">&lt; 2 hours</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800">
+            <div className="flex items-center gap-2 p-3 bg-purple-50 rounded-xl border border-purple-100">
               <Zap className="w-5 h-5 text-purple-600" />
               <div>
                 <p className="text-xs text-purple-600">Instant Book</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">Enabled</p>
+                <p className="text-sm font-semibold text-gray-900">Enabled</p>
               </div>
             </div>
           </div>
 
           {/* Dates */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="w-4 h-4 inline mr-1" />
               Rental Dates
             </label>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">Start Date</label>
+                <label className="block text-xs text-gray-600 mb-1">Start Date</label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">End Date</label>
+                <label className="block text-xs text-gray-600 mb-1">End Date</label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 focus:outline-none focus:border-teal-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
                 />
               </div>
             </div>
             {days > 0 && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              <p className="mt-2 text-sm text-gray-600">
                 {days} day{days > 1 ? 's' : ''} rental
               </p>
             )}
@@ -168,9 +168,9 @@ export default function QuickBook({
 
           {/* Payment Method */}
           {savedPaymentMethod && (
-            <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-200">
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <CreditCard className="w-4 h-4" />
                   Payment Method
                 </label>
@@ -183,10 +183,10 @@ export default function QuickBook({
                       VISA
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-gray-900">
                         •••• •••• •••• {savedPaymentMethod.last4}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Primary card</p>
+                      <p className="text-xs text-gray-500">Primary card</p>
                     </div>
                   </>
                 )}
@@ -196,10 +196,10 @@ export default function QuickBook({
                       PP
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                      <p className="text-sm font-medium text-gray-900">
                         {savedPaymentMethod.email}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">PayPal</p>
+                      <p className="text-xs text-gray-500">PayPal</p>
                     </div>
                   </>
                 )}
@@ -209,29 +209,29 @@ export default function QuickBook({
 
           {/* Price Breakdown */}
           {days > 0 && (
-            <div className="space-y-3 p-4 bg-teal-50 dark:bg-teal-900/20 rounded-2xl border border-teal-100 dark:border-teal-800">
+            <div className="space-y-3 p-4 bg-teal-50 rounded-2xl border border-teal-100">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-700 dark:text-gray-300">
+                <span className="text-gray-700">
                   ${equipment.daily_rate} x {days} days
                 </span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="font-medium text-gray-900">
                   ${subtotal.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-700 dark:text-gray-300">Service fee (12%)</span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="text-gray-700">Service fee (12%)</span>
+                <span className="font-medium text-gray-900">
                   ${serviceFee.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-700 dark:text-gray-300">Refundable deposit</span>
-                <span className="font-medium text-gray-900 dark:text-white">
+                <span className="text-gray-700">Refundable deposit</span>
+                <span className="font-medium text-gray-900">
                   ${equipment.deposit_amount.toFixed(2)}
                 </span>
               </div>
-              <div className="pt-3 border-t border-teal-200 dark:border-teal-700 flex justify-between">
-                <span className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="pt-3 border-t border-teal-200 flex justify-between">
+                <span className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                   <DollarSign className="w-5 h-5" />
                   Total
                 </span>
@@ -243,12 +243,12 @@ export default function QuickBook({
           )}
 
           {/* Benefits */}
-          <div className="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-2xl border border-purple-100 dark:border-purple-800">
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+          <div className="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100">
+            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <Zap className="w-5 h-5 text-purple-600" />
               Quick Book Benefits
             </h4>
-            <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
                 <Check className="w-5 h-5 text-purple-600 flex-shrink-0" />
                 <span>Instant confirmation - no waiting for approval</span>
@@ -266,10 +266,10 @@ export default function QuickBook({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-3">
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-100 transition-colors"
            >
             Cancel
           </button>

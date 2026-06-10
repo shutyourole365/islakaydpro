@@ -133,10 +133,10 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
     if (!preferences || !user) return;
 
     const newValue = !preferences[key];
-
+    
     // Optimistically update UI
     setPreferences(prev => prev ? { ...prev, [key]: newValue } : null);
-
+    
     setIsSaving(true);
     setSaveStatus('idle');
 
@@ -216,25 +216,25 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
 
   const renderCategory = (category: string, title: string) => {
     const items = preferenceOptions.filter(opt => opt.category === category);
-
+    
     return (
       <div key={category} className="mb-8">
-        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
           {title}
         </h3>
         <div className="space-y-4">
           {items.map((option) => (
             <div
               key={option.key}
-              className="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+              className="flex items-start justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
             >
               <div className="flex items-start gap-4">
-                <div className="p-2 bg-white dark:bg-gray-600 rounded-lg text-teal-500 shadow-sm">
+                <div className="p-2 bg-white rounded-lg text-teal-500 shadow-sm">
                   {option.icon}
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">{option.label}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{option.description}</p>
+                  <p className="font-medium text-gray-900">{option.label}</p>
+                  <p className="text-sm text-gray-500 mt-1">{option.description}</p>
                 </div>
               </div>
               <button
@@ -243,7 +243,7 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
                   preferences?.[option.key]
                     ? 'bg-teal-500'
-                    : 'bg-gray-200 dark:bg-gray-500'
+                    : 'bg-gray-200'
                 } ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
                 aria-pressed={!!preferences?.[option.key]}
                 aria-label={`Toggle ${option.label}`}
@@ -273,7 +273,7 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
     return (
       <div className={`text-center py-12 ${className}`}>
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-        <p className="text-gray-600 dark:text-gray-400">{error}</p>
+        <p className="text-gray-600">{error}</p>
         <button
           onClick={loadPreferences}
           className="mt-4 px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors"
@@ -293,18 +293,18 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
             <Bell className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Email Notifications</h2>
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your email preferences</p>
+            <h2 className="text-xl font-bold text-gray-900">Email Notifications</h2>
+            <p className="text-gray-500 text-sm">Manage your email preferences</p>
           </div>
         </div>
-
+        
         {/* Save Status Indicator */}
         {saveStatus !== 'idle' && (
           <div
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
               saveStatus === 'success'
-                ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
             }`}
           >
             {saveStatus === 'success' ? (
@@ -327,7 +327,7 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
         <button
           onClick={handleEnableAll}
           disabled={isSaving}
-          className="flex items-center gap-2 px-4 py-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-teal-50 text-teal-700 rounded-lg hover:bg-teal-100 transition-colors disabled:opacity-50"
          >
           <CheckCircle2 className="w-4 h-4" />
           Enable All
@@ -335,13 +335,13 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
         <button
           onClick={handleDisableAll}
           disabled={isSaving}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
          >
           <Bell className="w-4 h-4" />
           Disable All
         </button>
         {isSaving && (
-          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-gray-500">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span className="text-sm">Saving...</span>
           </div>
@@ -354,10 +354,10 @@ export default function EmailPreferences({ className = '' }: EmailPreferencesPro
       {renderCategory('marketing', 'Marketing & Updates')}
 
       {/* Unsubscribe Note */}
-      <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          <strong className="text-gray-700 dark:text-gray-300">Note:</strong> You will always receive important account and security emails
-          regardless of these settings. You can unsubscribe from all marketing emails at any time
+      <div className="mt-8 p-4 bg-gray-50 rounded-xl">
+        <p className="text-sm text-gray-500">
+          <strong>Note:</strong> You will always receive important account and security emails 
+          regardless of these settings. You can unsubscribe from all marketing emails at any time 
           by clicking the unsubscribe link in any email.
         </p>
       </div>

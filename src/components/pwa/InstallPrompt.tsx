@@ -29,14 +29,12 @@ export default function InstallPrompt() {
       }
     }
 
-    let bannerTimeout: ReturnType<typeof setTimeout> | null = null;
-
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-
+      
       // Show banner after 30 seconds on page
-      bannerTimeout = setTimeout(() => {
+      setTimeout(() => {
         setShowBanner(true);
       }, 30000);
     };
@@ -54,7 +52,6 @@ export default function InstallPrompt() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
-      if (bannerTimeout) clearTimeout(bannerTimeout);
     };
   }, []);
 
@@ -64,9 +61,11 @@ export default function InstallPrompt() {
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-
-      if (import.meta.env.DEV) {
-        console.log(outcome === 'accepted' ? 'PWA installed' : 'PWA installation dismissed');
+      
+      if (outcome === 'accepted') {
+        console.log('PWA installed');
+      } else {
+        console.log('PWA installation dismissed');
       }
     } catch (error) {
       console.error('PWA installation error:', error);
@@ -129,8 +128,8 @@ export default function InstallPrompt() {
       {showPrompt && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleDismiss} />
-
-          <div className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden animate-scale-in">
+          
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-scale-in">
             {/* Header */}
             <div className="relative bg-gradient-to-br from-teal-500 to-emerald-500 p-8 text-white text-center">
               <button
@@ -140,11 +139,11 @@ export default function InstallPrompt() {
               >
                 <X className="w-5 h-5" />
               </button>
-
+              
               <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <span className="text-4xl">🔧</span>
               </div>
-
+              
               <h2 className="text-2xl font-bold mb-2">Install Islakayd</h2>
               <p className="text-white/80">Add to your home screen for the best experience</p>
             </div>
@@ -153,12 +152,12 @@ export default function InstallPrompt() {
             <div className="p-6 space-y-4">
               {features.map((feature, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-teal-50 dark:bg-teal-900/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <feature.icon className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                  <div className="w-10 h-10 bg-teal-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <feature.icon className="w-5 h-5 text-teal-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{feature.description}</p>
+                    <h3 className="font-semibold text-gray-900">{feature.title}</h3>
+                    <p className="text-sm text-gray-500">{feature.description}</p>
                   </div>
                 </div>
               ))}
@@ -173,10 +172,10 @@ export default function InstallPrompt() {
                 <Download className="w-5 h-5" />
                 Install Now
               </button>
-
+              
               <button
                 onClick={handleDismiss}
-                className="w-full py-3 text-gray-500 dark:text-gray-400 font-medium hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                className="w-full py-3 text-gray-500 font-medium hover:text-gray-700 transition-colors"
                >
                 Maybe Later
               </button>
@@ -184,7 +183,7 @@ export default function InstallPrompt() {
 
             {/* Footer note */}
             <div className="px-6 pb-6">
-              <p className="text-xs text-center text-gray-400 dark:text-gray-500">
+              <p className="text-xs text-center text-gray-400">
                 No app store needed • Install directly from your browser
               </p>
             </div>
@@ -237,8 +236,8 @@ export function OfflineIndicator() {
 
   return (
     <div className={`fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full shadow-lg transition-all duration-300 ${
-      isOnline
-        ? 'bg-green-500 text-white'
+      isOnline 
+        ? 'bg-green-500 text-white' 
         : 'bg-gray-800 text-white'
     }`}>
       <div className="flex items-center gap-2 text-sm font-medium">

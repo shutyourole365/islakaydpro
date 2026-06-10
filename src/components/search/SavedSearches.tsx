@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Search, Bell, BellOff, Trash2, Edit2, Plus, Filter, X, Loader2, Copy, Clock, Eye } from 'lucide-react';
+import { Search, Bell, BellOff, Trash2, Edit2, Plus, Filter, X, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getSavedSearches, deleteSavedSearch, saveSearch } from '../../services/database';
-import { useToast } from '../ui/Toast';
+import { getSavedSearches, deleteSavedSearch } from '../../services/database';
 import type { SavedSearch as DBSavedSearch } from '../../types';
 
 interface SavedSearchesProps {
@@ -12,12 +11,10 @@ interface SavedSearchesProps {
 
 export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesProps) {
   const { user } = useAuth();
-  const { success, error: showError } = useToast();
   const [searches, setSearches] = useState<DBSavedSearch[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [cloning, setCloning] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -48,25 +45,6 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
     setEditName('');
   };
 
-  const handleCloneSearch = async (search: DBSavedSearch) => {
-    if (!user) return;
-    try {
-      setCloning(search.id);
-      const newSearch = await saveSearch({
-        user_id: user.id,
-        name: `${search.name} (copy)`,
-        filters: search.filters,
-        alert_enabled: false,
-      });
-      setSearches(prev => [newSearch as DBSavedSearch, ...prev]);
-      success('Search cloned successfully');
-    } catch {
-      showError('Failed to clone search');
-    } finally {
-      setCloning(null);
-    }
-  };
-
   const formatFilters = (filters: DBSavedSearch['filters']) => {
     const parts: string[] = [];
     if (filters.query) parts.push(`"${filters.query}"`);
@@ -79,17 +57,17 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-
-      <div className="relative w-full max-w-3xl max-h-[90vh] bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+      
+      <div className="relative w-full max-w-3xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-teal-50 to-emerald-50">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center">
               <Search className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Saved Searches</h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <h2 className="text-2xl font-bold text-gray-900">Saved Searches</h2>
+              <p className="text-sm text-gray-600">
                 {searches.length} saved • {searches.filter(s => s.alert_enabled).length} with alerts
               </p>
             </div>
@@ -97,9 +75,9 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
           <button
             onClick={onClose}
             aria-label="Close saved searches"
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
           >
-            <X className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+            <X className="w-6 h-6 text-gray-500" />
           </button>
         </div>
 
@@ -111,13 +89,13 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
             </div>
           ) : searches.length === 0 ? (
             <div className="text-center py-16">
-              <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-                <Search className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+              <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Search className="w-10 h-10 text-gray-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No saved searches yet
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
+              <p className="text-gray-600 mb-6">
                 Save your search criteria to find equipment faster
               </p>
               <button
@@ -132,7 +110,7 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
             searches.map((search) => (
               <div
                 key={search.id}
-                className="group p-4 rounded-2xl border border-gray-200 dark:border-gray-600 hover:border-teal-300 dark:hover:border-teal-600 hover:shadow-lg transition-all"
+                className="group p-4 rounded-2xl border border-gray-200 hover:border-teal-300 hover:shadow-lg transition-all"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -143,7 +121,7 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
                           placeholder="Search name"
-                          className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:border-teal-500"
+                          className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 focus:outline-none focus:border-teal-500"
                           autoFocus
                         />
                         <button
@@ -154,41 +132,34 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
                         </button>
                         <button
                           onClick={() => setEditingId(null)}
-                          className="px-3 py-1.5 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                          className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
                         >
                           Cancel
                         </button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
+                        <h3 className="font-semibold text-gray-900 text-lg">
                           {search.name}
                         </h3>
                         <button
                           aria-label="Edit search name" onClick={() => handleStartEdit(search)}
-                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                          className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-gray-100 transition-all"
                         >
                           <Edit2 className="w-4 h-4 text-gray-400" />
                         </button>
                       </div>
                     )}
 
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 flex items-center gap-2 flex-wrap">
+                    <p className="text-sm text-gray-600 mb-3 flex items-center gap-2 flex-wrap">
                       <Filter className="w-4 h-4" />
                       {formatFilters(search.filters)}
                     </p>
 
-                    <div className="flex items-center gap-4 text-sm flex-wrap">
-                      <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                        <Clock className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className="text-gray-500">
                         Created {new Date(search.created_at).toLocaleDateString()}
                       </span>
-                      {search.last_alert_at && (
-                        <span className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                          <Eye className="w-3.5 h-3.5" />
-                          Last alert {new Date(search.last_alert_at).toLocaleDateString()}
-                        </span>
-                      )}
                     </div>
                   </div>
 
@@ -196,8 +167,8 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
                     <div
                       className={`p-2 rounded-lg ${
                         search.alert_enabled
-                          ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
+                          ? 'bg-teal-50 text-teal-600'
+                          : 'bg-gray-100 text-gray-400'
                       }`}
                       title={search.alert_enabled ? 'Alerts enabled' : 'Alerts disabled'}
                     >
@@ -216,23 +187,8 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
                     </button>
 
                     <button
-                      aria-label="Clone search"
-                      onClick={() => handleCloneSearch(search)}
-                      disabled={cloning === search.id}
-                      title="Create a copy of this search"
-                      className="p-2 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50 transition-all"
-                    >
-                      {cloning === search.id ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <Copy className="w-5 h-5" />
-                      )}
-                    </button>
-
-                    <button
-                      aria-label="Delete saved search"
-                      onClick={() => handleDelete(search.id)}
-                      className="p-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                      aria-label="Delete saved search" onClick={() => handleDelete(search.id)}
+                      className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition-all"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -240,11 +196,11 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
                 </div>
 
                 {search.alert_enabled && (
-                  <div className="mt-3 px-3 py-2 bg-teal-50 dark:bg-teal-900/20 rounded-lg border border-teal-100 dark:border-teal-800 flex items-start gap-2">
-                    <Bell className="w-4 h-4 text-teal-600 dark:text-teal-400 mt-0.5" />
-                    <div className="flex-1 text-sm text-teal-700 dark:text-teal-300">
+                  <div className="mt-3 px-3 py-2 bg-teal-50 rounded-lg border border-teal-100 flex items-start gap-2">
+                    <Bell className="w-4 h-4 text-teal-600 mt-0.5" />
+                    <div className="flex-1 text-sm text-teal-700">
                       <p className="font-medium">Email alerts enabled</p>
-                      <p className="text-teal-600 dark:text-teal-400">
+                      <p className="text-teal-600">
                         We'll notify you when new equipment matches this search
                       </p>
                     </div>
@@ -257,13 +213,13 @@ export default function SavedSearches({ onClose, onSearchClick }: SavedSearchesP
 
         {/* Footer */}
         {searches.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
+            <p className="text-sm text-gray-600">
               💡 Tip: Enable alerts to get notified about price drops and new listings
             </p>
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
              >
               Close
             </button>

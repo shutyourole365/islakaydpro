@@ -1,226 +1,536 @@
-import type { ReactElement } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render as rtlRender, screen, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RentalAgreementGenerator from '../components/agreements/RentalAgreementGenerator';
-import { ToastProvider } from '../components/ui/Toast';
-
-// The component now uses useToast — wrap every render in ToastProvider.
-const render = (ui: ReactElement) =>
-  rtlRender(<ToastProvider>{ui}</ToastProvider>);
-
-vi.mock('../contexts/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'user-1', email: 'test@test.com' } }),
-}));
-
-const { mockChain } = vi.hoisted(() => {
-  const mockChain = {
-    select: vi.fn().mockReturnThis(),
-    or: vi.fn().mockReturnThis(),
-    order: vi.fn(),
-    insert: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    single: vi.fn().mockResolvedValue({ data: null, error: null }),
-    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-  };
-  return { mockChain };
-});
-
-vi.mock('../lib/supabase', () => ({
-  supabase: {
-    from: vi.fn().mockReturnValue(mockChain),
-  },
-}));
-
-const mockAgreements = [
-  {
-    id: 'agr-1',
-    booking_id: 'booking-1',
-    equipment_title: 'CAT 320 Excavator',
-    start_date: '2026-03-01',
-    end_date: '2026-03-05',
-    total_amount: 1200,
-    deposit_amount: 500,
-    daily_rate: 300,
-    insurance_plan: null,
-    special_terms: null,
-    status: 'pending' as const,
-    owner_signed_at: null,
-    renter_signed_at: null,
-    owner_id: 'user-1',
-    renter_id: 'user-2',
-    created_at: '2026-02-01T00:00:00Z',
-    owner: { full_name: 'Test Owner' },
-    renter: { full_name: 'John Doe' },
-  },
-  {
-    id: 'agr-2',
-    booking_id: 'booking-2',
-    equipment_title: 'Sony A7IV Camera Kit',
-    start_date: '2026-04-01',
-    end_date: '2026-04-03',
-    total_amount: 450,
-    deposit_amount: 200,
-    daily_rate: 150,
-    insurance_plan: 'basic',
-    special_terms: null,
-    status: 'fully_signed' as const,
-    owner_signed_at: '2026-03-15T00:00:00Z',
-    renter_signed_at: '2026-03-16T00:00:00Z',
-    owner_id: 'user-1',
-    renter_id: 'user-3',
-    created_at: '2026-03-01T00:00:00Z',
-    owner: { full_name: 'Test Owner' },
-    renter: { full_name: 'Sarah Miller' },
-  },
-];
 
 describe('RentalAgreementGenerator', () => {
   const mockOnBack = vi.fn();
 
   beforeEach(() => {
     mockOnBack.mockClear();
-    vi.clearAllMocks();
-    mockChain.select.mockReturnThis();
-    mockChain.or.mockReturnThis();
-    mockChain.order.mockResolvedValue({ data: mockAgreements, error: null });
   });
 
   describe('Component Rendering', () => {
-    it('should render title after loading', async () => {
+    it('should render with main title and description', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('Rental Agreements')).toBeInTheDocument());
+      expect(screen.getByText('Rental Agreement Generator')).toBeInTheDocument();
+      expect(screen.getByText(/Create and manage digital rental contracts/i)).toBeInTheDocument();
     });
 
-    it('should render description', async () => {
+    it('should display back button', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(screen.getByText('Digital contracts for your rentals')).toBeInTheDocument()
-      );
+      const backButton = screen.getByRole('button', { name: /go back/i });
+      expect(backButton).toBeInTheDocument();
     });
 
-    it('should display back button', async () => {
+    it('should display tab navigation', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('Rental Agreements')).toBeInTheDocument());
-      // Back button is an ArrowLeft icon button (no text label)
-      const buttons = screen.getAllByRole('button');
-      expect(buttons.length).toBeGreaterThan(0);
-    });
-
-    it('should display generate agreement section', async () => {
-      render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(screen.getByText('Generate Agreement from Booking')).toBeInTheDocument()
-      );
+      expect(screen.getByRole('button', { name: /My Agreements/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Templates/i })).toBeInTheDocument();
     });
   });
 
-  describe('Booking ID Form', () => {
-    it('should display booking ID input', async () => {
+  describe('Tab Navigation', () => {
+    it('should show agreements tab by default', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(screen.getByPlaceholderText('Paste your booking ID')).toBeInTheDocument()
-      );
+      expect(screen.getByText('Create New Agreement')).toBeInTheDocument();
     });
 
-    it('should display special terms textarea', async () => {
-      render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(
-          screen.getByPlaceholderText('Any additional terms for this rental...')
-        ).toBeInTheDocument()
-      );
-    });
-
-    it('should display generate button disabled when input empty', async () => {
-      render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: /Generate Agreement/i })).toBeDisabled()
-      );
-    });
-
-    it('should enable generate button when booking ID is entered', async () => {
+    it('should switch to templates tab', async () => {
       const user = userEvent.setup();
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      const input = await screen.findByPlaceholderText('Paste your booking ID');
-      await user.type(input, 'booking-123');
-      expect(screen.getByRole('button', { name: /Generate Agreement/i })).not.toBeDisabled();
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('Standard Rental Agreement')).toBeInTheDocument();
     });
 
-    it('should accept booking ID input', async () => {
+    it('should switch back to agreements tab', async () => {
       const user = userEvent.setup();
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      const input = (await screen.findByPlaceholderText(
-        'Paste your booking ID'
-      )) as HTMLInputElement;
-      await user.type(input, 'abc-123');
-      expect(input.value).toBe('abc-123');
-    });
 
-    it('should accept special terms input', async () => {
-      const user = userEvent.setup();
-      render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      const textarea = (await screen.findByPlaceholderText(
-        'Any additional terms for this rental...'
-      )) as HTMLTextAreaElement;
-      await user.type(textarea, 'Custom terms');
-      expect(textarea.value).toBe('Custom terms');
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const agreementsTab = screen.getByRole('button', { name: /My Agreements/i });
+      await user.click(agreementsTab);
+
+      expect(screen.getByText('Create New Agreement')).toBeInTheDocument();
     });
   });
 
-  describe('Agreements List', () => {
-    it('should list agreements after loading', async () => {
+  describe('Agreements Tab Display', () => {
+    it('should display create new agreement button', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument()
-      );
+      expect(screen.getByRole('button', { name: /Create New Agreement/i })).toBeInTheDocument();
+    });
+
+    it('should list all agreements', () => {
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
       expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
     });
 
-    it('should display status badges', async () => {
+    it('should display agreement status badges', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(screen.getByText('Awaiting Signatures')).toBeInTheDocument()
-      );
-      expect(screen.getByText('Fully Signed')).toBeInTheDocument();
+      expect(screen.getByText('Draft')).toBeInTheDocument();
+      const signedElements = screen.getAllByText('Signed');
+      expect(signedElements.length).toBeGreaterThan(0);
     });
 
-    it('should display date ranges on agreements', async () => {
+    it('should show renter names on agreements', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument());
+      // Renter names are shown as "Renter: John D." - check text content
+      expect(screen.getByText((content) => content.includes('John D.'))).toBeInTheDocument();
+      expect(screen.getByText((content) => content.includes('Sarah M.'))).toBeInTheDocument();
+    });
+
+    it('should display rental dates on agreements', () => {
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      // Should show date ranges
       const dateElements = screen.queryAllByText(/2026/);
       expect(dateElements.length).toBeGreaterThan(0);
     });
 
-    it('should display total cost on agreements', async () => {
+    it('should display total cost on agreements', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument());
-      const costElements = screen.queryAllByText(/\$[0-9,.]+/);
+      const costElements = screen.queryAllByText(/\$[0-9,]+/);
       expect(costElements.length).toBeGreaterThan(0);
     });
-  });
 
-  describe('Empty State', () => {
-    it('should show empty state when no agreements', async () => {
-      mockChain.order.mockResolvedValue({ data: [], error: null });
+    it('should display download button on agreements', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(
-          screen.getByText('No agreements yet. Generate one from a booking above.')
-        ).toBeInTheDocument()
-      );
+      const downloadButtons = screen.getAllByRole('button', { name: /Download/i });
+      expect(downloadButtons.length > 0).toBe(true);
+    });
+
+    it('should display action buttons based on status', () => {
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      // Should show different buttons for different statuses
+      const downloadButtons = screen.getAllByRole('button', { name: /Download/i });
+      expect(downloadButtons.length).toBeGreaterThan(0);
     });
   });
 
-  describe('Protection Note', () => {
-    it('should display protection note', async () => {
+  describe('Agreement Status Handling', () => {
+    it('should show send button for pending signature', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() =>
-        expect(
-          screen.getByText(/Signed agreements provide legal protection/i)
-        ).toBeInTheDocument()
-      );
+      const sendButtons = screen.queryAllByRole('button', { name: /Send/i });
+      expect(sendButtons.length > 0).toBe(true);
+    });
+
+    it('should show edit button for draft agreements', () => {
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      const editButtons = screen.queryAllByRole('button', { name: /Edit/i });
+      expect(editButtons.length > 0).toBe(true);
+    });
+
+    it('should show signed badge for signed agreements', () => {
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      const signedElements = screen.getAllByText('Signed');
+      expect(signedElements.length).toBeGreaterThan(0);
+    });
+
+    it('should show completed status for finished agreements', () => {
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      expect(screen.getByText('Completed')).toBeInTheDocument();
+    });
+  });
+
+  describe('Templates Tab Display', () => {
+    it('should display all templates', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('Standard Rental Agreement')).toBeInTheDocument();
+      expect(screen.getByText('Heavy Equipment Agreement')).toBeInTheDocument();
+      expect(screen.getByText('Photography Equipment Agreement')).toBeInTheDocument();
+      expect(screen.getByText('Short-Term Rental Agreement')).toBeInTheDocument();
+      expect(screen.getByText('Enterprise Agreement')).toBeInTheDocument();
+    });
+
+    it('should display template descriptions', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('Basic rental terms and conditions')).toBeInTheDocument();
+      expect(screen.getByText('Specialized for construction equipment')).toBeInTheDocument();
+    });
+
+    it('should display clause count for templates', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const clauseElements = screen.queryAllByText(/clauses/i);
+      expect(clauseElements.length).toBeGreaterThan(0);
+    });
+
+    it('should select first template by default', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('Standard Rental Agreement')).toBeInTheDocument();
+    });
+
+    it('should allow template selection', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const enterpriseTemplate = screen.getByRole('button', { name: /Enterprise Agreement/i });
+      await user.click(enterpriseTemplate);
+
+      expect(screen.getByText('Enterprise Agreement')).toBeInTheDocument();
+    });
+  });
+
+  describe('Template Form Display', () => {
+    it('should display agreement form in templates tab', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('Agreement Details')).toBeInTheDocument();
+    });
+
+    it('should display equipment input field', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const equipmentInput = screen.getByDisplayValue('CAT 320 Excavator') as HTMLInputElement;
+      expect(equipmentInput).toBeInTheDocument();
+    });
+
+    it('should display renter name input field', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const renterInput = screen.getByPlaceholderText(/Enter renter name/i);
+      expect(renterInput).toBeInTheDocument();
+    });
+
+    it('should display renter email input field', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const emailInput = screen.getByPlaceholderText(/Enter renter email/i);
+      expect(emailInput).toBeInTheDocument();
+    });
+
+    it('should display date input fields', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const dateInputs = screen.getAllByDisplayValue('');
+      expect(dateInputs.length > 0).toBe(true);
+    });
+  });
+
+  describe('Form Input Handling', () => {
+    it('should accept renter name input', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const renterInput = screen.getByPlaceholderText(/Enter renter name/i) as HTMLInputElement;
+      await user.type(renterInput, 'Jane Doe');
+
+      expect(renterInput.value).toBe('Jane Doe');
+    });
+
+    it('should accept renter email input', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const emailInput = screen.getByPlaceholderText(/Enter renter email/i) as HTMLInputElement;
+      await user.type(emailInput, 'jane@example.com');
+
+      expect(emailInput.value).toBe('jane@example.com');
+    });
+
+    it('should allow equipment name modification', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const equipmentInput = screen.getByDisplayValue('CAT 320 Excavator') as HTMLInputElement;
+      await user.clear(equipmentInput);
+      await user.type(equipmentInput, 'New Equipment');
+
+      expect(equipmentInput.value).toBe('New Equipment');
+    });
+
+    it('should accept date inputs', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const dateInputs = screen.getAllByDisplayValue('') as HTMLInputElement[];
+      if (dateInputs.length > 0) {
+        await user.type(dateInputs[0], '2026-03-01');
+        expect(dateInputs[0].value).toBe('2026-03-01');
+      }
+    });
+
+    it('should accept deposit amount input', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const numberInputs = screen.getAllByDisplayValue('2000');
+      if (numberInputs.length > 0) {
+        await user.clear(numberInputs[0]);
+        await user.type(numberInputs[0], '3000');
+      }
+    });
+
+    it('should accept total cost input', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const numberInputs = screen.getAllByDisplayValue('0');
+      if (numberInputs.length > 0) {
+        await user.type(numberInputs[0], '5000');
+      }
+    });
+  });
+
+  describe('Insurance Checkbox', () => {
+    it('should display insurance checkbox', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText(/Include insurance coverage/i)).toBeInTheDocument();
+    });
+
+    it('should have insurance checked by default', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const insuranceCheckbox = screen.getByRole('checkbox');
+      expect(insuranceCheckbox).toBeChecked();
+    });
+
+    it('should allow unchecking insurance', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const insuranceCheckbox = screen.getByRole('checkbox');
+      await user.click(insuranceCheckbox);
+
+      expect(insuranceCheckbox).not.toBeChecked();
+    });
+  });
+
+  describe('Additional Terms Field', () => {
+    it('should display additional terms textarea', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByPlaceholderText(/Add any custom terms/i)).toBeInTheDocument();
+    });
+
+    it('should accept custom terms input', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const termsField = screen.getByPlaceholderText(/Add any custom terms/i) as HTMLTextAreaElement;
+      await user.type(termsField, 'Custom terms here');
+
+      expect(termsField.value).toBe('Custom terms here');
+    });
+  });
+
+  describe('Agreement Preview Display', () => {
+    it('should display agreement preview section', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('Agreement Preview')).toBeInTheDocument();
+    });
+
+    it('should show equipment name in preview', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('EQUIPMENT RENTAL AGREEMENT')).toBeInTheDocument();
+      // Equipment is in a <p> with <strong>Equipment:</strong> tag - check for strong text
+      expect(screen.getByText('Equipment:')).toBeInTheDocument();
+      // Check that CAT 320 Excavator appears somewhere in the preview
+      const equipmentElements = screen.queryAllByText(/CAT 320 Excavator/);
+      expect(equipmentElements.length).toBeGreaterThan(0);
+    });
+
+    it('should update preview when renter name changes', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const renterInput = screen.getByPlaceholderText(/Enter renter name/i);
+      await user.type(renterInput, 'John Smith');
+
+      // Renter name appears after typing (in preview, broken by strong tag)
+      expect(screen.getByText('Renter:')).toBeInTheDocument();
+      expect(screen.getByText('John Smith')).toBeInTheDocument();
+    });
+
+    it('should show rental period in preview when dates entered', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      // Labels don't have 'for' attribute so use querySelectorAll for type="date"
+      const dateInputs = container.querySelectorAll('input[type="date"]');
+      if (dateInputs.length >= 2) {
+        fireEvent.change(dateInputs[0], { target: { value: '2026-03-01' } });
+        fireEvent.change(dateInputs[1], { target: { value: '2026-03-05' } });
+        expect(screen.getByText('Rental Period:')).toBeInTheDocument();
+      }
+    });
+
+    it('should calculate duration in preview', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      // Labels don't have 'for' attribute so use querySelectorAll for type="date"
+      const dateInputs = container.querySelectorAll('input[type="date"]');
+      if (dateInputs.length >= 2) {
+        fireEvent.change(dateInputs[0], { target: { value: '2026-03-01' } });
+        fireEvent.change(dateInputs[1], { target: { value: '2026-03-05' } });
+        expect(screen.getByText('Duration:')).toBeInTheDocument();
+      }
+    });
+
+    it('should show total cost in preview', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText(/Total Cost:/)).toBeInTheDocument();
+    });
+
+    it('should show insurance status in preview', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText(/Insurance:/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Generate & Sign Button', () => {
+    it('should display generate and sign button', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByRole('button', { name: /Generate & Sign/i })).toBeInTheDocument();
+    });
+
+    it('should have proper styling on button', async () => {
+      const user = userEvent.setup();
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      const generateButton = screen.getByRole('button', { name: /Generate & Sign/i });
+      expect(generateButton).toBeInTheDocument();
+    });
+  });
+
+  describe('Duration Calculation', () => {
+    it('should calculate days between start and end date', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<RentalAgreementGenerator onBack={mockOnBack} />);
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      // Labels don't have 'for' attribute so use querySelectorAll for type="date"
+      const dateInputs = container.querySelectorAll('input[type="date"]');
+      if (dateInputs.length >= 2) {
+        fireEvent.change(dateInputs[0], { target: { value: '2026-03-01' } });
+        fireEvent.change(dateInputs[1], { target: { value: '2026-03-06' } });
+        expect(screen.getByText('Duration:')).toBeInTheDocument();
+      }
     });
   });
 
@@ -228,113 +538,51 @@ describe('RentalAgreementGenerator', () => {
     it('should call onBack when back button is clicked', async () => {
       const user = userEvent.setup();
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('Rental Agreements')).toBeInTheDocument());
-      // The back button is the first button in the header area
-      const buttons = screen.getAllByRole('button');
-      await user.click(buttons[0]);
+
+      const backButton = screen.getByRole('button', { name: /go back/i });
+      await user.click(backButton);
+
       expect(mockOnBack).toHaveBeenCalledTimes(1);
     });
   });
 
-  describe('Agreement Detail View', () => {
-    it('should show agreement detail when clicking an agreement', async () => {
+  describe('Responsive Layout', () => {
+    it('should display form and preview side by side in templates', async () => {
       const user = userEvent.setup();
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument());
-      const card = screen.getByText('CAT 320 Excavator').closest('button');
-      if (card) await user.click(card);
-      await waitFor(() =>
-        expect(screen.getByText('Rental Agreement')).toBeInTheDocument()
-      );
+
+      const templatesTab = screen.getByRole('button', { name: /Templates/i });
+      await user.click(templatesTab);
+
+      expect(screen.getByText('Agreement Details')).toBeInTheDocument();
+      expect(screen.getByText('Agreement Preview')).toBeInTheDocument();
     });
 
-    it('should show download button in detail view', async () => {
-      const user = userEvent.setup();
+    it('should display agreements grid', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument());
-      const card = screen.getByText('CAT 320 Excavator').closest('button');
-      if (card) await user.click(card);
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: /Download/i })).toBeInTheDocument()
-      );
-    });
-
-    it('should show back to agreements button in detail view', async () => {
-      const user = userEvent.setup();
-      render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument());
-      const card = screen.getByText('CAT 320 Excavator').closest('button');
-      if (card) await user.click(card);
-      await waitFor(() =>
-        expect(screen.getByText('Back to Agreements')).toBeInTheDocument()
-      );
-    });
-
-    it('should show sign button for unsigned pending agreement', async () => {
-      const user = userEvent.setup();
-      render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument());
-      const card = screen.getByText('CAT 320 Excavator').closest('button');
-      if (card) await user.click(card);
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: /Sign as/i })).toBeInTheDocument()
-      );
+      expect(screen.getByText('CAT 320 Excavator')).toBeInTheDocument();
+      expect(screen.getByText('Sony A7IV Camera Kit')).toBeInTheDocument();
     });
   });
 
-  // Regression coverage for the alert() -> useToast migration. These two
-  // paths used to call window.alert(); they now surface a toast and must
-  // continue to surface SOMETHING the user can see.
-  describe('Toast surfacing (post alert() migration)', () => {
-    it('surfaces an error toast when the booking lookup returns no row', async () => {
-      mockChain.single.mockResolvedValueOnce({ data: null, error: { message: 'not found' } });
-
-      const user = userEvent.setup();
+  describe('Agreement Card Information', () => {
+    it('should display duration calculation on agreement cards', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('Rental Agreements')).toBeInTheDocument());
-
-      const input = screen.getByPlaceholderText('Paste your booking ID');
-      await user.type(input, 'bad-booking-id');
-      const generateBtn = screen.getByRole('button', { name: /Generate/i });
-      await user.click(generateBtn);
-
-      await waitFor(() => {
-        expect(screen.getByText('Booking not found')).toBeInTheDocument();
-      });
+      const durationElements = screen.getAllByText('Duration');
+      expect(durationElements.length).toBeGreaterThan(0);
     });
 
-    it('surfaces a warning toast when an agreement already exists', async () => {
-      // 1st single() resolves the booking lookup (success)
-      mockChain.single.mockResolvedValueOnce({
-        data: {
-          id: 'booking-xyz',
-          owner_id: 'user-1',
-          renter_id: 'user-2',
-          start_date: '2026-03-01',
-          end_date: '2026-03-05',
-          total_amount: 1000,
-          deposit_amount: 500,
-          daily_rate: 200,
-          service_fee: 50,
-          equipment: { title: 'Test Equipment' },
-        },
-        error: null,
-      });
-      // maybeSingle() returns an existing agreement
-      mockChain.maybeSingle.mockResolvedValueOnce({ data: { id: 'existing-agr' }, error: null });
-
-      const user = userEvent.setup();
+    it('should show formatted date ranges', () => {
       render(<RentalAgreementGenerator onBack={mockOnBack} />);
-      await waitFor(() => expect(screen.getByText('Rental Agreements')).toBeInTheDocument());
+      // Dates should be formatted properly
+      const dateElements = screen.queryAllByText(/2026/);
+      expect(dateElements.length).toBeGreaterThan(0);
+    });
 
-      const input = screen.getByPlaceholderText('Paste your booking ID');
-      await user.type(input, 'booking-xyz');
-      const generateBtn = screen.getByRole('button', { name: /Generate/i });
-      await user.click(generateBtn);
-
-      await waitFor(() => {
-        expect(screen.getByText('Agreement exists')).toBeInTheDocument();
-      });
+    it('should display formatted cost amounts', () => {
+      render(<RentalAgreementGenerator onBack={mockOnBack} />);
+      const costElements = screen.queryAllByText(/\$[0-9,]+/);
+      expect(costElements.length).toBeGreaterThan(0);
     });
   });
 });

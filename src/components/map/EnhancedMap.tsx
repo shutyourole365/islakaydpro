@@ -20,7 +20,6 @@ import {
   Globe,
 } from 'lucide-react';
 import type { Equipment } from '../../types';
-import { useToast } from '../ui/Toast';
 
 interface EnhancedMapProps {
   equipment: Equipment[];
@@ -54,7 +53,6 @@ export default function EnhancedMap({
   userLocation: initialUserLocation,
   className = '',
 }: EnhancedMapProps) {
-  const { addToast } = useToast();
   const mapRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mapInstance, setMapInstance] = useState<any>(null);
@@ -304,11 +302,7 @@ export default function EnhancedMap({
   const handleRouteToEquipment = (item: Equipment) => {
     if (!userLocation || !item.latitude || !item.longitude) return;
     const distance = calculateDistance(userLocation.lat, userLocation.lng, item.latitude, item.longitude);
-    addToast({
-      type: 'info',
-      title: `Distance to ${item.title}: ${distance.toFixed(1)} miles`,
-      message: 'Opening directions in Google Maps…',
-    });
+    alert(`Distance to ${item.title}: ${distance.toFixed(1)} miles\n\nOpening directions in Google Maps...`);
     window.open(`https://www.google.com/maps/dir/${userLocation.lat},${userLocation.lng}/${item.latitude},${item.longitude}`);
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   TrendingUp,
   DollarSign,
@@ -9,255 +9,262 @@ import {
   ArrowUp,
   ArrowDown,
   Activity,
-  Loader2,
+  Target,
 } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-import { useAuth } from '../../contexts/AuthContext';
 
 interface AnalyticsChartsProps {
   userId: string;
-  analytics?: unknown;
+  analytics?: {
+    revenue: { current: number; previous: number; trend: number };
+    bookings: { current: number; previous: number; trend: number };
+    views: { current: number; previous: number; trend: number };
+    rating: { current: number; previous: number; trend: number };
+  };
 }
 
-interface DayData {
+interface ChartData {
   label: string;
   value: number;
   color: string;
 }
 
-type TimeRange = '7d' | '30d' | '90d';
-type Metric = 'revenue' | 'bookings' | 'views';
+export default function AnalyticsCharts({ analytics }: AnalyticsChartsProps) {
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
+  const [activeMetric, setActiveMetric] = useState<'revenue' | 'bookings' | 'views'>('revenue');
 
-const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Mock data - in production this would come from your analytics service
+  const revenueData: ChartData[] = [
+    { label: 'Mon', value: 450, color: 'from-teal-400 to-emerald-400' },
+    { label: 'Tue', value: 680, color: 'from-teal-400 to-emerald-400' },
+    { label: 'Wed', value: 920, color: 'from-teal-400 to-emerald-400' },
+    { label: 'Thu', value: 750, color: 'from-teal-400 to-emerald-400' },
+    { label: 'Fri', value: 1100, color: 'from-teal-400 to-emerald-400' },
+    { label: 'Sat', value: 1450, color: 'from-teal-400 to-emerald-400' },
+    { label: 'Sun', value: 890, color: 'from-teal-400 to-emerald-400' },
+  ];
 
-function getDayLabel(dateStr: string): string {
-  return DAYS[new Date(dateStr).getDay()];
-}
+  const bookingsData: ChartData[] = [
+    { label: 'Mon', value: 3, color: 'from-violet-400 to-purple-400' },
+    { label: 'Tue', value: 5, color: 'from-violet-400 to-purple-400' },
+    { label: 'Wed', value: 7, color: 'from-violet-400 to-purple-400' },
+    { label: 'Thu', value: 4, color: 'from-violet-400 to-purple-400' },
+    { label: 'Fri', value: 9, color: 'from-violet-400 to-purple-400' },
+    { label: 'Sat', value: 11, color: 'from-violet-400 to-purple-400' },
+    { label: 'Sun', value: 6, color: 'from-violet-400 to-purple-400' },
+  ];
 
-function getDateRange(range: TimeRange): Date {
-  const now = new Date();
-  const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
-  return new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-}
+  const viewsData: ChartData[] = [
+    { label: 'Mon', value: 45, color: 'from-blue-400 to-cyan-400' },
+    { label: 'Tue', value: 62, color: 'from-blue-400 to-cyan-400' },
+    { label: 'Wed', value: 88, color: 'from-blue-400 to-cyan-400' },
+    { label: 'Thu', value: 71, color: 'from-blue-400 to-cyan-400' },
+    { label: 'Fri', value: 95, color: 'from-blue-400 to-cyan-400' },
+    { label: 'Sat', value: 123, color: 'from-blue-400 to-cyan-400' },
+    { label: 'Sun', value: 78, color: 'from-blue-400 to-cyan-400' },
+  ];
 
-function buildBuckets(range: TimeRange): string[] {
-  const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
-  const labels: string[] = [];
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    labels.push(d.toISOString().split('T')[0]);
-  }
-  return labels;
-}
+  const currentData = activeMetric === 'revenue' ? revenueData : 
+                      activeMetric === 'bookings' ? bookingsData : viewsData;
 
-export default function AnalyticsCharts({ userId }: AnalyticsChartsProps) {
-  const { user } = useAuth();
-  const resolvedUserId = userId || user?.id || '';
-  const [timeRange, setTimeRange] = useState<TimeRange>('7d');
-  const [activeMetric, setActiveMetric] = useState<Metric>('revenue');
-  const [loading, setLoading] = useState(true);
-  const [revenueData, setRevenueData] = useState<DayData[]>([]);
-  const [bookingsData, setBookingsData] = useState<DayData[]>([]);
-  const [summary, setSummary] = useState({
-    revenue: { current: 0, previous: 0 },
-    bookings: { current: 0, previous: 0 },
-    views: { current: 0, previous: 0 },
-    rating: { current: 0 },
-  });
+  const maxValue = Math.max(...currentData.map(d => d.value));
 
-  useEffect(() => {
-    if (!resolvedUserId) return;
+  const stats = analytics || {
+    revenue: { current: 6240, previous: 4850, trend: 28.7 },
+    bookings: { current: 45, previous: 38, trend: 18.4 },
+    views: { current: 562, previous: 412, trend: 36.4 },
+    rating: { current: 4.9, previous: 4.7, trend: 4.3 },
+  };
 
-    const load = async () => {
-      setLoading(true);
-      try {
-        const since = getDateRange(timeRange);
-        const buckets = buildBuckets(timeRange);
-
-        // Owner bookings in range
-        const { data: ownerBookings } = await supabase
-          .from('bookings')
-          .select('start_date, total_price, status')
-          .eq('owner_id', resolvedUserId)
-          .gte('start_date', since.toISOString())
-          .in('status', ['confirmed', 'active', 'completed']);
-
-        // Build revenue per day
-        const revMap: Record<string, number> = {};
-        const bkMap: Record<string, number> = {};
-        buckets.forEach(b => { revMap[b] = 0; bkMap[b] = 0; });
-
-        (ownerBookings || []).forEach(b => {
-          const day = b.start_date.split('T')[0];
-          if (revMap[day] !== undefined) {
-            revMap[day] += b.total_price || 0;
-            bkMap[day] = (bkMap[day] || 0) + 1;
-          }
-        });
-
-        const showBuckets = timeRange === '7d' ? buckets : buckets.filter((_, i) => i % Math.floor(buckets.length / 10) === 0);
-
-        setRevenueData(showBuckets.map(d => ({
-          label: timeRange === '7d' ? getDayLabel(d) : d.slice(5),
-          value: revMap[d] || 0,
-          color: 'from-teal-400 to-emerald-400',
-        })));
-
-        setBookingsData(showBuckets.map(d => ({
-          label: timeRange === '7d' ? getDayLabel(d) : d.slice(5),
-          value: bkMap[d] || 0,
-          color: 'from-violet-400 to-purple-400',
-        })));
-
-        // Summary stats
-        const totalRev = Object.values(revMap).reduce((a, b) => a + b, 0);
-        const totalBk = Object.values(bkMap).reduce((a, b) => a + b, 0);
-
-        // Rating avg from reviews
-        const { data: reviews } = await supabase
-          .from('reviews')
-          .select('rating')
-          .eq('reviewee_id', resolvedUserId)
-          .limit(100);
-        const avgRating = reviews && reviews.length > 0
-          ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
-          : 0;
-
-        setSummary({
-          revenue: { current: totalRev, previous: totalRev * 0.85 },
-          bookings: { current: totalBk, previous: Math.max(0, totalBk - 1) },
-          views: { current: 0, previous: 0 },
-          rating: { current: avgRating },
-        });
-      } catch (err) {
-        console.error('Failed to load analytics:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, [resolvedUserId, timeRange]);
-
-  const activeData = activeMetric === 'revenue' ? revenueData : bookingsData;
-  const maxVal = Math.max(...activeData.map(d => d.value), 1);
-
-  const trend = (curr: number, prev: number) =>
-    prev === 0 ? 0 : Math.round(((curr - prev) / prev) * 100);
-
-  const metrics = [
+  const insights = [
     {
-      id: 'revenue' as Metric,
-      label: 'Revenue',
-      value: `$${summary.revenue.current.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`,
-      trend: trend(summary.revenue.current, summary.revenue.previous),
-      icon: DollarSign,
-      color: 'text-teal-600',
-      bg: 'bg-teal-50',
+      icon: <TrendingUp className="w-5 h-5" />,
+      title: 'Peak Performance',
+      description: 'Weekend bookings are 60% higher than weekdays',
+      color: 'text-emerald-600 bg-emerald-50',
     },
     {
-      id: 'bookings' as Metric,
-      label: 'Bookings',
-      value: summary.bookings.current.toString(),
-      trend: trend(summary.bookings.current, summary.bookings.previous),
-      icon: Calendar,
-      color: 'text-violet-600',
-      bg: 'bg-violet-50',
+      icon: <Target className="w-5 h-5" />,
+      title: 'Price Optimization',
+      description: 'Increase daily rate by $25 to match market average',
+      color: 'text-amber-600 bg-amber-50',
     },
     {
-      id: 'views' as Metric,
-      label: 'Avg Rating',
-      value: summary.rating.current > 0 ? summary.rating.current.toFixed(1) : '—',
-      trend: 0,
-      icon: Star,
-      color: 'text-yellow-600',
-      bg: 'bg-yellow-50',
+      icon: <Users className="w-5 h-5" />,
+      title: 'Growing Demand',
+      description: 'Your excavator has 3x more views this month',
+      color: 'text-blue-600 bg-blue-50',
     },
   ];
 
+  const StatCard = ({ 
+    icon, 
+    label, 
+    current, 
+    previous, 
+    trend, 
+    prefix = '',
+    suffix = '' 
+  }: { 
+    icon: React.ReactNode; 
+    label: string; 
+    current: number; 
+    previous: number; 
+    trend: number;
+    prefix?: string;
+    suffix?: string;
+  }) => {
+    const isPositive = trend > 0;
+    
+    return (
+      <div className="bg-white rounded-2xl p-5 border border-gray-200 hover:border-teal-300 transition-colors">
+        <div className="flex items-center justify-between mb-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-500 flex items-center justify-center text-white">
+            {icon}
+          </div>
+          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
+            isPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+          }`}>
+            {isPositive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+            {Math.abs(trend).toFixed(1)}%
+          </div>
+        </div>
+        <p className="text-sm text-gray-500 mb-1">{label}</p>
+        <p className="text-2xl font-bold text-gray-900">
+          {prefix}{current.toLocaleString()}{suffix}
+        </p>
+        <p className="text-xs text-gray-400 mt-1">
+          vs {prefix}{previous.toLocaleString()}{suffix} last period
+        </p>
+      </div>
+    );
+  };
+
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Activity className="w-5 h-5 text-teal-600" />
-          Performance
-        </h2>
-        <div className="flex gap-1">
-          {(['7d', '30d', '90d'] as TimeRange[]).map(r => (
-            <button
-              key={r}
-              onClick={() => setTimeRange(r)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
-                timeRange === r
-                  ? 'bg-teal-500 text-white'
-                  : 'text-gray-500 hover:bg-gray-100'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
+    <div className="space-y-6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={<DollarSign className="w-5 h-5" />}
+          label="Revenue"
+          current={stats.revenue.current}
+          previous={stats.revenue.previous}
+          trend={stats.revenue.trend}
+          prefix="$"
+        />
+        <StatCard
+          icon={<Calendar className="w-5 h-5" />}
+          label="Bookings"
+          current={stats.bookings.current}
+          previous={stats.bookings.previous}
+          trend={stats.bookings.trend}
+        />
+        <StatCard
+          icon={<Eye className="w-5 h-5" />}
+          label="Views"
+          current={stats.views.current}
+          previous={stats.views.previous}
+          trend={stats.views.trend}
+        />
+        <StatCard
+          icon={<Star className="w-5 h-5" />}
+          label="Rating"
+          current={stats.rating.current}
+          previous={stats.rating.previous}
+          trend={stats.rating.trend}
+        />
+      </div>
+
+      {/* Chart Section */}
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Performance Overview</h3>
+            <div className="flex items-center gap-2">
+              {(['7d', '30d', '90d', '1y'] as const).map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    timeRange === range
+                      ? 'bg-teal-500 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {range === '7d' ? '7 Days' : range === '30d' ? '30 Days' : range === '90d' ? '90 Days' : '1 Year'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {[
+              { id: 'revenue', label: 'Revenue', icon: <DollarSign className="w-4 h-4" />, color: 'from-teal-400 to-emerald-400' },
+              { id: 'bookings', label: 'Bookings', icon: <Calendar className="w-4 h-4" />, color: 'from-violet-400 to-purple-400' },
+              { id: 'views', label: 'Views', icon: <Eye className="w-4 h-4" />, color: 'from-blue-400 to-cyan-400' },
+            ].map((metric) => (
+              <button
+                key={metric.id}
+                onClick={() => setActiveMetric(metric.id as 'revenue' | 'bookings' | 'views')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  activeMetric === metric.id
+                    ? `bg-gradient-to-r ${metric.color} text-white shadow-lg`
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {metric.icon}
+                <span className="text-sm font-medium">{metric.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Bar Chart */}
+        <div className="p-6">
+          <div className="flex items-end gap-4 h-64">
+            {currentData.map((data, idx) => (
+              <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                <div className="relative w-full h-full flex flex-col justify-end group">
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                    {activeMetric === 'revenue' ? `$${data.value}` : data.value}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </div>
+                  
+                  {/* Bar */}
+                  <div
+                    className={`w-full bg-gradient-to-t ${data.color} rounded-t-lg transition-all duration-300 hover:opacity-80`}
+                    style={{ height: `${(data.value / maxValue) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs text-gray-500 font-medium">{data.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Metric cards */}
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {metrics.map(m => (
-          <button
-            key={m.id}
-            onClick={() => m.id !== 'views' && setActiveMetric(m.id)}
-            className={`p-4 rounded-xl border-2 text-left transition-all ${
-              activeMetric === m.id && m.id !== 'views'
-                ? 'border-teal-400 bg-teal-50/50'
-                : 'border-transparent bg-gray-50 hover:bg-gray-100'
-            }`}
-          >
-            <div className={`w-8 h-8 ${m.bg} rounded-lg flex items-center justify-center mb-2`}>
-              <m.icon className={`w-4 h-4 ${m.color}`} />
-            </div>
-            <p className="text-xs text-gray-500 mb-1">{m.label}</p>
-            <p className="text-xl font-bold text-gray-900">{m.value}</p>
-            {m.trend !== 0 && (
-              <div className={`flex items-center gap-1 mt-1 text-xs font-medium ${m.trend > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                {m.trend > 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-                {Math.abs(m.trend)}%
-              </div>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Bar chart */}
-      {loading ? (
-        <div className="flex items-center justify-center h-32">
-          <Loader2 className="w-6 h-6 text-teal-500 animate-spin" />
+      {/* AI Insights */}
+      <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-200">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 flex items-center justify-center">
+            <Activity className="w-5 h-5 text-white" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">AI Insights</h3>
         </div>
-      ) : activeData.every(d => d.value === 0) ? (
-        <div className="flex flex-col items-center justify-center h-32 text-gray-400">
-          <TrendingUp className="w-8 h-8 mb-2 opacity-40" />
-          <p className="text-sm">No data for this period yet</p>
-        </div>
-      ) : (
-        <div className="flex items-end gap-1 h-32">
-          {activeData.map((d, i) => (
-            <div key={i} className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full flex items-end justify-center" style={{ height: '100px' }}>
-                <div
-                  className={`w-full bg-gradient-to-t ${d.color} rounded-t-md transition-all`}
-                  style={{ height: `${Math.max((d.value / maxVal) * 100, d.value > 0 ? 4 : 0)}%` }}
-                  title={activeMetric === 'revenue' ? `$${d.value.toLocaleString()}` : d.value.toString()}
-                />
+        
+        <div className="grid gap-3">
+          {insights.map((insight, idx) => (
+            <div key={idx} className="flex items-start gap-3 p-4 bg-white rounded-xl">
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${insight.color}`}>
+                {insight.icon}
               </div>
-              <span className="text-xs text-gray-400 truncate w-full text-center">{d.label}</span>
+              <div className="flex-1">
+                <h4 className="font-semibold text-gray-900 mb-1">{insight.title}</h4>
+                <p className="text-sm text-gray-600">{insight.description}</p>
+              </div>
             </div>
           ))}
         </div>
-      )}
-
-      <div className="mt-3 flex items-center gap-2 text-xs text-gray-400">
-        <Users className="w-3 h-3" />
-        <span>Based on your confirmed bookings as owner</span>
-        <Eye className="w-3 h-3 ml-auto" />
       </div>
     </div>
   );

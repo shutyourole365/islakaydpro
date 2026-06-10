@@ -1,178 +1,209 @@
-export default function PrivacyPolicy() {
+import React from 'react';
+import { ArrowLeft, Shield, Eye, Database, Users, Lock } from 'lucide-react';
+
+interface PrivacyPolicyProps {
+  onBack: () => void;
+}
+
+const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onBack }) => {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto prose dark:prose-invert">
-        <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-white">Privacy Policy</h1>
-        <p className="text-gray-600 dark:text-gray-400 mb-8">Last updated: May 2026</p>
+    <div className="min-h-screen bg-gray-50 pt-24 pb-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+           >
+            <ArrowLeft className="w-5 h-5" />
+            Back
+          </button>
 
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">1. Introduction</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            IslaKayd ("we", "us", "our", or "Company") operates the islakaydpro.netlify.app website and mobile application. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
-          </p>
-          <p className="text-gray-700 dark:text-gray-300">
-            Please read this Privacy Policy carefully. If you do not agree with our policies and practices, please do not use our Services.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">2. Information We Collect</h2>
-
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3 mt-6">Personal Information You Provide</h3>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2 mb-4">
-            <li><strong>Account Information:</strong> Name, email, phone number, address, date of birth</li>
-            <li><strong>Identity Verification:</strong> Government ID, photos, verification documents</li>
-            <li><strong>Payment Information:</strong> Credit card details (processed by Stripe, not stored by us)</li>
-            <li><strong>Profile Information:</strong> Bio, avatar, ratings, reviews</li>
-            <li><strong>Communication:</strong> Messages, support tickets, feedback</li>
-            <li><strong>Equipment Data:</strong> Listings, availability, photos, descriptions</li>
-            <li><strong>Booking Information:</strong> Rental history, dates, locations, insurance choices</li>
-          </ul>
-
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-3 mt-6">Automatically Collected Information</h3>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-            <li><strong>Device Information:</strong> IP address, browser type, operating system</li>
-            <li><strong>Usage Data:</strong> Pages viewed, clicks, search queries, time spent</li>
-            <li><strong>Location Data:</strong> GPS location (with your permission) for nearby rentals</li>
-            <li><strong>Cookies & Analytics:</strong> Session data, preferences, analytics tracking</li>
-          </ul>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">3. How We Use Your Information</h2>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-            <li>Provide, maintain, and improve our Services</li>
-            <li>Process bookings, payments, and refunds</li>
-            <li>Send transactional communications (confirmations, updates, support)</li>
-            <li>Send marketing communications (only with your consent)</li>
-            <li>Verify identity and prevent fraud</li>
-            <li>Comply with legal obligations and enforce agreements</li>
-            <li>Analyze usage patterns to improve user experience</li>
-            <li>Resolve disputes and handle complaints</li>
-            <li>Send push notifications (only if you opt-in)</li>
-          </ul>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">4. Data Sharing & Disclosure</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            <strong>We do NOT sell your data.</strong> We only share information in these cases:
-          </p>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-            <li><strong>Service Providers:</strong> Stripe (payments), Netlify (hosting), Supabase (database)</li>
-            <li><strong>Other Users:</strong> Limited profile info to facilitate rentals (name, reviews, ratings)</li>
-            <li><strong>Legal Requirements:</strong> When required by law or to protect our rights</li>
-            <li><strong>Business Transfers:</strong> In case of merger, acquisition, or asset sale</li>
-            <li><strong>With Your Consent:</strong> For any other purpose explicitly approved by you</li>
-          </ul>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">5. Data Security</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            We implement comprehensive security measures to protect your information:
-          </p>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-            <li>SSL/TLS encryption for all data in transit</li>
-            <li>Encrypted storage for sensitive personal data</li>
-            <li>Row-level database security (only you can access your data)</li>
-            <li>Regular security audits and vulnerability testing</li>
-            <li>Strict access controls for staff</li>
-            <li>Two-factor authentication available</li>
-          </ul>
-          <p className="text-gray-700 dark:text-gray-300 mt-4">
-            <strong>No method of transmission over the internet is 100% secure.</strong> While we strive to protect your information, we cannot guarantee absolute security.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">6. Your Rights</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            You have the right to:
-          </p>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-            <li><strong>Access:</strong> Request a copy of your personal data</li>
-            <li><strong>Correction:</strong> Update or correct inaccurate information</li>
-            <li><strong>Deletion:</strong> Request deletion of your account and data (right to be forgotten)</li>
-            <li><strong>Portability:</strong> Receive your data in a portable format</li>
-            <li><strong>Opt-out:</strong> Unsubscribe from marketing communications anytime</li>
-            <li><strong>Withdraw Consent:</strong> Withdraw notification permissions</li>
-          </ul>
-          <p className="text-gray-700 dark:text-gray-300 mt-4">
-            To exercise these rights, contact us at support@islakayd.com
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">7. Data Retention</h2>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-            <li><strong>Account Data:</strong> Kept as long as your account is active, then 30 days for recovery</li>
-            <li><strong>Booking/Payment Records:</strong> 7 years (legal/tax requirements)</li>
-            <li><strong>Messages:</strong> Until deleted by you or 2 years of inactivity</li>
-            <li><strong>Analytics:</strong> 90 days of aggregated data</li>
-            <li><strong>Verification Documents:</strong> Until verified, then securely deleted</li>
-          </ul>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">8. Cookies & Tracking</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            We use cookies and similar technologies for:
-          </p>
-          <ul className="list-disc pl-6 text-gray-700 dark:text-gray-300 space-y-2">
-            <li>Session management (keeping you logged in)</li>
-            <li>Remembering preferences</li>
-            <li>Analytics and usage patterns</li>
-            <li>Security and fraud prevention</li>
-          </ul>
-          <p className="text-gray-700 dark:text-gray-300 mt-4">
-            You can control cookies through your browser settings. Disabling cookies may affect functionality.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">9. Children's Privacy</h2>
-          <p className="text-gray-700 dark:text-gray-300">
-            Our Services are not intended for children under 18 years of age. We do not knowingly collect personal information from children under 18. If we become aware that a child under 18 has provided us with personal information, we will delete such information and terminate the child's account.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">10. GDPR & CCPA Compliance</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            <strong>For EU Residents (GDPR):</strong> We process your data with your explicit consent and maintain a lawful basis for each processing activity. You have the rights mentioned in Section 6.
-          </p>
-          <p className="text-gray-700 dark:text-gray-300">
-            <strong>For California Residents (CCPA):</strong> You have the right to know, delete, and opt-out of the sale of your personal information. We do not sell your data.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">11. Third-Party Links</h2>
-          <p className="text-gray-700 dark:text-gray-300">
-            Our Services may contain links to third-party websites. We are not responsible for their privacy practices. Please review their privacy policies before providing information.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">12. Policy Changes</h2>
-          <p className="text-gray-700 dark:text-gray-300">
-            We may update this Privacy Policy from time to time. We will notify you of material changes via email or a prominent notice on our Services. Your continued use of the Services constitutes acceptance of the updated policy.
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">13. Contact Us</h2>
-          <p className="text-gray-700 dark:text-gray-300">
-            If you have questions about this Privacy Policy or our privacy practices:
-          </p>
-          <div className="bg-gray-100 dark:bg-gray-800 p-6 rounded-lg mt-4">
-            <p className="text-gray-700 dark:text-gray-300"><strong>Email:</strong> privacy@islakayd.com</p>
-            <p className="text-gray-700 dark:text-gray-300"><strong>Mailing Address:</strong> IslaKayd Support, 123 Tech Street, San Francisco, CA 94105, USA</p>
-            <p className="text-gray-700 dark:text-gray-300"><strong>Response Time:</strong> We aim to respond within 30 days</p>
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+              <Shield className="w-8 h-8 text-blue-600" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
+            <p className="text-lg text-gray-600">Last updated: February 7, 2026</p>
           </div>
-        </section>
+        </div>
+
+        {/* Content */}
+        <div className="bg-white rounded-lg shadow-sm p-8 space-y-8">
+          {/* Introduction */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
+            <p className="text-gray-700 leading-relaxed">
+              At Islakayd, we are committed to protecting your privacy and ensuring the security of your personal information.
+              This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.
+            </p>
+          </section>
+
+          {/* Information We Collect */}
+          <section>
+            <div className="flex items-start gap-3 mb-4">
+              <Database className="w-6 h-6 text-blue-600 mt-1" />
+              <h2 className="text-2xl font-semibold text-gray-900">2. Information We Collect</h2>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Personal Information:</h3>
+                <ul className="list-disc list-inside text-gray-700 space-y-1 ml-4">
+                  <li>Name, email address, and phone number</li>
+                  <li>Billing and payment information</li>
+                  <li>Government-issued ID for verification</li>
+                  <li>Location data for equipment matching</li>
+                  <li>Profile information and preferences</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Usage Information:</h3>
+                <ul className="list-disc list-inside text-gray-700 space-y-1 ml-4">
+                  <li>Equipment search and booking history</li>
+                  <li>Communication records between users</li>
+                  <li>Device information and IP addresses</li>
+                  <li>Analytics and performance data</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          {/* How We Use Your Information */}
+          <section>
+            <div className="flex items-start gap-3 mb-4">
+              <Eye className="w-6 h-6 text-blue-600 mt-1" />
+              <h2 className="text-2xl font-semibold text-gray-900">3. How We Use Your Information</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed mb-4">We use your information to:</p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li>Provide and maintain our equipment rental services</li>
+              <li>Process payments and manage bookings</li>
+              <li>Verify user identities and prevent fraud</li>
+              <li>Facilitate communication between equipment owners and renters</li>
+              <li>Improve our platform and develop new features</li>
+              <li>Send important service updates and notifications</li>
+              <li>Comply with legal obligations</li>
+            </ul>
+          </section>
+
+          {/* Information Sharing */}
+          <section>
+            <div className="flex items-start gap-3 mb-4">
+              <Users className="w-6 h-6 text-blue-600 mt-1" />
+              <h2 className="text-2xl font-semibold text-gray-900">4. Information Sharing</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed mb-4">We may share your information in the following circumstances:</p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li><strong>With other users:</strong> Basic profile information to facilitate rentals</li>
+              <li><strong>With service providers:</strong> Payment processors, verification services, and hosting providers</li>
+              <li><strong>For legal compliance:</strong> When required by law or to protect our rights</li>
+              <li><strong>Business transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+              <li><strong>With consent:</strong> When you explicitly agree to sharing</li>
+            </ul>
+          </section>
+
+          {/* Data Security */}
+          <section>
+            <div className="flex items-start gap-3 mb-4">
+              <Lock className="w-6 h-6 text-blue-600 mt-1" />
+              <h2 className="text-2xl font-semibold text-gray-900">5. Data Security</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              We implement appropriate technical and organizational measures to protect your personal information against
+              unauthorized access, alteration, disclosure, or destruction. These measures include:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li>Encryption of data in transit and at rest</li>
+              <li>Regular security audits and updates</li>
+              <li>Access controls and authentication requirements</li>
+              <li>Secure payment processing through certified providers</li>
+              <li>Regular backups and disaster recovery procedures</li>
+            </ul>
+          </section>
+
+          {/* Your Rights */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Your Rights</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">You have the right to:</p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li><strong>Access:</strong> Request a copy of your personal information</li>
+              <li><strong>Correction:</strong> Update or correct inaccurate information</li>
+              <li><strong>Deletion:</strong> Request deletion of your personal information</li>
+              <li><strong>Portability:</strong> Receive your data in a structured format</li>
+              <li><strong>Restriction:</strong> Limit how we process your information</li>
+              <li><strong>Objection:</strong> Object to certain types of processing</li>
+            </ul>
+          </section>
+
+          {/* Cookies and Tracking */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Cookies and Tracking Technologies</h2>
+            <p className="text-gray-700 leading-relaxed mb-4">
+              We use cookies and similar technologies to enhance your experience on our platform. This includes:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
+              <li><strong>Essential cookies:</strong> Required for platform functionality</li>
+              <li><strong>Analytics cookies:</strong> Help us understand how you use our platform</li>
+              <li><strong>Marketing cookies:</strong> Used to show relevant advertisements</li>
+              <li><strong>Preference cookies:</strong> Remember your settings and preferences</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed">
+              You can control cookie settings through your browser preferences.
+            </p>
+          </section>
+
+          {/* Third-Party Services */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Third-Party Services</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Our platform integrates with third-party services including payment processors, verification services,
+              and analytics providers. These services have their own privacy policies, and we encourage you to review them.
+            </p>
+          </section>
+
+          {/* Data Retention */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Data Retention</h2>
+            <p className="text-gray-700 leading-relaxed">
+              We retain your personal information for as long as necessary to provide our services and comply with legal obligations.
+              Account data is typically retained for 7 years after account closure for tax and legal compliance purposes.
+            </p>
+          </section>
+
+          {/* International Data Transfers */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. International Data Transfers</h2>
+            <p className="text-gray-700 leading-relaxed">
+              Your information may be transferred to and processed in countries other than your own. We ensure appropriate
+              safeguards are in place to protect your data during international transfers.
+            </p>
+          </section>
+
+          {/* Changes to Privacy Policy */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Changes to This Privacy Policy</h2>
+            <p className="text-gray-700 leading-relaxed">
+              We may update this Privacy Policy from time to time. We will notify you of any material changes via email
+              or through our platform. Your continued use of our services after such changes constitutes acceptance of the updated policy.
+            </p>
+          </section>
+
+          {/* Contact Information */}
+          <section className="border-t pt-8">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">12. Contact Us</h2>
+            <p className="text-gray-700 leading-relaxed">
+              If you have any questions about this Privacy Policy or our data practices, please contact us:
+            </p>
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p className="text-gray-700"><strong>Email:</strong> privacy@islakayd.com</p>
+              <p className="text-gray-700"><strong>Data Protection Officer:</strong> dpo@islakayd.com</p>
+              <p className="text-gray-700"><strong>Address:</strong> Islakayd Inc., Privacy Department</p>
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default PrivacyPolicy;
