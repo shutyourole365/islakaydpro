@@ -37,6 +37,8 @@ import {
   Building,
   RefreshCw,
   Users,
+  Sparkles,
+  Gift,
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
@@ -70,6 +72,9 @@ const NotificationSettings = lazy(() => import('../settings/NotificationSettings
 const RenterTrustScore = lazy(() => import('../trust/RenterTrustScore'));
 const EnhancedReviewSystem = lazy(() => import('../reviews/EnhancedReviewSystem'));
 const BookingStatusTracker = lazy(() => import('../booking/BookingStatusTracker'));
+const SmartRecommendationsPanel = lazy(() => import('../recommendations/SmartRecommendationsPanel'));
+const DynamicPricingManager = lazy(() => import('../pricing/DynamicPricingManager'));
+const LoyaltyProgramPanel = lazy(() => import('../loyalty/LoyaltyProgramPanel'));
 
 interface DashboardProps {
   onBack: () => void;
@@ -78,7 +83,7 @@ interface DashboardProps {
   onNavigate?: (page: string) => void;
 }
 
-type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings' | 'referral';
+type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings' | 'referral' | 'recommendations' | 'pricing' | 'loyalty';
 type BookingFilter = 'all' | 'pending' | 'confirmed' | 'active' | 'completed' | 'cancelled';
 
 export default function Dashboard({
@@ -336,8 +341,11 @@ export default function Dashboard({
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'recommendations', label: 'Recommendations', icon: Sparkles },
     { id: 'bookings', label: 'My Bookings', icon: Calendar, badge: bookings.filter(b => b.status === 'pending').length },
     { id: 'listings', label: 'My Listings', icon: Package, badge: pendingOwnerBookings.length },
+    { id: 'pricing', label: 'Dynamic Pricing', icon: DollarSign },
+    { id: 'loyalty', label: 'Loyalty Program', icon: Gift },
     { id: 'favorites', label: 'Favorites', icon: Heart, badge: favorites.length },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
     { id: 'notifications', label: 'Notifications', icon: Activity, badge: notifications.filter(n => !n.is_read).length },
@@ -1400,6 +1408,24 @@ export default function Dashboard({
                   userName={profile?.full_name || user?.email || ''}
                 />
               </div>
+            )}
+
+            {activeTab === 'recommendations' && (
+              <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-teal-500" /></div>}>
+                <SmartRecommendationsPanel />
+              </Suspense>
+            )}
+
+            {activeTab === 'pricing' && (
+              <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-teal-500" /></div>}>
+                <DynamicPricingManager />
+              </Suspense>
+            )}
+
+            {activeTab === 'loyalty' && (
+              <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-teal-500" /></div>}>
+                <LoyaltyProgramPanel />
+              </Suspense>
             )}
           </div>
         </div>
