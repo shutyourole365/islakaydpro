@@ -15,7 +15,7 @@ describe('BookingCalendar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Mock current date to a fixed date for consistent tests
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date('2026-02-05'));
   });
 
@@ -42,7 +42,7 @@ describe('BookingCalendar', () => {
   });
 
   it('should navigate to next month', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     render(<BookingCalendar {...defaultProps} />);
     
     expect(screen.getByText('February 2026')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('BookingCalendar', () => {
   });
 
   it('should select a start date when clicking a future date', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     render(<BookingCalendar {...defaultProps} />);
 
     // Click on the 15th of the month
@@ -120,7 +120,7 @@ describe('BookingCalendar', () => {
   });
 
   it('should clear dates when X button is clicked', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     const startDate = new Date('2026-02-15');
     render(
       <BookingCalendar 
@@ -173,7 +173,7 @@ describe('BookingCalendar', () => {
   });
 
   it('should enforce minimum rental days', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     const startDate = new Date('2026-02-15');
     
     render(
@@ -193,7 +193,7 @@ describe('BookingCalendar', () => {
   });
 
   it('should enforce maximum rental days', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     const startDate = new Date('2026-02-10');
     
     render(
@@ -221,7 +221,7 @@ describe('BookingCalendar', () => {
   });
 
   it('should reset selection when clicking date before current start', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     const startDate = new Date('2026-02-20');
     
     render(

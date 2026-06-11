@@ -1,4 +1,5 @@
-import { Facebook, Twitter, Instagram, Linkedin, Youtube, ShieldCheck, Star, Zap } from 'lucide-react';
+import { ShieldCheck, Star, Zap } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from '../ui/BrandIcons';
 import LogoPro from '../branding/LogoPro';
 
 const socialLinks = [

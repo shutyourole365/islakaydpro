@@ -4,13 +4,11 @@ import {
   Copy,
   Mail,
   MessageCircle,
-  Facebook,
-  Twitter,
-  Instagram,
   X,
   Check,
   ExternalLink,
 } from 'lucide-react';
+import { Facebook, Twitter, Instagram } from '../ui/BrandIcons';
 import { Button } from '../ui/Button';
 import { useToast } from '../ui/Toast';
 

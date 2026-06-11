@@ -6,12 +6,11 @@ import {
   CheckCircle2,
   Mail,
   MessageSquare,
-  Twitter,
-  Facebook,
   Link2,
   DollarSign,
   Trophy,
 } from 'lucide-react';
+import { Twitter, Facebook } from '../ui/BrandIcons';
 
 interface ReferralProgramProps {
   userId: string;

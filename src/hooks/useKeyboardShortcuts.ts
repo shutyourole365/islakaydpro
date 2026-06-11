@@ -255,7 +255,7 @@ export function useTypeaheadSearch(
 ) {
   const { timeout = 300, enabled = true } = options;
   const bufferRef = useRef('');
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (!enabled) return;
