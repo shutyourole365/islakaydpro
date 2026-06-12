@@ -34,7 +34,7 @@ import ThemeToggle from '../ui/ThemeToggle';
 
 interface HeaderProps {
   onSearchClick: () => void;
-  onAuthClick: () => void;
+  onAuthClick: (mode?: 'signin' | 'signup') => void;
   isAuthenticated: boolean;
   onNavigate: (page: string) => void;
   onListEquipment: () => void;
@@ -141,8 +141,8 @@ export default function Header({
     };
   }, []);
 
-  const isHomePage = currentPage === 'home';
-  const showTransparent = isHomePage && !isScrolled && !isMobileMenuOpen;
+  // The light hero needs a solid header; transparent-over-photo mode is retired
+  const showTransparent: boolean = false;
 
   const navItemClass = (page?: string) =>
     `text-sm font-medium transition-colors hover:text-teal-500 ${
@@ -206,10 +206,10 @@ export default function Header({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        showTransparent
-          ? 'bg-gradient-to-b from-black/50 to-transparent'
-          : 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg dark:shadow-gray-950/50'
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ${
+        isScrolled
+          ? 'shadow-lg dark:shadow-gray-950/50'
+          : 'border-b border-gray-100 dark:border-gray-800'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -402,7 +402,7 @@ export default function Header({
               <div className="hidden sm:flex items-center gap-3">
                 <ThemeToggle variant="dropdown" />
                 <button
-                  onClick={onAuthClick}
+                  onClick={() => onAuthClick('signin')}
                   className={`px-4 py-2.5 rounded-full text-sm font-medium transition-colors ${
                     showTransparent
                       ? 'text-white hover:bg-white/10'
@@ -412,7 +412,7 @@ export default function Header({
                   Sign In
                 </button>
                 <button
-                  onClick={onAuthClick}
+                  onClick={() => onAuthClick('signup')}
                   className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
                     showTransparent
                       ? 'bg-white text-gray-900 hover:bg-gray-100'
@@ -535,7 +535,7 @@ export default function Header({
               <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-3">
                 <button
                   onClick={() => {
-                    onAuthClick();
+                    onAuthClick('signin');
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full py-3 rounded-xl text-gray-700 dark:text-gray-200 font-medium border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
@@ -544,7 +544,7 @@ export default function Header({
                 </button>
                 <button
                   onClick={() => {
-                    onAuthClick();
+                    onAuthClick('signup');
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full py-3 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors"

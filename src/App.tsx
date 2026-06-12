@@ -625,6 +625,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
@@ -1329,7 +1330,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {currentPage !== 'list-equipment' && (
         <Header
           onSearchClick={() => setIsSearchOpen(true)}
-          onAuthClick={() => setIsAuthOpen(true)}
+          onAuthClick={(mode) => { setAuthMode(mode ?? 'signin'); setIsAuthOpen(true); }}
           isAuthenticated={isAuthenticated}
           onNavigate={handleNavigate}
           onListEquipment={handleListEquipment}
@@ -1397,7 +1398,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
 
             <Testimonials />
 
-            <CTASection onGetStarted={() => setIsAuthOpen(true)} />
+            <CTASection onGetStarted={() => { setAuthMode('signup'); setIsAuthOpen(true); }} />
           </main>
 
           <Footer onNavigate={handleNavigate} />
@@ -1733,6 +1734,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       <Suspense fallback={null}>
         <AuthModal
           isOpen={isAuthOpen}
+          initialMode={authMode}
           onClose={() => setIsAuthOpen(false)}
           onSuccess={() => setIsAuthOpen(false)}
         />

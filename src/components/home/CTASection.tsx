@@ -57,7 +57,7 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <button
                 onClick={onGetStarted}
-                className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-full hover:shadow-xl transition-all"
+                className="flex items-center gap-2 px-8 py-4 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-colors"
                >
                 Start Listing Today
                 <ArrowRight className="w-5 h-5" />
@@ -105,7 +105,7 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-gray-400">Estimated Monthly Earnings</span>
                     </div>
-                    <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
+                    <div className="text-4xl font-bold text-teal-400">
                       $1,500 - $3,000
                     </div>
                     <p className="text-sm text-gray-500 mt-2">

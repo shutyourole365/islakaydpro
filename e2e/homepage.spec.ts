@@ -5,7 +5,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
     
     // Check main heading
-    await expect(page.getByRole('heading', { name: /rent any equipment/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /rent anything/i })).toBeVisible();
 
     // Check navigation elements
     await expect(page.getByRole('button', { name: /browse equipment/i })).toBeVisible();
