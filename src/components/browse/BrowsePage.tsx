@@ -25,6 +25,7 @@ interface BrowsePageProps {
   onFavoriteClick: (equipmentId: string) => void;
   favorites: Set<string>;
   onBack: () => void;
+  isLoading?: boolean;
 }
 
 export default function BrowsePage({
@@ -36,6 +37,7 @@ export default function BrowsePage({
   onFavoriteClick,
   favorites,
   onBack,
+  isLoading = false,
 }: BrowsePageProps) {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -419,7 +421,20 @@ export default function BrowsePage({
           </p>
         </div>
 
-        {filteredEquipment.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
+                <div className="aspect-[4/3] bg-gray-200" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 w-3/4 bg-gray-200 rounded" />
+                  <div className="h-3 w-1/2 bg-gray-100 rounded" />
+                  <div className="h-3 w-1/3 bg-gray-100 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredEquipment.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Search className="w-10 h-10 text-gray-400" />

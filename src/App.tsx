@@ -1433,6 +1433,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onEquipmentClick={handleEquipmentClick}
             onFavoriteClick={handleFavoriteToggle}
             favorites={favorites}
+            isLoading={isLoadingEquipment}
             onBack={() => {
               setSearchQuery('');
               setSearchCategory('');
