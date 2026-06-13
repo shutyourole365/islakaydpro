@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   Heart,
@@ -7,17 +7,17 @@ import {
   MapPin,
   Shield,
   CheckCircle2,
-  Calendar,
   ChevronLeft,
   ChevronRight,
   MessageSquare,
-  Award,
   Truck,
   AlertCircle,
   Info,
   DollarSign,
+  Grid3x3,
 } from 'lucide-react';
-import type { Equipment } from '../../types';
+import type { Equipment, Review } from '../../types';
+import { getReviews } from '../../services/database';
 import ShareEquipment from './ShareEquipment';
 import PriceNegotiator from '../negotiation/PriceNegotiator';
 import MaintenancePredictor from '../predictive/MaintenancePredictor';
@@ -31,6 +31,15 @@ interface EquipmentDetailProps {
   onFavoriteToggle: () => void;
 }
 
+function timeAgo(dateString: string): string {
+  const days = Math.floor((Date.now() - new Date(dateString).getTime()) / 86_400_000);
+  if (days < 1) return 'Today';
+  if (days < 30) return `${days} day${days === 1 ? '' : 's'} ago`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} month${months === 1 ? '' : 's'} ago`;
+  return `${Math.floor(months / 12)} year${Math.floor(months / 12) === 1 ? '' : 's'} ago`;
+}
+
 export default function EquipmentDetail({
   equipment,
   onClose,
@@ -39,394 +48,367 @@ export default function EquipmentDetail({
   isFavorite,
   onFavoriteToggle,
 }: EquipmentDetailProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [showNegotiator, setShowNegotiator] = useState(false);
   const [showMaintenance, setShowMaintenance] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === equipment.images.length - 1 ? 0 : prev + 1
-    );
-  };
+  const images = equipment.images?.length ? equipment.images : [];
 
-  const prevImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? equipment.images.length - 1 : prev - 1
-    );
-  };
+  useEffect(() => {
+    let active = true;
+    setReviewsLoading(true);
+    getReviews({ equipmentId: equipment.id, limit: 6 })
+      .then((data) => { if (active) setReviews(data); })
+      .catch(() => { if (active) setReviews([]); })
+      .finally(() => { if (active) setReviewsLoading(false); });
+    return () => { active = false; };
+  }, [equipment.id]);
 
-  const calculateTotal = () => {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (lightboxIndex === null) return;
+      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'ArrowRight') setLightboxIndex((i) => (i === null ? 0 : (i + 1) % images.length));
+      if (e.key === 'ArrowLeft') setLightboxIndex((i) => (i === null ? 0 : (i - 1 + images.length) % images.length));
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [lightboxIndex, images.length]);
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const pricing = (() => {
     if (!startDate || !endDate) return null;
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86_400_000);
     if (days <= 0) return null;
-
     const subtotal = days * equipment.daily_rate;
     const serviceFee = subtotal * 0.12;
-    const total = subtotal + serviceFee + equipment.deposit_amount;
+    return { days, subtotal, serviceFee, total: subtotal + serviceFee + equipment.deposit_amount };
+  })();
 
-    return { days, subtotal, serviceFee, total };
-  };
+  const ratingValue = equipment.rating || (reviews.length
+    ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length
+    : 0);
+  const reviewCount = equipment.total_reviews || reviews.length;
 
-  const pricing = calculateTotal();
+  // Rating distribution for the breakdown bars
+  const distribution = [5, 4, 3, 2, 1].map((star) => {
+    const count = reviews.filter((r) => Math.round(r.rating) === star).length;
+    return { star, count, pct: reviews.length ? (count / reviews.length) * 100 : 0 };
+  });
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+    <div className="fixed inset-0 z-[100] flex items-start justify-center sm:p-4 overflow-y-auto">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-6xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <div className="relative w-full max-w-5xl my-0 sm:my-6 bg-white sm:rounded-3xl shadow-2xl overflow-hidden">
+        {/* Top bar */}
+        <div className="sticky top-0 z-20 flex items-center justify-between px-5 py-3 bg-white/95 backdrop-blur border-b border-gray-100">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-           >
+            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+          >
             <ChevronLeft className="w-5 h-5" />
-            Back to results
+            Back
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+            >
+              <Share2 className="w-4 h-4" /> Share
+            </button>
             <button
               onClick={onFavoriteToggle}
               aria-label="Toggle favorite"
-              className={`p-2.5 rounded-full transition-colors ${
-                isFavorite
-                  ? 'bg-red-50 text-red-500'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-             
-              >
-              <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500' : ''}`} />
-            </button>
-            <button
-              onClick={() => setShowShareModal(true)}
-              aria-label="Share equipment"
-              className="p-2.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
             >
-              <Share2 className="w-5 h-5" />
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+              {isFavorite ? 'Saved' : 'Save'}
             </button>
             <button
               onClick={onClose}
               aria-label="Close"
-              className="p-2.5 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-5 overflow-y-auto max-h-[calc(90vh-70px)]">
-          <div className="lg:col-span-3 p-6">
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4">
-              <img
-                src={equipment.images[currentImageIndex]}
-                alt={equipment.title}
-                className="w-full h-full object-cover"
-              />
-              {equipment.images.length > 1 && (
-                <>
-                  <button
-                    onClick={prevImage}
-                    aria-label="Previous image"
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-gray-800 hover:bg-white transition-colors shadow-lg"
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </button>
-                  <button
-                    onClick={nextImage}
-                    aria-label="Next image"
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 flex items-center justify-center text-gray-800 hover:bg-white transition-colors shadow-lg"
-                   >
-                    <ChevronRight className="w-6 h-6" />
-                  </button>
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
-                    {equipment.images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentImageIndex(index)}
-                        aria-label={`Go to image ${index + 1}`}
-                        className={`w-2 h-2 rounded-full transition-all ${
-                          index === currentImageIndex
-                            ? 'bg-white w-6'
-                            : 'bg-white/50 hover:bg-white/75'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {equipment.images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {equipment.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    aria-label={`View image ${index + 1}`}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                      index === currentImageIndex
-                        ? 'border-teal-500'
-                        : 'border-transparent opacity-60 hover:opacity-100'
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${equipment.title} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+        <div className="px-5 sm:px-8 pt-6">
+          {/* Title */}
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">{equipment.title}</h1>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 mb-5">
+            {reviewCount > 0 && (
+              <>
+                <span className="flex items-center gap-1 font-medium">
+                  <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
+                  {ratingValue.toFixed(1)}
+                </span>
+                <span className="text-gray-400">·</span>
+                <span className="underline">{reviewCount} review{reviewCount === 1 ? '' : 's'}</span>
+                <span className="text-gray-400">·</span>
+              </>
             )}
-
-            <div className="mt-6">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                    {equipment.title}
-                  </h1>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                      <span className="font-semibold text-gray-900">
-                        {equipment.rating.toFixed(1)}
-                      </span>
-                      <span className="text-gray-500">
-                        ({equipment.total_reviews} reviews)
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-gray-500">
-                      <MapPin className="w-4 h-4" />
-                      {equipment.location}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap gap-2 mb-6">
-                {equipment.is_featured && (
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full text-sm font-medium">
-                    <Award className="w-4 h-4" />
-                    Featured
-                  </span>
-                )}
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
-                  <Shield className="w-4 h-4" />
-                  Verified Owner
-                </span>
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium capitalize">
-                  <CheckCircle2 className="w-4 h-4" />
-                  {equipment.condition} Condition
-                </span>
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                  <Truck className="w-4 h-4" />
-                  Delivery Available
-                </span>
-              </div>
-
-              <div className="border-t border-gray-100 pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-3">Description</h2>
-                <p className="text-gray-600 leading-relaxed">{equipment.description}</p>
-              </div>
-
-              {equipment.features.length > 0 && (
-                <div className="border-t border-gray-100 pt-6 mt-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">Features</h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    {equipment.features.map((feature, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2 text-gray-600"
-                      >
-                        <CheckCircle2 className="w-5 h-5 text-teal-500 flex-shrink-0" />
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {Object.keys(equipment.specifications).length > 0 && (
-                <div className="border-t border-gray-100 pt-6 mt-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                    Specifications
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    {Object.entries(equipment.specifications).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-2 border-b border-gray-50">
-                        <span className="text-gray-500 capitalize">{key}</span>
-                        <span className="font-medium text-gray-900">{value}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="border-t border-gray-100 pt-6 mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Maintenance Status
-                  </h2>
-                  <button
-                    onClick={() => setShowMaintenance(true)}
-                    className="text-teal-600 hover:text-teal-700 text-sm font-medium"
-                  >
-                    View Details →
-                  </button>
-                </div>
-                <div className="flex items-center gap-3 p-4 bg-green-50 rounded-xl">
-                  <CheckCircle2 className="w-6 h-6 text-green-600" />
-                  <div>
-                    <p className="font-medium text-green-800">Equipment is in good condition</p>
-                    <p className="text-sm text-green-600">Last maintenance: 2 weeks ago</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <span className="flex items-center gap-1 text-gray-600">
+              <MapPin className="w-4 h-4" /> {equipment.location || 'Location on request'}
+            </span>
           </div>
 
-          <div className="lg:col-span-2 bg-gray-50 p-6">
-            <div className="sticky top-6">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-end justify-between mb-6">
-                  <div>
-                    <span className="text-3xl font-bold text-gray-900">
-                      ${equipment.daily_rate}
-                    </span>
-                    <span className="text-gray-500">/day</span>
-                  </div>
-                  <div className="text-right text-sm text-gray-500">
-                    {equipment.weekly_rate && (
-                      <p>${equipment.weekly_rate}/week</p>
-                    )}
-                    {equipment.monthly_rate && (
-                      <p>${equipment.monthly_rate}/month</p>
-                    )}
+          {/* Airbnb-style photo gallery */}
+          {images.length > 0 && (
+            <div className="relative grid grid-cols-4 grid-rows-2 gap-2 rounded-2xl overflow-hidden aspect-[2/1] mb-8">
+              <button
+                onClick={() => setLightboxIndex(0)}
+                className={`relative overflow-hidden group ${images.length > 1 ? 'col-span-2 row-span-2' : 'col-span-4 row-span-2'}`}
+              >
+                <img src={images[0]} alt={equipment.title} className="w-full h-full object-cover group-hover:brightness-95 transition-all" />
+              </button>
+              {images.slice(1, 5).map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setLightboxIndex(i + 1)}
+                  className="relative overflow-hidden group col-span-1 row-span-1"
+                >
+                  <img src={img} alt={`${equipment.title} ${i + 2}`} className="w-full h-full object-cover group-hover:brightness-95 transition-all" />
+                </button>
+              ))}
+              {images.length > 1 && (
+                <button
+                  onClick={() => setLightboxIndex(0)}
+                  className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white text-gray-900 text-sm font-medium rounded-lg border border-gray-900/10 shadow-sm hover:bg-gray-50 transition-colors"
+                >
+                  <Grid3x3 className="w-4 h-4" /> Show all photos
+                </button>
+              )}
+            </div>
+          )}
+
+          <div className="grid lg:grid-cols-3 gap-10 pb-10">
+            {/* Left: content */}
+            <div className="lg:col-span-2">
+              {/* Badges */}
+              <div className="flex flex-wrap gap-2 pb-6 border-b border-gray-100">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+                  <Shield className="w-4 h-4" /> Verified owner
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium capitalize">
+                  <CheckCircle2 className="w-4 h-4" /> {equipment.condition} condition
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                  <Truck className="w-4 h-4" /> Delivery available
+                </span>
+              </div>
+
+              {/* Owner */}
+              <div className="flex items-center gap-4 py-6 border-b border-gray-100">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white font-bold overflow-hidden">
+                  {equipment.owner?.avatar_url
+                    ? <img src={equipment.owner.avatar_url} alt="" className="w-full h-full object-cover" />
+                    : (equipment.owner?.full_name?.charAt(0) || 'O')}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">Hosted by {equipment.owner?.full_name || 'the owner'}</p>
+                  <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                    {(equipment.owner?.rating ?? 5).toFixed(1)} · {equipment.owner?.total_reviews ?? 0} reviews
+                    {equipment.owner?.is_verified && <span className="ml-1 inline-flex items-center gap-1 text-teal-600"><Shield className="w-3.5 h-3.5" /> Verified</span>}
+                  </p>
+                </div>
+              </div>
+
+              {/* Description */}
+              {equipment.description && (
+                <div className="py-6 border-b border-gray-100">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-3">About this equipment</h2>
+                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">{equipment.description}</p>
+                </div>
+              )}
+
+              {/* Features */}
+              {equipment.features.length > 0 && (
+                <div className="py-6 border-b border-gray-100">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">What's included</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {equipment.features.map((f, i) => (
+                      <div key={i} className="flex items-center gap-3 text-gray-700">
+                        <CheckCircle2 className="w-5 h-5 text-teal-500 flex-shrink-0" /> {f}
+                      </div>
+                    ))}
                   </div>
                 </div>
+              )}
 
-                <div className="space-y-4 mb-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        Start Date
-                      </label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="date"
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
-                        />
+              {/* Specifications */}
+              {Object.keys(equipment.specifications).length > 0 && (
+                <div className="py-6 border-b border-gray-100">
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
+                    {Object.entries(equipment.specifications).map(([k, v]) => (
+                      <div key={k} className="flex justify-between py-2 border-b border-gray-50">
+                        <span className="text-gray-500 capitalize">{k}</span>
+                        <span className="font-medium text-gray-900">{v}</span>
                       </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                        End Date
-                      </label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="date"
-                          value={endDate}
-                          onChange={(e) => setEndDate(e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 px-4 py-3 bg-blue-50 rounded-xl text-sm text-blue-700">
-                    <Info className="w-5 h-5 flex-shrink-0" />
-                    <span>
-                      Min {equipment.min_rental_days} days, max {equipment.max_rental_days} days rental
-                    </span>
+                    ))}
                   </div>
                 </div>
+              )}
 
-                {pricing && (
-                  <div className="border-t border-gray-100 pt-4 mb-6 space-y-3">
-                    <div className="flex justify-between text-gray-600">
-                      <span>
-                        ${equipment.daily_rate} x {pricing.days} days
-                      </span>
-                      <span>${pricing.subtotal.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>Service fee (12%)</span>
-                      <span>${pricing.serviceFee.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>Refundable deposit</span>
-                      <span>${equipment.deposit_amount.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-lg font-semibold text-gray-900 pt-3 border-t border-gray-100">
-                      <span>Total</span>
-                      <span>${pricing.total.toFixed(2)}</span>
-                    </div>
+              {/* Reviews */}
+              <div className="py-6">
+                <div className="flex items-center gap-2 mb-6">
+                  <Star className="w-5 h-5 fill-gray-900 text-gray-900" />
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {ratingValue > 0 ? `${ratingValue.toFixed(1)} · ${reviewCount} review${reviewCount === 1 ? '' : 's'}` : 'No reviews yet'}
+                  </h2>
+                </div>
+
+                {reviews.length > 0 && (
+                  <div className="grid sm:grid-cols-2 gap-x-10 gap-y-2 mb-8 max-w-md">
+                    {distribution.map(({ star, pct }) => (
+                      <div key={star} className="flex items-center gap-3 text-sm">
+                        <span className="w-3 text-gray-600">{star}</span>
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-gray-900 rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
 
-                <button
-                  onClick={() => onBook(equipment, { start: startDate, end: endDate })}
-                  disabled={!pricing}
-                  className="w-full py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed mb-3"
-                >
-                  {pricing ? 'Reserve Now' : 'Select Dates to Book'}
-                </button>
-
-                <button
-                  onClick={() => onMessage(equipment)}
-                  className="w-full py-4 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <MessageSquare className="w-5 h-5" />
-                  Message Owner
-                </button>
-
-                <button
-                  onClick={() => setShowNegotiator(true)}
-                  className="w-full py-4 border border-orange-200 text-orange-700 font-semibold rounded-xl hover:bg-orange-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <DollarSign className="w-5 h-5" />
-                  Negotiate Price
-                </button>
-
-                <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center text-white font-bold">
-                      {equipment.owner?.full_name?.charAt(0) || 'O'}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">
-                        {equipment.owner?.full_name || 'Owner'}
-                      </p>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                        <span>
-                          {equipment.owner?.rating?.toFixed(1) || '5.0'} (
-                          {equipment.owner?.total_reviews || 0} reviews)
-                        </span>
+                {reviewsLoading ? (
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    {[0, 1].map((i) => (
+                      <div key={i} className="animate-pulse space-y-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gray-200" />
+                          <div className="space-y-1.5"><div className="h-3 w-24 bg-gray-200 rounded" /><div className="h-2.5 w-16 bg-gray-100 rounded" /></div>
+                        </div>
+                        <div className="h-3 w-full bg-gray-100 rounded" />
+                        <div className="h-3 w-4/5 bg-gray-100 rounded" />
                       </div>
-                      {equipment.owner?.is_verified && (
-                        <span className="inline-flex items-center gap-1 text-sm text-teal-600 mt-1">
-                          <Shield className="w-4 h-4" />
-                          Verified
-                        </span>
-                      )}
+                    ))}
+                  </div>
+                ) : reviews.length === 0 ? (
+                  <p className="text-gray-500">Be the first to review this equipment after your rental.</p>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
+                    {reviews.map((r) => (
+                      <div key={r.id}>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white text-sm font-semibold overflow-hidden">
+                            {r.reviewer?.avatar_url
+                              ? <img src={r.reviewer.avatar_url} alt="" className="w-full h-full object-cover" />
+                              : (r.reviewer?.full_name?.charAt(0) || 'U')}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900 text-sm">{r.reviewer?.full_name || 'Renter'}</p>
+                            <p className="text-xs text-gray-400">{timeAgo(r.created_at)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-0.5 mb-1.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(r.rating) ? 'fill-amber-500 text-amber-500' : 'text-gray-200'}`} />
+                          ))}
+                        </div>
+                        {r.title && <p className="font-medium text-gray-900 text-sm mb-1">{r.title}</p>}
+                        {r.comment && <p className="text-gray-600 text-sm leading-relaxed">{r.comment}</p>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right: sticky booking card */}
+            <div className="lg:col-span-1">
+              <div className="lg:sticky lg:top-20">
+                <div className="bg-white rounded-2xl p-6 shadow-lg ring-1 ring-gray-200">
+                  <div className="flex items-baseline justify-between mb-5">
+                    <div>
+                      <span className="text-2xl font-bold text-gray-900">${equipment.daily_rate}</span>
+                      <span className="text-gray-500"> / day</span>
                     </div>
+                    {reviewCount > 0 && (
+                      <span className="flex items-center gap-1 text-sm text-gray-700">
+                        <Star className="w-4 h-4 fill-gray-900 text-gray-900" /> {ratingValue.toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-gray-300 divide-y divide-gray-300 mb-4">
+                    <div className="grid grid-cols-2 divide-x divide-gray-300">
+                      <label className="p-3 cursor-pointer">
+                        <span className="block text-[11px] font-semibold text-gray-700 uppercase tracking-wide">Start</span>
+                        <input type="date" min={today} value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full text-sm text-gray-900 focus:outline-none bg-transparent" />
+                      </label>
+                      <label className="p-3 cursor-pointer">
+                        <span className="block text-[11px] font-semibold text-gray-700 uppercase tracking-wide">End</span>
+                        <input type="date" min={startDate || today} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-sm text-gray-900 focus:outline-none bg-transparent" />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-gray-50 rounded-lg text-xs text-gray-500">
+                    <Info className="w-4 h-4 flex-shrink-0" />
+                    Min {equipment.min_rental_days} · max {equipment.max_rental_days} days
+                  </div>
+
+                  <button
+                    onClick={() => onBook(equipment, { start: startDate, end: endDate })}
+                    disabled={!pricing}
+                    className="w-full py-3.5 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {pricing ? 'Reserve now' : 'Select dates'}
+                  </button>
+                  {!pricing && <p className="text-center text-xs text-gray-400 mt-2">You won't be charged yet</p>}
+
+                  {pricing && (
+                    <div className="mt-5 space-y-3 text-sm">
+                      <div className="flex justify-between text-gray-600">
+                        <span className="underline">${equipment.daily_rate} × {pricing.days} day{pricing.days === 1 ? '' : 's'}</span>
+                        <span>${pricing.subtotal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span className="underline">Service fee</span>
+                        <span>${pricing.serviceFee.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span className="underline">Refundable deposit</span>
+                        <span>${equipment.deposit_amount.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between font-semibold text-gray-900 pt-3 border-t border-gray-200">
+                        <span>Total</span>
+                        <span>${pricing.total.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    <button
+                      onClick={() => onMessage(equipment)}
+                      className="py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <MessageSquare className="w-4 h-4" /> Message
+                    </button>
+                    <button
+                      onClick={() => setShowNegotiator(true)}
+                      className="py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      <DollarSign className="w-4 h-4" /> Offer
+                    </button>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0 text-gray-400" />
-                  <p>
-                    Free cancellation up to 48 hours before pickup. Deposit fully
-                    refundable upon return.
-                  </p>
+                <div className="mt-4 flex items-start gap-2 text-xs text-gray-500 px-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 text-gray-400" />
+                  Free cancellation up to 48 hours before pickup. Deposit fully refundable on return.
                 </div>
               </div>
             </div>
@@ -434,7 +416,38 @@ export default function EquipmentDetail({
         </div>
       </div>
 
-      {/* Share Equipment Modal */}
+      {/* Lightbox */}
+      {lightboxIndex !== null && images.length > 0 && (
+        <div className="fixed inset-0 z-[110] bg-black/95 flex items-center justify-center" onClick={() => setLightboxIndex(null)}>
+          <button onClick={() => setLightboxIndex(null)} aria-label="Close gallery" className="absolute top-5 right-5 p-2 text-white/80 hover:text-white">
+            <X className="w-7 h-7" />
+          </button>
+          <span className="absolute top-6 left-6 text-white/80 text-sm">{lightboxIndex + 1} / {images.length}</span>
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex((lightboxIndex - 1 + images.length) % images.length); }}
+                aria-label="Previous" className="absolute left-4 sm:left-8 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setLightboxIndex((lightboxIndex + 1) % images.length); }}
+                aria-label="Next" className="absolute right-4 sm:right-8 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
+          <img
+            src={images[lightboxIndex]}
+            alt={`${equipment.title} ${lightboxIndex + 1}`}
+            className="max-w-[92vw] max-h-[88vh] object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+
       <ShareEquipment
         equipmentId={equipment.id}
         equipmentTitle={equipment.title}
@@ -451,12 +464,7 @@ export default function EquipmentDetail({
           ownerId={equipment.owner_id}
           ownerName={equipment.owner?.full_name || 'Owner'}
           rentalDays={pricing.days}
-          onAccepted={() => {
-            // Handle accepted negotiation
-            setShowNegotiator(false);
-            // Could update the booking with negotiated price
-          }}
-
+          onAccepted={() => setShowNegotiator(false)}
           onRejected={() => setShowNegotiator(false)}
           onClose={() => setShowNegotiator(false)}
         />
@@ -467,12 +475,9 @@ export default function EquipmentDetail({
           equipmentId={equipment.id}
           equipmentTitle={equipment.title}
           category={equipment.category_id ?? ''}
-          hoursUsed={500} // Mock data
-          lastMaintenanceDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)} // 2 weeks ago
-          onScheduleMaintenance={() => {
-            // Handle scheduling
-            setShowMaintenance(false);
-          }}
+          hoursUsed={500}
+          lastMaintenanceDate={new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)}
+          onScheduleMaintenance={() => setShowMaintenance(false)}
           onClose={() => setShowMaintenance(false)}
         />
       )}
