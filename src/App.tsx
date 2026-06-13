@@ -34,7 +34,7 @@ import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
 import { useCookieConsent } from './hooks/useCookieConsent';
-import { addFavorite, removeFavorite, getEquipment } from './services/database';
+import { addFavorite, removeFavorite, getEquipment, createReview } from './services/database';
 import { verifyCheckoutSession } from './services/payments';
 import { getPersonalizedRecommendations } from './services/ai';
 
@@ -1451,6 +1451,11 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onEquipmentClick={handleEquipmentClick}
             onListEquipment={handleListEquipment}
             onNavigate={(page: string) => setCurrentPage(page as PageType)}
+            onLeaveReview={(equipment, bookingId) => {
+              setReviewEquipment(equipment);
+              setReviewBookingId(bookingId);
+              setIsEnhancedReviewOpen(true);
+            }}
           />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
@@ -2285,7 +2290,21 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
                 equipmentTitle={reviewEquipment.title}
                 bookingId={reviewBookingId}
                 onSubmit={async (reviewData) => {
-                  console.log('Review submitted:', reviewData);
+                  if (user && reviewEquipment && reviewBookingId) {
+                    await createReview({
+                      booking_id: reviewBookingId,
+                      equipment_id: reviewEquipment.id,
+                      reviewer_id: user.id,
+                      reviewee_id: reviewEquipment.owner_id,
+                      rating: reviewData.rating,
+                      title: reviewData.title || null,
+                      comment: reviewData.comment || null,
+                      is_equipment_review: true,
+                      equipment_condition: reviewData.aspectRatings.condition,
+                      communication: reviewData.aspectRatings.communication,
+                      punctuality: reviewData.aspectRatings.accuracy,
+                    });
+                  }
                   setIsEnhancedReviewOpen(false);
                   setReviewEquipment(null);
                   setReviewBookingId(null);

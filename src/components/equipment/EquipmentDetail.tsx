@@ -271,12 +271,13 @@ export default function EquipmentDetail({
 
                 {reviews.length > 0 && (
                   <div className="grid sm:grid-cols-2 gap-x-10 gap-y-2 mb-8 max-w-md">
-                    {distribution.map(({ star, pct }) => (
+                    {distribution.map(({ star, pct, count }) => (
                       <div key={star} className="flex items-center gap-3 text-sm">
                         <span className="w-3 text-gray-600">{star}</span>
                         <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                           <div className="h-full bg-gray-900 rounded-full" style={{ width: `${pct}%` }} />
                         </div>
+                        <span className="w-6 text-right text-xs text-gray-400">{count}</span>
                       </div>
                     ))}
                   </div>

@@ -44,6 +44,7 @@ export default function BrowsePage({
   const [location, setLocation] = useState('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [condition, setCondition] = useState('');
+  const [rentalDuration, setRentalDuration] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(false);
@@ -90,6 +91,25 @@ export default function BrowsePage({
       filtered = filtered.filter((item) => item.condition === condition);
     }
 
+    if (rentalDuration) {
+      filtered = filtered.filter((item) => {
+        const min = item.min_rental_days;
+        const max = item.max_rental_days;
+        switch (rentalDuration) {
+          case 'short':
+            return min <= 3;
+          case 'week':
+            return min <= 7 && max >= 4;
+          case 'month':
+            return max >= 8 && max < 30;
+          case 'long':
+            return max >= 30;
+          default:
+            return true;
+        }
+      });
+    }
+
     switch (sortBy) {
       case 'price-low':
         filtered.sort((a, b) => a.daily_rate - b.daily_rate);
@@ -99,6 +119,9 @@ export default function BrowsePage({
         break;
       case 'rating':
         filtered.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'popular':
+        filtered.sort((a, b) => b.total_bookings - a.total_bookings);
         break;
       case 'newest':
         filtered.sort(
@@ -124,7 +147,7 @@ export default function BrowsePage({
     }
 
     return filtered;
-  }, [deferredSearchQuery, selectedCategory, location, priceRange, condition, sortBy, equipment, categories, userCoords, nearMeRadius]);
+  }, [deferredSearchQuery, selectedCategory, location, priceRange, condition, rentalDuration, sortBy, equipment, categories, userCoords, nearMeRadius]);
 
   const clearFilters = () => {
     setSearchQuery('');
@@ -132,6 +155,7 @@ export default function BrowsePage({
     setLocation('');
     setPriceRange([0, 1000]);
     setCondition('');
+    setRentalDuration('');
     setSortBy('featured');
     setUserCoords(null);
   };
@@ -164,6 +188,7 @@ export default function BrowsePage({
     selectedCategory,
     location,
     condition,
+    rentalDuration,
     priceRange[0] > 0 || priceRange[1] < 1000,
   ].filter(Boolean).length;
 
@@ -318,6 +343,7 @@ export default function BrowsePage({
                 className="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 bg-white focus:outline-none focus:border-teal-500"
               >
                 <option value="featured">Featured</option>
+                <option value="popular">Most Popular</option>
                 <option value="price-low">Price: Low to High</option>
                 <option value="price-high">Price: High to Low</option>
                 <option value="rating">Highest Rated</option>
@@ -330,7 +356,7 @@ export default function BrowsePage({
         {showFilters && (
           <div className="border-t border-gray-100 bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category
@@ -390,6 +416,23 @@ export default function BrowsePage({
                     <option value="excellent">Excellent</option>
                     <option value="good">Good</option>
                     <option value="fair">Fair</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Rental Length
+                  </label>
+                  <select
+                    value={rentalDuration}
+                    onChange={(e) => setRentalDuration(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500"
+                  >
+                    <option value="">Any Length</option>
+                    <option value="short">1-3 days</option>
+                    <option value="week">4-7 days</option>
+                    <option value="month">1-4 weeks</option>
+                    <option value="long">Monthly+</option>
                   </select>
                 </div>
 
@@ -467,7 +510,7 @@ export default function BrowsePage({
               {filteredEquipment.map((item) => (
                 <button
                   key={item.id}
-                 
+                  aria-label={`View ${item.title}`}
                   onClick={() => {
                     setSelectedMapEquipment(item.id);
                     onEquipmentClick(item);
@@ -512,10 +555,11 @@ export default function BrowsePage({
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredEquipment.map((item) => (
+            {filteredEquipment.map((item, index) => (
               <div
                 key={item.id}
-                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300"
+                className="group bg-white rounded-2xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 animate-in slide-in-from-bottom-4"
+                style={{ animationDelay: `${Math.min(index * 40, 320)}ms`, animationFillMode: 'both' }}
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
@@ -526,7 +570,8 @@ export default function BrowsePage({
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
 
                   <button
-                   
+                    aria-label={favorites.has(item.id) ? 'Remove from saved' : 'Save to favorites'}
+                    aria-pressed={favorites.has(item.id)}
                     onClick={(e) => {
                       e.stopPropagation();
                       onFavoriteClick(item.id);
@@ -631,7 +676,8 @@ export default function BrowsePage({
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="text-xl font-semibold text-gray-900">{item.title}</h3>
                     <button
-                     
+                      aria-label={favorites.has(item.id) ? 'Remove from saved' : 'Save to favorites'}
+                      aria-pressed={favorites.has(item.id)}
                       onClick={(e) => {
                         e.stopPropagation();
                         onFavoriteClick(item.id);
