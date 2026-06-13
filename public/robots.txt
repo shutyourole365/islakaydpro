@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /?page=dashboard
+Disallow: /?page=admin
+Disallow: /?page=security
+Disallow: /?page=analytics
+Disallow: /?page=earnings
+Disallow: /?page=revenue-dashboard
+Disallow: /?page=support-tickets
+Disallow: /?page=disputes
+Disallow: /?page=id-verification
+
+Sitemap: https://islakayd.com/sitemap.xml

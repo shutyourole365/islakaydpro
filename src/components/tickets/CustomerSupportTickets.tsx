@@ -219,6 +219,13 @@ export default function CustomerSupportTickets({ onBack }: CustomerSupportTicket
               </div>
 
               {/* Tickets */}
+              {filteredTickets.length === 0 ? (
+                <div className="text-center py-12">
+                  <MessageSquare className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                  <p className="font-medium text-gray-900 mb-1">No support tickets found</p>
+                  <p className="text-sm text-gray-500">Try adjusting your filters</p>
+                </div>
+              ) : (
               <div className="space-y-3">
                 {filteredTickets.map((ticket) => {
                   const statusCfg = statusConfig[ticket.status];
@@ -264,6 +271,7 @@ export default function CustomerSupportTickets({ onBack }: CustomerSupportTicket
                   );
                 })}
               </div>
+              )}
             </div>
           </div>
 

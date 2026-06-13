@@ -56,6 +56,7 @@ import {
   updateProfile,
   updateBookingStatus,
   logAuditEvent,
+  getReviews,
 } from '../../services/database';
 import ReferralProgram from '../referral/ReferralProgram';
 
@@ -68,6 +69,7 @@ interface DashboardProps {
   onEquipmentClick: (equipment: Equipment) => void;
   onListEquipment: () => void;
   onNavigate?: (page: string) => void;
+  onLeaveReview?: (equipment: Equipment, bookingId: string) => void;
 }
 
 type TabType = 'overview' | 'bookings' | 'listings' | 'favorites' | 'messages' | 'notifications' | 'security' | 'settings' | 'referral';
@@ -78,6 +80,7 @@ export default function Dashboard({
   onEquipmentClick,
   onListEquipment,
   onNavigate,
+  onLeaveReview,
 }: DashboardProps) {
   const { user, profile, refreshProfile } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
@@ -101,6 +104,7 @@ export default function Dashboard({
   const [saving, setSaving] = useState(false);
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [reviewedBookingIds, setReviewedBookingIds] = useState<Set<string>>(new Set());
 
   // Use transition for non-urgent updates
   const [, startTransition] = useTransition();
@@ -110,7 +114,7 @@ export default function Dashboard({
 
     setLoading(true);
     try {
-      const [analyticsData, bookingsData, ownerBookingsData, listingsData, favoritesData, notificationsData, conversationsData] = await Promise.all([
+      const [analyticsData, bookingsData, ownerBookingsData, listingsData, favoritesData, notificationsData, conversationsData, myReviews] = await Promise.all([
         getUserAnalytics(user.id),
         getBookings({ renterId: user.id }),
         getBookings({ ownerId: user.id }),
@@ -118,6 +122,7 @@ export default function Dashboard({
         getFavorites(user.id),
         getNotifications(user.id),
         getConversations(user.id),
+        getReviews({ reviewerId: user.id }),
       ]);
 
       // Use startTransition for non-urgent state updates
@@ -129,6 +134,7 @@ export default function Dashboard({
         setFavorites(favoritesData.map(f => f.equipment!).filter(Boolean));
         setNotifications(notificationsData);
         setConversations(conversationsData);
+        setReviewedBookingIds(new Set(myReviews.map(r => r.booking_id).filter(Boolean) as string[]));
       });
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
@@ -597,14 +603,27 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center justify-between">
                               <p className="text-lg font-semibold text-gray-900">${booking.total_amount.toFixed(2)}</p>
-                              <button
-                               
-                                onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
-                                className="flex items-center gap-2 px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-xl transition-colors"
-                              >
-                                View Details
-                                <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                              </button>
+                              <div className="flex items-center gap-2">
+                                {(booking.status === 'completed' || (booking.status === 'confirmed' && new Date(booking.end_date) < new Date())) &&
+                                  !reviewedBookingIds.has(booking.id) &&
+                                  booking.equipment &&
+                                  onLeaveReview && (
+                                    <button
+                                      onClick={() => booking.equipment && onLeaveReview(booking.equipment, booking.id)}
+                                      className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 font-medium rounded-xl hover:bg-amber-100 transition-colors"
+                                    >
+                                      <Star className="w-4 h-4" aria-hidden="true" />
+                                      Leave a Review
+                                    </button>
+                                  )}
+                                <button
+                                  onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
+                                  className="flex items-center gap-2 px-4 py-2 text-teal-600 font-medium hover:bg-teal-50 rounded-xl transition-colors"
+                                >
+                                  View Details
+                                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>

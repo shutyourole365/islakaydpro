@@ -5,8 +5,19 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Offset in-page anchor jumps so targets clear the fixed 80px header */
+    scroll-padding-top: 6rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Show a calm placeholder tint while images load instead of a flash of nothing */
+  img {
+    background-color: theme('colors.gray.100');
+  }
+
+  .dark img {
+    background-color: theme('colors.gray.800');
   }
 
   body {

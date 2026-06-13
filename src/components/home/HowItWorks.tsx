@@ -1,6 +1,10 @@
 import { Search, Calendar, Truck, Star, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-export default function HowItWorks() {
+interface HowItWorksProps {
+  onGetStarted?: () => void;
+}
+
+export default function HowItWorks({ onGetStarted }: HowItWorksProps) {
   const steps = [
     {
       icon: <Search className="w-8 h-8" />,
@@ -87,13 +91,13 @@ export default function HowItWorks() {
         </div>
 
         <div className="mt-16 text-center">
-          <a
-            href="#"
+          <button
+            onClick={() => onGetStarted?.()}
             className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-colors"
           >
             Start Renting Today
             <ArrowRight className="w-5 h-5" />
-          </a>
+          </button>
         </div>
       </div>
     </section>

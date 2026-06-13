@@ -1,4 +1,5 @@
-import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { ShieldCheck, Star, Zap } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from '../ui/BrandIcons';
 import LogoPro from '../branding/LogoPro';
 
 const socialLinks = [
@@ -9,6 +10,12 @@ const socialLinks = [
   { Icon: Youtube, url: import.meta.env.VITE_YOUTUBE_URL, label: 'YouTube' },
 ].filter(s => s.url);
 
+const trustBadges = [
+  { Icon: ShieldCheck, label: 'Verified owners & renters' },
+  { Icon: Star, label: 'Reviewed by real customers' },
+  { Icon: Zap, label: 'Instant booking available' },
+];
+
 interface FooterProps {
   onNavigate?: (page: string) => void;
 }
@@ -17,11 +24,11 @@ export default function Footer({ onNavigate }: FooterProps) {
   const footerLinks = {
     'Rent Equipment': [
       { label: 'Browse All', page: 'browse' },
-      { label: 'Construction', page: 'browse', category: 'construction' },
-      { label: 'Power Tools', page: 'browse', category: 'power-tools' },
-      { label: 'Photography', page: 'browse', category: 'photography' },
-      { label: 'Events', page: 'browse', category: 'events' },
-      { label: 'Vehicles', page: 'browse', category: 'vehicles' },
+      { label: 'Wanted Requests', page: 'requests' },
+      { label: 'Construction', page: 'browse' },
+      { label: 'Power Tools', page: 'browse' },
+      { label: 'Photography', page: 'browse' },
+      { label: 'Events', page: 'browse' },
     ],
     'List Equipment': [
       { label: 'Start Listing', page: 'list-equipment' },
@@ -47,14 +54,32 @@ export default function Footer({ onNavigate }: FooterProps) {
     ],
   };
 
+  const legalLinks = [
+    { label: 'Terms of Service', page: 'terms' },
+    { label: 'Privacy Policy', page: 'privacy' },
+    { label: 'Cookie Policy', page: 'cookies' },
+    { label: 'Refund Policy', page: 'refund' },
+    { label: 'Accessibility', page: 'accessibility' },
+  ];
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Trust strip */}
+        <div className="py-6 border-b border-gray-800 flex flex-wrap items-center justify-center md:justify-between gap-4">
+          {trustBadges.map(({ Icon, label }) => (
+            <div key={label} className="flex items-center gap-2 text-sm text-gray-400">
+              <Icon className="w-4 h-4 text-teal-400" />
+              {label}
+            </div>
+          ))}
+        </div>
+
         <div className="py-16 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
-            <a href="/" className="inline-block mb-6">
+            <button onClick={() => onNavigate?.('home')} aria-label="Go to home page" className="inline-block mb-6">
               <LogoPro variant="light" size="md" showText={true} />
-            </a>
+            </button>
             <p className="text-gray-400 text-sm leading-relaxed mb-6">
               The world's most advanced equipment rental marketplace. Rent anything, anywhere, powered by AI.
             </p>
@@ -83,12 +108,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                 {links.map((link) => (
                   <li key={link.label}>
                     <button
-                     
-                      onClick={() => {
-                        if (link.page) {
-                          onNavigate?.(link.page);
-                        }
-                      }}
+                      onClick={() => onNavigate?.(link.page)}
                       className="text-sm text-gray-400 hover:text-teal-400 transition-colors text-left"
                     >
                       {link.label}
@@ -103,51 +123,31 @@ export default function Footer({ onNavigate }: FooterProps) {
         <div className="py-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-              <button
-               
-                onClick={() => onNavigate?.('terms')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Terms of Service
-              </button>
-              <button
-               
-                onClick={() => onNavigate?.('privacy')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Privacy Policy
-              </button>
-              <button
-               
-                onClick={() => onNavigate?.('cookies')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Cookie Policy
-              </button>
-              <button
-               
-                onClick={() => onNavigate?.('refund')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Refund Policy
-              </button>
-              <button
-               
-                onClick={() => onNavigate?.('accessibility')}
-                className="text-gray-400 hover:text-teal-400 transition-colors"
-              >
-                Accessibility
-              </button>
+              {legalLinks.map(({ label, page }) => (
+                <button
+                  key={label}
+                  onClick={() => onNavigate?.(page)}
+                  className="text-gray-400 hover:text-teal-400 transition-colors"
+                >
+                  {label}
+                </button>
+              ))}
             </div>
             <div className="flex items-center gap-4">
-              <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
+              <select
+                aria-label="Language"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500"
+              >
                 <option>English (AU)</option>
                 <option>English (US)</option>
                 <option>Spanish</option>
                 <option>French</option>
                 <option>German</option>
               </select>
-              <select className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500">
+              <select
+                aria-label="Currency"
+                className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-teal-500"
+              >
                 <option>AUD $</option>
                 <option>USD $</option>
                 <option>EUR</option>
@@ -157,7 +157,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             </div>
           </div>
           <p className="text-center text-gray-500 text-sm mt-6">
-            2024 Islakayd Pty Ltd. All rights reserved.
+            © {new Date().getFullYear()} Islakayd Pty Ltd. All rights reserved.
           </p>
         </div>
       </div>

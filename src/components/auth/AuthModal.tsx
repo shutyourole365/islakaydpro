@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useState, useEffect, useId } from 'react';
 import { X, Mail, Lock, User, Eye, EyeOff, Package, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { signUpWithRetry, getAuthErrorMessage } from '../../services/authHelpers';
@@ -10,10 +10,20 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialMode?: 'signin' | 'signup';
 }
 
-export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
+export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 'signin' }: AuthModalProps) {
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(initialMode);
+
+  // Follow the caller's intent each time the modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+      setError('');
+      setSuccess('');
+    }
+  }, [isOpen, initialMode]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -129,7 +139,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div role="dialog" aria-modal="true" aria-label="Sign in" className="relative w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex">
+      <div role="dialog" aria-modal="true" aria-label="Sign in" className="relative w-full max-w-4xl max-h-[92vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex">
         <div className="hidden lg:flex flex-col w-2/5 bg-gradient-to-br from-teal-600 to-emerald-600 p-10 text-white">
           <div className="flex items-center gap-2 mb-8">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
@@ -171,16 +181,39 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           </div>
         </div>
 
-        <div className="flex-1 p-8 lg:p-10">
+        <div className="flex-1 p-8 lg:p-10 overflow-y-auto">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 backdrop-blur hover:bg-gray-100 transition-colors"
             aria-label="Close authentication dialog"
           >
             <X className="w-6 h-6 text-gray-500" />
           </button>
 
           <div className="max-w-sm mx-auto">
+            {mode !== 'forgot' && (
+              <div className="flex p-1 mb-8 bg-gray-100 rounded-full" role="tablist" aria-label="Sign in or sign up">
+                {([['signin', 'Sign in'], ['signup', 'Sign up']] as const).map(([value, label]) => (
+                  <button
+                    key={value}
+                    role="tab"
+                    aria-selected={mode === value}
+                    onClick={() => {
+                      setMode(value);
+                      setError('');
+                      setSuccess('');
+                    }}
+                    className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                      mode === value
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               {mode === 'signin' && 'Welcome back'}
               {mode === 'signup' && 'Create your account'}
@@ -247,6 +280,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
+                    autoComplete="email"
                     className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
                   />
                 </div>
@@ -264,9 +298,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
+                      placeholder={mode === 'signup' ? 'At least 8 characters' : 'Enter your password'}
                       required
-                      minLength={6}
+                      minLength={mode === 'signup' ? 8 : 6}
+                      autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                       className="w-full pl-12 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
                     />
                     <button

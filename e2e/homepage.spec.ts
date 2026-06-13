@@ -5,7 +5,7 @@ test.describe('Homepage', () => {
     await page.goto('/');
     
     // Check main heading
-    await expect(page.getByRole('heading', { name: /rent any equipment/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /rent anything/i })).toBeVisible();
 
     // Check navigation elements
     await expect(page.getByRole('button', { name: /browse equipment/i })).toBeVisible();
@@ -63,20 +63,23 @@ test.describe('Theme', () => {
   test('should toggle dark mode', async ({ page }) => {
     await page.goto('/');
 
-    // Theme toggle is only rendered for authenticated users
-    const themeButton = page.locator('button[aria-label*="Switch to"], button[aria-label*="Toggle theme"]').first();
-    const isVisible = await themeButton.isVisible({ timeout: 2000 }).catch(() => false);
+    const htmlElement = page.locator('html');
+    const initialIsDark = ((await htmlElement.getAttribute('class')) || '').includes('dark');
+
+    // The header renders the dropdown theme toggle; pick the opposite theme from it
+    const themeMenuButton = page.locator('button[aria-label="Toggle theme menu"]').first();
+    const isVisible = await themeMenuButton.isVisible({ timeout: 2000 }).catch(() => false);
     if (!isVisible) return; // Skip if theme toggle not available
 
-    // Get initial state
-    const htmlElement = page.locator('html');
-    const initialClass = await htmlElement.getAttribute('class');
+    await themeMenuButton.click();
+    await page
+      .getByRole('button', { name: initialIsDark ? 'Set theme to Light' : 'Set theme to Dark' })
+      .click();
 
-    // Toggle theme
-    await themeButton.click();
-
-    // Class should change
-    const newClass = await htmlElement.getAttribute('class');
-    expect(newClass).not.toBe(initialClass);
+    if (initialIsDark) {
+      await expect(htmlElement).not.toHaveClass(/dark/);
+    } else {
+      await expect(htmlElement).toHaveClass(/dark/);
+    }
   });
 });

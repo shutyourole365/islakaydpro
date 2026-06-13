@@ -95,7 +95,7 @@ export default function AIAssistantEnhanced() {
   // Stable session ID per browser tab — persists across page refreshes
   const [sessionId] = useLocalStorage<string>(
     'kayd_session_id',
-    () => crypto.randomUUID()
+    crypto.randomUUID()
   );
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -128,7 +128,6 @@ export default function AIAssistantEnhanced() {
       setShowQuickActions(false);
     }).catch(() => {});
   // Only run once when the widget opens for the first time
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, user]);
 
   // Load personalized recommendations when assistant opens for logged-in users
@@ -369,8 +368,6 @@ export default function AIAssistantEnhanced() {
       }));
 
     conversationHistory.push({ role: 'user' as const, content: userMessage });
-
-    let fullText = '';
 
     // If AI is disabled by environment or user preference, use local rule-based responses
     if (!aiIsEnabled) {

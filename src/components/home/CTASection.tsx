@@ -2,9 +2,10 @@ import { ArrowRight, Package, DollarSign, Shield, Users } from 'lucide-react';
 
 interface CTASectionProps {
   onGetStarted: () => void;
+  onLearnMore?: () => void;
 }
 
-export default function CTASection({ onGetStarted }: CTASectionProps) {
+export default function CTASection({ onGetStarted, onLearnMore }: CTASectionProps) {
   const ownerBenefits = [
     {
       icon: <DollarSign className="w-6 h-6" />,
@@ -57,17 +58,17 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <button
                 onClick={onGetStarted}
-                className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-full hover:shadow-xl transition-all"
+                className="flex items-center gap-2 px-8 py-4 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-colors"
                >
                 Start Listing Today
                 <ArrowRight className="w-5 h-5" />
               </button>
-              <a
-                href="#"
+              <button
+                onClick={() => onLearnMore?.()}
                 className="flex items-center gap-2 px-8 py-4 text-gray-700 font-semibold hover:text-teal-600 transition-colors"
               >
                 Learn More
-              </a>
+              </button>
             </div>
           </div>
 
@@ -105,7 +106,7 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-gray-400">Estimated Monthly Earnings</span>
                     </div>
-                    <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400">
+                    <div className="text-4xl font-bold text-teal-400">
                       $1,500 - $3,000
                     </div>
                     <p className="text-sm text-gray-500 mt-2">

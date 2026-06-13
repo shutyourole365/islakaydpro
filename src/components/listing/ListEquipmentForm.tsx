@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,8 +10,11 @@ import {
   CheckCircle2,
   Camera,
   Info,
+  Loader2,
 } from 'lucide-react';
 import type { Category } from '../../types';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface ListEquipmentFormProps {
   categories: Category[];
@@ -47,6 +50,10 @@ export default function ListEquipmentForm({
   onClose,
   onSubmit,
 }: ListEquipmentFormProps) {
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<EquipmentFormData>({
     title: '',
@@ -114,6 +121,63 @@ export default function ListEquipmentForm({
       ...formData,
       images: formData.images.filter((_, i) => i !== index),
     });
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    if (!user) {
+      setUploadError('You must be signed in to upload photos.');
+      return;
+    }
+
+    if (formData.images.length + files.length > 10) {
+      setUploadError('Maximum 10 photos per listing.');
+      return;
+    }
+
+    setUploadError(null);
+    setIsUploading(true);
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) {
+          setUploadError(`${file.name} is not an image file.`);
+          continue;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          setUploadError(`${file.name} is too large. Maximum 10MB per photo.`);
+          continue;
+        }
+
+        const ext = file.name.split('.').pop() || 'jpg';
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+        const { error } = await supabase.storage
+          .from('equipment-images')
+          .upload(path, file, { cacheControl: '3600', upsert: false });
+
+        if (error) {
+          setUploadError(error.message);
+          continue;
+        }
+
+        const { data } = supabase.storage.from('equipment-images').getPublicUrl(path);
+        uploadedUrls.push(data.publicUrl);
+      }
+
+      if (uploadedUrls.length > 0) {
+        setFormData(prev => ({ ...prev, images: [...prev.images, ...uploadedUrls] }));
+      }
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const isStepValid = () => {
@@ -361,10 +425,35 @@ export default function ListEquipmentForm({
                   <p className="text-gray-600 mb-4">
                     Drag and drop photos here, or click to browse
                   </p>
-                  <button className="px-6 py-3 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors">
-                    <Upload className="w-5 h-5 inline mr-2" />
-                    Upload Photos
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="px-6 py-3 bg-teal-500 text-white font-medium rounded-xl hover:bg-teal-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 inline mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-5 h-5 inline mr-2" />
+                        Upload Photos
+                      </>
+                    )}
                   </button>
+                  <p className="text-xs text-gray-500 mt-3">JPEG, PNG, WebP or GIF. Max 10MB per photo.</p>
+                  {uploadError && (
+                    <p className="text-sm text-red-600 mt-3">{uploadError}</p>
+                  )}
                 </div>
 
                 <div className="bg-blue-50 rounded-xl p-4 flex items-start gap-3">

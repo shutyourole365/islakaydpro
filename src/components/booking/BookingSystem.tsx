@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   X,
   Calendar,
@@ -17,12 +17,13 @@ import {
   Lock,
   ArrowRight,
   FileText,
+  AlertCircle,
 } from 'lucide-react';
 import type { Equipment, InsurancePlan, UserId } from '../../types';
 import SmartScheduler from '../scheduling/SmartScheduler';
 import { useAuth } from '../../contexts/AuthContext';
-import { createBooking, getBookingById } from '../../services/database';
-import type { Booking } from '../../types';
+import { createBooking, getBookingById, checkAvailability, getEquipmentAvailability } from '../../services/database';
+import type { Booking, EquipmentAvailability } from '../../types';
 import { createCheckoutSession } from '../../services/payments';
 import { sendBookingConfirmation } from '../../services/email';
 import { useToast } from '../ui/Toast';
@@ -100,6 +101,8 @@ export default function BookingSystem({
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null);
+  const [availability, setAvailability] = useState<'idle' | 'checking' | 'available' | 'unavailable'>('idle');
+  const [blockedRanges, setBlockedRanges] = useState<EquipmentAvailability[]>([]);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -178,8 +181,23 @@ export default function BookingSystem({
     return days;
   }, [currentMonth]);
 
+  // Load this equipment's existing booked/blocked date ranges so the calendar can show them
+  useEffect(() => {
+    let active = true;
+    const todayStr = today.toISOString().split('T')[0];
+    getEquipmentAvailability(equipment.id, todayStr)
+      .then((ranges) => { if (active) setBlockedRanges(ranges); })
+      .catch(() => { if (active) setBlockedRanges([]); });
+    return () => { active = false; };
+  }, [equipment.id, today]);
+
+  const isDateBlocked = (date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return blockedRanges.some((range) => dateStr >= range.start_date && dateStr <= range.end_date);
+  };
+
   const isDateDisabled = (date: Date) => {
-    return date < today;
+    return date < today || isDateBlocked(date);
   };
 
   const isDateInRange = (date: Date) => {
@@ -226,10 +244,27 @@ export default function BookingSystem({
     }
   };
 
+  // Check the chosen dates against existing bookings/blocks for this equipment
+  useEffect(() => {
+    if (!selectedStart || !selectedEnd) {
+      setAvailability('idle');
+      return;
+    }
+    let active = true;
+    setAvailability('checking');
+    const start = selectedStart.toISOString().split('T')[0];
+    const end = selectedEnd.toISOString().split('T')[0];
+    checkAvailability(equipment.id, start, end)
+      .then((isFree) => { if (active) setAvailability(isFree ? 'available' : 'unavailable'); })
+      // Fail open: if the check itself errors, don't block — createBooking remains the source of truth
+      .catch(() => { if (active) setAvailability('available'); });
+    return () => { active = false; };
+  }, [selectedStart, selectedEnd, equipment.id]);
+
   const canProceed = () => {
     switch (currentStep) {
       case 'dates':
-        return selectedStart && selectedEnd && rentalDays >= equipment.min_rental_days;
+        return !!selectedStart && !!selectedEnd && rentalDays >= equipment.min_rental_days && availability !== 'unavailable' && availability !== 'checking';
       case 'options':
         return deliveryOption === 'pickup' || (deliveryOption === 'delivery' && deliveryAddress.trim());
       case 'payment':
@@ -364,6 +399,7 @@ export default function BookingSystem({
           </div>
           <button
             onClick={onClose}
+            aria-label="Close booking dialog"
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />
@@ -452,6 +488,7 @@ export default function BookingSystem({
                         return <div key={`empty-${index}`} className="aspect-square" />;
                       }
 
+                      const blocked = isDateBlocked(date);
                       const disabled = isDateDisabled(date);
                       const selected = isDateSelected(date);
                       const inRange = isDateInRange(date);
@@ -461,12 +498,14 @@ export default function BookingSystem({
                         <button
                           key={date.toISOString()}
                           onClick={() => handleDateClick(date)}
-                          aria-label={`Select ${date.toDateString()}`}
+                          aria-label={blocked ? `${date.toDateString()} unavailable` : `Select ${date.toDateString()}`}
                           disabled={disabled}
+                          title={blocked ? 'Already booked' : undefined}
                           className={`
                             aspect-square flex items-center justify-center rounded-lg text-sm font-medium
                             transition-all duration-200
                             ${disabled ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer'}
+                            ${blocked ? 'bg-gray-50 line-through' : ''}
                             ${selected ? 'bg-teal-500 text-white shadow-lg' : ''}
                             ${inRange && !selected ? 'bg-teal-100 text-teal-700' : ''}
                             ${!disabled && !selected && !inRange ? 'hover:bg-gray-100 text-gray-900' : ''}
@@ -488,6 +527,10 @@ export default function BookingSystem({
                   <div className="flex items-center gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-teal-100" />
                     <span>In range</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded-full bg-gray-50 border border-gray-200" />
+                    <span>Unavailable</span>
                   </div>
                 </div>
               </div>
@@ -519,6 +562,22 @@ export default function BookingSystem({
                           <span className="text-gray-600">Duration</span>
                           <span className="font-semibold text-gray-900">{rentalDays} day{rentalDays > 1 ? 's' : ''}</span>
                         </div>
+                        {availability === 'checking' && (
+                          <p className="mt-3 flex items-center gap-2 text-sm text-gray-500">
+                            <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                            Checking availability…
+                          </p>
+                        )}
+                        {availability === 'available' && (
+                          <p className="mt-3 flex items-center gap-2 text-sm text-green-600 font-medium">
+                            <CheckCircle className="w-4 h-4" /> Available for these dates
+                          </p>
+                        )}
+                        {availability === 'unavailable' && (
+                          <p className="mt-3 flex items-center gap-2 text-sm text-red-600 font-medium">
+                            <AlertCircle className="w-4 h-4" /> These dates are already booked — please pick another range
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>

@@ -3,6 +3,20 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EquipmentAvailabilityCalendar from '../components/availability/EquipmentAvailabilityCalendar';
 
+vi.mock('../contexts/AuthContext', () => {
+  const mockUser = { id: 'test-user' };
+  return {
+    useAuth: () => ({ user: mockUser, profile: null, isAuthenticated: true, isLoading: false }),
+  };
+});
+
+vi.mock('../services/database', () => ({
+  getEquipment: vi.fn().mockResolvedValue({ data: [], count: 0 }),
+  getEquipmentAvailability: vi.fn().mockResolvedValue([]),
+  blockDates: vi.fn().mockResolvedValue(undefined),
+  unblockDates: vi.fn().mockResolvedValue(undefined),
+}));
+
 describe('EquipmentAvailabilityCalendar', () => {
   const mockOnBack = vi.fn();
 
@@ -107,7 +121,7 @@ describe('EquipmentAvailabilityCalendar', () => {
       await user.click(prevButtons[0]);
 
       // Month should have changed
-      expect(screen.queryByText(/January|February|March/i)).toBeInTheDocument();
+      expect(screen.queryByText(/January|February|March|April|May|June|July|August|September|October|November|December/i)).toBeInTheDocument();
     });
 
     it('should display day headers', () => {

@@ -97,6 +97,7 @@ export default function PhotoMessaging({ conversationId, onSendMessage, onClose 
         {onClose && (
           <button
             onClick={onClose}
+            aria-label="Close"
             className="p-1.5 rounded-full hover:bg-gray-200 transition-colors"
           >
             <X className="w-5 h-5 text-gray-600" />

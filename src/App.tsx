@@ -28,11 +28,13 @@ import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
+import CommandPalette from './components/ui/CommandPalette';
+import BackToTop from './components/ui/BackToTop';
 import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
 import { useCookieConsent } from './hooks/useCookieConsent';
-import { addFavorite, removeFavorite, getEquipment } from './services/database';
+import { addFavorite, removeFavorite, getEquipment, createReview } from './services/database';
 import { verifyCheckoutSession } from './services/payments';
 import { getPersonalizedRecommendations } from './services/ai';
 
@@ -621,7 +623,9 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [featuredEquipment, setFeaturedEquipment] = useState<Equipment[]>([]);
   const [isLoadingEquipment, setIsLoadingEquipment] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
@@ -759,7 +763,6 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, '', cleanUrl);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -851,9 +854,49 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
     }
   };
 
+  // Global keyboard shortcuts: Cmd/Ctrl+K opens the command palette, "/" opens search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(open => !open);
+        return;
+      }
+      const target = e.target as HTMLElement;
+      const isTyping =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT' ||
+        target.isContentEditable;
+      if (e.key === '/' && !isTyping && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleNavigate = (page: string) => {
     const knownPages: PageType[] = ['home', 'browse', 'dashboard', 'list-equipment', 'security', 'analytics', 'admin', 'notifications', 'payments', 'subscription', 'sustainability', 'tutorials', 'loyalty', 'fleet', 'referrals', 'pwa', 'trust-score', 'alerts', 'bundles', 'warranties', 'bulk-booking', 'insights', 'terms', 'privacy', 'cookies', 'refund', 'accessibility', 'cancellation', 'about', 'careers', 'press', 'blog', 'partnerships', 'investors', 'help', 'safety', 'trust', 'contact', 'pricing-calculator', 'insurance', 'host-resources', 'host-community', 'ai-matching', 'smart-contracts', 'ar-preview', 'carbon-tracker', 'equipment-financing', 'iot-telematics', 'ar-visualization', 'gps-tracking', 'crypto-payments', 'ai-insurance', 'sustainability-dashboard', 'social-communities', 'voice-ai-assistant', 'blockchain-contracts', 'vr-training', 'drone-delivery', 'industry-integrations', 'maintenance', 'scheduler', 'equipment-health', 'cost-estimator', 'seasonal-deals', 'rental-history', 'multi-language', 'availability-calendar', 'revenue-dashboard', 'certification-tracker', 'agreement-generator', 'support-tickets', 'requests', '404'];
     setCurrentPage(knownPages.includes(page as PageType) ? (page as PageType) : '404');
+  };
+
+  // Adapter for the command palette, which navigates with URL-style paths
+  const handlePaletteNavigate = (path: string) => {
+    const page = path.replace(/^\//, '');
+    if (page === 'list') {
+      handleListEquipment();
+      return;
+    }
+    const pageAliases: Record<string, string> = {
+      '': 'home',
+      messages: 'dashboard',
+      bookings: 'dashboard',
+      favorites: 'dashboard',
+      settings: 'dashboard',
+    };
+    handleNavigate(pageAliases[page] ?? page);
   };
 
   const handleSearch = (query: string) => {
@@ -1287,7 +1330,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {currentPage !== 'list-equipment' && (
         <Header
           onSearchClick={() => setIsSearchOpen(true)}
-          onAuthClick={() => setIsAuthOpen(true)}
+          onAuthClick={(mode) => { setAuthMode(mode ?? 'signin'); setIsAuthOpen(true); }}
           isAuthenticated={isAuthenticated}
           onNavigate={handleNavigate}
           onListEquipment={handleListEquipment}
@@ -1314,6 +1357,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             <Categories
               categories={categories}
               onCategoryClick={handleCategoryClick}
+              onViewAll={() => setCurrentPage('browse')}
             />
 
             <FeaturedListings
@@ -1322,6 +1366,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               onFavoriteClick={handleFavoriteToggle}
               favorites={favorites}
               onAddToComparison={handleAddToComparison}
+              onViewAll={() => setCurrentPage('browse')}
               isLoading={isLoadingEquipment}
             />
 
@@ -1351,11 +1396,14 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               </section>
             )}
 
-            <HowItWorks />
+            <HowItWorks onGetStarted={() => setCurrentPage('browse')} />
 
             <Testimonials />
 
-            <CTASection onGetStarted={() => setIsAuthOpen(true)} />
+            <CTASection
+              onGetStarted={() => { setAuthMode('signup'); setIsAuthOpen(true); }}
+              onLearnMore={() => setCurrentPage('host-resources')}
+            />
           </main>
 
           <Footer onNavigate={handleNavigate} />
@@ -1385,6 +1433,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onEquipmentClick={handleEquipmentClick}
             onFavoriteClick={handleFavoriteToggle}
             favorites={favorites}
+            isLoading={isLoadingEquipment}
             onBack={() => {
               setSearchQuery('');
               setSearchCategory('');
@@ -1402,6 +1451,11 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onEquipmentClick={handleEquipmentClick}
             onListEquipment={handleListEquipment}
             onNavigate={(page: string) => setCurrentPage(page as PageType)}
+            onLeaveReview={(equipment, bookingId) => {
+              setReviewEquipment(equipment);
+              setReviewBookingId(bookingId);
+              setIsEnhancedReviewOpen(true);
+            }}
           />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
@@ -1691,6 +1745,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       <Suspense fallback={null}>
         <AuthModal
           isOpen={isAuthOpen}
+          initialMode={authMode}
           onClose={() => setIsAuthOpen(false)}
           onSuccess={() => setIsAuthOpen(false)}
         />
@@ -1758,6 +1813,16 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           unreadNotifications={unreadNotifications}
         />
       )}
+
+      {/* Command Palette (Cmd/Ctrl+K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onNavigate={handlePaletteNavigate}
+      />
+
+      {/* Back to Top */}
+      <BackToTop />
 
       {/* Skip Link for Accessibility */}
       <SkipLink />
@@ -2225,7 +2290,21 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
                 equipmentTitle={reviewEquipment.title}
                 bookingId={reviewBookingId}
                 onSubmit={async (reviewData) => {
-                  console.log('Review submitted:', reviewData);
+                  if (user && reviewEquipment && reviewBookingId) {
+                    await createReview({
+                      booking_id: reviewBookingId,
+                      equipment_id: reviewEquipment.id,
+                      reviewer_id: user.id,
+                      reviewee_id: reviewEquipment.owner_id,
+                      rating: reviewData.rating,
+                      title: reviewData.title || null,
+                      comment: reviewData.comment || null,
+                      is_equipment_review: true,
+                      equipment_condition: reviewData.aspectRatings.condition,
+                      communication: reviewData.aspectRatings.communication,
+                      punctuality: reviewData.aspectRatings.accuracy,
+                    });
+                  }
                   setIsEnhancedReviewOpen(false);
                   setReviewEquipment(null);
                   setReviewBookingId(null);

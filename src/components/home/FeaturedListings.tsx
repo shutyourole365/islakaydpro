@@ -8,6 +8,7 @@ interface FeaturedListingsProps {
   onFavoriteClick: (equipmentId: string) => void;
   favorites: Set<string>;
   onAddToComparison?: (equipment: Equipment) => void;
+  onViewAll?: () => void;
   isLoading?: boolean;
 }
 
@@ -17,6 +18,7 @@ export default function FeaturedListings({
   onFavoriteClick,
   favorites,
   onAddToComparison,
+  onViewAll,
   isLoading = false,
 }: FeaturedListingsProps) {
   return (
@@ -35,13 +37,13 @@ export default function FeaturedListings({
               Discover highly-rated equipment from verified owners
             </p>
           </div>
-          <a
-            href="#"
+          <button
+            onClick={() => onViewAll?.()}
             className="flex items-center gap-2 text-teal-600 font-semibold hover:text-teal-700 transition-colors"
           >
             View All
             <ArrowRight className="w-5 h-5" />
-          </a>
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

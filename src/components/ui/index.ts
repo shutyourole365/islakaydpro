@@ -77,3 +77,6 @@ export { default as KeyboardShortcutsHelp } from './KeyboardShortcutsHelp';
 
 // Theme Toggle
 export { default as ThemeToggle } from './ThemeToggle';
+
+// Back to Top
+export { default as BackToTop } from './BackToTop';

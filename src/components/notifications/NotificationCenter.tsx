@@ -168,6 +168,7 @@ export default function NotificationCenter({ onBack }: NotificationCenterProps) 
           <div className="flex items-center gap-4">
             <button
               onClick={onBack}
+              aria-label="Go back"
               className="p-2 rounded-xl hover:bg-gray-100 transition-colors"
             >
               <ArrowLeft className="w-6 h-6 text-gray-600" />

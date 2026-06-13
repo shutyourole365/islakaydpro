@@ -61,9 +61,15 @@ export function validateEnvironment(): ValidationResult {
     warnings.push('VITE_SENTRY_DSN not set - error tracking will be limited in production');
   }
 
-  // Validate key formats
-  if (env.VITE_SUPABASE_ANON_KEY && env.VITE_SUPABASE_ANON_KEY.length < 100) {
-    errors.push('VITE_SUPABASE_ANON_KEY appears invalid - should be a long JWT token');
+  // Validate key formats: either a legacy JWT anon key (eyJ..., long) or a
+  // modern publishable key (sb_publishable_...)
+  if (env.VITE_SUPABASE_ANON_KEY) {
+    const key = env.VITE_SUPABASE_ANON_KEY;
+    const isLegacyJwt = key.startsWith('eyJ') && key.length >= 100;
+    const isPublishableKey = key.startsWith('sb_publishable_');
+    if (!isLegacyJwt && !isPublishableKey) {
+      errors.push('VITE_SUPABASE_ANON_KEY appears invalid - should be a legacy JWT anon key (eyJ...) or a publishable key (sb_publishable_...)');
+    }
   }
 
   // Stripe is optional - only warn, don't block
