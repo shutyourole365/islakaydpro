@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   X,
   Calendar,
@@ -17,11 +17,12 @@ import {
   Lock,
   ArrowRight,
   FileText,
+  AlertCircle,
 } from 'lucide-react';
 import type { Equipment, InsurancePlan, UserId } from '../../types';
 import SmartScheduler from '../scheduling/SmartScheduler';
 import { useAuth } from '../../contexts/AuthContext';
-import { createBooking, getBookingById } from '../../services/database';
+import { createBooking, getBookingById, checkAvailability } from '../../services/database';
 import type { Booking } from '../../types';
 import { createCheckoutSession } from '../../services/payments';
 import { sendBookingConfirmation } from '../../services/email';
@@ -100,6 +101,7 @@ export default function BookingSystem({
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [confirmedBooking, setConfirmedBooking] = useState<Booking | null>(null);
+  const [availability, setAvailability] = useState<'idle' | 'checking' | 'available' | 'unavailable'>('idle');
 
   const today = useMemo(() => {
     const d = new Date();
@@ -226,10 +228,27 @@ export default function BookingSystem({
     }
   };
 
+  // Check the chosen dates against existing bookings/blocks for this equipment
+  useEffect(() => {
+    if (!selectedStart || !selectedEnd) {
+      setAvailability('idle');
+      return;
+    }
+    let active = true;
+    setAvailability('checking');
+    const start = selectedStart.toISOString().split('T')[0];
+    const end = selectedEnd.toISOString().split('T')[0];
+    checkAvailability(equipment.id, start, end)
+      .then((isFree) => { if (active) setAvailability(isFree ? 'available' : 'unavailable'); })
+      // Fail open: if the check itself errors, don't block — createBooking remains the source of truth
+      .catch(() => { if (active) setAvailability('available'); });
+    return () => { active = false; };
+  }, [selectedStart, selectedEnd, equipment.id]);
+
   const canProceed = () => {
     switch (currentStep) {
       case 'dates':
-        return selectedStart && selectedEnd && rentalDays >= equipment.min_rental_days;
+        return !!selectedStart && !!selectedEnd && rentalDays >= equipment.min_rental_days && availability !== 'unavailable' && availability !== 'checking';
       case 'options':
         return deliveryOption === 'pickup' || (deliveryOption === 'delivery' && deliveryAddress.trim());
       case 'payment':
@@ -519,6 +538,22 @@ export default function BookingSystem({
                           <span className="text-gray-600">Duration</span>
                           <span className="font-semibold text-gray-900">{rentalDays} day{rentalDays > 1 ? 's' : ''}</span>
                         </div>
+                        {availability === 'checking' && (
+                          <p className="mt-3 flex items-center gap-2 text-sm text-gray-500">
+                            <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                            Checking availability…
+                          </p>
+                        )}
+                        {availability === 'available' && (
+                          <p className="mt-3 flex items-center gap-2 text-sm text-green-600 font-medium">
+                            <CheckCircle className="w-4 h-4" /> Available for these dates
+                          </p>
+                        )}
+                        {availability === 'unavailable' && (
+                          <p className="mt-3 flex items-center gap-2 text-sm text-red-600 font-medium">
+                            <AlertCircle className="w-4 h-4" /> These dates are already booked — please pick another range
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
