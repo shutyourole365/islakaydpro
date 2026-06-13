@@ -280,6 +280,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     required
+                    autoComplete="email"
                     className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
                   />
                 </div>
@@ -297,9 +298,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
+                      placeholder={mode === 'signup' ? 'At least 8 characters' : 'Enter your password'}
                       required
-                      minLength={6}
+                      minLength={mode === 'signup' ? 8 : 6}
+                      autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                       className="w-full pl-12 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
                     />
                     <button
