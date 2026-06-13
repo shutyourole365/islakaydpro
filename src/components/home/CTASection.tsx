@@ -2,9 +2,10 @@ import { ArrowRight, Package, DollarSign, Shield, Users } from 'lucide-react';
 
 interface CTASectionProps {
   onGetStarted: () => void;
+  onLearnMore?: () => void;
 }
 
-export default function CTASection({ onGetStarted }: CTASectionProps) {
+export default function CTASection({ onGetStarted, onLearnMore }: CTASectionProps) {
   const ownerBenefits = [
     {
       icon: <DollarSign className="w-6 h-6" />,
@@ -62,12 +63,12 @@ export default function CTASection({ onGetStarted }: CTASectionProps) {
                 Start Listing Today
                 <ArrowRight className="w-5 h-5" />
               </button>
-              <a
-                href="#"
+              <button
+                onClick={() => onLearnMore?.()}
                 className="flex items-center gap-2 px-8 py-4 text-gray-700 font-semibold hover:text-teal-600 transition-colors"
               >
                 Learn More
-              </a>
+              </button>
             </div>
           </div>
 

@@ -1357,6 +1357,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             <Categories
               categories={categories}
               onCategoryClick={handleCategoryClick}
+              onViewAll={() => setCurrentPage('browse')}
             />
 
             <FeaturedListings
@@ -1365,6 +1366,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               onFavoriteClick={handleFavoriteToggle}
               favorites={favorites}
               onAddToComparison={handleAddToComparison}
+              onViewAll={() => setCurrentPage('browse')}
               isLoading={isLoadingEquipment}
             />
 
@@ -1394,11 +1396,14 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               </section>
             )}
 
-            <HowItWorks />
+            <HowItWorks onGetStarted={() => setCurrentPage('browse')} />
 
             <Testimonials />
 
-            <CTASection onGetStarted={() => { setAuthMode('signup'); setIsAuthOpen(true); }} />
+            <CTASection
+              onGetStarted={() => { setAuthMode('signup'); setIsAuthOpen(true); }}
+              onLearnMore={() => setCurrentPage('host-resources')}
+            />
           </main>
 
           <Footer onNavigate={handleNavigate} />

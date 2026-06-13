@@ -69,9 +69,10 @@ const CategoryItem = memo(function CategoryItem({ category, onClick, index }: Ca
 interface CategoriesProps {
   categories: Category[];
   onCategoryClick: (category: Category) => void;
+  onViewAll?: () => void;
 }
 
-export default function Categories({ categories, onCategoryClick }: CategoriesProps) {
+export default function Categories({ categories, onCategoryClick, onViewAll }: CategoriesProps) {
   return (
     <section id="categories" className="py-24 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -101,13 +102,13 @@ export default function Categories({ categories, onCategoryClick }: CategoriesPr
         </div>
 
         <div className="text-center mt-12">
-          <a
-            href="#"
+          <button
+            onClick={() => onViewAll?.()}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-colors"
           >
             View All Categories
             <ArrowRight className="w-5 h-5" />
-          </a>
+          </button>
         </div>
       </div>
     </section>
