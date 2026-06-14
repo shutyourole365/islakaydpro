@@ -12,6 +12,8 @@ import {
   Clock,
   ArrowLeft,
   Map,
+  PackageOpen,
+  Plus,
 } from 'lucide-react';
 import type { Equipment, Category } from '../../types';
 import EquipmentMap from '../map/EquipmentMap';
@@ -26,6 +28,7 @@ interface BrowsePageProps {
   favorites: Set<string>;
   onBack: () => void;
   isLoading?: boolean;
+  onListEquipment?: () => void;
 }
 
 export default function BrowsePage({
@@ -38,6 +41,7 @@ export default function BrowsePage({
   favorites,
   onBack,
   isLoading = false,
+  onListEquipment,
 }: BrowsePageProps) {
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -478,21 +482,60 @@ export default function BrowsePage({
             ))}
           </div>
         ) : filteredEquipment.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Search className="w-10 h-10 text-gray-400" />
+          equipment.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <PackageOpen className="w-10 h-10 text-teal-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No equipment listed yet
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Be the first to list your gear and start earning. It only takes a couple of
+                minutes to post a listing.
+              </p>
+              {onListEquipment && (
+                <button
+                  onClick={onListEquipment}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                  List your equipment
+                </button>
+              )}
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No equipment found</h3>
-            <p className="text-gray-600 mb-6">
-              Try adjusting your filters or search terms
-            </p>
-            <button
-              onClick={clearFilters}
-              className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
-             >
-              Clear All Filters
-            </button>
-          </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-10 h-10 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No matches found</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                {activeFiltersCount > 0
+                  ? "We couldn't find equipment matching your filters. Try widening your search or clearing some filters."
+                  : "We couldn't find any available equipment right now. Check back soon — new listings are added regularly."}
+              </p>
+              <div className="flex items-center justify-center gap-3 flex-wrap">
+                {activeFiltersCount > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="px-6 py-3 bg-teal-500 text-white font-semibold rounded-xl hover:bg-teal-600 transition-colors"
+                  >
+                    Clear All Filters
+                  </button>
+                )}
+                {onListEquipment && (
+                  <button
+                    onClick={onListEquipment}
+                    className="inline-flex items-center gap-2 px-6 py-3 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    <Plus className="w-5 h-5" />
+                    List your equipment
+                  </button>
+                )}
+              </div>
+            </div>
+          )
         ) : viewMode === 'map' ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="h-[600px] lg:h-[calc(100vh-280px)] lg:sticky lg:top-40">
