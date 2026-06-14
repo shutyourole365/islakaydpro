@@ -1434,6 +1434,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onFavoriteClick={handleFavoriteToggle}
             favorites={favorites}
             isLoading={isLoadingEquipment}
+            onListEquipment={handleListEquipment}
             onBack={() => {
               setSearchQuery('');
               setSearchCategory('');
