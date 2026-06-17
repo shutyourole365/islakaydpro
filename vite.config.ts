@@ -22,31 +22,38 @@ export default defineConfig({
     minify: 'esbuild',
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks - separate heavy dependencies
-          'react-vendor': ['react', 'react-dom'],
-          'supabase': ['@supabase/supabase-js'],
-          'leaflet': ['leaflet', 'react-leaflet'],
-          
-          // Premium feature chunks - lazy loaded
-          'premium-features': [
-            './src/components/subscription/SubscriptionPlans',
-            './src/components/sustainability/CarbonFootprintTracker',
-            './src/components/tutorials/AREquipmentTutorial',
-            './src/components/booking/GroupBooking',
-            './src/components/delivery/DroneDeliveryTracking',
-            './src/components/inspection/AIDamageDetection',
-            './src/components/contracts/BlockchainContract',
-            './src/components/gamification/LoyaltyProgram',
-            './src/components/fleet/FleetManager',
-          ],
-          
-          // Admin & analytics chunks
-          'admin': [
-            './src/components/admin/AdminPanel',
-            './src/components/dashboard/AnalyticsDashboard',
-            './src/components/security/SecurityCenter',
-          ],
+        manualChunks(id) {
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+            return 'react-vendor';
+          }
+          if (id.includes('node_modules/@supabase')) {
+            return 'supabase';
+          }
+          if (id.includes('node_modules/leaflet') || id.includes('node_modules/react-leaflet')) {
+            return 'leaflet';
+          }
+          const premiumPaths = [
+            'components/subscription/SubscriptionPlans',
+            'components/sustainability/CarbonFootprintTracker',
+            'components/tutorials/AREquipmentTutorial',
+            'components/booking/GroupBooking',
+            'components/delivery/DroneDeliveryTracking',
+            'components/inspection/AIDamageDetection',
+            'components/contracts/BlockchainContract',
+            'components/gamification/LoyaltyProgram',
+            'components/fleet/FleetManager',
+          ];
+          if (premiumPaths.some((p) => id.includes(p))) {
+            return 'premium-features';
+          }
+          const adminPaths = [
+            'components/admin/AdminPanel',
+            'components/dashboard/AnalyticsDashboard',
+            'components/security/SecurityCenter',
+          ];
+          if (adminPaths.some((p) => id.includes(p))) {
+            return 'admin';
+          }
         },
       },
     },
