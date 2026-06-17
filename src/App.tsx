@@ -2291,25 +2291,28 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
                 equipmentTitle={reviewEquipment.title}
                 bookingId={reviewBookingId}
                 onSubmit={async (reviewData) => {
-                  if (user && reviewEquipment && reviewBookingId) {
-                    await createReview({
-                      booking_id: reviewBookingId,
-                      equipment_id: reviewEquipment.id,
-                      reviewer_id: user.id,
-                      reviewee_id: reviewEquipment.owner_id,
-                      rating: reviewData.rating,
-                      title: reviewData.title || null,
-                      comment: reviewData.comment || null,
-                      is_equipment_review: true,
-                      equipment_condition: reviewData.aspectRatings.condition,
-                      communication: reviewData.aspectRatings.communication,
-                      punctuality: reviewData.aspectRatings.accuracy,
-                    });
+                  try {
+                    if (user && reviewEquipment && reviewBookingId) {
+                      await createReview({
+                        booking_id: reviewBookingId,
+                        equipment_id: reviewEquipment.id,
+                        reviewer_id: user.id,
+                        reviewee_id: reviewEquipment.owner_id,
+                        rating: reviewData.rating,
+                        title: reviewData.title || null,
+                        comment: reviewData.comment || null,
+                        is_equipment_review: true,
+                        equipment_condition: reviewData.aspectRatings.condition,
+                        communication: reviewData.aspectRatings.communication,
+                      });
+                    }
+                    setIsEnhancedReviewOpen(false);
+                    setReviewEquipment(null);
+                    setReviewBookingId(null);
+                    addToast({ type: 'success', title: 'Review submitted!', message: 'Thank you for your detailed review.' });
+                  } catch {
+                    addToast({ type: 'error', title: 'Submission failed', message: 'Could not save your review. Please try again.' });
                   }
-                  setIsEnhancedReviewOpen(false);
-                  setReviewEquipment(null);
-                  setReviewBookingId(null);
-                  addToast({ type: 'success', title: 'Review submitted!', message: 'Thank you for your detailed review.' });
                 }}
                 onClose={() => {
                   setIsEnhancedReviewOpen(false);

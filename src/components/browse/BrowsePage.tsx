@@ -105,7 +105,7 @@ export default function BrowsePage({
           case 'week':
             return min <= 7 && max >= 4;
           case 'month':
-            return max >= 8 && max < 30;
+            return min <= 29 && max >= 8;
           case 'long':
             return max >= 30;
           default:
