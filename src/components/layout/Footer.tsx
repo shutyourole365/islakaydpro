@@ -63,13 +63,16 @@ export default function Footer({ onNavigate }: FooterProps) {
   ];
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="relative bg-gray-950 text-gray-300">
+      <div className="h-1 w-full bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Trust strip */}
-        <div className="py-6 border-b border-gray-800 flex flex-wrap items-center justify-center md:justify-between gap-4">
+        <div className="py-6 border-b border-gray-800/80 flex flex-wrap items-center justify-center md:justify-between gap-4">
           {trustBadges.map(({ Icon, label }) => (
             <div key={label} className="flex items-center gap-2 text-sm text-gray-400">
-              <Icon className="w-4 h-4 text-teal-400" />
+              <span className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center">
+                <Icon className="w-4 h-4 text-teal-400" />
+              </span>
               {label}
             </div>
           ))}

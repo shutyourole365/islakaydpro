@@ -57,6 +57,9 @@ export { useSupabaseStatus } from './useSupabaseStatus';
 // Theme hook
 export { useTheme } from './useTheme';
 
+// Scroll reveal & count-up animation hooks
+export { useScrollReveal, useCountUp } from './useScrollReveal';
+
 // Advanced hooks for equipment rental features
 export {
   useEquipmentAvailability,

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Search, MapPin, Calendar, ArrowRight, ShieldCheck, Star, Zap } from 'lucide-react';
+import { useScrollReveal, useCountUp } from '../../hooks/useScrollReveal';
 
 interface HeroProps {
   onSearch: (query: string, location: string) => void;
@@ -31,15 +32,30 @@ const heroImages = [
 const popularSearches = ['Excavators', 'Power Drills', 'Cameras', 'DJ Equipment', 'Party Tents'];
 
 const stats = [
-  { value: '50K+', label: 'Equipment listed' },
-  { value: '120K+', label: 'Happy renters' },
-  { value: '98%', label: 'Satisfaction rate' },
-  { value: '$50K', label: 'Damage protection' },
+  { value: 50, suffix: 'K+', label: 'Equipment listed' },
+  { value: 120, suffix: 'K+', label: 'Happy renters' },
+  { value: 98, suffix: '%', label: 'Satisfaction rate' },
+  { value: 50, prefix: '$', suffix: 'K', label: 'Damage protection' },
 ];
+
+function Stat({ stat, active }: { stat: (typeof stats)[number]; active: boolean }) {
+  const count = useCountUp(stat.value, active);
+  return (
+    <div>
+      <div className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+        {stat.prefix ?? ''}
+        {count}
+        {stat.suffix ?? ''}
+      </div>
+      <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
+    </div>
+  );
+}
 
 export default function Hero({ onSearch }: HeroProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useState('');
+  const [statsRef, statsVisible] = useScrollReveal<HTMLDivElement>({ threshold: 0.3 });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,24 +63,27 @@ export default function Hero({ onSearch }: HeroProps) {
   };
 
   return (
-    <section className="relative bg-white dark:bg-gray-950 overflow-hidden">
+    <section className="relative bg-aurora bg-white dark:bg-gray-950 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16 lg:pt-40 lg:pb-20">
         {/* Eyebrow */}
-        <div className="flex justify-center mb-6">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-800 text-sm font-medium text-gray-600 dark:text-gray-300">
-            <span className="w-2 h-2 rounded-full bg-teal-500" />
+        <div className="flex justify-center mb-6 animate-fade-in-down">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-teal-200/70 dark:border-teal-800/50 bg-white/70 dark:bg-gray-900/50 backdrop-blur text-sm font-medium text-gray-700 dark:text-gray-200 shadow-soft">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75 animate-ping" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-teal-500" />
+            </span>
             The equipment rental marketplace
           </span>
         </div>
 
         {/* Headline */}
-        <h1 className="text-center text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6">
+        <h1 className="text-center text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6 text-balance animate-fade-in-up">
           Rent anything.
           <br />
-          <span className="text-teal-600 dark:text-teal-400">Build everything.</span>
+          <span className="text-gradient-animated">Build everything.</span>
         </h1>
 
-        <p className="text-center text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
+        <p className="text-center text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 text-pretty">
           From power tools to heavy machinery — rent verified equipment from owners near
           you, or earn by listing your own.
         </p>
@@ -72,7 +91,7 @@ export default function Hero({ onSearch }: HeroProps) {
         {/* Search */}
         <form
           onSubmit={handleSubmit}
-          className="max-w-3xl mx-auto mb-6 bg-white dark:bg-gray-900 rounded-2xl md:rounded-full shadow-lg ring-1 ring-gray-200 dark:ring-gray-800 p-2"
+          className="max-w-3xl mx-auto mb-6 bg-white dark:bg-gray-900 rounded-2xl md:rounded-full shadow-brand ring-1 ring-gray-200/80 dark:ring-gray-800 p-2 transition-shadow hover:shadow-brand-lg"
           role="search"
         >
           <div className="flex flex-col md:flex-row md:items-center md:divide-x divide-gray-200 dark:divide-gray-800">
@@ -113,7 +132,7 @@ export default function Hero({ onSearch }: HeroProps) {
             <div className="p-1 md:pl-3">
               <button
                 type="submit"
-                className="w-full md:w-auto flex items-center justify-center gap-2 px-7 py-3 bg-teal-600 text-white font-semibold rounded-xl md:rounded-full hover:bg-teal-700 transition-colors"
+                className="w-full md:w-auto flex items-center justify-center gap-2 px-7 py-3 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 bg-[length:200%_auto] hover:bg-[position:right_center] text-white font-semibold rounded-xl md:rounded-full shadow-brand transition-all duration-300"
               >
                 <Search className="w-5 h-5" />
                 <span className="md:hidden lg:inline">Search</span>
@@ -129,7 +148,7 @@ export default function Hero({ onSearch }: HeroProps) {
             <button
               key={item}
               onClick={() => onSearch(item, '')}
-              className="px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300 hover:border-gray-900 dark:hover:border-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="px-4 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300 hover:border-teal-500 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-teal-50/50 dark:hover:bg-teal-900/20 transition-colors"
             >
               {item}
             </button>
@@ -142,18 +161,18 @@ export default function Hero({ onSearch }: HeroProps) {
             <button
               key={image.label}
               onClick={() => onSearch(image.label, '')}
-              className="group relative aspect-[4/3] rounded-2xl overflow-hidden text-left focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
+              className="group relative aspect-[4/3] rounded-2xl overflow-hidden text-left shadow-soft hover:shadow-brand transition-shadow focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950"
             >
               <img
                 src={image.src}
                 alt={image.alt}
                 loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                <span className="text-white font-semibold">{image.label}</span>
-                <span className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-white font-semibold drop-shadow">{image.label}</span>
+                <span className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
                   <ArrowRight className="w-4 h-4 text-gray-900" />
                 </span>
               </div>
@@ -162,13 +181,13 @@ export default function Hero({ onSearch }: HeroProps) {
         </div>
 
         {/* Stats + trust row */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 border-t border-gray-100 dark:border-gray-800 pt-10">
+        <div
+          ref={statsRef}
+          className={`reveal ${statsVisible ? 'reveal-visible' : ''} flex flex-col lg:flex-row items-center justify-between gap-8 border-t border-gray-100 dark:border-gray-800 pt-10`}
+        >
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-12 gap-y-6">
             {stats.map((stat) => (
-              <div key={stat.label}>
-                <div className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{stat.value}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
-              </div>
+              <Stat key={stat.label} stat={stat} active={statsVisible} />
             ))}
           </div>
           <div className="flex flex-col sm:flex-row gap-x-8 gap-y-2 text-sm text-gray-500 dark:text-gray-400">

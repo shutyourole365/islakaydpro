@@ -30,6 +30,8 @@ import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import CommandPalette from './components/ui/CommandPalette';
 import BackToTop from './components/ui/BackToTop';
+import AnnouncementBar from './components/ui/AnnouncementBar';
+import Reveal from './components/ui/Reveal';
 import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
@@ -624,6 +626,10 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isLoadingEquipment, setIsLoadingEquipment] = useState(true);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(() => {
+    try { return localStorage.getItem('announcement_dismissed_v1') !== 'true'; }
+    catch { return true; }
+  });
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
@@ -1327,6 +1333,16 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       <InstallPrompt />
       <OfflineIndicator />
 
+      {showAnnouncement && currentPage === 'home' && (
+        <AnnouncementBar
+          onAction={() => setCurrentPage('browse')}
+          onDismiss={() => {
+            setShowAnnouncement(false);
+            try { localStorage.setItem('announcement_dismissed_v1', 'true'); } catch { /* ignore */ }
+          }}
+        />
+      )}
+
       {currentPage !== 'list-equipment' && (
         <Header
           onSearchClick={() => setIsSearchOpen(true)}
@@ -1335,6 +1351,8 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           onNavigate={handleNavigate}
           onListEquipment={handleListEquipment}
           onSignOut={handleSignOut}
+          onSelectCategory={(slug) => { setSearchCategory(slug); setCurrentPage('browse'); }}
+          offsetTop={showAnnouncement && currentPage === 'home'}
           currentPage={currentPage}
         />
       )}
@@ -1354,11 +1372,13 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
                 showDetailedPreview={true}
               />
 
-            <Categories
-              categories={categories}
-              onCategoryClick={handleCategoryClick}
-              onViewAll={() => setCurrentPage('browse')}
-            />
+            <Reveal>
+              <Categories
+                categories={categories}
+                onCategoryClick={handleCategoryClick}
+                onViewAll={() => setCurrentPage('browse')}
+              />
+            </Reveal>
 
             <FeaturedListings
               equipment={featuredEquipment}
@@ -1396,14 +1416,20 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               </section>
             )}
 
-            <HowItWorks onGetStarted={() => setCurrentPage('browse')} />
+            <Reveal>
+              <HowItWorks onGetStarted={() => setCurrentPage('browse')} />
+            </Reveal>
 
-            <Testimonials />
+            <Reveal>
+              <Testimonials />
+            </Reveal>
 
-            <CTASection
-              onGetStarted={() => { setAuthMode('signup'); setIsAuthOpen(true); }}
-              onLearnMore={() => setCurrentPage('host-resources')}
-            />
+            <Reveal>
+              <CTASection
+                onGetStarted={() => { setAuthMode('signup'); setIsAuthOpen(true); }}
+                onLearnMore={() => setCurrentPage('host-resources')}
+              />
+            </Reveal>
           </main>
 
           <Footer onNavigate={handleNavigate} />

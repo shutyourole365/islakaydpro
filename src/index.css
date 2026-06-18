@@ -66,7 +66,7 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-semibold rounded-full shadow-soft hover:shadow-glow transition-all duration-300 hover:scale-[1.02] active:scale-[0.98];
+    @apply relative inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 bg-[length:200%_auto] text-white font-semibold rounded-full shadow-brand hover:shadow-brand-lg hover:bg-[position:right_center] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-secondary {
@@ -83,6 +83,10 @@
 
   .card-hover {
     @apply card transition-all duration-300 hover:shadow-soft-lg hover:border-gray-200 dark:hover:border-gray-600 hover:-translate-y-1;
+  }
+
+  .card-glow {
+    @apply card transition-all duration-300 hover:shadow-brand hover:border-teal-200 dark:hover:border-teal-800/60 hover:-translate-y-1;
   }
 
   .input {
@@ -158,6 +162,38 @@
     @apply skeleton rounded-full;
   }
 
+  .text-gradient-animated {
+    @apply bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient;
+  }
+
+  /* Soft animated aurora glow used behind the hero */
+  .bg-aurora {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .bg-aurora::before {
+    content: '';
+    position: absolute;
+    inset: -20% -10% auto -10%;
+    height: 70%;
+    z-index: -1;
+    background:
+      radial-gradient(40% 50% at 20% 30%, rgba(20, 184, 166, 0.22), transparent 70%),
+      radial-gradient(45% 55% at 80% 20%, rgba(6, 182, 212, 0.20), transparent 70%),
+      radial-gradient(40% 45% at 60% 70%, rgba(16, 185, 129, 0.18), transparent 70%);
+    filter: blur(40px);
+    animation: aurora 18s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .dark .bg-aurora::before {
+    background:
+      radial-gradient(40% 50% at 20% 30%, rgba(20, 184, 166, 0.28), transparent 70%),
+      radial-gradient(45% 55% at 80% 20%, rgba(6, 182, 212, 0.24), transparent 70%),
+      radial-gradient(40% 45% at 60% 70%, rgba(16, 185, 129, 0.22), transparent 70%);
+  }
+
   .dot-pattern {
     background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
     background-size: 20px 20px;
@@ -186,6 +222,19 @@
 
   .slide-in-from-bottom-4 {
     --tw-enter-translate-y: 1rem;
+  }
+
+  /* Scroll-reveal: elements fade/slide in when they enter the viewport */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .text-balance {
@@ -365,6 +414,11 @@ input[type="number"] {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 

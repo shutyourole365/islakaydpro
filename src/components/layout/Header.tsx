@@ -27,6 +27,20 @@ import {
   PenSquare,
   Handshake,
   TrendingUp,
+  LayoutGrid,
+  HardHat,
+  Drill,
+  Camera,
+  Music,
+  Trees,
+  Truck,
+  Sparkles,
+  Lightbulb,
+  Dumbbell,
+  Home,
+  Plane,
+  PartyPopper,
+  ArrowRight,
 } from 'lucide-react';
 import NotificationsDropdown from '../notifications/NotificationsDropdown';
 import LogoPro from '../branding/LogoPro';
@@ -39,8 +53,25 @@ interface HeaderProps {
   onNavigate: (page: string) => void;
   onListEquipment: () => void;
   onSignOut: () => void;
+  onSelectCategory?: (slug: string) => void;
+  offsetTop?: boolean;
   currentPage: string;
 }
+
+const exploreCategories = [
+  { label: 'Construction', slug: 'construction', Icon: HardHat },
+  { label: 'Power Tools', slug: 'power-tools', Icon: Drill },
+  { label: 'Photography', slug: 'photography', Icon: Camera },
+  { label: 'Audio & DJ', slug: 'audio', Icon: Music },
+  { label: 'Landscaping', slug: 'landscaping', Icon: Trees },
+  { label: 'Events & Parties', slug: 'events', Icon: PartyPopper },
+  { label: 'Vehicles', slug: 'vehicles', Icon: Truck },
+  { label: 'Cleaning', slug: 'cleaning', Icon: Sparkles },
+  { label: 'Drones & Aerial', slug: 'drones', Icon: Plane },
+  { label: 'Lighting', slug: 'lighting', Icon: Lightbulb },
+  { label: 'Sports & Rec', slug: 'sports', Icon: Dumbbell },
+  { label: 'Home Improvement', slug: 'home-improvement', Icon: Home },
+];
 
 const companyLinks = [
   { label: 'About Us', page: 'about', Icon: Info },
@@ -75,6 +106,8 @@ export default function Header({
   onNavigate,
   onListEquipment,
   onSignOut,
+  onSelectCategory,
+  offsetTop = false,
   currentPage,
 }: HeaderProps) {
   const { user, profile } = useAuth();
@@ -85,6 +118,7 @@ export default function Header({
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isCompanyMenuOpen, setIsCompanyMenuOpen] = useState(false);
   const [isSupportMenuOpen, setIsSupportMenuOpen] = useState(false);
+  const [isExploreMenuOpen, setIsExploreMenuOpen] = useState(false);
   const unsubRef = useRef<(() => void) | null>(null);
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'My Account';
@@ -117,6 +151,14 @@ export default function Header({
     setIsNotificationsOpen(false);
     setIsCompanyMenuOpen(false);
     setIsSupportMenuOpen(false);
+    setIsExploreMenuOpen(false);
+  };
+
+  const handleCategorySelect = (slug: string) => {
+    setIsExploreMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    if (onSelectCategory) onSelectCategory(slug);
+    else onNavigate('browse');
   };
 
   useEffect(() => {
@@ -126,6 +168,7 @@ export default function Header({
       if (!target.closest('.notifications-menu')) setIsNotificationsOpen(false);
       if (!target.closest('.company-menu')) setIsCompanyMenuOpen(false);
       if (!target.closest('.support-menu')) setIsSupportMenuOpen(false);
+      if (!target.closest('.explore-menu')) setIsExploreMenuOpen(false);
     };
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -206,7 +249,9 @@ export default function Header({
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ${
+      className={`fixed left-0 right-0 z-50 transition-all duration-300 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ${
+        offsetTop ? 'top-10' : 'top-0'
+      } ${
         isScrolled
           ? 'shadow-lg dark:shadow-gray-950/50'
           : 'border-b border-gray-100 dark:border-gray-800'
@@ -220,6 +265,54 @@ export default function Header({
             </button>
 
             <nav className="hidden lg:flex items-center gap-7" aria-label="Primary">
+              {/* Explore mega-menu */}
+              <div className="relative explore-menu">
+                <button
+                  onClick={() => setIsExploreMenuOpen(!isExploreMenuOpen)}
+                  aria-haspopup="menu"
+                  aria-expanded={isExploreMenuOpen}
+                  className={`flex items-center gap-1 ${navItemClass()}`}
+                >
+                  <LayoutGrid className="w-4 h-4" />
+                  Explore
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isExploreMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isExploreMenuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute top-full left-0 mt-3 w-[640px] bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-5 z-50 animate-fade-in"
+                  >
+                    <div className="flex items-center justify-between px-2 pb-3 mb-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                        Browse by category
+                      </span>
+                      <button
+                        onClick={() => { onNavigate('browse'); setIsExploreMenuOpen(false); }}
+                        className="inline-flex items-center gap-1 text-sm font-medium text-teal-600 dark:text-teal-400 hover:gap-2 transition-all"
+                      >
+                        View all <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1">
+                      {exploreCategories.map(({ label, slug, Icon }) => (
+                        <button
+                          key={slug}
+                          role="menuitem"
+                          onClick={() => handleCategorySelect(slug)}
+                          className="group flex items-center gap-3 px-3 py-2.5 rounded-xl text-left hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
+                        >
+                          <span className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/40 dark:to-emerald-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:from-teal-500 group-hover:to-emerald-500 group-hover:text-white transition-all">
+                            <Icon className="w-5 h-5" />
+                          </span>
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-200 group-hover:text-teal-700 dark:group-hover:text-teal-300">
+                            {label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               <button onClick={() => onNavigate('browse')} className={navItemClass('browse')}>
                 Browse Equipment
               </button>
@@ -263,7 +356,7 @@ export default function Header({
                   className={`hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all ${
                     showTransparent
                       ? 'bg-white text-gray-900 hover:bg-gray-100'
-                      : 'bg-teal-500 text-white hover:bg-teal-600'
+                      : 'bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 bg-[length:200%_auto] hover:bg-[position:right_center] text-white shadow-brand hover:shadow-brand-lg'
                   }`}
                 >
                   <Plus className="w-4 h-4" />
@@ -413,10 +506,10 @@ export default function Header({
                 </button>
                 <button
                   onClick={() => onAuthClick('signup')}
-                  className={`px-4 py-2.5 rounded-full text-sm font-medium transition-all ${
+                  className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
                     showTransparent
                       ? 'bg-white text-gray-900 hover:bg-gray-100'
-                      : 'bg-teal-500 text-white hover:bg-teal-600'
+                      : 'bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 bg-[length:200%_auto] hover:bg-[position:right_center] text-white shadow-brand hover:shadow-brand-lg'
                   }`}
                 >
                   Get Started
@@ -476,6 +569,25 @@ export default function Header({
               ))}
             </nav>
 
+            {/* Category quick-grid */}
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
+              <span className="block px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+                Categories
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {exploreCategories.slice(0, 8).map(({ label, slug, Icon }) => (
+                  <button
+                    key={slug}
+                    onClick={() => handleCategorySelect(slug)}
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-800 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-colors"
+                  >
+                    <Icon className="w-4 h-4 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                    <span className="truncate">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="flex items-center justify-between px-4 py-2 border-t border-gray-100 dark:border-gray-800 pt-4">
               <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Appearance</span>
               <ThemeToggle variant="dropdown" />
@@ -488,7 +600,7 @@ export default function Header({
                     onListEquipment();
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full py-3 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 text-white font-medium shadow-brand transition-colors"
                 >
                   List Equipment
                 </button>
@@ -547,7 +659,7 @@ export default function Header({
                     onAuthClick('signup');
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full py-3 rounded-xl bg-teal-500 text-white font-medium hover:bg-teal-600 transition-colors"
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 text-white font-medium shadow-brand transition-colors"
                 >
                   Get Started
                 </button>

@@ -35,6 +35,32 @@ export default {
           900: '#064e3b',
           950: '#022c22',
         },
+        // Supporting hue for richer brand gradients (teal -> emerald -> cyan)
+        secondary: {
+          50: '#ecfeff',
+          100: '#cffafe',
+          200: '#a5f3fc',
+          300: '#67e8f9',
+          400: '#22d3ee',
+          500: '#06b6d4',
+          600: '#0891b2',
+          700: '#0e7490',
+          800: '#155e75',
+          900: '#164e63',
+          950: '#083344',
+        },
+        // Layered neutral surfaces for a deeper, more premium dark mode
+        surface: {
+          50: '#f8fafa',
+          100: '#f1f5f5',
+          800: '#16201f',
+          900: '#0d1716',
+          950: '#070f0e',
+        },
+      },
+      backgroundImage: {
+        'brand-gradient': 'linear-gradient(135deg, #14b8a6 0%, #10b981 50%, #06b6d4 100%)',
+        'brand-gradient-soft': 'linear-gradient(135deg, #f0fdfa 0%, #ecfeff 100%)',
       },
       boxShadow: {
         'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
@@ -42,6 +68,8 @@ export default {
         'soft-xl': '0 20px 60px -5px rgba(0, 0, 0, 0.12), 0 8px 25px -5px rgba(0, 0, 0, 0.04)',
         'glow': '0 0 20px rgba(20, 184, 166, 0.3)',
         'glow-lg': '0 0 40px rgba(20, 184, 166, 0.4)',
+        'brand': '0 10px 30px -10px rgba(13, 148, 136, 0.35)',
+        'brand-lg': '0 20px 50px -12px rgba(13, 148, 136, 0.45)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
@@ -54,8 +82,19 @@ export default {
         'pulse-soft': 'pulseSoft 2s infinite',
         'float': 'float 3s ease-in-out infinite',
         'shimmer': 'shimmer 2s infinite',
+        'gradient': 'gradientShift 8s ease infinite',
+        'aurora': 'aurora 18s ease-in-out infinite',
       },
       keyframes: {
+        gradientShift: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        aurora: {
+          '0%, 100%': { transform: 'translate3d(0,0,0) scale(1)' },
+          '33%': { transform: 'translate3d(2%, -3%, 0) scale(1.05)' },
+          '66%': { transform: 'translate3d(-2%, 2%, 0) scale(0.97)' },
+        },
         fadeIn: {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
