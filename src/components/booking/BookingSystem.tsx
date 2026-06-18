@@ -28,6 +28,9 @@ import { createCheckoutSession } from '../../services/payments';
 import { sendBookingConfirmation } from '../../services/email';
 import { useToast } from '../ui/Toast';
 
+const toLocalDateStr = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
 interface BookingSystemProps {
   equipment: Equipment;
   onClose: () => void;
@@ -184,7 +187,7 @@ export default function BookingSystem({
   // Load this equipment's existing booked/blocked date ranges so the calendar can show them
   useEffect(() => {
     let active = true;
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = toLocalDateStr(today);
     getEquipmentAvailability(equipment.id, todayStr)
       .then((ranges) => { if (active) setBlockedRanges(ranges); })
       .catch(() => { if (active) setBlockedRanges([]); });
@@ -192,7 +195,7 @@ export default function BookingSystem({
   }, [equipment.id, today]);
 
   const isDateBlocked = (date: Date) => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = toLocalDateStr(date);
     return blockedRanges.some((range) => dateStr >= range.start_date && dateStr <= range.end_date);
   };
 
@@ -252,12 +255,11 @@ export default function BookingSystem({
     }
     let active = true;
     setAvailability('checking');
-    const start = selectedStart.toISOString().split('T')[0];
-    const end = selectedEnd.toISOString().split('T')[0];
+    const start = toLocalDateStr(selectedStart);
+    const end = toLocalDateStr(selectedEnd);
     checkAvailability(equipment.id, start, end)
       .then((isFree) => { if (active) setAvailability(isFree ? 'available' : 'unavailable'); })
-      // Fail open: if the check itself errors, don't block — createBooking remains the source of truth
-      .catch(() => { if (active) setAvailability('available'); });
+      .catch(() => { if (active) setAvailability('unavailable'); });
     return () => { active = false; };
   }, [selectedStart, selectedEnd, equipment.id]);
 
@@ -299,8 +301,8 @@ export default function BookingSystem({
         equipment_id: equipment.id,
         renter_id: user.id as UserId,
         owner_id: equipment.owner_id,
-        start_date: selectedStart.toISOString().split('T')[0],
-        end_date: selectedEnd.toISOString().split('T')[0],
+        start_date: toLocalDateStr(selectedStart),
+        end_date: toLocalDateStr(selectedEnd),
         total_days: rentalDays,
         daily_rate: equipment.daily_rate,
         subtotal: pricing.basePrice,

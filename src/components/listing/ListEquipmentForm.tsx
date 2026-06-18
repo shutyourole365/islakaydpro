@@ -125,6 +125,7 @@ export default function ListEquipmentForm({
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    if (fileInputRef.current) fileInputRef.current.value = '';
     if (files.length === 0) return;
 
     if (!user) {
@@ -172,11 +173,10 @@ export default function ListEquipmentForm({
       if (uploadedUrls.length > 0) {
         setFormData(prev => ({ ...prev, images: [...prev.images, ...uploadedUrls] }));
       }
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
