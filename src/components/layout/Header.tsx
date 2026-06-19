@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getUnreadNotificationCount, subscribeToNotifications } from '../../services/database';
+import { getUnreadNotificationCount, subscribeToNotifications, getUnreadMessageCount, subscribeToMessages } from '../../services/database';
 import {
   Search,
   Menu,
@@ -79,6 +79,8 @@ export default function Header({
 }: HeaderProps) {
   const { user, profile } = useAuth();
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+  const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+  const msgUnsubRef = useRef<(() => void) | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -105,6 +107,18 @@ export default function Header({
     unsubRef.current = unsub?.unsubscribe ? () => unsub.unsubscribe() : null;
     return () => { unsubRef.current?.(); };
   }, [user]);
+
+  // Real-time unread message count
+  useEffect(() => {
+    if (!user) { setUnreadMsgCount(0); return; }
+    getUnreadMessageCount(user.id).then(setUnreadMsgCount).catch(() => {});
+    // Subscribe to new messages for this user
+    const channel = subscribeToMessages('all', () => {
+      getUnreadMessageCount(user.id).then(setUnreadMsgCount).catch(() => {});
+    });
+    msgUnsubRef.current = channel?.unsubscribe ? () => channel.unsubscribe() : null;
+    return () => { msgUnsubRef.current?.(); };
+  }, [user?.id]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -283,15 +297,20 @@ export default function Header({
                     <Heart className="w-5 h-5" />
                   </button>
                   <button
-                    aria-label="Messages"
+                    aria-label={unreadMsgCount > 0 ? `Messages, ${unreadMsgCount} unread` : 'Messages'}
                     onClick={() => onNavigate('dashboard')}
-                    className={`p-2.5 rounded-full transition-colors ${
+                    className={`p-2.5 rounded-full transition-colors relative ${
                       showTransparent
                         ? 'text-white hover:bg-white/10'
                         : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
                     <MessageSquare className="w-5 h-5" />
+                    {unreadMsgCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-teal-500 text-white text-[10px] font-bold rounded-full">
+                        {unreadMsgCount > 9 ? '9+' : unreadMsgCount}
+                      </span>
+                    )}
                   </button>
                   <div className="relative notifications-menu">
                     <button
@@ -559,3 +578,4 @@ export default function Header({
     </header>
   );
 }
+
