@@ -112,6 +112,7 @@ const QuickBook = lazy(() => import('./components/booking/QuickBook'));
 const AISearchEngine = lazy(() => import('./components/search/AISearchEngine'));
 const PhotoMessaging = lazy(() => import('./components/messaging/PhotoMessaging'));
 const EnhancedReviewSystem = lazy(() => import('./components/reviews/EnhancedReviewSystem'));
+const PostBookingReviewPrompt = lazy(() => import('./components/reviews/PostBookingReviewPrompt'));
 const PWAEnhancedFeatures = lazy(() => import('./components/pwa/PWAEnhancedFeatures'));
 const MultiPaymentSystem = lazy(() => import('./components/payments/MultiPaymentSystem'));
 
@@ -665,6 +666,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isAISearchOpen, setIsAISearchOpen] = useState(false);
   const [isPhotoMessagingOpen, setIsPhotoMessagingOpen] = useState(false);
   const [isEnhancedReviewOpen, setIsEnhancedReviewOpen] = useState(false);
+  const [postBookingPromptBooking, setPostBookingPromptBooking] = useState<{ booking: import('./types').Booking; equipment: import('./types').Equipment } | null>(null);
   const [isMultiPaymentOpen, setIsMultiPaymentOpen] = useState(false);
   const [reviewEquipment, setReviewEquipment] = useState<Equipment | null>(null);
   const [reviewBookingId, setReviewBookingId] = useState<string | null>(null);
@@ -1479,9 +1481,9 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onListEquipment={handleListEquipment}
             onNavigate={(page: string) => setCurrentPage(page as PageType)}
             onLeaveReview={(equipment, bookingId) => {
-              setReviewEquipment(equipment);
-              setReviewBookingId(bookingId);
-              setIsEnhancedReviewOpen(true);
+              // Use quick prompt if we have equipment object, else fall back to full modal
+              const mockBooking = { id: bookingId } as import('./types').Booking;
+              setPostBookingPromptBooking({ booking: mockBooking, equipment });
             }}
           />
           <Footer onNavigate={handleNavigate} />
@@ -2307,6 +2309,33 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       )}
 
       {/* Enhanced Review System Modal */}
+      {postBookingPromptBooking && (
+        <Suspense fallback={null}>
+          <PostBookingReviewPrompt
+            booking={postBookingPromptBooking.booking}
+            equipment={postBookingPromptBooking.equipment}
+            onSubmit={async (rating, comment) => {
+              const { booking, equipment } = postBookingPromptBooking;
+              if (!user) return;
+              await createReview({
+                booking_id: booking.id,
+                equipment_id: equipment.id,
+                reviewer_id: user.id,
+                reviewee_id: equipment.owner_id,
+                rating,
+                title: null,
+                comment: comment || null,
+                is_equipment_review: true,
+                equipment_condition: rating,
+                communication: rating,
+              });
+              addToast({ type: 'success', title: 'Review submitted!', message: 'Thanks for helping the community.' });
+            }}
+            onDismiss={() => setPostBookingPromptBooking(null)}
+          />
+        </Suspense>
+      )}
+
       {isEnhancedReviewOpen && reviewEquipment && reviewBookingId && (
         <Suspense fallback={<PageLoader />}>
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -3073,3 +3102,4 @@ function App() {
 }
 
 export default App;
+
