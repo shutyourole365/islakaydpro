@@ -52,6 +52,9 @@ import {
   getConversations,
   getMessages,
   sendMessage,
+  markMessagesRead,
+  subscribeToMessages,
+  getUnreadMessageCount,
   getUserAnalytics,
   updateProfile,
   updateBookingStatus,
@@ -105,6 +108,8 @@ export default function Dashboard({
   const [ownerBookings, setOwnerBookings] = useState<Booking[]>([]);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [reviewedBookingIds, setReviewedBookingIds] = useState<Set<string>>(new Set());
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [messagesEndRef] = useState<React.RefObject<HTMLDivElement>>(() => ({ current: null }));
 
   // Use transition for non-urgent updates
   const [, startTransition] = useTransition();
@@ -158,11 +163,51 @@ export default function Dashboard({
     }
   }, [profile]);
 
+  // Real-time message subscription with read receipts
   useEffect(() => {
-    if (selectedConversation) {
-      getMessages(selectedConversation).then(setMessages);
-    }
-  }, [selectedConversation]);
+    if (!selectedConversation || !user) return;
+
+    // Load messages and mark as read
+    getMessages(selectedConversation).then((msgs) => {
+      setMessages(msgs);
+      // Mark unread messages as read
+      const unreadIds = msgs
+        .filter(m => m.sender_id !== user.id && !m.read)
+        .map(m => m.id);
+      if (unreadIds.length > 0) {
+        markMessagesRead(unreadIds).then(() => {
+          // Refresh unread count
+          getUnreadMessageCount(user.id).then(setUnreadMessageCount);
+          // Update conversation unread badge
+          setConversations(prev =>
+            prev.map(c => c.id === selectedConversation ? { ...c, unread_count: 0 } : c)
+          );
+        });
+      }
+    });
+
+    // Subscribe to new messages
+    const subscription = subscribeToMessages(selectedConversation, (newMsg) => {
+      setMessages(prev => {
+        if (prev.find(m => m.id === newMsg.id)) return prev;
+        return [...prev, newMsg];
+      });
+      // Auto-mark as read if from other user
+      if (newMsg.sender_id !== user?.id) {
+        markMessagesRead([newMsg.id]).catch(() => {});
+      }
+    });
+
+    return () => {
+      subscription?.unsubscribe?.();
+    };
+  }, [selectedConversation, user]);
+
+  // Load unread message count on mount
+  useEffect(() => {
+    if (!user) return;
+    getUnreadMessageCount(user.id).then(setUnreadMessageCount);
+  }, [user]);
 
   const handleRemoveFavorite = async (equipmentId: string) => {
     if (!user) return;
@@ -187,18 +232,32 @@ export default function Dashboard({
     const conversation = conversations.find(c => c.id === selectedConversation);
     if (!conversation) return;
 
-    const receiverId = conversation.participants?.find(p => p.user_id !== user.id)?.user_id;
+    const receiverId = (conversation.participants as Array<{user_id: string}> | undefined)
+      ?.find(p => p.user_id !== user.id)?.user_id;
     if (!receiverId) return;
 
-    const message = await sendMessage({
-      conversationId: selectedConversation,
-      senderId: user.id,
-      receiverId,
-      content: newMessage.trim(),
-    });
-
-    setMessages(prev => [...prev, message]);
+    const text = newMessage.trim();
     setNewMessage('');
+
+    try {
+      const message = await sendMessage({
+        conversationId: selectedConversation,
+        senderId: user.id,
+        receiverId,
+        content: text,
+      });
+      setMessages(prev => [...prev, message]);
+      // Update conversation list last message
+      setConversations(prev =>
+        prev.map(c => c.id === selectedConversation
+          ? { ...c, last_message: { content: text } as Message }
+          : c
+        )
+      );
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      setNewMessage(text); // restore on error
+    }
   };
 
   const handleSaveSettings = async () => {
@@ -231,7 +290,7 @@ export default function Dashboard({
     { id: 'bookings', label: 'My Bookings', icon: Calendar, badge: bookings.filter(b => b.status === 'pending').length },
     { id: 'listings', label: 'My Listings', icon: Package, badge: pendingOwnerBookings.length },
     { id: 'favorites', label: 'Favorites', icon: Heart, badge: favorites.length },
-    { id: 'messages', label: 'Messages', icon: MessageSquare },
+    { id: 'messages', label: 'Messages', icon: MessageSquare, badge: unreadMessageCount },
     { id: 'notifications', label: 'Notifications', icon: Activity, badge: notifications.filter(n => !n.is_read).length },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'settings', label: 'Settings', icon: Settings },
@@ -877,10 +936,15 @@ export default function Dashboard({
                                 }`}
                               >
                                 <p>{msg.content}</p>
-                                <p className={`text-xs mt-1 ${
+                                <p className={`text-xs mt-1 flex items-center gap-1 ${
                                   msg.sender_id === user?.id ? 'text-teal-100' : 'text-gray-500'
                                 }`}>
                                   {formatRelativeTime(msg.created_at)}
+                                  {msg.sender_id === user?.id && (
+                                    <span title={msg.read ? 'Read' : 'Delivered'}>
+                                      {msg.read ? '✓✓' : '✓'}
+                                    </span>
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -1310,3 +1374,4 @@ function VerificationItem({ icon: Icon, title, description, verified }: {
     </div>
   );
 }
+
