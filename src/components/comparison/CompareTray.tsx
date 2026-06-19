@@ -1,6 +1,9 @@
 import { X, Scale, ArrowRight } from 'lucide-react';
 import type { Equipment } from '../../types';
 
+const FALLBACK_IMAGE =
+  'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=200';
+
 interface CompareTrayProps {
   items: Equipment[];
   /** Max comparable items (matches the handler cap in App). */
@@ -50,7 +53,7 @@ export default function CompareTray({ items, max = 4, onRemove, onClear, onCompa
                 className="group relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700"
                 title={item.title}
               >
-                <img src={item.images[0]} alt={item.title} className="w-full h-full object-cover" />
+                <img src={item.images?.[0] || FALLBACK_IMAGE} alt={item.title} className="w-full h-full object-cover" />
                 <button
                   onClick={() => onRemove(item.id)}
                   aria-label={`Remove ${item.title} from comparison`}

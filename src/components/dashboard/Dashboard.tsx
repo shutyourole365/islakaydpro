@@ -375,7 +375,9 @@ export default function Dashboard({
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-gray-900 dark:text-white truncate">{profile?.full_name || 'User'}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Member since {new Date(profile?.created_at || '').getFullYear()}</p>
+                  {profile?.created_at && !Number.isNaN(new Date(profile.created_at).getFullYear()) && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Member since {new Date(profile.created_at).getFullYear()}</p>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -676,7 +678,7 @@ export default function Dashboard({
                                   )}
                                 <button
                                   onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
-                                  className="flex items-center gap-2 px-4 py-2 text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 rounded-xl transition-colors"
+                                  className="flex items-center gap-2 px-4 py-2 text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-xl transition-colors"
                                 >
                                   View Details
                                   <ChevronRight className="w-4 h-4" aria-hidden="true" />
@@ -1024,7 +1026,7 @@ export default function Dashboard({
                         {notifications.map((notification) => (
                           <div
                             key={notification.id}
-                            className={`p-4 flex items-start gap-4 ${!notification.is_read ? 'bg-teal-50/50' : ''}`}
+                            className={`p-4 flex items-start gap-4 ${!notification.is_read ? 'bg-teal-50/50 dark:bg-teal-900/20' : ''}`}
                           >
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                               notification.type.includes('booking') ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400' :
