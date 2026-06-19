@@ -2313,7 +2313,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           <PostBookingReviewPrompt
             equipment={postBookingPromptBooking.equipment}
             onSubmit={async (rating, comment) => {
-              const { booking, equipment } = postBookingPromptBooking;
+              const { equipment } = postBookingPromptBooking;
               if (!user) return;
               await createReview({
                 booking_id: postBookingPromptBooking.booking.id,
