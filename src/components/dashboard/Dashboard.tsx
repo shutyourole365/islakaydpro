@@ -631,7 +631,7 @@ export default function Dashboard({
                     </button>
                   </div>
                 ) : (
-                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100">
+                  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
                     {filteredBookings.map((booking) => (
                       <div key={booking.id} className="p-6">
                         <div className="flex items-start gap-4">
@@ -712,7 +712,7 @@ export default function Dashboard({
                     <div className="p-4 border-b border-gray-100 dark:border-gray-700">
                       <h3 className="font-semibold text-gray-900 dark:text-white">Pending Requests ({pendingOwnerBookings.length})</h3>
                     </div>
-                    <div className="divide-y divide-gray-100">
+                    <div className="divide-y divide-gray-100 dark:divide-gray-700">
                       {pendingOwnerBookings.map((booking) => (
                         <div key={booking.id} className="p-4">
                           <div className="flex items-center gap-4">
@@ -894,7 +894,7 @@ export default function Dashboard({
                             }`}
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                                 <Users className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                               </div>
                               <div className="flex-1 min-w-0">
@@ -1022,7 +1022,7 @@ export default function Dashboard({
                         <p className="text-gray-600 dark:text-gray-300">You're all caught up!</p>
                       </div>
                     ) : (
-                      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100">
+                      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 divide-y divide-gray-100 dark:divide-gray-700">
                         {notifications.map((notification) => (
                           <div
                             key={notification.id}
@@ -1106,7 +1106,7 @@ export default function Dashboard({
                   <div className="p-6 space-y-4">
                     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                           <Lock className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div>
@@ -1121,7 +1121,7 @@ export default function Dashboard({
 
                     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                           <Smartphone className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div>
@@ -1133,8 +1133,8 @@ export default function Dashboard({
                       </div>
                       <button className={`px-4 py-2 font-medium rounded-lg transition-colors ${
                         profile?.two_factor_enabled
-                          ? 'text-red-600 dark:text-red-400 hover:bg-red-50'
-                          : 'text-teal-600 dark:text-teal-400 hover:bg-teal-50'
+                          ? 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30'
+                          : 'text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/30'
                       }`}
                      
                       >
@@ -1351,7 +1351,7 @@ function VerificationItem({ icon: Icon, title, description, verified }: {
     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl">
       <div className="flex items-center gap-4">
         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-          verified ? 'bg-green-100 dark:bg-green-900/40' : 'bg-gray-200'
+          verified ? 'bg-green-100 dark:bg-green-900/40' : 'bg-gray-200 dark:bg-gray-700'
         }`}>
           <Icon className={`w-5 h-5 ${verified ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-300'}`} />
         </div>

@@ -404,7 +404,7 @@ export default function AnalyticsDashboard({
         <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Recent Activity</h3>
         <div className="space-y-4">
           {data.recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                 activity.type === 'booking' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
                 activity.type === 'payment' ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' :
