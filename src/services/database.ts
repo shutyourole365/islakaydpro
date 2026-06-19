@@ -656,6 +656,52 @@ export function subscribeToMessages(conversationId: string, callback: (message: 
     .subscribe();
 }
 
+// Mark specific messages as read
+export async function markMessagesRead(messageIds: string[]): Promise<void> {
+  if (!messageIds.length) return;
+  const { error } = await supabase
+    .from('messages')
+    .update({ read: true })
+    .in('id', messageIds);
+  if (error) console.error('markMessagesRead error:', error);
+}
+
+// Get total unread message count for a user
+export async function getUnreadMessageCount(userId: string): Promise<number> {
+  const { count, error } = await supabase
+    .from('messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('receiver_id', userId)
+    .eq('read', false);
+  if (error) return 0;
+  return count ?? 0;
+}
+
+// Get bookings starting tomorrow (for reminder notifications)
+export async function getBookingsStartingTomorrow(): Promise<Array<{
+  id: string;
+  renter_id: string;
+  start_date: string;
+  equipment: { title: string };
+}>> {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .select('id, renter_id, start_date, equipment:equipment_id(title)')
+    .eq('status', 'confirmed')
+    .gte('start_date', tomorrowStr + 'T00:00:00')
+    .lte('start_date', tomorrowStr + 'T23:59:59');
+
+  if (error) {
+    console.error('getBookingsStartingTomorrow error:', error);
+    return [];
+  }
+  return (data ?? []) as Array<{ id: string; renter_id: string; start_date: string; equipment: { title: string } }>;
+}
+
 // ============================================
 // Trust Score Functions
 // ============================================
@@ -1038,4 +1084,5 @@ export async function trackPriceChange(equipmentId: string, oldPrice: number, ne
     }
   }
 }
+
 
