@@ -699,7 +699,7 @@ export async function getBookingsStartingTomorrow(): Promise<Array<{
     console.error('getBookingsStartingTomorrow error:', error);
     return [];
   }
-  return (data ?? []) as Array<{ id: string; renter_id: string; start_date: string; equipment: { title: string } }>;
+  return (data ?? []) as unknown as Array<{ id: string; renter_id: string; start_date: string; equipment: { title: string } }>;
 }
 
 // ============================================
