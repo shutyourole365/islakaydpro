@@ -106,12 +106,12 @@ export default function EquipmentDetail({
     <div className="fixed inset-0 z-[100] flex items-start justify-center sm:p-4 overflow-y-auto">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-5xl my-0 sm:my-6 bg-white sm:rounded-3xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-5xl my-0 sm:my-6 bg-white dark:bg-gray-800 sm:rounded-3xl shadow-2xl overflow-hidden">
         {/* Top bar */}
-        <div className="sticky top-0 z-20 flex items-center justify-between px-5 py-3 bg-white/95 backdrop-blur border-b border-gray-100">
+        <div className="sticky top-0 z-20 flex items-center justify-between px-5 py-3 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-b border-gray-100 dark:border-gray-700">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
             Back
@@ -119,14 +119,14 @@ export default function EquipmentDetail({
           <div className="flex items-center gap-1.5">
             <button
               onClick={() => setShowShareModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <Share2 className="w-4 h-4" /> Share
             </button>
             <button
               onClick={onFavoriteToggle}
               aria-label="Toggle favorite"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
               {isFavorite ? 'Saved' : 'Save'}
@@ -134,7 +134,7 @@ export default function EquipmentDetail({
             <button
               onClick={onClose}
               aria-label="Close"
-              className="p-2 rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -143,12 +143,12 @@ export default function EquipmentDetail({
 
         <div className="px-5 sm:px-8 pt-6">
           {/* Title */}
-          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">{equipment.title}</h1>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 mb-5">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-white mb-2">{equipment.title}</h1>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 dark:text-gray-200 mb-5">
             {reviewCount > 0 && (
               <>
                 <span className="flex items-center gap-1 font-medium">
-                  <Star className="w-4 h-4 fill-gray-900 text-gray-900" />
+                  <Star className="w-4 h-4 fill-gray-900 dark:fill-white text-gray-900 dark:text-white" />
                   {ratingValue.toFixed(1)}
                 </span>
                 <span className="text-gray-400">·</span>
@@ -156,7 +156,7 @@ export default function EquipmentDetail({
                 <span className="text-gray-400">·</span>
               </>
             )}
-            <span className="flex items-center gap-1 text-gray-600">
+            <span className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
               <MapPin className="w-4 h-4" /> {equipment.location || 'Location on request'}
             </span>
           </div>
@@ -182,7 +182,7 @@ export default function EquipmentDetail({
               {images.length > 1 && (
                 <button
                   onClick={() => setLightboxIndex(0)}
-                  className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white text-gray-900 text-sm font-medium rounded-lg border border-gray-900/10 shadow-sm hover:bg-gray-50 transition-colors"
+                  className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm font-medium rounded-lg border border-gray-900/10 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <Grid3x3 className="w-4 h-4" /> Show all photos
                 </button>
@@ -194,28 +194,28 @@ export default function EquipmentDetail({
             {/* Left: content */}
             <div className="lg:col-span-2">
               {/* Badges */}
-              <div className="flex flex-wrap gap-2 pb-6 border-b border-gray-100">
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 text-teal-700 rounded-full text-sm font-medium">
+              <div className="flex flex-wrap gap-2 pb-6 border-b border-gray-100 dark:border-gray-700">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full text-sm font-medium">
                   <Shield className="w-4 h-4" /> Verified owner
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-sm font-medium capitalize">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-full text-sm font-medium capitalize">
                   <CheckCircle2 className="w-4 h-4" /> {equipment.condition} condition
                 </span>
-                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-sm font-medium">
                   <Truck className="w-4 h-4" /> Delivery available
                 </span>
               </div>
 
               {/* Owner */}
-              <div className="flex items-center gap-4 py-6 border-b border-gray-100">
+              <div className="flex items-center gap-4 py-6 border-b border-gray-100 dark:border-gray-700">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white font-bold overflow-hidden">
                   {equipment.owner?.avatar_url
                     ? <img src={equipment.owner.avatar_url} alt="" className="w-full h-full object-cover" />
                     : (equipment.owner?.full_name?.charAt(0) || 'O')}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">Hosted by {equipment.owner?.full_name || 'the owner'}</p>
-                  <p className="text-sm text-gray-500 flex items-center gap-1">
+                  <p className="font-semibold text-gray-900 dark:text-white">Hosted by {equipment.owner?.full_name || 'the owner'}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                     {(equipment.owner?.rating ?? 5).toFixed(1)} · {equipment.owner?.total_reviews ?? 0} reviews
                     {equipment.owner?.is_verified && <span className="ml-1 inline-flex items-center gap-1 text-teal-600"><Shield className="w-3.5 h-3.5" /> Verified</span>}
@@ -225,19 +225,19 @@ export default function EquipmentDetail({
 
               {/* Description */}
               {equipment.description && (
-                <div className="py-6 border-b border-gray-100">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-3">About this equipment</h2>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">{equipment.description}</p>
+                <div className="py-6 border-b border-gray-100 dark:border-gray-700">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">About this equipment</h2>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">{equipment.description}</p>
                 </div>
               )}
 
               {/* Features */}
               {equipment.features.length > 0 && (
-                <div className="py-6 border-b border-gray-100">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">What's included</h2>
+                <div className="py-6 border-b border-gray-100 dark:border-gray-700">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">What's included</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {equipment.features.map((f, i) => (
-                      <div key={i} className="flex items-center gap-3 text-gray-700">
+                      <div key={i} className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
                         <CheckCircle2 className="w-5 h-5 text-teal-500 flex-shrink-0" /> {f}
                       </div>
                     ))}
@@ -247,13 +247,13 @@ export default function EquipmentDetail({
 
               {/* Specifications */}
               {Object.keys(equipment.specifications).length > 0 && (
-                <div className="py-6 border-b border-gray-100">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h2>
+                <div className="py-6 border-b border-gray-100 dark:border-gray-700">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Specifications</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
                     {Object.entries(equipment.specifications).map(([k, v]) => (
-                      <div key={k} className="flex justify-between py-2 border-b border-gray-50">
-                        <span className="text-gray-500 capitalize">{k}</span>
-                        <span className="font-medium text-gray-900">{v}</span>
+                      <div key={k} className="flex justify-between py-2 border-b border-gray-50 dark:border-gray-700">
+                        <span className="text-gray-500 dark:text-gray-400 capitalize">{k}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">{v}</span>
                       </div>
                     ))}
                   </div>
@@ -263,8 +263,8 @@ export default function EquipmentDetail({
               {/* Reviews */}
               <div className="py-6">
                 <div className="flex items-center gap-2 mb-6">
-                  <Star className="w-5 h-5 fill-gray-900 text-gray-900" />
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <Star className="w-5 h-5 fill-gray-900 dark:fill-white text-gray-900 dark:text-white" />
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {ratingValue > 0 ? `${ratingValue.toFixed(1)} · ${reviewCount} review${reviewCount === 1 ? '' : 's'}` : 'No reviews yet'}
                   </h2>
                 </div>
@@ -273,9 +273,9 @@ export default function EquipmentDetail({
                   <div className="grid sm:grid-cols-2 gap-x-10 gap-y-2 mb-8 max-w-md">
                     {distribution.map(({ star, pct, count }) => (
                       <div key={star} className="flex items-center gap-3 text-sm">
-                        <span className="w-3 text-gray-600">{star}</span>
-                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-gray-900 rounded-full" style={{ width: `${pct}%` }} />
+                        <span className="w-3 text-gray-600 dark:text-gray-300">{star}</span>
+                        <div className="flex-1 h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="h-full bg-gray-900 dark:bg-white rounded-full" style={{ width: `${pct}%` }} />
                         </div>
                         <span className="w-6 text-right text-xs text-gray-400">{count}</span>
                       </div>
@@ -288,16 +288,16 @@ export default function EquipmentDetail({
                     {[0, 1].map((i) => (
                       <div key={i} className="animate-pulse space-y-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gray-200" />
-                          <div className="space-y-1.5"><div className="h-3 w-24 bg-gray-200 rounded" /><div className="h-2.5 w-16 bg-gray-100 rounded" /></div>
+                          <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700" />
+                          <div className="space-y-1.5"><div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded" /><div className="h-2.5 w-16 bg-gray-100 dark:bg-gray-700/60 rounded" /></div>
                         </div>
-                        <div className="h-3 w-full bg-gray-100 rounded" />
-                        <div className="h-3 w-4/5 bg-gray-100 rounded" />
+                        <div className="h-3 w-full bg-gray-100 dark:bg-gray-700/60 rounded" />
+                        <div className="h-3 w-4/5 bg-gray-100 dark:bg-gray-700/60 rounded" />
                       </div>
                     ))}
                   </div>
                 ) : reviews.length === 0 ? (
-                  <p className="text-gray-500">Be the first to review this equipment after your rental.</p>
+                  <p className="text-gray-500 dark:text-gray-400">Be the first to review this equipment after your rental.</p>
                 ) : (
                   <div className="grid sm:grid-cols-2 gap-x-10 gap-y-8">
                     {reviews.map((r) => (
@@ -309,17 +309,17 @@ export default function EquipmentDetail({
                               : (r.reviewer?.full_name?.charAt(0) || 'U')}
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900 text-sm">{r.reviewer?.full_name || 'Renter'}</p>
+                            <p className="font-medium text-gray-900 dark:text-white text-sm">{r.reviewer?.full_name || 'Renter'}</p>
                             <p className="text-xs text-gray-400">{timeAgo(r.created_at)}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-0.5 mb-1.5">
                           {[1, 2, 3, 4, 5].map((s) => (
-                            <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(r.rating) ? 'fill-amber-500 text-amber-500' : 'text-gray-200'}`} />
+                            <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(r.rating) ? 'fill-amber-500 text-amber-500' : 'text-gray-200 dark:text-gray-600'}`} />
                           ))}
                         </div>
-                        {r.title && <p className="font-medium text-gray-900 text-sm mb-1">{r.title}</p>}
-                        {r.comment && <p className="text-gray-600 text-sm leading-relaxed">{r.comment}</p>}
+                        {r.title && <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">{r.title}</p>}
+                        {r.comment && <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{r.comment}</p>}
                       </div>
                     ))}
                   </div>
@@ -330,33 +330,33 @@ export default function EquipmentDetail({
             {/* Right: sticky booking card */}
             <div className="lg:col-span-1">
               <div className="lg:sticky lg:top-20">
-                <div className="bg-white rounded-2xl p-6 shadow-lg ring-1 ring-gray-200">
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700">
                   <div className="flex items-baseline justify-between mb-5">
                     <div>
-                      <span className="text-2xl font-bold text-gray-900">${equipment.daily_rate}</span>
-                      <span className="text-gray-500"> / day</span>
+                      <span className="text-2xl font-bold text-gray-900 dark:text-white">${equipment.daily_rate}</span>
+                      <span className="text-gray-500 dark:text-gray-400"> / day</span>
                     </div>
                     {reviewCount > 0 && (
-                      <span className="flex items-center gap-1 text-sm text-gray-700">
-                        <Star className="w-4 h-4 fill-gray-900 text-gray-900" /> {ratingValue.toFixed(1)}
+                      <span className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-200">
+                        <Star className="w-4 h-4 fill-gray-900 dark:fill-white text-gray-900 dark:text-white" /> {ratingValue.toFixed(1)}
                       </span>
                     )}
                   </div>
 
-                  <div className="rounded-xl border border-gray-300 divide-y divide-gray-300 mb-4">
-                    <div className="grid grid-cols-2 divide-x divide-gray-300">
+                  <div className="rounded-xl border border-gray-300 dark:border-gray-700 divide-y divide-gray-300 dark:divide-gray-700 mb-4">
+                    <div className="grid grid-cols-2 divide-x divide-gray-300 dark:divide-gray-700">
                       <label className="p-3 cursor-pointer">
-                        <span className="block text-[11px] font-semibold text-gray-700 uppercase tracking-wide">Start</span>
-                        <input type="date" min={today} value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full text-sm text-gray-900 focus:outline-none bg-transparent" />
+                        <span className="block text-[11px] font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide">Start</span>
+                        <input type="date" min={today} value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full text-sm text-gray-900 dark:text-white focus:outline-none bg-transparent" />
                       </label>
                       <label className="p-3 cursor-pointer">
-                        <span className="block text-[11px] font-semibold text-gray-700 uppercase tracking-wide">End</span>
-                        <input type="date" min={startDate || today} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-sm text-gray-900 focus:outline-none bg-transparent" />
+                        <span className="block text-[11px] font-semibold text-gray-700 dark:text-gray-200 uppercase tracking-wide">End</span>
+                        <input type="date" min={startDate || today} value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full text-sm text-gray-900 dark:text-white focus:outline-none bg-transparent" />
                       </label>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-gray-50 rounded-lg text-xs text-gray-500">
+                  <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-gray-50 dark:bg-gray-700/40 rounded-lg text-xs text-gray-500 dark:text-gray-400">
                     <Info className="w-4 h-4 flex-shrink-0" />
                     Min {equipment.min_rental_days} · max {equipment.max_rental_days} days
                   </div>
@@ -372,19 +372,19 @@ export default function EquipmentDetail({
 
                   {pricing && (
                     <div className="mt-5 space-y-3 text-sm">
-                      <div className="flex justify-between text-gray-600">
+                      <div className="flex justify-between text-gray-600 dark:text-gray-300">
                         <span className="underline">${equipment.daily_rate} × {pricing.days} day{pricing.days === 1 ? '' : 's'}</span>
                         <span>${pricing.subtotal.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-gray-600">
+                      <div className="flex justify-between text-gray-600 dark:text-gray-300">
                         <span className="underline">Service fee</span>
                         <span>${pricing.serviceFee.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between text-gray-600">
+                      <div className="flex justify-between text-gray-600 dark:text-gray-300">
                         <span className="underline">Refundable deposit</span>
                         <span>${equipment.deposit_amount.toFixed(2)}</span>
                       </div>
-                      <div className="flex justify-between font-semibold text-gray-900 pt-3 border-t border-gray-200">
+                      <div className="flex justify-between font-semibold text-gray-900 dark:text-white pt-3 border-t border-gray-200 dark:border-gray-700">
                         <span>Total</span>
                         <span>${pricing.total.toFixed(2)}</span>
                       </div>
@@ -394,20 +394,20 @@ export default function EquipmentDetail({
                   <div className="grid grid-cols-2 gap-2 mt-4">
                     <button
                       onClick={() => onMessage(equipment)}
-                      className="py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
+                      className="py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-1.5"
                     >
                       <MessageSquare className="w-4 h-4" /> Message
                     </button>
                     <button
                       onClick={() => setShowNegotiator(true)}
-                      className="py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-1.5"
+                      className="py-2.5 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-1.5"
                     >
                       <DollarSign className="w-4 h-4" /> Offer
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-start gap-2 text-xs text-gray-500 px-2">
+                <div className="mt-4 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 px-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0 text-gray-400" />
                   Free cancellation up to 48 hours before pickup. Deposit fully refundable on return.
                 </div>

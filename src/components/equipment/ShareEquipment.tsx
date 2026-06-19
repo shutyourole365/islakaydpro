@@ -60,7 +60,7 @@ export default function ShareEquipment({
           setTimeout(() => setCopied(false), 2000);
         }
       },
-      color: 'bg-gray-100 hover:bg-gray-200 text-gray-700',
+      color: 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200',
     },
     {
       name: 'Email',
@@ -70,7 +70,7 @@ export default function ShareEquipment({
         const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
         window.open(`mailto:?subject=${subject}&body=${body}`);
       },
-      color: 'bg-red-100 hover:bg-red-200 text-red-700',
+      color: 'bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/40 text-red-700 dark:text-red-400',
     },
     {
       name: 'Facebook',
@@ -78,7 +78,7 @@ export default function ShareEquipment({
       action: () => {
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`, '_blank');
       },
-      color: 'bg-blue-100 hover:bg-blue-200 text-blue-700',
+      color: 'bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-400',
     },
     {
       name: 'Twitter',
@@ -86,7 +86,7 @@ export default function ShareEquipment({
       action: () => {
         window.open(`https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`, '_blank');
       },
-      color: 'bg-sky-100 hover:bg-sky-200 text-sky-700',
+      color: 'bg-sky-100 dark:bg-sky-900/30 hover:bg-sky-200 dark:hover:bg-sky-900/40 text-sky-700 dark:text-sky-400',
     },
     {
       name: 'WhatsApp',
@@ -94,7 +94,7 @@ export default function ShareEquipment({
       action: () => {
         window.open(`https://wa.me/?text=${encodedText}%20${encodedUrl}`, '_blank');
       },
-      color: 'bg-green-100 hover:bg-green-200 text-green-700',
+      color: 'bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400',
     },
     {
       name: 'Instagram',
@@ -104,21 +104,21 @@ export default function ShareEquipment({
         navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
         success('Content copied! You can now paste it in Instagram.');
       },
-      color: 'bg-pink-100 hover:bg-pink-200 text-pink-700',
+      color: 'bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/40 text-pink-700 dark:text-pink-400',
     },
   ];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="flex items-center justify-between p-6 border-b">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full">
+        <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
           <div className="flex items-center space-x-2">
             <Share2 className="h-6 w-6 text-teal-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Share Equipment</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Share Equipment</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             <X className="h-6 w-6" />
           </button>
@@ -126,7 +126,7 @@ export default function ShareEquipment({
 
         <div className="p-6">
           {/* Equipment Preview */}
-          <div className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center space-x-3 mb-6 p-3 bg-gray-50 dark:bg-gray-700/40 rounded-lg">
             {equipmentImage && (
               <img
                 src={equipmentImage}
@@ -135,14 +135,14 @@ export default function ShareEquipment({
               />
             )}
             <div className="flex-1">
-              <h3 className="font-medium text-gray-900 text-sm">{equipmentTitle}</h3>
-              <p className="text-xs text-gray-500">Available for rent on Islakayd</p>
+              <h3 className="font-medium text-gray-900 dark:text-white text-sm">{equipmentTitle}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Available for rent on Islakayd</p>
             </div>
           </div>
 
           {/* Share URL */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
               Share Link
             </label>
             <div className="flex space-x-2">
@@ -150,7 +150,7 @@ export default function ShareEquipment({
                 type="text"
                 value={shareUrl}
                 readOnly
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 dark:text-white"
               />
               <Button
                 onClick={async () => {
@@ -175,7 +175,7 @@ export default function ShareEquipment({
 
           {/* Share Options */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
               Share via
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -184,7 +184,7 @@ export default function ShareEquipment({
                   key={option.name}
                   onClick={option.action}
                   aria-label={option.name}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-left hover:border-gray-300 ${option.color}`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-left hover:border-gray-300 dark:hover:border-gray-700 ${option.color}`}
                 >
                   <option.icon className="w-5 h-5" />
                   <span className="text-sm font-medium">{option.name}</span>
@@ -194,7 +194,7 @@ export default function ShareEquipment({
           </div>
 
           {/* Additional Actions */}
-          <div className="mt-6 pt-4 border-t">
+          <div className="mt-6 pt-4 border-t dark:border-gray-700">
             <button
               onClick={() => window.open(shareUrl, '_blank')}
               className="flex items-center space-x-2 text-teal-600 hover:text-teal-700 text-sm font-medium"
