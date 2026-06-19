@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   ArrowLeft, Users, Package, DollarSign, Flag, Shield, Settings,
-  Search, Filter, CheckCircle2, XCircle, Eye, Ban, Mail, Activity,
+  Search, CheckCircle2, XCircle, Ban, Activity,
   Clock, RefreshCw, AlertTriangle, TrendingUp, Calendar,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
