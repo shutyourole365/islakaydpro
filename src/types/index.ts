@@ -156,6 +156,7 @@ export interface Message {
   equipment_id: string | null;
   content: string;
   is_read: boolean;
+  read?: boolean;
   created_at: string;
   sender?: Profile;
   receiver?: Profile;
@@ -673,3 +674,4 @@ export interface ScheduledMessage {
   created_at: string;
   sent_at: string | null;
 }
+
