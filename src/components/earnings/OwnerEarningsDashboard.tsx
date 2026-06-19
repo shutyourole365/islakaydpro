@@ -385,17 +385,32 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
                 <div className="divide-y divide-gray-100">
                   {payouts.map(p => (
                     <div key={p.id} className="p-4 flex items-center gap-4">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900">{fmt(p.amount / 100)}</p>
-                        <p className="text-sm text-gray-500">{new Date(p.created_at).toLocaleDateString()}</p>
+                      <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
+                        <DollarSign className="w-4 h-4 text-teal-600" />
                       </div>
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
-                        p.status === 'completed' ? 'bg-green-50 text-green-600' :
-                        p.status === 'failed' ? 'bg-red-50 text-red-600' :
-                        'bg-amber-50 text-amber-600'
-                      }`}>
-                        {p.status}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900">{fmt(p.amount / 100)}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(p.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          {p.arrival_date && (
+                            <span className="ml-2 text-teal-600">
+                              · arrives {new Date(p.arrival_date * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                          p.status === 'paid' ? 'bg-green-50 text-green-600' :
+                          p.status === 'failed' ? 'bg-red-50 text-red-600' :
+                          p.status === 'in_transit' ? 'bg-blue-50 text-blue-600' :
+                          'bg-amber-50 text-amber-600'
+                        }`}>
+                          {p.status === 'paid' ? '✓ Paid' :
+                           p.status === 'in_transit' ? 'In Transit' :
+                           p.status === 'failed' ? 'Failed' : p.status}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -432,3 +447,4 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
     </div>
   );
 }
+
