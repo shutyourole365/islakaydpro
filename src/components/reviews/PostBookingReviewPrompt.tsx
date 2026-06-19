@@ -5,17 +5,15 @@
  */
 import { useState, useEffect } from 'react';
 import { Star, X, MessageSquare, ThumbsUp } from 'lucide-react';
-import type { Equipment, Booking } from '../../types';
+import type { Equipment } from '../../types';
 
 interface PostBookingReviewPromptProps {
-  booking: Booking;
   equipment: Equipment;
   onSubmit: (rating: number, comment: string) => Promise<void>;
   onDismiss: () => void;
 }
 
 export default function PostBookingReviewPrompt({
-  booking,
   equipment,
   onSubmit,
   onDismiss,
