@@ -1482,8 +1482,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onNavigate={(page: string) => setCurrentPage(page as PageType)}
             onLeaveReview={(equipment, bookingId) => {
               // Use quick prompt if we have equipment object, else fall back to full modal
-              const mockBooking = { id: bookingId } as import('./types').Booking;
-              setPostBookingPromptBooking({ booking: mockBooking, equipment });
+              setPostBookingPromptBooking({ booking: { id: bookingId } as import('./types').Booking, equipment });
             }}
           />
           <Footer onNavigate={handleNavigate} />
@@ -2312,13 +2311,12 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {postBookingPromptBooking && (
         <Suspense fallback={null}>
           <PostBookingReviewPrompt
-            booking={postBookingPromptBooking.booking}
             equipment={postBookingPromptBooking.equipment}
             onSubmit={async (rating, comment) => {
               const { booking, equipment } = postBookingPromptBooking;
               if (!user) return;
               await createReview({
-                booking_id: booking.id,
+                booking_id: postBookingPromptBooking.booking.id,
                 equipment_id: equipment.id,
                 reviewer_id: user.id,
                 reviewee_id: equipment.owner_id,
