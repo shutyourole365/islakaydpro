@@ -392,23 +392,20 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
                         <p className="font-semibold text-gray-900">{fmt(p.amount / 100)}</p>
                         <p className="text-xs text-gray-500">
                           {new Date(p.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          {p.arrival_date && (
-                            <span className="ml-2 text-teal-600">
-                              · arrives {new Date(p.arrival_date * 1000).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
-                            </span>
+                          {p.booking?.equipment?.title && (
+                            <span className="ml-2 text-gray-400">· {p.booking.equipment.title}</span>
                           )}
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                          p.status === 'paid' ? 'bg-green-50 text-green-600' :
+                          p.status === 'completed' ? 'bg-green-50 text-green-600' :
                           p.status === 'failed' ? 'bg-red-50 text-red-600' :
-                          p.status === 'in_transit' ? 'bg-blue-50 text-blue-600' :
                           'bg-amber-50 text-amber-600'
                         }`}>
-                          {p.status === 'paid' ? '✓ Paid' :
-                           p.status === 'in_transit' ? 'In Transit' :
-                           p.status === 'failed' ? 'Failed' : p.status}
+                          {p.status === 'completed' ? '✓ Paid' :
+                           p.status === 'failed' ? 'Failed' :
+                           'Pending'}
                         </span>
                       </div>
                     </div>
