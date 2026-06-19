@@ -109,7 +109,6 @@ export default function Dashboard({
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [reviewedBookingIds, setReviewedBookingIds] = useState<Set<string>>(new Set());
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-  const [messagesEndRef] = useState<React.RefObject<HTMLDivElement>>(() => ({ current: null }));
 
   // Use transition for non-urgent updates
   const [, startTransition] = useTransition();
@@ -172,7 +171,7 @@ export default function Dashboard({
       setMessages(msgs);
       // Mark unread messages as read
       const unreadIds = msgs
-        .filter(m => m.sender_id !== user.id && !m.read)
+        .filter(m => m.sender_id !== user.id && !m.read && !m.is_read)
         .map(m => m.id);
       if (unreadIds.length > 0) {
         markMessagesRead(unreadIds).then(() => {
