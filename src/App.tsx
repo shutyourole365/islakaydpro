@@ -26,6 +26,7 @@ import NotFound from './components/ui/NotFound';
 import ListEquipmentForm from './components/listing/ListEquipmentForm';
 import BookingSystem from './components/booking/BookingSystem';
 import EquipmentComparison from './components/comparison/EquipmentComparison';
+import CompareTray from './components/comparison/CompareTray';
 import { SkipLink } from './components/ui/AccessibleComponents';
 import QuickActionsMenu from './components/ui/QuickActionsMenu';
 import CommandPalette from './components/ui/CommandPalette';
@@ -1822,15 +1823,14 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         </Suspense>
       )}
 
-      {/* Comparison Floating Button */}
-      {comparisonItems.length > 0 && !isComparisonOpen && (
-        <button
-          onClick={() => setIsComparisonOpen(true)}
-          className="fixed bottom-24 right-6 z-40 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
-        >
-          <span className="text-lg">⚖️</span>
-          <span className="font-medium">Compare ({comparisonItems.length})</span>
-        </button>
+      {/* Comparison Tray */}
+      {!isComparisonOpen && (
+        <CompareTray
+          items={comparisonItems}
+          onRemove={handleRemoveFromComparison}
+          onClear={() => setComparisonItems([])}
+          onCompare={() => setIsComparisonOpen(true)}
+        />
       )}
 
       {/* Quick Actions Menu */}

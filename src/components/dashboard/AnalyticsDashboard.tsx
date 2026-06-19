@@ -140,13 +140,13 @@ export default function AnalyticsDashboard({
   }, [data.revenueHistory]);
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back button */}
         {onBack && (
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white mb-6"
            >
             <ArrowUpRight className="w-5 h-5 rotate-[225deg]" />
             Back to Dashboard
@@ -157,19 +157,19 @@ export default function AnalyticsDashboard({
           {/* Header with Period Selector */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h2>
-              <p className="text-gray-500 text-sm">Track your rental performance</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Track your rental performance</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex bg-gray-100 rounded-lg p-1">
+              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                 {periods.map((p) => (
                   <button
                     key={p.id}
                     onClick={() => handlePeriodChange(p.id as typeof period)}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
                       period === p.id
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 {p.label}
@@ -179,13 +179,13 @@ export default function AnalyticsDashboard({
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
            >
             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={onExport}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
            >
             <Download className="w-4 h-4" />
             <span className="hidden sm:inline">Export</span>
@@ -228,10 +228,10 @@ export default function AnalyticsDashboard({
       {/* Charts Section */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Revenue Chart */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold text-gray-900">Revenue Overview</h3>
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <h3 className="font-semibold text-gray-900 dark:text-white">Revenue Overview</h3>
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
               {[
                 { id: 'revenue', label: 'Revenue', icon: LineChart },
                 { id: 'bookings', label: 'Bookings', icon: BarChart3 },
@@ -242,8 +242,8 @@ export default function AnalyticsDashboard({
                   onClick={() => setActiveChart(chart.id as typeof activeChart)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-all ${
                     activeChart === chart.id
-                      ? 'bg-white text-gray-900 shadow-sm'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                   }`}
                 >
                   <chart.icon className="w-4 h-4" />
@@ -265,7 +265,7 @@ export default function AnalyticsDashboard({
                     {formatCurrency(item.amount)}
                   </div>
                 </div>
-                <span className="text-xs text-gray-400 mt-2">
+                <span className="text-xs text-gray-400 dark:text-gray-400 mt-2">
                   {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
               </div>
@@ -274,16 +274,16 @@ export default function AnalyticsDashboard({
         </div>
 
         {/* Bookings by Status */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-6">Bookings by Status</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Bookings by Status</h3>
           <div className="space-y-4">
             {data.bookingsByStatus.map((item) => (
               <div key={item.status}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600 capitalize">{item.status}</span>
-                  <span className="text-sm font-medium text-gray-900">{item.count}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300 capitalize">{item.status}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">{item.count}</span>
                 </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{
@@ -324,8 +324,8 @@ export default function AnalyticsDashboard({
               </svg>
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">{data.totalBookings}</div>
-                  <div className="text-xs text-gray-500">Total</div>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-white">{data.totalBookings}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">Total</div>
                 </div>
               </div>
             </div>
@@ -336,8 +336,8 @@ export default function AnalyticsDashboard({
       {/* Performance Metrics & Top Categories */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Performance Metrics */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-6">Performance Metrics</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Performance Metrics</h3>
           <div className="grid grid-cols-2 gap-4">
             <PerformanceMetric
               icon={Star}
@@ -371,8 +371,8 @@ export default function AnalyticsDashboard({
         </div>
 
         {/* Top Categories */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <h3 className="font-semibold text-gray-900 mb-6">Top Performing Categories</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Top Performing Categories</h3>
           <div className="space-y-4">
             {data.topCategories.map((category, index) => (
               <div key={category.name} className="flex items-center gap-4">
@@ -386,10 +386,10 @@ export default function AnalyticsDashboard({
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">{category.name}</span>
-                    <span className="text-sm text-gray-500">{category.count} rentals</span>
+                    <span className="font-medium text-gray-900 dark:text-white">{category.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{category.count} rentals</span>
                   </div>
-                  <div className="text-sm text-green-600 font-medium">
+                  <div className="text-sm text-green-600 dark:text-green-400 font-medium">
                     {formatCurrency(category.revenue)} revenue
                   </div>
                 </div>
@@ -400,16 +400,16 @@ export default function AnalyticsDashboard({
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-        <h3 className="font-semibold text-gray-900 mb-6">Recent Activity</h3>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="font-semibold text-gray-900 dark:text-white mb-6">Recent Activity</h3>
         <div className="space-y-4">
           {data.recentActivity.map((activity, index) => (
-            <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors">
+            <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                activity.type === 'booking' ? 'bg-blue-100 text-blue-600' :
-                activity.type === 'payment' ? 'bg-green-100 text-green-600' :
-                activity.type === 'review' ? 'bg-amber-100 text-amber-600' :
-                'bg-gray-100 text-gray-600'
+                activity.type === 'booking' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
+                activity.type === 'payment' ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' :
+                activity.type === 'review' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400' :
+                'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
               }`}>
                 {activity.type === 'booking' && <Calendar className="w-5 h-5" />}
                 {activity.type === 'payment' && <DollarSign className="w-5 h-5" />}
@@ -417,11 +417,11 @@ export default function AnalyticsDashboard({
                 {activity.type === 'view' && <Eye className="w-5 h-5" />}
               </div>
               <div className="flex-1">
-                <p className="text-gray-900">{activity.description}</p>
-                <p className="text-sm text-gray-500">{formatTimeAgo(activity.time)}</p>
+                <p className="text-gray-900 dark:text-white">{activity.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{formatTimeAgo(activity.time)}</p>
               </div>
               {activity.amount && (
-                <span className="text-green-600 font-semibold">
+                <span className="text-green-600 dark:text-green-400 font-semibold">
                   +{formatCurrency(activity.amount)}
                 </span>
               )}
@@ -451,20 +451,20 @@ function MetricCard({
   const isPositive = change >= 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
       <div className="flex items-start justify-between mb-4">
         <div className={`p-2.5 rounded-xl ${color}`}>
           <Icon className="w-5 h-5 text-white" />
         </div>
         <div className={`flex items-center gap-1 text-sm font-medium ${
-          isPositive ? 'text-green-600' : 'text-red-600'
+          isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
         }`}>
           {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
           {Math.abs(change)}%
         </div>
       </div>
-      <div className="text-2xl font-bold text-gray-900 mb-1">{value}</div>
-      <div className="text-sm text-gray-500">{label}</div>
+      <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{value}</div>
+      <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
     </div>
   );
 }
@@ -483,13 +483,13 @@ function PerformanceMetric({
   color: string;
 }) {
   return (
-    <div className="p-4 bg-gray-50 rounded-xl">
+    <div className="p-4 bg-gray-50 dark:bg-gray-700/40 rounded-xl">
       <div className="flex items-center gap-2 mb-2">
         <Icon className={`w-4 h-4 ${color}`} />
-        <span className="text-sm text-gray-600">{label}</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300">{label}</span>
       </div>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
-      <div className="text-xs text-gray-500">{subtext}</div>
+      <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400">{subtext}</div>
     </div>
   );
 }
