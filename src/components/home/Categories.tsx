@@ -41,17 +41,17 @@ const CategoryItem = memo(function CategoryItem({ category, onClick, index }: Ca
   return (
     <button
       onClick={() => onClick(category)}
-      className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm hover:shadow-brand transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-teal-200 dark:hover:border-teal-800/60 hover:-translate-y-1 overflow-hidden"
+      className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft hover:shadow-brand-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-teal-300/70 dark:hover:border-teal-700/60 hover:-translate-y-1.5 overflow-hidden"
       style={{ animationDelay: `${index * 50}ms` }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-emerald-500/0 group-hover:from-teal-500/10 group-hover:to-emerald-500/10 transition-all duration-300" />
 
       <div className="relative">
-        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/40 dark:to-emerald-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:from-teal-500 group-hover:to-emerald-500 group-hover:text-white transition-all duration-300 mb-4">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/40 dark:to-emerald-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 group-hover:from-teal-500 group-hover:to-emerald-500 group-hover:text-white group-hover:shadow-brand group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 mb-4">
           {iconMap[category.icon || 'Sparkles']}
         </div>
 
-        <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-left">
+        <h3 className="font-bold text-gray-900 dark:text-white mb-1 text-left group-hover:text-teal-700 dark:group-hover:text-teal-300 transition-colors">
           {category.name}
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400 text-left">
@@ -59,8 +59,8 @@ const CategoryItem = memo(function CategoryItem({ category, onClick, index }: Ca
         </p>
       </div>
 
-      <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">
-        <ArrowRight className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+      <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-teal-50 dark:bg-teal-900/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transform translate-x-3 group-hover:translate-x-0 transition-all duration-300">
+        <ArrowRight className="w-4 h-4 text-teal-600 dark:text-teal-400" />
       </div>
     </button>
   );

@@ -135,7 +135,7 @@ export default function EquipmentShowcase({
   const currentEquipment = equipment[currentIndex];
 
   return (
-    <div className="relative bg-gradient-to-r from-teal-600 to-emerald-600 rounded-2xl overflow-hidden">
+    <div className="relative bg-gradient-to-br from-teal-600 via-emerald-600 to-cyan-600 bg-[length:200%_200%] animate-gradient rounded-3xl overflow-hidden shadow-brand-lg ring-1 ring-white/10">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{
@@ -151,7 +151,7 @@ export default function EquipmentShowcase({
               <img
                 src={currentEquipment.images[0] || '/placeholder-equipment.jpg'}
                 alt={currentEquipment.title}
-                className="w-80 h-60 object-cover rounded-xl shadow-2xl"
+                className="w-80 h-60 object-cover rounded-2xl shadow-2xl ring-1 ring-white/20 transition-transform duration-500 hover:scale-[1.02]"
               />
               {/* Featured Badge */}
               <div className="absolute top-4 left-4 bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
