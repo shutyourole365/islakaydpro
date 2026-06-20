@@ -77,7 +77,7 @@ export default function Hero({ onSearch }: HeroProps) {
         </div>
 
         {/* Headline */}
-        <h1 className="text-center text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 dark:text-white mb-6 text-balance animate-fade-in-up">
+        <h1 className="text-center text-6xl sm:text-7xl lg:text-8xl font-extrabold tracking-tighter text-gray-900 dark:text-white mb-6 text-balance animate-fade-in-up">
           Rent anything.
           <br />
           <span className="text-gradient-animated">Build everything.</span>

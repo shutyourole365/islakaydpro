@@ -77,14 +77,14 @@ export default function Categories({ categories, onCategoryClick, onViewAll }: C
     <section id="categories" className="py-24 bg-gray-50 dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full text-sm font-medium mb-4">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 text-teal-700 dark:text-teal-300 ring-1 ring-inset ring-teal-500/20 rounded-full text-sm font-semibold mb-5">
             <Sparkles className="w-4 h-4" />
             Explore Categories
           </span>
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Find Equipment by Category
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-5 text-balance">
+            Find equipment by <span className="text-gradient-animated">category</span>
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto text-pretty">
             Browse thousands of tools and equipment across 12+ categories. From construction
             to photography, we have everything you need.
           </p>

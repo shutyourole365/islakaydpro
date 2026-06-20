@@ -22,27 +22,27 @@ export default function FeaturedListings({
   isLoading = false,
 }: FeaturedListingsProps) {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-28 bg-white dark:bg-gray-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-12">
           <div>
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 rounded-full text-sm font-medium mb-4">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-700 dark:text-amber-300 ring-1 ring-inset ring-amber-500/20 rounded-full text-sm font-semibold mb-5">
               <Star className="w-4 h-4 fill-amber-500" />
               Featured Equipment
             </span>
-            <h2 className="text-4xl font-bold text-gray-900 mb-2">
-              Top-Rated Equipment Near You
+            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900 dark:text-white mb-3 text-balance">
+              Top-rated equipment <span className="text-gradient-animated">near you</span>
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-400 text-pretty">
               Discover highly-rated equipment from verified owners
             </p>
           </div>
           <button
             onClick={() => onViewAll?.()}
-            className="flex items-center gap-2 text-teal-600 font-semibold hover:text-teal-700 transition-colors"
+            className="group flex items-center gap-2 text-teal-600 dark:text-teal-400 font-semibold hover:gap-3 transition-all"
           >
             View All
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </div>
 
@@ -50,12 +50,12 @@ export default function FeaturedListings({
           {isLoading ? (
             // Loading skeleton
             Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-soft animate-pulse">
-                <div className="aspect-[4/3] bg-gray-200" />
+              <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-soft border border-gray-100 dark:border-gray-700 animate-pulse">
+                <div className="aspect-[4/3] bg-gray-200 dark:bg-gray-700" />
                 <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  <div className="h-6 bg-gray-200 rounded w-1/3" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+                  <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
                 </div>
               </div>
             ))
