@@ -60,7 +60,7 @@ const Testimonials = memo(function Testimonials() {
   };
 
   return (
-    <section className="py-24 bg-gray-900 relative overflow-hidden">
+    <section className="py-28 bg-gray-950 relative overflow-hidden">
       <div className="absolute inset-0">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px]" />
@@ -72,8 +72,10 @@ const Testimonials = memo(function Testimonials() {
             <Star className="w-4 h-4 fill-teal-400" />
             Trusted by Thousands
           </span>
-          <h2 className="text-4xl font-bold text-white mb-4">What Our Users Say</h2>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-5 text-balance">
+            What our users <span className="text-gradient-animated">say</span>
+          </h2>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto text-pretty">
             Join over 120,000 satisfied renters and owners who trust Islakayd for their
             equipment needs.
           </p>
@@ -149,7 +151,7 @@ const Testimonials = memo(function Testimonials() {
                   aria-label={`Go to testimonial ${index + 1}`}
                   className={`w-2 h-2 rounded-full transition-all ${
                     index === currentIndex
-                      ? 'bg-teal-500 w-8'
+                      ? 'bg-gradient-to-r from-teal-500 to-emerald-500 w-8'
                       : 'bg-white/30 hover:bg-white/50'
                   }`}
                 />

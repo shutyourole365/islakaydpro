@@ -25,18 +25,18 @@ export default function CTASection({ onGetStarted, onLearnMore }: CTASectionProp
   ];
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-28 bg-white dark:bg-gray-950 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-sm font-medium mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-500/20 rounded-full text-sm font-semibold mb-6">
               <Package className="w-4 h-4" />
               List Your Equipment
             </span>
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-              Turn Your Equipment Into a Business
+            <h2 className="text-4xl lg:text-6xl font-bold tracking-tight text-gray-900 dark:text-white mb-6 leading-[1.05] text-balance">
+              Turn your equipment into a <span className="text-gradient-animated">business</span>
             </h2>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 text-pretty">
               Join thousands of equipment owners who are earning money by sharing their
               tools when they're not in use. Set your own prices, availability, and rules.
             </p>
@@ -44,12 +44,12 @@ export default function CTASection({ onGetStarted, onLearnMore }: CTASectionProp
             <div className="space-y-6 mb-10">
               {ownerBenefits.map((benefit, index) => (
                 <div key={index} className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 flex items-center justify-center text-teal-600 flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 dark:from-teal-900/40 dark:to-emerald-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400 flex-shrink-0">
                     {benefit.icon}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{benefit.title}</h3>
-                    <p className="text-gray-600">{benefit.description}</p>
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-1">{benefit.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-400">{benefit.description}</p>
                   </div>
                 </div>
               ))}
@@ -58,14 +58,14 @@ export default function CTASection({ onGetStarted, onLearnMore }: CTASectionProp
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <button
                 onClick={onGetStarted}
-                className="flex items-center gap-2 px-8 py-4 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-colors"
+                className="btn-primary px-8 py-4 text-base"
                >
                 Start Listing Today
                 <ArrowRight className="w-5 h-5" />
               </button>
               <button
                 onClick={() => onLearnMore?.()}
-                className="flex items-center gap-2 px-8 py-4 text-gray-700 font-semibold hover:text-teal-600 transition-colors"
+                className="flex items-center gap-2 px-8 py-4 text-gray-700 dark:text-gray-200 font-semibold hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
               >
                 Learn More
               </button>
@@ -73,8 +73,8 @@ export default function CTASection({ onGetStarted, onLearnMore }: CTASectionProp
           </div>
 
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-teal-200 to-emerald-200 rounded-3xl blur-3xl opacity-30" />
-            <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-300 to-emerald-300 rounded-[2rem] blur-3xl opacity-30 dark:opacity-20" />
+            <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2rem] p-8 overflow-hidden ring-1 ring-white/10 shadow-2xl">
               <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/20 rounded-full blur-[80px]" />
 
               <div className="relative">
