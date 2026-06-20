@@ -22,8 +22,11 @@ export default function FeaturedListings({
   isLoading = false,
 }: FeaturedListingsProps) {
   return (
-    <section className="py-28 bg-white dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative py-28 bg-white dark:bg-gray-950 overflow-hidden">
+      {/* Decorative depth */}
+      <div aria-hidden="true" className="pointer-events-none absolute -top-24 -right-24 w-[28rem] h-[28rem] bg-teal-500/10 dark:bg-teal-500/[0.07] rounded-full blur-[120px]" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 -left-24 w-[28rem] h-[28rem] bg-emerald-500/10 dark:bg-emerald-500/[0.06] rounded-full blur-[120px]" />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-12">
           <div>
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 text-amber-700 dark:text-amber-300 ring-1 ring-inset ring-amber-500/20 rounded-full text-sm font-semibold mb-5">
@@ -60,16 +63,21 @@ export default function FeaturedListings({
               </div>
             ))
           ) : (
-            equipment.slice(0, 8).map((item) => (
-              <EquipmentCard
+            equipment.slice(0, 8).map((item, index) => (
+              <div
                 key={item.id}
-                equipment={item}
-                onEquipmentClick={onEquipmentClick}
-                onFavoriteClick={onFavoriteClick}
-                isFavorite={favorites.has(item.id)}
-                onAddToComparison={onAddToComparison}
-                showCompareButton={true}
-              />
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${Math.min(index * 60, 480)}ms`, animationFillMode: 'both' }}
+              >
+                <EquipmentCard
+                  equipment={item}
+                  onEquipmentClick={onEquipmentClick}
+                  onFavoriteClick={onFavoriteClick}
+                  isFavorite={favorites.has(item.id)}
+                  onAddToComparison={onAddToComparison}
+                  showCompareButton={true}
+                />
+              </div>
             ))
           )}
         </div>
