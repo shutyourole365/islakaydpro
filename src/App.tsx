@@ -735,42 +735,59 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
     fetchEquipment();
   }, [fetchEquipment]);
 
-  // Verify Stripe checkout session on redirect back from payment
+  // Handle return from Stripe Checkout. The checkout success_url redirects to
+  // /booking/success?session_id=...&booking_id=..., and cancel to /booking/cancel.
+  // (A /* -> /index.html rewrite in public/_redirects lets these deep links load.)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const bookingStatus = params.get('booking');
+    const path = window.location.pathname;
     const sessionId = params.get('session_id');
+    const isSuccess = path.startsWith('/booking/success') || params.get('booking') === 'success';
+    const isCancelled = path.startsWith('/booking/cancel') || params.get('booking') === 'cancelled';
 
-    if (bookingStatus === 'success' && sessionId) {
-      verifyCheckoutSession(sessionId).then(({ success, bookingId }) => {
-        if (success) {
-          addToast({
-            type: 'success',
-            title: 'Payment successful!',
-            message: bookingId
-              ? `Your booking #${bookingId.slice(0, 8)} is confirmed.`
-              : 'Your booking has been confirmed.',
+    if (isSuccess) {
+      if (sessionId) {
+        verifyCheckoutSession(sessionId)
+          .then(({ success, bookingId }) => {
+            addToast(
+              success
+                ? {
+                    type: 'success',
+                    title: 'Payment successful!',
+                    message: bookingId
+                      ? `Your booking #${bookingId.slice(0, 8)} is confirmed.`
+                      : 'Your booking has been confirmed.',
+                  }
+                : {
+                    type: 'warning',
+                    title: 'Payment received — confirming',
+                    message: 'Your payment is processing and will appear in your dashboard shortly.',
+                  }
+            );
+          })
+          .catch(() => {
+            addToast({
+              type: 'info',
+              title: 'Payment received',
+              message: 'Check your dashboard for your booking status.',
+            });
           });
-        } else {
-          addToast({
-            type: 'warning',
-            title: 'Payment pending',
-            message: 'Your payment is being processed. Check your dashboard for updates.',
-          });
-        }
-      }).catch(() => {});
-
-      // Clean up URL params without reloading
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, '', cleanUrl);
-    } else if (bookingStatus === 'cancelled') {
+      } else {
+        addToast({
+          type: 'success',
+          title: 'Payment successful!',
+          message: 'Your booking has been confirmed.',
+        });
+      }
+      window.history.replaceState({}, '', '/');
+      setCurrentPage('dashboard');
+    } else if (isCancelled) {
       addToast({
         type: 'info',
-        title: 'Booking cancelled',
+        title: 'Checkout cancelled',
         message: 'Your booking was not completed. You can try again anytime.',
       });
-      const cleanUrl = window.location.pathname;
-      window.history.replaceState({}, '', cleanUrl);
+      window.history.replaceState({}, '', '/');
     }
   }, []);
 
