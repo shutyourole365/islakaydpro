@@ -41,7 +41,7 @@ const EquipmentCard = memo(function EquipmentCard({
     return (
       <div
         onClick={() => onEquipmentClick(equipment)}
-        className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-xl transition-all duration-300 flex cursor-pointer"
+        className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-teal-200 dark:hover:border-teal-800/60 hover:shadow-brand hover:-translate-y-1 transition-all duration-300 flex cursor-pointer"
       >
         <div className="relative w-48 flex-shrink-0">
           {!imageLoaded && !imageError && (
@@ -63,7 +63,7 @@ const EquipmentCard = memo(function EquipmentCard({
         <div className="flex-1 p-4 flex flex-col justify-between">
           <div>
             <div className="flex items-start justify-between gap-2 mb-2">
-              <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-teal-600 transition-colors">
+              <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                 {equipment.title}
               </h3>
               <button
@@ -108,7 +108,7 @@ const EquipmentCard = memo(function EquipmentCard({
     return (
       <div
         onClick={() => onEquipmentClick(equipment)}
-        className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-lg transition-all duration-300 cursor-pointer"
+        className="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-teal-200 dark:hover:border-teal-800/60 hover:shadow-brand hover:-translate-y-1 transition-all duration-300 cursor-pointer"
       >
         <div className="relative aspect-square overflow-hidden">
           {!imageLoaded && !imageError && (
@@ -152,7 +152,7 @@ const EquipmentCard = memo(function EquipmentCard({
   return (
     <div
       onClick={() => onEquipmentClick(equipment)}
-      className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-xl transition-all duration-300 cursor-pointer"
+      className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-teal-200 dark:hover:border-teal-800/60 hover:shadow-brand-lg hover:-translate-y-1.5 transition-all duration-300 cursor-pointer"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         {!imageLoaded && !imageError && (
@@ -184,7 +184,7 @@ const EquipmentCard = memo(function EquipmentCard({
           {showCompareButton && onAddToComparison && (
             <button
               onClick={handleCompareClick}
-              className="w-10 h-10 rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 hover:bg-purple-500 hover:text-white flex items-center justify-center transition-all duration-300"
+              className="w-10 h-10 rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-600 dark:text-gray-300 hover:bg-teal-500 hover:text-white flex items-center justify-center transition-all duration-300"
               title="Add to comparison"
             >
               <Plus className="w-5 h-5" />
@@ -216,7 +216,7 @@ const EquipmentCard = memo(function EquipmentCard({
 
       <div className="p-5">
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-teal-600 transition-colors">
+          <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
             {equipment.title}
           </h3>
         </div>

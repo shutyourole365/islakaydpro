@@ -1400,15 +1400,17 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
               />
             </Reveal>
 
-            <FeaturedListings
-              equipment={featuredEquipment}
-              onEquipmentClick={handleEquipmentClick}
-              onFavoriteClick={handleFavoriteToggle}
-              favorites={favorites}
-              onAddToComparison={handleAddToComparison}
-              onViewAll={() => setCurrentPage('browse')}
-              isLoading={isLoadingEquipment}
-            />
+            <Reveal>
+              <FeaturedListings
+                equipment={featuredEquipment}
+                onEquipmentClick={handleEquipmentClick}
+                onFavoriteClick={handleFavoriteToggle}
+                favorites={favorites}
+                onAddToComparison={handleAddToComparison}
+                onViewAll={() => setCurrentPage('browse')}
+                isLoading={isLoadingEquipment}
+              />
+            </Reveal>
 
             <RecentlyViewed
               onEquipmentClick={handleEquipmentClick}
