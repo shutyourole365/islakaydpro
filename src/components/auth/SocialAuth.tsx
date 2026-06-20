@@ -64,10 +64,10 @@ export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps
         <>
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-gray-200 dark:border-gray-700" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">
+              <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
                 {mode === 'signin' ? 'Or sign in with' : 'Or sign up with'}
               </span>
             </div>
@@ -117,7 +117,7 @@ export default function SocialAuth({ onError, onLoading, mode }: SocialAuthProps
           }
         }}
         aria-label="Send magic link"
-        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-all"
+        className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
           <path d="M15 7h2a5 5 0 010 10h-2m-6 0H7A5 5 0 017 7h2"/>

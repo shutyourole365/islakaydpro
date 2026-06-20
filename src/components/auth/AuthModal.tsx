@@ -139,7 +139,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div role="dialog" aria-modal="true" aria-label={mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Sign up' : 'Reset password'} className="relative w-full max-w-4xl max-h-[92vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex">
+      <div role="dialog" aria-modal="true" aria-label={mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Sign up' : 'Reset password'} className="relative w-full max-w-4xl max-h-[92vh] bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex">
         <div className="hidden lg:flex flex-col w-2/5 bg-gradient-to-br from-teal-600 to-emerald-600 p-10 text-white">
           <div className="flex items-center gap-2 mb-8">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
@@ -184,15 +184,15 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
         <div className="flex-1 p-8 lg:p-10 overflow-y-auto">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 backdrop-blur hover:bg-gray-100 transition-colors"
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 dark:bg-gray-700/80 backdrop-blur hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             aria-label="Close authentication dialog"
           >
-            <X className="w-6 h-6 text-gray-500" />
+            <X className="w-6 h-6 text-gray-500 dark:text-gray-400" />
           </button>
 
           <div className="max-w-sm mx-auto">
             {mode !== 'forgot' && (
-              <div className="flex p-1 mb-8 bg-gray-100 rounded-full" role="tablist" aria-label="Sign in or sign up">
+              <div className="flex p-1 mb-8 bg-gray-100 dark:bg-gray-700 rounded-full" role="tablist" aria-label="Sign in or sign up">
                 {([['signin', 'Sign in'], ['signup', 'Sign up']] as const).map(([value, label]) => (
                   <button
                     key={value}
@@ -205,8 +205,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                     }}
                     className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
                       mode === value
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700'
+                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                     }`}
                   >
                     {label}
@@ -214,25 +214,25 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                 ))}
               </div>
             )}
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               {mode === 'signin' && 'Welcome back'}
               {mode === 'signup' && 'Create your account'}
               {mode === 'forgot' && 'Reset password'}
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="text-gray-600 dark:text-gray-300 mb-8">
               {mode === 'signin' && 'Sign in to continue to your account'}
               {mode === 'signup' && 'Start renting equipment in minutes'}
               {mode === 'forgot' && "Enter your email and we'll send you a reset link"}
             </p>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800/50 rounded-xl text-red-600 dark:text-red-400 text-sm">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-100 rounded-xl text-green-600 text-sm">
+              <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/30 border border-green-100 dark:border-green-800/50 rounded-xl text-green-600 dark:text-green-400 text-sm">
                 {success}
               </div>
             )}
@@ -249,7 +249,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
             >
               {mode === 'signup' && (
                 <div>
-                  <label htmlFor={fullNameId} className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={fullNameId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
                     Full Name
                   </label>
                   <div className="relative">
@@ -261,14 +261,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="John Doe"
                       required
-                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
+                      className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
                     />
                   </div>
                 </div>
               )}
 
               <div>
-                <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
@@ -281,14 +281,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                     placeholder="you@example.com"
                     required
                     autoComplete="email"
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
                   />
                 </div>
               </div>
 
               {mode !== 'forgot' && (
                 <div>
-                  <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 mb-1.5">
+                  <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
                     Password
                   </label>
                   <div className="relative">
@@ -302,13 +302,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                       required
                       minLength={mode === 'signup' ? 8 : 6}
                       autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
-                      className="w-full pl-12 pr-12 py-3.5 rounded-xl border border-gray-200 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
+                      className="w-full pl-12 pr-12 py-3.5 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 transition-all"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                     >
                       {showPassword ? (
                         <EyeOff className="w-5 h-5" />
@@ -325,9 +325,9 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-500"
+                      className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-teal-500 focus:ring-teal-500"
                     />
-                    <span className="text-sm text-gray-600">Remember me</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-300">Remember me</span>
                   </label>
                   <button
                     type="button"
@@ -361,10 +361,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
             {/* Divider */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
+                <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500">or continue with</span>
+                <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">or continue with</span>
               </div>
             </div>
 
@@ -390,7 +390,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
             <div className="mt-8 text-center">
               {mode === 'signin' && (
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Don't have an account?{' '}
                   <button
                    
@@ -405,7 +405,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
                 </p>
               )}
               {(mode === 'signup' || mode === 'forgot') && (
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   Already have an account?{' '}
                   <button
                    
@@ -422,7 +422,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
               )}
             </div>
 
-            <p className="mt-6 text-xs text-center text-gray-500">
+            <p className="mt-6 text-xs text-center text-gray-500 dark:text-gray-400">
               By continuing, you agree to Islakayd's{' '}
               <a href="#" className="text-teal-600 hover:underline">
                 Terms of Service
