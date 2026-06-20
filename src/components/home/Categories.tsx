@@ -41,8 +41,8 @@ const CategoryItem = memo(function CategoryItem({ category, onClick, index }: Ca
   return (
     <button
       onClick={() => onClick(category)}
-      className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft hover:shadow-brand-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-teal-300/70 dark:hover:border-teal-700/60 hover:-translate-y-1.5 overflow-hidden"
-      style={{ animationDelay: `${index * 50}ms` }}
+      className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft hover:shadow-brand-lg transition-all duration-300 border border-gray-100 dark:border-gray-700 hover:border-teal-300/70 dark:hover:border-teal-700/60 hover:-translate-y-1.5 overflow-hidden animate-fade-in-up"
+      style={{ animationDelay: `${Math.min(index * 50, 500)}ms`, animationFillMode: 'both' }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-emerald-500/0 group-hover:from-teal-500/10 group-hover:to-emerald-500/10 transition-all duration-300" />
 
@@ -74,8 +74,9 @@ interface CategoriesProps {
 
 export default function Categories({ categories, onCategoryClick, onViewAll }: CategoriesProps) {
   return (
-    <section id="categories" className="py-24 bg-gray-50 dark:bg-gray-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="categories" className="relative py-24 bg-gray-50 dark:bg-gray-950 overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-teal-500/5 dark:bg-teal-500/[0.04] rounded-full blur-[140px]" />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-teal-500/10 to-emerald-500/10 text-teal-700 dark:text-teal-300 ring-1 ring-inset ring-teal-500/20 rounded-full text-sm font-semibold mb-5">
             <Sparkles className="w-4 h-4" />
