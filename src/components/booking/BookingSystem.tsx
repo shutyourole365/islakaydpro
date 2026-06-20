@@ -382,9 +382,9 @@ export default function BookingSystem({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <img
               src={equipment.images[0]}
@@ -392,8 +392,8 @@ export default function BookingSystem({
               className="w-14 h-14 rounded-xl object-cover"
             />
             <div>
-              <h2 className="font-semibold text-gray-900">{equipment.title}</h2>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
+              <h2 className="font-semibold text-gray-900 dark:text-white">{equipment.title}</h2>
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                 <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                 {equipment.rating.toFixed(1)} • {equipment.total_reviews} reviews
               </div>
@@ -402,20 +402,20 @@ export default function BookingSystem({
           <button
             onClick={onClose}
             aria-label="Close booking dialog"
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         {/* Progress Steps */}
-        <div className="px-6 py-4 border-b border-gray-100">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
                 <div
                   className={`flex items-center gap-2 ${
-                    index <= currentStepIndex ? 'text-teal-600' : 'text-gray-400'
+                    index <= currentStepIndex ? 'text-teal-600 dark:text-teal-400' : 'text-gray-400'
                   }`}
                 >
                   <div
@@ -423,8 +423,8 @@ export default function BookingSystem({
                       index < currentStepIndex
                         ? 'bg-teal-500 text-white'
                         : index === currentStepIndex
-                        ? 'bg-teal-100 text-teal-600'
-                        : 'bg-gray-100 text-gray-400'
+                        ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
                     }`}
                   >
                     {index < currentStepIndex ? <CheckCircle className="w-5 h-5" /> : step.icon}
@@ -434,7 +434,7 @@ export default function BookingSystem({
                 {index < steps.length - 1 && (
                   <div
                     className={`w-12 sm:w-24 h-0.5 mx-2 ${
-                      index < currentStepIndex ? 'bg-teal-500' : 'bg-gray-200'
+                      index < currentStepIndex ? 'bg-teal-500' : 'bg-gray-200 dark:bg-gray-700'
                     }`}
                   />
                 )}
@@ -450,15 +450,15 @@ export default function BookingSystem({
             <div className="grid md:grid-cols-2 gap-6">
               {/* Calendar */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Rental Dates</h3>
-                
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Rental Dates</h3>
+
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
                   {/* Month Navigation */}
-                  <div className="flex items-center justify-between px-4 py-3 bg-gray-50">
+                  <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/40">
                     <button
                       onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
                       aria-label="Previous month"
-                      className="p-1 hover:bg-gray-200 rounded-lg"
+                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"
                     >
                       <ChevronLeft className="w-5 h-5" />
                     </button>
@@ -468,16 +468,16 @@ export default function BookingSystem({
                     <button
                       onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
                       aria-label="Next month"
-                      className="p-1 hover:bg-gray-200 rounded-lg"
+                      className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg"
                     >
                       <ChevronRight className="w-5 h-5" />
                     </button>
                   </div>
 
                   {/* Day Headers */}
-                  <div className="grid grid-cols-7 gap-1 px-2 py-2 bg-gray-50">
+                  <div className="grid grid-cols-7 gap-1 px-2 py-2 bg-gray-50 dark:bg-gray-700/40">
                     {dayNames.map((day) => (
-                      <div key={day} className="text-center text-xs font-medium text-gray-500 py-1">
+                      <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-1">
                         {day}
                       </div>
                     ))}
@@ -506,11 +506,11 @@ export default function BookingSystem({
                           className={`
                             aspect-square flex items-center justify-center rounded-lg text-sm font-medium
                             transition-all duration-200
-                            ${disabled ? 'text-gray-300 cursor-not-allowed' : 'cursor-pointer'}
-                            ${blocked ? 'bg-gray-50 line-through' : ''}
+                            ${disabled ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' : 'cursor-pointer'}
+                            ${blocked ? 'bg-gray-50 dark:bg-gray-700/40 line-through' : ''}
                             ${selected ? 'bg-teal-500 text-white shadow-lg' : ''}
-                            ${inRange && !selected ? 'bg-teal-100 text-teal-700' : ''}
-                            ${!disabled && !selected && !inRange ? 'hover:bg-gray-100 text-gray-900' : ''}
+                            ${inRange && !selected ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400' : ''}
+                            ${!disabled && !selected && !inRange ? 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white' : ''}
                             ${isToday && !selected ? 'ring-2 ring-teal-500 ring-offset-1' : ''}
                           `}
                         >
@@ -521,7 +521,7 @@ export default function BookingSystem({
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
+                <div className="mt-4 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1.5">
                     <div className="w-3 h-3 rounded-full bg-teal-500" />
                     <span>Selected</span>
@@ -531,7 +531,7 @@ export default function BookingSystem({
                     <span>In range</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-gray-50 border border-gray-200" />
+                    <div className="w-3 h-3 rounded-full bg-gray-50 dark:bg-gray-700/40 border border-gray-200 dark:border-gray-700" />
                     <span>Unavailable</span>
                   </div>
                 </div>
@@ -539,33 +539,33 @@ export default function BookingSystem({
 
               {/* Date Summary */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Rental Summary</h3>
-                
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Rental Summary</h3>
+
                 <div className="space-y-4">
                   {/* Selected Dates */}
-                  <div className="bg-gray-50 rounded-xl p-4">
+                  <div className="bg-gray-50 dark:bg-gray-700/40 rounded-xl p-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-xs text-gray-500 uppercase tracking-wide">Start Date</label>
-                        <p className="font-semibold text-gray-900 mt-1">
+                        <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Start Date</label>
+                        <p className="font-semibold text-gray-900 dark:text-white mt-1">
                           {selectedStart?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || '—'}
                         </p>
                       </div>
                       <div>
-                        <label className="text-xs text-gray-500 uppercase tracking-wide">End Date</label>
-                        <p className="font-semibold text-gray-900 mt-1">
+                        <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">End Date</label>
+                        <p className="font-semibold text-gray-900 dark:text-white mt-1">
                           {selectedEnd?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) || '—'}
                         </p>
                       </div>
                     </div>
                     {rentalDays > 0 && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
-                          <span className="text-gray-600">Duration</span>
-                          <span className="font-semibold text-gray-900">{rentalDays} day{rentalDays > 1 ? 's' : ''}</span>
+                          <span className="text-gray-600 dark:text-gray-300">Duration</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{rentalDays} day{rentalDays > 1 ? 's' : ''}</span>
                         </div>
                         {availability === 'checking' && (
-                          <p className="mt-3 flex items-center gap-2 text-sm text-gray-500">
+                          <p className="mt-3 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                             <span className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
                             Checking availability…
                           </p>
@@ -585,12 +585,12 @@ export default function BookingSystem({
                   </div>
 
                   {/* Rental Requirements */}
-                  <div className="bg-blue-50 rounded-xl p-4">
+                  <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4">
                     <div className="flex items-start gap-3">
                       <Info className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                       <div className="text-sm">
-                        <p className="font-medium text-blue-800">Rental Requirements</p>
-                        <ul className="mt-2 text-blue-700 space-y-1">
+                        <p className="font-medium text-blue-800 dark:text-blue-300">Rental Requirements</p>
+                        <ul className="mt-2 text-blue-700 dark:text-blue-400 space-y-1">
                           <li>• Minimum rental: {equipment.min_rental_days} day{equipment.min_rental_days > 1 ? 's' : ''}</li>
                           <li>• Maximum rental: {equipment.max_rental_days} days</li>
                           <li>• Deposit required: ${equipment.deposit_amount}</li>
@@ -601,10 +601,10 @@ export default function BookingSystem({
 
                   {/* Quick Price Preview */}
                   {rentalDays > 0 && (
-                    <div className="bg-teal-50 rounded-xl p-4">
+                    <div className="bg-teal-50 dark:bg-teal-900/30 rounded-xl p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm text-teal-700">${equipment.daily_rate}/day × {rentalDays} days</p>
+                          <p className="text-sm text-teal-700 dark:text-teal-400">${equipment.daily_rate}/day × {rentalDays} days</p>
                           {pricing.savedAmount > 0 && (
                             <p className="text-xs text-green-600 mt-1">
                               <Gift className="w-3 h-3 inline mr-1" />
@@ -612,7 +612,7 @@ export default function BookingSystem({
                             </p>
                           )}
                         </div>
-                        <p className="text-2xl font-bold text-teal-700">${pricing.basePrice.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-teal-700 dark:text-teal-400">${pricing.basePrice.toLocaleString()}</p>
                       </div>
                     </div>
                   )}
@@ -635,7 +635,7 @@ export default function BookingSystem({
             <div className="space-y-6">
               {/* Insurance Plans */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <Shield className="w-5 h-5 text-teal-500" />
                   Protection Plans
                 </h3>
@@ -646,24 +646,24 @@ export default function BookingSystem({
                       onClick={() => setSelectedInsurance(selectedInsurance?.id === plan.id ? null : plan)}
                       className={`p-4 rounded-xl border-2 text-left transition-all ${
                         selectedInsurance?.id === plan.id
-                          ? 'border-teal-500 bg-teal-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30'
+                          : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-gray-900">{plan.name}</span>
+                        <span className="font-semibold text-gray-900 dark:text-white">{plan.name}</span>
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                          selectedInsurance?.id === plan.id ? 'border-teal-500 bg-teal-500' : 'border-gray-300'
+                          selectedInsurance?.id === plan.id ? 'border-teal-500 bg-teal-500' : 'border-gray-300 dark:border-gray-700'
                         }`}>
                           {selectedInsurance?.id === plan.id && <CheckCircle className="w-3 h-3 text-white" />}
                         </div>
                       </div>
-                      <p className="text-teal-600 font-semibold mb-2">
+                      <p className="text-teal-600 dark:text-teal-400 font-semibold mb-2">
                         +{(plan.rate * 100).toFixed(0)}% of rental
                       </p>
                       <ul className="space-y-1">
                         {plan.features.map((feature, i) => (
-                          <li key={i} className="text-xs text-gray-600 flex items-center gap-1">
+                          <li key={i} className="text-xs text-gray-600 dark:text-gray-300 flex items-center gap-1">
                             <Check className="w-3 h-3 text-green-500" />
                             {feature}
                           </li>
@@ -676,7 +676,7 @@ export default function BookingSystem({
 
               {/* Delivery Options */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <Truck className="w-5 h-5 text-teal-500" />
                   Delivery Options
                 </h3>
@@ -685,19 +685,19 @@ export default function BookingSystem({
                     onClick={() => setDeliveryOption('pickup')}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       deliveryOption === 'pickup'
-                        ? 'border-teal-500 bg-teal-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        deliveryOption === 'pickup' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
+                        deliveryOption === 'pickup' ? 'bg-teal-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }`}>
                         <MapPin className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">Self Pickup</p>
-                        <p className="text-sm text-gray-500">Free • {equipment.location}</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">Self Pickup</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Free • {equipment.location}</p>
                       </div>
                     </div>
                   </button>
@@ -706,19 +706,19 @@ export default function BookingSystem({
                     onClick={() => setDeliveryOption('delivery')}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       deliveryOption === 'delivery'
-                        ? 'border-teal-500 bg-teal-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-teal-500 bg-teal-50 dark:bg-teal-900/30'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        deliveryOption === 'delivery' ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-600'
+                        deliveryOption === 'delivery' ? 'bg-teal-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                       }`}>
                         <Truck className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">Delivery</p>
-                        <p className="text-sm text-gray-500">+$50 • Direct to your location</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">Delivery</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">+$50 • Direct to your location</p>
                       </div>
                     </div>
                   </button>
@@ -726,13 +726,13 @@ export default function BookingSystem({
 
                 {deliveryOption === 'delivery' && (
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Address</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Delivery Address</label>
                     <input
                       type="text"
                       value={deliveryAddress}
                       onChange={(e) => setDeliveryAddress(e.target.value)}
                       placeholder="Enter your delivery address"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
                 )}
@@ -740,7 +740,7 @@ export default function BookingSystem({
 
               {/* Promo Code */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <Tag className="w-5 h-5 text-teal-500" />
                   Promo Code
                 </h3>
@@ -751,7 +751,7 @@ export default function BookingSystem({
                     onChange={(e) => setPromoCode(e.target.value)}
                     placeholder="Enter promo code"
                     disabled={promoApplied}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-100"
+                    className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-gray-100 dark:disabled:bg-gray-700"
                   />
                   <button
                     onClick={applyPromoCode}
@@ -771,7 +771,7 @@ export default function BookingSystem({
 
               {/* Notes */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-teal-500" />
                   Special Requests (Optional)
                 </h3>
@@ -780,7 +780,7 @@ export default function BookingSystem({
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Any special requirements or notes for the owner..."
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
                 />
               </div>
             </div>
@@ -791,11 +791,11 @@ export default function BookingSystem({
             <div className="grid md:grid-cols-2 gap-6">
               {/* Price Breakdown */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Price Breakdown</h3>
-                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Price Breakdown</h3>
+                <div className="bg-gray-50 dark:bg-gray-700/40 rounded-xl p-4 space-y-3">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">${equipment.daily_rate}/day × {rentalDays} days</span>
-                    <span className="font-medium">${(equipment.daily_rate * rentalDays).toLocaleString()}</span>
+                    <span className="text-gray-600 dark:text-gray-300">${equipment.daily_rate}/day × {rentalDays} days</span>
+                    <span className="font-medium dark:text-white">${(equipment.daily_rate * rentalDays).toLocaleString()}</span>
                   </div>
                   
                   {pricing.savedAmount > 0 && (
@@ -807,32 +807,32 @@ export default function BookingSystem({
                   
                   {selectedInsurance && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">{selectedInsurance.name}</span>
-                      <span className="font-medium">${pricing.insurance.toFixed(2)}</span>
+                      <span className="text-gray-600 dark:text-gray-300">{selectedInsurance.name}</span>
+                      <span className="font-medium dark:text-white">${pricing.insurance.toFixed(2)}</span>
                     </div>
                   )}
                   
                   {deliveryOption === 'delivery' && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Delivery fee</span>
-                      <span className="font-medium">$50.00</span>
+                      <span className="text-gray-600 dark:text-gray-300">Delivery fee</span>
+                      <span className="font-medium dark:text-white">$50.00</span>
                     </div>
                   )}
                   
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Service fee (12%)</span>
-                    <span className="font-medium">${pricing.serviceFee.toFixed(2)}</span>
+                    <span className="text-gray-600 dark:text-gray-300">Service fee (12%)</span>
+                    <span className="font-medium dark:text-white">${pricing.serviceFee.toFixed(2)}</span>
                   </div>
                   
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Refundable deposit</span>
-                    <span className="font-medium">${pricing.deposit.toFixed(2)}</span>
+                    <span className="text-gray-600 dark:text-gray-300">Refundable deposit</span>
+                    <span className="font-medium dark:text-white">${pricing.deposit.toFixed(2)}</span>
                   </div>
-                  
-                  <div className="pt-3 border-t border-gray-200">
-                    <div className="flex justify-between text-lg font-bold">
+
+                  <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between text-lg font-bold dark:text-white">
                       <span>Total</span>
-                      <span className="text-teal-600">${pricing.total.toFixed(2)}</span>
+                      <span className="text-teal-600 dark:text-teal-400">${pricing.total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -840,31 +840,31 @@ export default function BookingSystem({
 
               {/* Payment Form */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Details</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Payment Details</h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Card Number</label>
                     <input
                       type="text"
                       placeholder="1234 5678 9012 3456"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Expiry</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Expiry</label>
                       <input
                         type="text"
                         placeholder="MM/YY"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">CVV</label>
                       <input
                         type="text"
                         placeholder="123"
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
+                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500"
                       />
                     </div>
                   </div>
@@ -877,14 +877,14 @@ export default function BookingSystem({
                       onChange={(e) => setAgreeToTerms(e.target.checked)}
                       className="w-4 h-4 text-teal-500 rounded mt-1"
                     />
-                    <label htmlFor="terms" className="text-sm text-gray-600">
+                    <label htmlFor="terms" className="text-sm text-gray-600 dark:text-gray-300">
                       I agree to the <a href="#" className="text-teal-600 hover:underline">Terms of Service</a> and{' '}
                       <a href="#" className="text-teal-600 hover:underline">Rental Agreement</a>. I understand that the deposit
                       is refundable upon safe return of the equipment.
                     </label>
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mt-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-4">
                     <Lock className="w-4 h-4" />
                     Your payment is secure and encrypted
                   </div>
@@ -899,29 +899,29 @@ export default function BookingSystem({
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="w-10 h-10 text-green-500" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Booking Confirmed!</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
                 Your booking reference is{' '}
                 <span className="font-mono font-bold">
                   {confirmedBooking ? `ISK-${confirmedBooking.id.slice(-8).toUpperCase()}` : `ISK-${Date.now().toString().slice(-8)}`}
                 </span>
               </p>
               
-              <div className="bg-gray-50 rounded-xl p-6 max-w-md mx-auto text-left">
-                <h3 className="font-semibold text-gray-900 mb-4">What's Next?</h3>
+              <div className="bg-gray-50 dark:bg-gray-700/40 rounded-xl p-6 max-w-md mx-auto text-left">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4">What's Next?</h3>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-sm font-bold">1</div>
-                    <p className="text-sm text-gray-600">Confirmation email sent to your inbox</p>
+                    <div className="w-6 h-6 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Confirmation email sent to your inbox</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-sm font-bold">2</div>
-                    <p className="text-sm text-gray-600">Owner will confirm within 2 hours</p>
+                    <div className="w-6 h-6 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Owner will confirm within 2 hours</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-sm font-bold">3</div>
-                    <p className="text-sm text-gray-600">
-                      {deliveryOption === 'delivery' 
+                    <div className="w-6 h-6 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {deliveryOption === 'delivery'
                         ? 'Equipment will be delivered to your address'
                         : 'Pick up at the scheduled time'}
                     </p>
@@ -933,12 +933,12 @@ export default function BookingSystem({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
           {currentStep !== 'confirmation' && (
             <>
               <button
                 onClick={currentStep === 'dates' ? onClose : handleBack}
-                className="px-6 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+                className="px-6 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
                >
                 {currentStep === 'dates' ? 'Cancel' : 'Back'}
               </button>
@@ -972,7 +972,7 @@ export default function BookingSystem({
             <div className="w-full flex gap-4">
               <button
                 onClick={onClose}
-                className="flex-1 px-6 py-3 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+                className="flex-1 px-6 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                >
                 Close
               </button>
