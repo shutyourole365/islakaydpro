@@ -189,39 +189,39 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
   };
 
   const statusColor: Record<string, string> = {
-    completed: 'text-green-600 bg-green-50',
-    confirmed: 'text-blue-600 bg-blue-50',
-    active: 'text-teal-600 bg-teal-50',
-    pending: 'text-amber-600 bg-amber-50',
-    cancelled: 'text-gray-500 bg-gray-50',
+    completed: 'text-green-600 bg-green-50 dark:bg-green-900/30 dark:text-green-400',
+    confirmed: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400',
+    active: 'text-teal-600 bg-teal-50 dark:bg-teal-900/30 dark:text-teal-400',
+    pending: 'text-amber-600 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-400',
+    cancelled: 'text-gray-500 bg-gray-50 dark:bg-gray-700/40 dark:text-gray-400',
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <button onClick={onBack} className="text-gray-600 hover:text-gray-900 transition-colors">
+            <button onClick={onBack} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Earnings Dashboard</h1>
-              <p className="text-gray-500 text-sm">Track your rental income</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Earnings Dashboard</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Track your rental income</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex rounded-xl overflow-hidden border border-gray-200 bg-white">
+            <div className="flex rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               {(['30d', '90d', 'ytd', 'all'] as const).map(p => (
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
-                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${period === p ? 'bg-teal-500 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+                  className={`px-3 py-1.5 text-sm font-medium transition-colors ${period === p ? 'bg-teal-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                 >
                   {p === '30d' ? '30D' : p === '90d' ? '90D' : p === 'ytd' ? 'YTD' : 'All'}
                 </button>
               ))}
             </div>
-            <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 bg-white rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+            <button onClick={exportCSV} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
               <Download className="w-4 h-4" /> Export
             </button>
           </div>
@@ -229,7 +229,7 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
 
         {/* Payout setup banner */}
         {payoutStatus && !payoutStatus.isOnboarded && import.meta.env.VITE_STRIPE_PUBLIC_KEY && (
-          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div className="mb-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-2xl p-4 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <CreditCard className="w-5 h-5 text-amber-600 flex-shrink-0" />
               <div>
@@ -250,16 +250,16 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
 
         {/* Stripe balance display */}
         {stripeBalance && (
-          <div className="mb-6 bg-teal-50 border border-teal-200 rounded-2xl p-4 flex items-center gap-6">
-            <CreditCard className="w-5 h-5 text-teal-600 flex-shrink-0" />
+          <div className="mb-6 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/50 rounded-2xl p-4 flex items-center gap-6">
+            <CreditCard className="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
             <div className="flex gap-8">
               <div>
-                <p className="text-xs text-teal-600 font-medium">Available for payout</p>
-                <p className="text-xl font-bold text-teal-900">{fmt(stripeBalance.available)}</p>
+                <p className="text-xs text-teal-600 dark:text-teal-400 font-medium">Available for payout</p>
+                <p className="text-xl font-bold text-teal-900 dark:text-teal-200">{fmt(stripeBalance.available)}</p>
               </div>
               <div>
-                <p className="text-xs text-teal-600 font-medium">Pending</p>
-                <p className="text-xl font-bold text-teal-700">{fmt(stripeBalance.pending)}</p>
+                <p className="text-xs text-teal-600 dark:text-teal-400 font-medium">Pending</p>
+                <p className="text-xl font-bold text-teal-700 dark:text-teal-300">{fmt(stripeBalance.pending)}</p>
               </div>
             </div>
           </div>
@@ -273,98 +273,98 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
           <>
             {/* Summary Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                    <DollarSign className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div className={`flex items-center gap-1 text-xs font-medium ${summary.monthlyGrowth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                     {summary.monthlyGrowth >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                     {Math.abs(summary.monthlyGrowth).toFixed(0)}%
                   </div>
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{fmt(summary.totalEarned)}</p>
-                <p className="text-xs text-gray-500 mt-1">Total Earned</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(summary.totalEarned)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Total Earned</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-3">
-                  <Clock className="w-5 h-5 text-amber-600" />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center mb-3">
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{fmt(summary.pendingPayout)}</p>
-                <p className="text-xs text-gray-500 mt-1">Pending Payout</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(summary.pendingPayout)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Pending Payout</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center mb-3">
-                  <TrendingUp className="w-5 h-5 text-teal-600" />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-xl flex items-center justify-center mb-3">
+                  <TrendingUp className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{fmt(summary.thisMonth)}</p>
-                <p className="text-xs text-gray-500 mt-1">This Month</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(summary.thisMonth)}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">This Month</p>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
-                  <Package className="w-5 h-5 text-blue-600" />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-3">
+                  <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{summary.completedBookings}</p>
-                <p className="text-xs text-gray-500 mt-1">Completed Rentals</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{summary.completedBookings}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Completed Rentals</p>
               </div>
             </div>
 
             {/* Secondary stats */}
             <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-purple-600" />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
+                <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-gray-900">{fmt(summary.avgBookingValue)}</p>
-                  <p className="text-xs text-gray-500">Avg. Booking Value</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">{fmt(summary.avgBookingValue)}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Avg. Booking Value</p>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
-                <div className="w-10 h-10 bg-teal-100 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-teal-600" />
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
+                <div className="w-10 h-10 bg-teal-100 dark:bg-teal-900/30 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-gray-900">
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">
                     {summary.totalBookings > 0 ? Math.round((summary.completedBookings / summary.totalBookings) * 100) : 0}%
                   </p>
-                  <p className="text-xs text-gray-500">Completion Rate</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Completion Rate</p>
                 </div>
               </div>
             </div>
 
             {/* Transaction list */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900">Recent Transactions</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+              <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white">Recent Transactions</h3>
               </div>
               {bookings.length === 0 ? (
                 <div className="text-center py-16">
-                  <DollarSign className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">No transactions in this period.</p>
+                  <DollarSign className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400">No transactions in this period.</p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
                   {bookings.map(b => {
                     const net = b.total_amount - b.service_fee;
                     const sc = statusColor[b.status] || statusColor.pending;
                     return (
                       <div key={b.id} className="p-4 flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <Package className="w-5 h-5 text-gray-500" />
+                        <div className="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Package className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">{b.equipment?.title || 'Unknown Equipment'}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-gray-900 dark:text-white truncate">{b.equipment?.title || 'Unknown Equipment'}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {b.renter?.full_name || 'Renter'} · {new Date(b.start_date).toLocaleDateString()} – {new Date(b.end_date).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="font-semibold text-gray-900">{fmt(net)}</p>
-                          <p className="text-xs text-gray-400">after {fmt(b.service_fee)} fee</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">{fmt(net)}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-400">after {fmt(b.service_fee)} fee</p>
                         </div>
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${sc} flex-shrink-0`}>
                           {b.status}
@@ -378,30 +378,30 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
 
             {/* Payout History */}
             {payouts.length > 0 && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-900">Payout History</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mt-6">
+                <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Payout History</h3>
                 </div>
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
                   {payouts.map(p => (
                     <div key={p.id} className="p-4 flex items-center gap-4">
-                      <div className="w-9 h-9 rounded-xl bg-teal-50 flex items-center justify-center flex-shrink-0">
-                        <DollarSign className="w-4 h-4 text-teal-600" />
+                      <div className="w-9 h-9 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center flex-shrink-0">
+                        <DollarSign className="w-4 h-4 text-teal-600 dark:text-teal-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900">{fmt(p.amount / 100)}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="font-semibold text-gray-900 dark:text-white">{fmt(p.amount / 100)}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {new Date(p.created_at).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}
                           {p.booking?.equipment?.title && (
-                            <span className="ml-2 text-gray-400">· {p.booking.equipment.title}</span>
+                            <span className="ml-2 text-gray-400 dark:text-gray-400">· {p.booking.equipment.title}</span>
                           )}
                         </p>
                       </div>
                       <div className="text-right flex-shrink-0">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                          p.status === 'completed' ? 'bg-green-50 text-green-600' :
-                          p.status === 'failed' ? 'bg-red-50 text-red-600' :
-                          'bg-amber-50 text-amber-600'
+                          p.status === 'completed' ? 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400' :
+                          p.status === 'failed' ? 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+                          'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
                         }`}>
                           {p.status === 'completed' ? '✓ Paid' :
                            p.status === 'failed' ? 'Failed' :
@@ -417,18 +417,18 @@ export default function OwnerEarningsDashboard({ onBack }: OwnerEarningsDashboar
             {/* Request Payout for completed bookings */}
             {payoutStatus?.isOnboarded && bookings.filter(b => b.status === 'completed' && b.payment_status === 'paid').length > 0 && (
               <div className="mt-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Request Payout</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Request Payout</h3>
                 <div className="space-y-2">
                   {bookings.filter(b => b.status === 'completed' && b.payment_status === 'paid').slice(0, 5).map(b => (
-                    <div key={b.id} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center justify-between gap-4">
+                    <div key={b.id} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-3 flex items-center justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="font-medium text-gray-900 truncate">{b.equipment?.title || 'Equipment'}</p>
-                        <p className="text-sm text-gray-500">{fmt(b.total_amount - b.service_fee)}</p>
+                        <p className="font-medium text-gray-900 dark:text-white truncate">{b.equipment?.title || 'Equipment'}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{fmt(b.total_amount - b.service_fee)}</p>
                       </div>
                       <button
                         onClick={() => handleRequestPayout(b.id)}
                         disabled={requestingPayoutId === b.id}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 transition-colors disabled:opacity-60 flex-shrink-0"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white text-sm font-medium rounded-lg shadow-brand hover:from-teal-600 hover:to-emerald-600 transition-colors disabled:opacity-60 flex-shrink-0"
                       >
                         {requestingPayoutId === b.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                         Payout
