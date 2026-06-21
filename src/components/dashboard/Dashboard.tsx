@@ -72,6 +72,7 @@ interface DashboardProps {
   onBack: () => void;
   onEquipmentClick: (equipment: Equipment) => void;
   onListEquipment: () => void;
+  onEditEquipment?: (equipment: Equipment) => void;
   onNavigate?: (page: string) => void;
   onLeaveReview?: (equipment: Equipment, bookingId: string) => void;
 }
@@ -83,6 +84,7 @@ export default function Dashboard({
   onBack,
   onEquipmentClick,
   onListEquipment,
+  onEditEquipment,
   onNavigate,
   onLeaveReview,
 }: DashboardProps) {
@@ -112,6 +114,7 @@ export default function Dashboard({
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [availabilityEquipment, setAvailabilityEquipment] = useState<Equipment | null>(null);
   const [conversationSearch, setConversationSearch] = useState('');
+  const [cancellingBookingId, setCancellingBookingId] = useState<string | null>(null);
 
   // Use transition for non-urgent updates
   const [, startTransition] = useTransition();
@@ -282,6 +285,16 @@ export default function Dashboard({
     await updateBookingStatus(bookingId, status);
     setOwnerBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b));
     if (user) logAuditEvent({ userId: user.id, action: `booking_${action}`, metadata: { bookingId } }).catch(() => {});
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      await updateBookingStatus(bookingId, 'cancelled');
+      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' as const } : b));
+      setCancellingBookingId(null);
+    } catch {
+      // silently fail — UI stays open so user can retry
+    }
   };
 
   const filteredBookings = bookings.filter(b => bookingFilter === 'all' || b.status === bookingFilter);
@@ -679,6 +692,15 @@ export default function Dashboard({
                                       Leave a Review
                                     </button>
                                   )}
+                                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                                  <button
+                                    onClick={() => setCancellingBookingId(booking.id)}
+                                    className="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 font-medium hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                                  >
+                                    <X className="w-4 h-4" aria-hidden="true" />
+                                    Cancel
+                                  </button>
+                                )}
                                 <button
                                   onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
                                   className="flex items-center gap-2 px-4 py-2 text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-xl transition-colors"
@@ -812,7 +834,11 @@ export default function Dashboard({
                             >
                               <Calendar className="w-5 h-5" />
                             </button>
-                            <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Edit listing">
+                            <button
+                              onClick={() => onEditEquipment?.(item)}
+                              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                              aria-label="Edit listing"
+                            >
                               <Edit className="w-5 h-5" />
                             </button>
                             <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
@@ -1406,6 +1432,36 @@ export default function Dashboard({
           equipment={availabilityEquipment}
           onClose={() => setAvailabilityEquipment(null)}
         />
+      )}
+
+      {/* Cancellation Confirmation Modal */}
+      {cancellingBookingId && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setCancellingBookingId(null)} />
+          <div className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/30 mx-auto mb-4">
+              <XCircle className="w-7 h-7 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">Cancel Booking?</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+              This action cannot be undone. Please check the cancellation policy before proceeding.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setCancellingBookingId(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+              >
+                Keep Booking
+              </button>
+              <button
+                onClick={() => handleCancelBooking(cancellingBookingId)}
+                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm font-medium"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

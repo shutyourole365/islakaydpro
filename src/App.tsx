@@ -3,7 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import type { Category, Equipment, SearchFilters, EquipmentId, UserId } from './types';
 import { useToast } from './components/ui/Toast';
-import { createEquipment } from './services/database';
+import { createEquipment, updateEquipment } from './services/database';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import Hero from './components/home/Hero';
@@ -658,6 +658,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isSmartPricingOpen, setIsSmartPricingOpen] = useState(false);
   const [isLiveTrackerOpen, setIsLiveTrackerOpen] = useState(false);
   const [isDamageWizardOpen, setIsDamageWizardOpen] = useState(false);
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
   // New premium features
   const [isPriceNegotiatorOpen, setIsPriceNegotiatorOpen] = useState(false);
   const [isMaintenancePredictorOpen, setIsMaintenancePredictorOpen] = useState(false);
@@ -1308,6 +1309,39 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
     setCurrentPage('home');
   };
 
+  const handleEditListingSubmit = async (formData: {
+    title: string; category_id: string; description: string; brand: string; model: string;
+    condition: string; daily_rate: number; weekly_rate: number; monthly_rate: number;
+    deposit_amount: number; location: string; features: string[]; images: string[];
+    min_rental_days: number; max_rental_days: number;
+  }) => {
+    if (!user || !editingEquipment) return;
+    try {
+      await updateEquipment(editingEquipment.id, {
+        category_id: formData.category_id,
+        title: formData.title,
+        description: formData.description,
+        brand: formData.brand || null,
+        model: formData.model || null,
+        condition: formData.condition as 'excellent' | 'good' | 'fair' | 'poor',
+        daily_rate: formData.daily_rate,
+        weekly_rate: formData.weekly_rate || null,
+        monthly_rate: formData.monthly_rate || null,
+        deposit_amount: formData.deposit_amount || 0,
+        location: formData.location,
+        images: formData.images,
+        features: formData.features,
+        min_rental_days: formData.min_rental_days || 1,
+        max_rental_days: formData.max_rental_days || 90,
+      });
+      addToast({ type: 'success', title: 'Listing updated!', message: 'Your changes have been saved.' });
+      setEditingEquipment(null);
+      setCurrentPage('dashboard');
+    } catch (err) {
+      addToast({ type: 'error', title: 'Update failed', message: err instanceof Error ? err.message : 'Could not save changes.' });
+    }
+  };
+
   const handleListingSubmit = async (formData: {
     title: string; category_id: string; description: string; brand: string; model: string;
     condition: string; daily_rate: number; weekly_rate: number; monthly_rate: number;
@@ -1499,9 +1533,9 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onBack={() => setCurrentPage('home')}
             onEquipmentClick={handleEquipmentClick}
             onListEquipment={handleListEquipment}
+            onEditEquipment={(equipment) => { setEditingEquipment(equipment); setCurrentPage('list-equipment'); }}
             onNavigate={(page: string) => setCurrentPage(page as PageType)}
             onLeaveReview={(equipment, bookingId) => {
-              // Use quick prompt if we have equipment object, else fall back to full modal
               setPostBookingPromptBooking({ booking: { id: bookingId } as import('./types').Booking, equipment });
             }}
           />
@@ -1770,8 +1804,9 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         <Suspense fallback={<PageLoader />}>
           <ListEquipmentForm
             categories={categories}
-            onClose={() => setCurrentPage('home')}
-            onSubmit={handleListingSubmit}
+            onClose={() => { setEditingEquipment(null); setCurrentPage(editingEquipment ? 'dashboard' : 'home'); }}
+            onSubmit={editingEquipment ? handleEditListingSubmit : handleListingSubmit}
+            initialData={editingEquipment ?? undefined}
           />
         </Suspense>
       )}
