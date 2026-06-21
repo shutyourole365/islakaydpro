@@ -449,6 +449,7 @@ export async function getConversations(userId: string): Promise<Conversation[]> 
       conversation:conversations(
         *,
         equipment:equipment(*),
+        participants:conversation_participants(*, user:profiles(*)),
         messages(*, sender:profiles!messages_sender_id_fkey(*))
       )
     `)

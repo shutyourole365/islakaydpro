@@ -39,6 +39,7 @@ import {
   Users,
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
+import AvailabilityManager from '../owner/AvailabilityManager';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -109,6 +110,8 @@ export default function Dashboard({
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
   const [reviewedBookingIds, setReviewedBookingIds] = useState<Set<string>>(new Set());
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [availabilityEquipment, setAvailabilityEquipment] = useState<Equipment | null>(null);
+  const [conversationSearch, setConversationSearch] = useState('');
 
   // Use transition for non-urgent updates
   const [, startTransition] = useTransition();
@@ -801,10 +804,18 @@ export default function Dashboard({
                             >
                               View
                             </button>
-                            <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Edit booking">
+                            <button
+                              onClick={() => setAvailabilityEquipment(item)}
+                              className="p-2 text-teal-600 dark:text-teal-400 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-lg transition-colors"
+                              aria-label="Manage availability"
+                              title="Manage availability"
+                            >
+                              <Calendar className="w-5 h-5" />
+                            </button>
+                            <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Edit listing">
                               <Edit className="w-5 h-5" />
                             </button>
-                            <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                            <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -863,126 +874,205 @@ export default function Dashboard({
               </div>
             )}
 
-            {activeTab === 'messages' && (
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div className="flex h-[600px]">
-                  <div className="w-80 border-r border-gray-100 dark:border-gray-700 flex flex-col">
-                    <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                        <input
-                          type="text"
-                          placeholder="Search conversations..."
-                          aria-label="Search conversations"
-                          className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:border-teal-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                        />
+            {activeTab === 'messages' && (() => {
+              const filteredConvs = conversations.filter(conv => {
+                const q = conversationSearch.toLowerCase();
+                if (!q) return true;
+                const other = conv.participants?.find(p => p.user_id !== user?.id);
+                const name = other?.user?.full_name || '';
+                const equipment = conv.equipment?.title || '';
+                const lastMsg = conv.last_message?.content || '';
+                return name.toLowerCase().includes(q) || equipment.toLowerCase().includes(q) || lastMsg.toLowerCase().includes(q);
+              });
+
+              const activeConv = conversations.find(c => c.id === selectedConversation);
+              const otherParticipant = activeConv?.participants?.find(p => p.user_id !== user?.id);
+              const otherName = otherParticipant?.user?.full_name || 'User';
+
+              return (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                  <div className="flex h-[600px]">
+                    {/* Conversation List */}
+                    <div className={`border-r border-gray-100 dark:border-gray-700 flex flex-col ${selectedConversation ? 'hidden md:flex md:w-80' : 'w-full md:w-80'}`}>
+                      <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Messages</h3>
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+                          <input
+                            type="text"
+                            value={conversationSearch}
+                            onChange={(e) => setConversationSearch(e.target.value)}
+                            placeholder="Search conversations..."
+                            aria-label="Search conversations"
+                            className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm focus:outline-none focus:border-teal-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex-1 overflow-y-auto">
+                        {filteredConvs.length === 0 ? (
+                          <div className="p-8 text-center">
+                            <MessageSquare className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                            <p className="text-gray-500 dark:text-gray-400 text-sm">
+                              {conversations.length === 0 ? 'No conversations yet' : 'No matches'}
+                            </p>
+                          </div>
+                        ) : (
+                          filteredConvs.map((conv) => {
+                            const other = conv.participants?.find(p => p.user_id !== user?.id);
+                            const displayName = other?.user?.full_name || conv.equipment?.title || 'Conversation';
+                            const initials = displayName.charAt(0).toUpperCase();
+                            const lastMsgPreview = conv.last_message?.content
+                              || conv.messages?.[conv.messages.length - 1]?.content
+                              || 'No messages yet';
+                            const hasUnread = (conv.unread_count || 0) > 0;
+
+                            return (
+                              <button
+                                key={conv.id}
+                                onClick={() => setSelectedConversation(conv.id)}
+                                className={`w-full p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-50 dark:border-gray-700/50 last:border-0 ${
+                                  selectedConversation === conv.id ? 'bg-teal-50 dark:bg-teal-900/30 border-l-2 border-l-teal-500' : ''
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="relative flex-shrink-0">
+                                    {other?.user?.avatar_url ? (
+                                      <img
+                                        src={other.user.avatar_url}
+                                        alt={displayName}
+                                        className="w-11 h-11 rounded-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+                                        <span className="text-white font-semibold text-sm">{initials}</span>
+                                      </div>
+                                    )}
+                                    {hasUnread && (
+                                      <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-teal-500 rounded-full border-2 border-white dark:border-gray-800" />
+                                    )}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between mb-0.5">
+                                      <p className={`text-sm truncate ${hasUnread ? 'font-semibold text-gray-900 dark:text-white' : 'font-medium text-gray-800 dark:text-gray-200'}`}>
+                                        {displayName}
+                                      </p>
+                                      {conv.unread_count && conv.unread_count > 0 ? (
+                                        <span className="flex-shrink-0 w-5 h-5 bg-teal-500 text-white text-xs font-medium rounded-full flex items-center justify-center">
+                                          {conv.unread_count}
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                    {conv.equipment?.title && (
+                                      <p className="text-xs text-teal-600 dark:text-teal-400 truncate mb-0.5">
+                                        {conv.equipment.title}
+                                      </p>
+                                    )}
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{lastMsgPreview}</p>
+                                  </div>
+                                </div>
+                              </button>
+                            );
+                          })
+                        )}
                       </div>
                     </div>
-                    <div className="flex-1 overflow-y-auto">
-                      {conversations.length === 0 ? (
-                        <div className="p-8 text-center">
-                          <MessageSquare className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                          <p className="text-gray-500 dark:text-gray-400 text-sm">No conversations yet</p>
-                        </div>
-                      ) : (
-                        conversations.map((conv) => (
-                          <button
-                            key={conv.id}
-                            onClick={() => setSelectedConversation(conv.id)}
-                            className={`w-full p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                              selectedConversation === conv.id ? 'bg-teal-50 dark:bg-teal-900/30' : ''
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                                <Users className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+
+                    {/* Chat View */}
+                    <div className={`flex-1 flex flex-col ${!selectedConversation ? 'hidden md:flex' : 'flex'}`}>
+                      {selectedConversation ? (
+                        <>
+                          <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                            <button
+                              onClick={() => setSelectedConversation(null)}
+                              className="md:hidden p-2 -ml-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                              aria-label="Back to conversations"
+                            >
+                              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300 rotate-180" />
+                            </button>
+                            {otherParticipant?.user?.avatar_url ? (
+                              <img src={otherParticipant.user.avatar_url} alt={otherName} className="w-9 h-9 rounded-full object-cover" />
+                            ) : (
+                              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-400 to-emerald-500 flex items-center justify-center">
+                                <span className="text-white font-semibold text-sm">{otherName.charAt(0)}</span>
                               </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="font-medium text-gray-900 dark:text-white truncate">
-                                  {conv.equipment?.title || 'Conversation'}
-                                </p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                                  {conv.last_message?.content || 'No messages'}
-                                </p>
-                              </div>
-                              {conv.unread_count && conv.unread_count > 0 && (
-                                <span className="w-5 h-5 bg-teal-500 text-white text-xs rounded-full flex items-center justify-center">
-                                  {conv.unread_count}
-                                </span>
+                            )}
+                            <div>
+                              <h3 className="font-semibold text-gray-900 dark:text-white text-sm">{otherName}</h3>
+                              {activeConv?.equipment?.title && (
+                                <p className="text-xs text-teal-600 dark:text-teal-400">{activeConv.equipment.title}</p>
                               )}
                             </div>
-                          </button>
-                        ))
+                          </div>
+                          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-gray-900/50">
+                            {messages.length === 0 ? (
+                              <div className="flex items-center justify-center h-full">
+                                <p className="text-sm text-gray-400 dark:text-gray-500">No messages yet. Say hello!</p>
+                              </div>
+                            ) : (
+                              messages.map((msg) => {
+                                const isMe = msg.sender_id === user?.id;
+                                return (
+                                  <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                    <div
+                                      className={`max-w-[72%] px-4 py-2.5 rounded-2xl shadow-sm ${
+                                        isMe
+                                          ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-br-sm'
+                                          : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-sm'
+                                      }`}
+                                    >
+                                      <p className="text-sm leading-relaxed">{msg.content}</p>
+                                      <p className={`text-xs mt-1 flex items-center gap-1 ${
+                                        isMe ? 'text-white/70 justify-end' : 'text-gray-400 dark:text-gray-500'
+                                      }`}>
+                                        {formatRelativeTime(msg.created_at)}
+                                        {isMe && (
+                                          <span title={msg.is_read || msg.read ? 'Read' : 'Delivered'}>
+                                            {msg.is_read || msg.read ? '✓✓' : '✓'}
+                                          </span>
+                                        )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                          <div className="p-4 border-t border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800">
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                                placeholder="Type a message..."
+                                aria-label="Type a message"
+                                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-teal-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm"
+                              />
+                              <button
+                                onClick={handleSendMessage}
+                                disabled={!newMessage.trim()}
+                                className="p-2.5 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl hover:shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                aria-label="Send message"
+                              >
+                                <Send className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="text-center">
+                            <MessageSquare className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                            <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Select a conversation</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Choose from your conversations to start messaging</p>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
-
-                  <div className="flex-1 flex flex-col">
-                    {selectedConversation ? (
-                      <>
-                        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
-                          <h3 className="font-semibold text-gray-900 dark:text-white">Conversation</h3>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                          {messages.map((msg) => (
-                            <div
-                              key={msg.id}
-                              className={`flex ${msg.sender_id === user?.id ? 'justify-end' : 'justify-start'}`}
-                            >
-                              <div
-                                className={`max-w-[70%] px-4 py-2 rounded-2xl ${
-                                  msg.sender_id === user?.id
-                                    ? 'bg-teal-500 text-white'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'
-                                }`}
-                              >
-                                <p>{msg.content}</p>
-                                <p className={`text-xs mt-1 flex items-center gap-1 ${
-                                  msg.sender_id === user?.id ? 'text-teal-100' : 'text-gray-500 dark:text-gray-400'
-                                }`}>
-                                  {formatRelativeTime(msg.created_at)}
-                                  {msg.sender_id === user?.id && (
-                                    <span title={msg.read ? 'Read' : 'Delivered'}>
-                                      {msg.read ? '✓✓' : '✓'}
-                                    </span>
-                                  )}
-                                </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="p-4 border-t border-gray-100 dark:border-gray-700">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={newMessage}
-                              onChange={(e) => setNewMessage(e.target.value)}
-                              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                              placeholder="Type a message..."
-                              aria-label="Type a message"
-                              className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:border-teal-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                            />
-                            <button
-                              onClick={handleSendMessage}
-                              className="p-2 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-colors"
-                             aria-label="Send message">
-                              <Send className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="flex-1 flex items-center justify-center">
-                        <div className="text-center">
-                          <MessageSquare className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                          <p className="text-gray-500 dark:text-gray-400">Select a conversation to start messaging</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {activeTab === 'notifications' && (
               <div className="space-y-6">
@@ -1309,6 +1399,14 @@ export default function Dashboard({
           </div>
         </div>
       </div>
+
+      {/* Availability Manager Modal */}
+      {availabilityEquipment && (
+        <AvailabilityManager
+          equipment={availabilityEquipment}
+          onClose={() => setAvailabilityEquipment(null)}
+        />
+      )}
     </div>
   );
 }
