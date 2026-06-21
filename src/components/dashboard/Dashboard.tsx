@@ -37,6 +37,7 @@ import {
   Building,
   RefreshCw,
   Users,
+  Power,
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
 import AvailabilityManager from '../owner/AvailabilityManager';
@@ -61,6 +62,8 @@ import {
   updateBookingStatus,
   logAuditEvent,
   getReviews,
+  updateEquipment,
+  deleteEquipment,
 } from '../../services/database';
 import ReferralProgram from '../referral/ReferralProgram';
 
@@ -115,6 +118,8 @@ export default function Dashboard({
   const [availabilityEquipment, setAvailabilityEquipment] = useState<Equipment | null>(null);
   const [conversationSearch, setConversationSearch] = useState('');
   const [cancellingBookingId, setCancellingBookingId] = useState<string | null>(null);
+  const [togglingListingId, setTogglingListingId] = useState<string | null>(null);
+  const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
 
   // Use transition for non-urgent updates
   const [, startTransition] = useTransition();
@@ -294,6 +299,28 @@ export default function Dashboard({
       setCancellingBookingId(null);
     } catch {
       // silently fail — UI stays open so user can retry
+    }
+  };
+
+  const handleToggleListing = async (item: Equipment) => {
+    setTogglingListingId(item.id);
+    try {
+      await updateEquipment(item.id, { is_active: !item.is_active });
+      setMyListings(prev => prev.map(l => l.id === item.id ? { ...l, is_active: !item.is_active } : l));
+    } catch {
+      // silently fail
+    } finally {
+      setTogglingListingId(null);
+    }
+  };
+
+  const handleDeleteListing = async (id: string) => {
+    try {
+      await deleteEquipment(id);
+      setMyListings(prev => prev.filter(l => l.id !== id));
+      setDeletingListingId(null);
+    } catch {
+      // silently fail
     }
   };
 
@@ -802,11 +829,22 @@ export default function Dashboard({
                             className="w-full h-40 object-cover"
                           />
                           <div className="absolute top-3 right-3">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-lg ${
-                              item.is_active ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                            }`}>
+                            <button
+                              onClick={() => handleToggleListing(item)}
+                              disabled={togglingListingId === item.id}
+                              title={item.is_active ? 'Pause listing' : 'Activate listing'}
+                              className={`flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-lg transition-colors disabled:opacity-60 ${
+                                item.is_active
+                                  ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/60'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                              }`}
+                            >
+                              {togglingListingId === item.id
+                                ? <Loader2 className="w-3 h-3 animate-spin" />
+                                : <Power className="w-3 h-3" />
+                              }
                               {item.is_active ? 'Active' : 'Inactive'}
-                            </span>
+                            </button>
                           </div>
                         </div>
                         <div className="p-4">
@@ -841,7 +879,11 @@ export default function Dashboard({
                             >
                               <Edit className="w-5 h-5" />
                             </button>
-                            <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                            <button
+                              onClick={() => setDeletingListingId(item.id)}
+                              aria-label="Delete listing"
+                              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            >
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -1458,6 +1500,36 @@ export default function Dashboard({
                 className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm font-medium"
               >
                 Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Listing Confirmation Modal */}
+      {deletingListingId && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeletingListingId(null)} />
+          <div className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/30 mx-auto mb-4">
+              <Trash2 className="w-7 h-7 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">Remove Listing?</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+              This will deactivate the listing and remove it from search results. Active bookings will not be affected.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeletingListingId(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+              >
+                Keep Listing
+              </button>
+              <button
+                onClick={() => handleDeleteListing(deletingListingId)}
+                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm font-medium"
+              >
+                Yes, Remove
               </button>
             </div>
           </div>
