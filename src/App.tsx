@@ -1411,6 +1411,8 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
         />
       )}
 
+      <div key={currentPage} className="page-transition">
+
       {currentPage === 'home' && (
         <>
           <main>
@@ -1810,6 +1812,8 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
           />
         </Suspense>
       )}
+
+      </div>{/* end page-transition wrapper */}
 
       {currentPage !== 'list-equipment' && (
         <Suspense fallback={null}>
