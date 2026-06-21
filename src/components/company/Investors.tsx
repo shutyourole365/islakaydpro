@@ -145,7 +145,7 @@ export default function Investors({ onBack }: InvestorsProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -156,7 +156,7 @@ export default function Investors({ onBack }: InvestorsProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-green-600 to-green-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -178,7 +178,7 @@ export default function Investors({ onBack }: InvestorsProps) {
                   </div>
                 ))}
               </div>
-              <Button className="bg-white text-green-600 hover:bg-gray-50">
+              <Button className="bg-white dark:bg-gray-800 text-green-600 dark:text-green-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                 Download Investor Kit
               </Button>
             </div>
@@ -188,8 +188,8 @@ export default function Investors({ onBack }: InvestorsProps) {
             <div className="max-w-4xl mx-auto">
               {/* Company Overview */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">Company Overview</h2>
-                <div className="prose prose-lg max-w-none text-gray-600">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Company Overview</h2>
+                <div className="prose prose-lg max-w-none text-gray-600 dark:text-gray-300">
                   <p className="mb-4">
                     Islakayd is revolutionizing the $100B+ equipment rental industry by connecting equipment owners with renters through a trusted, transparent, and efficient marketplace. Founded in 2020, we've grown from a startup to a global platform serving over 500,000 users across 150+ countries.
                   </p>
@@ -204,24 +204,24 @@ export default function Investors({ onBack }: InvestorsProps) {
 
               {/* Market Opportunity */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">Market Opportunity</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Market Opportunity</h2>
                 <div className="grid md:grid-cols-2 gap-8">
-                  <div className="bg-blue-50 rounded-lg p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Total Addressable Market</h3>
-                    <div className="text-3xl font-bold text-blue-600 mb-2">$100B+</div>
-                    <p className="text-gray-600 mb-4">Global equipment rental market size</p>
-                    <ul className="space-y-1 text-sm text-gray-600">
+                  <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Total Addressable Market</h3>
+                    <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">$100B+</div>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">Global equipment rental market size</p>
+                    <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                       <li>• Construction equipment: $45B</li>
                       <li>• Industrial machinery: $30B</li>
                       <li>• Agricultural equipment: $15B</li>
                       <li>• Other specialty equipment: $10B</li>
                     </ul>
                   </div>
-                  <div className="bg-green-50 rounded-lg p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Serviceable Addressable Market</h3>
-                    <div className="text-3xl font-bold text-green-600 mb-2">$25B</div>
-                    <p className="text-gray-600 mb-4">Online equipment rental opportunity</p>
-                    <ul className="space-y-1 text-sm text-gray-600">
+                  <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Serviceable Addressable Market</h3>
+                    <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">$25B</div>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">Online equipment rental opportunity</p>
+                    <ul className="space-y-1 text-sm text-gray-600 dark:text-gray-300">
                       <li>• Currently 90% offline transactions</li>
                       <li>• Growing digital adoption</li>
                       <li>• International expansion potential</li>
@@ -233,18 +233,18 @@ export default function Investors({ onBack }: InvestorsProps) {
 
               {/* Investors */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Investors</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Investors</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {investors.map((investor, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
                       <img
                         src={investor.logo}
                         alt={investor.name}
                         className="w-24 h-12 mx-auto mb-4 object-contain"
                       />
-                      <h3 className="font-semibold text-gray-900 mb-1">{investor.name}</h3>
-                      <p className="text-sm text-blue-600 mb-2">{investor.type}</p>
-                      <p className="text-sm text-gray-600">{investor.description}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{investor.name}</h3>
+                      <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">{investor.type}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{investor.description}</p>
                     </div>
                   ))}
                 </div>
@@ -252,20 +252,20 @@ export default function Investors({ onBack }: InvestorsProps) {
 
               {/* Milestones */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Key Milestones</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Key Milestones</h2>
                 <div className="space-y-6">
                   {milestones.map((milestone, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                         <div className="flex items-center">
-                          <div className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mr-4">
+                          <div className="bg-blue-100 text-blue-800 dark:text-blue-300 text-sm font-medium px-3 py-1 rounded-full mr-4">
                             {milestone.year} {milestone.quarter}
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900">{milestone.title}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{milestone.title}</h3>
                         </div>
                       </div>
-                      <p className="text-gray-600 mb-2">{milestone.description}</p>
-                      <p className="text-sm text-green-600 font-medium">{milestone.impact}</p>
+                      <p className="text-gray-600 dark:text-gray-300 mb-2">{milestone.description}</p>
+                      <p className="text-sm text-green-600 dark:text-green-400 font-medium">{milestone.impact}</p>
                     </div>
                   ))}
                 </div>
@@ -273,17 +273,17 @@ export default function Investors({ onBack }: InvestorsProps) {
 
               {/* Documents */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">Investor Documents</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Investor Documents</h2>
                 <div className="grid md:grid-cols-2 gap-4">
                   {documents.map((doc, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-4 flex items-center justify-between hover:bg-gray-100 transition-colors">
+                    <div key={index} className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                          <Download className="w-5 h-5 text-blue-600" />
+                          <Download className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-gray-900">{doc.name}</h4>
-                          <p className="text-sm text-gray-500">{doc.type} • {doc.size} • {doc.date}</p>
+                          <h4 className="font-medium text-gray-900 dark:text-white">{doc.name}</h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{doc.type} • {doc.size} • {doc.date}</p>
                         </div>
                       </div>
                       <Button variant="outline" size="sm">
@@ -295,21 +295,21 @@ export default function Investors({ onBack }: InvestorsProps) {
               </div>
 
               {/* Contact */}
-              <div className="bg-green-50 rounded-lg p-8 text-center">
-                <Award className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Invest in the Future</h2>
-                <p className="text-gray-600 mb-6">
+              <div className="bg-green-50 dark:bg-green-900/30 rounded-lg p-8 text-center">
+                <Award className="w-12 h-12 text-green-600 dark:text-green-400 mx-auto mb-4" />
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Invest in the Future</h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
                   Join our world-class investor syndicate and be part of transforming the equipment rental industry.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button className="bg-green-600 hover:bg-green-700">
                     Schedule Investor Meeting
                   </Button>
-                  <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white">
+                  <Button variant="outline" className="border-green-600 text-green-600 dark:text-green-400 hover:bg-green-600 hover:text-white">
                     Join Investor Mailing List
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500 mt-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
                   Contact: investors@islakayd.com | +1 (555) 123-4567
                 </p>
               </div>
