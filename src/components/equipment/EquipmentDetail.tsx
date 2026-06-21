@@ -60,6 +60,7 @@ export default function EquipmentDetail({
   const [calOffset, setCalOffset] = useState(0);
 
   const images = equipment.images?.length ? equipment.images : [];
+  const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     let active = true;
@@ -89,8 +90,6 @@ export default function EquipmentDetail({
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [lightboxIndex, images.length]);
-
-  const today = new Date().toISOString().split('T')[0];
 
   const pricing = (() => {
     if (!startDate || !endDate) return null;
