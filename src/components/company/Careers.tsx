@@ -91,7 +91,7 @@ export default function Careers({ onBack }: CareersProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -102,7 +102,7 @@ export default function Careers({ onBack }: CareersProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-green-600 to-green-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -123,57 +123,57 @@ export default function Careers({ onBack }: CareersProps) {
           <div className="px-8 py-16">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Values</h2>
-                <p className="text-xl text-gray-600">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Our Values</h2>
+                <p className="text-xl text-gray-600 dark:text-gray-300">
                   The principles that guide everything we do at Islakayd.
                 </p>
               </div>
 
               <div className="grid md:grid-cols-3 gap-8 mb-16">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Users className="w-8 h-8 text-blue-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">People First</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">People First</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
                     We put our users and team members at the center of everything we do. Their success is our success.
                   </p>
                 </div>
 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Zap className="w-8 h-8 text-purple-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Innovation</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Innovation</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
                     We embrace new ideas and technologies to solve complex problems and create better experiences.
                   </p>
                 </div>
 
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Heart className="w-8 h-8 text-green-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Integrity</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Integrity</h3>
+                  <p className="text-gray-600 dark:text-gray-300">
                     We act with honesty, transparency, and accountability in all our interactions and decisions.
                   </p>
                 </div>
               </div>
 
               {/* Benefits Section */}
-              <div className="bg-gray-50 rounded-lg p-8 mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Why Join Islakayd?</h2>
+              <div className="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-8 mb-16">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Why Join Islakayd?</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {benefits.map((benefit, index) => (
-                    <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
+                    <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                       <div className="flex items-center mb-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
                           {benefit.icon}
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900">{benefit.title}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{benefit.title}</h3>
                       </div>
-                      <p className="text-gray-600 text-sm">{benefit.description}</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">{benefit.description}</p>
                     </div>
                   ))}
                 </div>
@@ -181,31 +181,31 @@ export default function Careers({ onBack }: CareersProps) {
 
               {/* Open Positions */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Open Positions</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Open Positions</h2>
                 <div className="space-y-6">
                   {openPositions.map((position, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 hover:shadow-md transition-shadow">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-1">{position.title}</h3>
+                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{position.title}</h3>
                           <p className="text-blue-600 font-medium">{position.department}</p>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
                             <MapPin className="w-4 h-4 mr-1" />
                             {position.location}
                           </span>
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
                             <Clock className="w-4 h-4 mr-1" />
                             {position.type}
                           </span>
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 text-purple-800">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
                             <DollarSign className="w-4 h-4 mr-1" />
                             {position.salary}
                           </span>
                         </div>
                       </div>
-                      <p className="text-gray-600 mb-4">{position.description}</p>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">{position.description}</p>
                       <Button className="bg-blue-600 hover:bg-blue-700">
                         Apply Now
                       </Button>
@@ -215,12 +215,12 @@ export default function Careers({ onBack }: CareersProps) {
               </div>
 
               {/* Culture Section */}
-              <div className="bg-blue-50 rounded-lg p-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Our Culture</h2>
+              <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-8">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 text-center">Our Culture</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">How We Work</h3>
-                    <ul className="space-y-2 text-gray-600">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">How We Work</h3>
+                    <ul className="space-y-2 text-gray-600 dark:text-gray-300">
                       <li>• Async-first communication with flexible hours</li>
                       <li>• Quarterly company retreats and team events</li>
                       <li>• Open feedback culture with regular 1:1s</li>
@@ -229,8 +229,8 @@ export default function Careers({ onBack }: CareersProps) {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">What We Believe</h3>
-                    <ul className="space-y-2 text-gray-600">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">What We Believe</h3>
+                    <ul className="space-y-2 text-gray-600 dark:text-gray-300">
                       <li>• Everyone deserves access to the tools they need</li>
                       <li>• Technology can solve real-world problems</li>
                       <li>• Small teams can achieve big things</li>

@@ -102,7 +102,7 @@ export default function Partnerships({ onBack }: PartnershipsProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -113,7 +113,7 @@ export default function Partnerships({ onBack }: PartnershipsProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -124,7 +124,7 @@ export default function Partnerships({ onBack }: PartnershipsProps) {
                 Join forces with Islakayd to revolutionize the equipment rental industry
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button className="bg-white text-teal-600 hover:bg-gray-50">
+                <Button className="bg-white dark:bg-gray-800 text-teal-600 dark:text-teal-400 hover:bg-gray-50 dark:hover:bg-gray-800">
                   Become a Partner
                 </Button>
                 <Button variant="outline" className="border-white text-white hover:bg-white hover:text-teal-600">
@@ -138,18 +138,18 @@ export default function Partnerships({ onBack }: PartnershipsProps) {
             <div className="max-w-4xl mx-auto">
               {/* Partnership Types */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Partnership Opportunities</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Partnership Opportunities</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {partnerTypes.map((type, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div key={index} className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 hover:shadow-md transition-shadow">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                         {type.icon}
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-3">{type.title}</h3>
-                      <p className="text-gray-600 mb-4">{type.description}</p>
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{type.title}</h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">{type.description}</p>
                       <ul className="space-y-1">
                         {type.benefits.map((benefit, idx) => (
-                          <li key={idx} className="text-sm text-gray-600 flex items-center">
+                          <li key={idx} className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
                             <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></div>
                             {benefit}
                           </li>
@@ -162,20 +162,20 @@ export default function Partnerships({ onBack }: PartnershipsProps) {
 
               {/* Partnership Levels */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Partnership Levels</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Partnership Levels</h2>
                 <div className="space-y-6">
                   {partnershipLevels.map((level, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                        <h3 className="text-xl font-semibold text-gray-900">{level.level}</h3>
-                        <span className="text-sm text-gray-500 mt-1 md:mt-0">{level.requirements}</span>
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{level.level}</h3>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 mt-1 md:mt-0">{level.requirements}</span>
                       </div>
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Benefits:</h4>
+                          <h4 className="font-medium text-gray-900 dark:text-white mb-2">Benefits:</h4>
                           <ul className="space-y-1">
                             {level.benefits.map((benefit, idx) => (
-                              <li key={idx} className="text-sm text-gray-600 flex items-center">
+                              <li key={idx} className="text-sm text-gray-600 dark:text-gray-300 flex items-center">
                                 <div className="w-1.5 h-1.5 bg-green-600 rounded-full mr-2"></div>
                                 {benefit}
                               </li>
@@ -195,18 +195,18 @@ export default function Partnerships({ onBack }: PartnershipsProps) {
 
               {/* Current Partners */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Partners</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Partners</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {currentPartners.map((partner, index) => (
-                    <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                    <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
                       <img
                         src={partner.logo}
                         alt={partner.name}
                         className="w-20 h-10 mx-auto mb-4 object-contain"
                       />
-                      <h3 className="font-semibold text-gray-900 mb-1">{partner.name}</h3>
-                      <p className="text-sm text-blue-600 mb-2">{partner.type}</p>
-                      <p className="text-sm text-gray-600">{partner.description}</p>
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{partner.name}</h3>
+                      <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">{partner.type}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{partner.description}</p>
                     </div>
                   ))}
                 </div>
@@ -214,55 +214,55 @@ export default function Partnerships({ onBack }: PartnershipsProps) {
 
               {/* Partnership Process */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Partnership Process</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">Partnership Process</h2>
                 <div className="grid md:grid-cols-4 gap-8">
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400 font-bold text-lg">
                       1
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Initial Contact</h3>
-                    <p className="text-sm text-gray-600">Reach out to discuss partnership opportunities and mutual benefits.</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Initial Contact</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Reach out to discuss partnership opportunities and mutual benefits.</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400 font-bold text-lg">
                       2
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Partnership Assessment</h3>
-                    <p className="text-sm text-gray-600">We evaluate alignment, technical compatibility, and strategic fit.</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Partnership Assessment</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">We evaluate alignment, technical compatibility, and strategic fit.</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400 font-bold text-lg">
                       3
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Integration Planning</h3>
-                    <p className="text-sm text-gray-600">Develop detailed integration plan and timeline for partnership launch.</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Integration Planning</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Develop detailed integration plan and timeline for partnership launch.</p>
                   </div>
                   <div className="text-center">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 font-bold text-lg">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400 font-bold text-lg">
                       4
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Launch & Scale</h3>
-                    <p className="text-sm text-gray-600">Execute partnership launch and continuously optimize for mutual success.</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Launch & Scale</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">Execute partnership launch and continuously optimize for mutual success.</p>
                   </div>
                 </div>
               </div>
 
               {/* Contact Section */}
-              <div className="bg-teal-50 rounded-lg p-8 text-center">
-                <Handshake className="w-12 h-12 text-teal-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Partner?</h2>
-                <p className="text-gray-600 mb-6">
+              <div className="bg-teal-50 dark:bg-teal-900/30 rounded-lg p-8 text-center">
+                <Handshake className="w-12 h-12 text-teal-600 dark:text-teal-400 mx-auto mb-4" />
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Ready to Partner?</h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
                   Join our growing network of partners and help shape the future of equipment rental.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button className="bg-teal-600 hover:bg-teal-700">
                     Start Partnership Application
                   </Button>
-                  <Button variant="outline" className="border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white">
+                  <Button variant="outline" className="border-teal-600 text-teal-600 dark:text-teal-400 hover:bg-teal-600 hover:text-white">
                     Schedule a Call
                   </Button>
                 </div>
-                <p className="text-sm text-gray-500 mt-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
                   Contact: partnerships@islakayd.com | +1 (555) 123-4567
                 </p>
               </div>

@@ -118,7 +118,7 @@ export default function Press({ onBack }: PressProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button
           onClick={onBack}
@@ -129,7 +129,7 @@ export default function Press({ onBack }: PressProps) {
           Back to Islakayd
         </Button>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-purple-600 to-purple-800 text-white px-8 py-16">
             <div className="max-w-4xl mx-auto text-center">
@@ -154,20 +154,20 @@ export default function Press({ onBack }: PressProps) {
             <div className="max-w-4xl mx-auto">
               {/* Press Releases */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">Press Releases</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Press Releases</h2>
                 <div className="space-y-6">
                   {pressReleases.map((release, index) => (
-                    <div key={index} className="border-b border-gray-200 pb-6 last:border-b-0">
+                    <div key={index} className="border-b border-gray-200 dark:border-gray-700 pb-6 last:border-b-0">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-xl font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white hover:text-blue-600 cursor-pointer">
                           {release.title}
                         </h3>
-                        <span className="text-sm text-gray-500 flex items-center ml-4">
+                        <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center ml-4">
                           <Calendar className="w-4 h-4 mr-1" />
                           {release.date}
                         </span>
                       </div>
-                      <p className="text-gray-600 mb-3">{release.summary}</p>
+                      <p className="text-gray-600 dark:text-gray-300 mb-3">{release.summary}</p>
                       <Button variant="ghost" className="p-0 h-auto text-blue-600 hover:text-blue-800">
                         Read Full Release
                         <ExternalLink className="w-4 h-4 ml-1" />
@@ -179,15 +179,15 @@ export default function Press({ onBack }: PressProps) {
 
               {/* Media Coverage */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">Recent Coverage</h2>
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Recent Coverage</h2>
                 <div className="grid md:grid-cols-2 gap-6">
                   {coverage.map((article, index) => (
-                    <div key={index} className="bg-gray-50 rounded-lg p-6">
+                    <div key={index} className="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-6">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-blue-600">{article.publication}</span>
-                        <span className="text-sm text-gray-500">{article.date}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{article.date}</span>
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3 hover:text-blue-600 cursor-pointer">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 hover:text-blue-600 cursor-pointer">
                         {article.title}
                       </h3>
                       <Button variant="ghost" className="p-0 h-auto text-blue-600 hover:text-blue-800">
@@ -201,18 +201,18 @@ export default function Press({ onBack }: PressProps) {
 
               {/* Media Kit */}
               <div className="mb-16">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">Media Kit</h2>
-                <p className="text-gray-600 mb-6">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Media Kit</h2>
+                <p className="text-gray-600 dark:text-gray-300 mb-6">
                   Download our complete media kit including logos, photos, brand guidelines, and company information.
                 </p>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {mediaKit.map((item, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 transition-colors">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-blue-600">{item.type}</span>
-                        <span className="text-sm text-gray-500">{item.size}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{item.size}</span>
                       </div>
-                      <h4 className="font-medium text-gray-900 mb-3">{item.name}</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-3">{item.name}</h4>
                       <Button variant="outline" size="sm" className="w-full">
                         <Download className="w-4 h-4 mr-2" />
                         Download
@@ -223,12 +223,12 @@ export default function Press({ onBack }: PressProps) {
               </div>
 
               {/* Contact Information */}
-              <div className="bg-blue-50 rounded-lg p-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6">Press Contact</h2>
+              <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-8">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">Press Contact</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">Media Inquiries</h3>
-                    <div className="space-y-2 text-gray-600">
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Media Inquiries</h3>
+                    <div className="space-y-2 text-gray-600 dark:text-gray-300">
                       <p><strong>Email:</strong> press@islakayd.com</p>
                       <p><strong>Phone:</strong> +1 (555) 123-4567</p>
                       <p><strong>Response Time:</strong> Within 24 hours</p>
