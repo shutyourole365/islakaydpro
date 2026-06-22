@@ -1,5 +1,5 @@
-const CACHE_NAME = 'islakayd-v1';
-const RUNTIME_CACHE = 'islakayd-runtime-v1';
+const CACHE_NAME = 'islakayd-v2';
+const RUNTIME_CACHE = 'islakayd-runtime-v2';
 
 // Assets to cache on install
 const PRECACHE_ASSETS = [
@@ -106,6 +106,12 @@ async function cacheFirst(request) {
     return networkResponse;
   } catch (error) {
     console.log('[SW] Cache-first fetch failed:', error);
+    // For scripts/styles, never substitute a fake body — returning a non-JS
+    // 503 would make a dynamic import "succeed" with garbage and crash the app.
+    // Let the request reject so the page can recover (e.g. reload for fresh assets).
+    if (request.destination === 'script' || request.destination === 'style') {
+      return Response.error();
+    }
     return new Response('Offline', { status: 503 });
   }
 }
