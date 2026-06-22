@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { ToastProvider } from './components/ui/Toast';
-import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { ErrorBoundary, isChunkLoadError, reloadOnceForStaleChunks } from './components/ui/ErrorBoundary';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { registerServiceWorker } from './lib/serviceWorker';
 import { analytics } from './services/analytics';
@@ -18,6 +18,17 @@ if (import.meta.env.DEV) {
 
 // Initialize error monitoring first
 errorMonitoring.initialize();
+
+// Recover from stale-deploy chunk load failures before they reach the user.
+// Vite fires `vite:preloadError` when a dynamic import can't be fetched (e.g. a
+// hashed chunk was replaced by a newer deploy); reload once to get fresh assets.
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault();
+  reloadOnceForStaleChunks();
+});
+window.addEventListener('unhandledrejection', (event) => {
+  if (isChunkLoadError(event.reason)) reloadOnceForStaleChunks();
+});
 
 // Validate environment variables on startup
 const envValidation = validateEnvironment();

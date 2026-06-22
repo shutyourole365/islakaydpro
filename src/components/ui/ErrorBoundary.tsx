@@ -1,6 +1,32 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
+const CHUNK_ERROR_RE = /loading chunk|loading css chunk|dynamically imported module|module script failed|failed to fetch dynamically imported/i;
+
+/** True when the error looks like a failed dynamic import / stale-chunk fetch. */
+export function isChunkLoadError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error ?? '');
+  return CHUNK_ERROR_RE.test(msg);
+}
+
+/**
+ * Reload the page once to pick up fresh assets. Guards against an infinite
+ * reload loop (if the chunk is genuinely gone) by rate-limiting via
+ * sessionStorage. Returns true if a reload was triggered.
+ */
+export function reloadOnceForStaleChunks(): boolean {
+  try {
+    const KEY = 'chunk-reload-at';
+    const last = Number(sessionStorage.getItem(KEY) || '0');
+    if (Date.now() - last < 20000) return false; // already tried very recently
+    sessionStorage.setItem(KEY, String(Date.now()));
+  } catch {
+    // sessionStorage unavailable — fall through and reload anyway
+  }
+  window.location.reload();
+  return true;
+}
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -29,6 +55,15 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Auto-recover from stale-deploy chunk load failures: when a new build
+    // changes hashed chunk names, a previously cached index.html (or service
+    // worker) can request a chunk that no longer exists, rejecting the dynamic
+    // import. Reload once to fetch fresh assets instead of stranding the user.
+    if (isChunkLoadError(error) && reloadOnceForStaleChunks()) {
+      return;
+    }
+
     this.setState({
       error,
       errorInfo,
