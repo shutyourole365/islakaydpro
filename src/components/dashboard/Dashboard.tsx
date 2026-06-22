@@ -38,10 +38,12 @@ import {
   RefreshCw,
   Users,
   Power,
+  CalendarPlus,
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
 import AvailabilityManager from '../owner/AvailabilityManager';
 import PayoutSetupBanner from './PayoutSetupBanner';
+import { downloadBookingICS } from '../../utils/calendar';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -723,6 +725,16 @@ export default function Dashboard({
                                       Leave a Review
                                     </button>
                                   )}
+                                {(booking.status === 'confirmed' || booking.status === 'active') && (
+                                  <button
+                                    onClick={() => downloadBookingICS(booking)}
+                                    className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                                    title="Add this rental to your calendar"
+                                  >
+                                    <CalendarPlus className="w-4 h-4" aria-hidden="true" />
+                                    Add to calendar
+                                  </button>
+                                )}
                                 {(booking.status === 'pending' || booking.status === 'confirmed') && (
                                   <button
                                     onClick={() => setCancellingBookingId(booking.id)}
