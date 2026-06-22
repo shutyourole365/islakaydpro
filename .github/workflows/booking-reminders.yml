@@ -1,0 +1,87 @@
+name: Booking Pickup Reminders
+
+on:
+  schedule:
+    # 08:00 AWST = 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    name: Send Pickup Reminders
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Calculate tomorrow (AWST)
+        id: date
+        run: |
+          TOMORROW=$(TZ="Australia/Perth" date -d "+1 day" +%Y-%m-%d)
+          echo "tomorrow=$TOMORROW" >> $GITHUB_OUTPUT
+          echo "Tomorrow (AWST): $TOMORROW"
+
+      - name: Query and notify
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, os, subprocess
+          from datetime import datetime, timedelta, timezone
+
+          awst = timezone(timedelta(hours=8))
+          tomorrow = (datetime.now(awst) + timedelta(days=1)).strftime('%Y-%m-%d')
+
+          supabase_url = os.environ['SUPABASE_URL'].rstrip('/')
+          service_key = os.environ['SERVICE_KEY']
+
+          print(f"Checking bookings for: {tomorrow}")
+
+          # Fetch bookings
+          url = f"{supabase_url}/rest/v1/bookings?select=id,start_date,renter_id,equipment:equipment(title),renter:profiles!bookings_renter_id_fkey(full_name)&status=eq.confirmed&start_date=eq.{tomorrow}"
+          req = urllib.request.Request(url, headers={
+              "apikey": service_key,
+              "Authorization": f"Bearer {service_key}",
+          })
+          with urllib.request.urlopen(req) as r:
+              bookings = json.loads(r.read())
+
+          print(f"Found {len(bookings)} booking(s)")
+          if not bookings:
+              print("Nothing to do.")
+              exit(0)
+
+          sent = 0
+          for booking in bookings:
+              equipment_title = (booking.get('equipment') or {}).get('title', 'your equipment')
+              renter_name = (booking.get('renter') or {}).get('full_name') or 'there'
+
+              payload = json.dumps({
+                  "user_id": booking['renter_id'],
+                  "type": "booking_reminder",
+                  "title": "Pickup reminder \U0001f514",
+                  "message": f'Hey {renter_name}! Don\'t forget \u2014 pick up "{equipment_title}" tomorrow.',
+                  "read": False,
+                  "booking_id": booking['id'],
+              }).encode()
+
+              req2 = urllib.request.Request(
+                  f"{supabase_url}/rest/v1/notifications",
+                  data=payload,
+                  headers={
+                      "apikey": service_key,
+                      "Authorization": f"Bearer {service_key}",
+                      "Content-Type": "application/json",
+                      "Prefer": "return=minimal",
+                  },
+                  method="POST"
+              )
+              try:
+                  with urllib.request.urlopen(req2) as r:
+                      sent += 1
+                      print(f"  \u2705 Notified {renter_name} \u2192 {equipment_title}")
+              except Exception as e:
+                  print(f"  \u274c Failed for {booking['id'][:8]}: {e}")
+
+          print(f"\nDone: {sent}/{len(bookings)} notifications sent.")
+          PYEOF
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
