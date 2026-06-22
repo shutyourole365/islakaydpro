@@ -1547,18 +1547,20 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
   trend?: number;
 }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-      <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white mb-4`}>
+    <div className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-soft-lg hover:-translate-y-0.5 transition-all duration-300">
+      {/* soft tinted glow that intensifies on hover */}
+      <div className={`absolute -top-8 -right-8 w-24 h-24 ${color} rounded-full opacity-[0.07] group-hover:opacity-[0.12] blur-xl transition-opacity duration-300`} />
+      <div className={`relative w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-105 transition-transform duration-300`}>
         <Icon className="w-6 h-6" />
       </div>
-      <div className="flex items-end justify-between">
+      <div className="relative flex items-end justify-between">
         <div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
         </div>
         {trend !== undefined && (
-          <div className={`flex items-center gap-1 text-sm ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {trend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+          <div className={`flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full ${trend >= 0 ? 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30' : 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30'}`}>
+            {trend >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
             {Math.abs(trend)}%
           </div>
         )}

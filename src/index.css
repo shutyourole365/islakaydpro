@@ -469,6 +469,11 @@ input[type="number"] {
   100% { transform: translateX(100%); }
 }
 
+@keyframes toast-countdown {
+  from { width: 100%; }
+  to   { width: 0%;   }
+}
+
 /* Staggered fade-up for grid items; pair with inline animation-delay */
 .stagger-item {
   opacity: 0;
