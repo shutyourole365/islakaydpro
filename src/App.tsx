@@ -37,7 +37,7 @@ import FeatureShowcase from './components/ui/FeatureShowcase';
 import InstallPrompt, { OfflineIndicator } from './components/pwa/InstallPrompt';
 import { CookieConsentBanner, CookieSettingsModal } from './components/ui/CookieConsent';
 import { useCookieConsent } from './hooks/useCookieConsent';
-import { addFavorite, removeFavorite, getEquipment, createReview } from './services/database';
+import { addFavorite, removeFavorite, getEquipment, createReview, saveSearch } from './services/database';
 import { verifyCheckoutSession } from './services/payments';
 import { getPersonalizedRecommendations } from './services/ai';
 
@@ -1539,6 +1539,17 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             favorites={favorites}
             isLoading={isLoadingEquipment}
             onListEquipment={handleListEquipment}
+            onSaveSearch={async (filters) => {
+              if (!user) { setIsAuthOpen(true); return; }
+              const name = [filters.query, filters.category, filters.location]
+                .filter(Boolean).join(' · ') || 'All equipment';
+              try {
+                await saveSearch({ user_id: user.id, name, filters, alert_enabled: true });
+                addToast({ type: 'success', title: 'Search saved', message: 'We’ll alert you when new matches are listed.' });
+              } catch {
+                addToast({ type: 'error', title: 'Could not save', message: 'Please try again.' });
+              }
+            }}
             onBack={() => {
               setSearchQuery('');
               setSearchCategory('');

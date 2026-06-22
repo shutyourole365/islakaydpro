@@ -14,8 +14,10 @@ import {
   Map,
   PackageOpen,
   Plus,
+  Bookmark,
+  Check,
 } from 'lucide-react';
-import type { Equipment, Category } from '../../types';
+import type { Equipment, Category, SearchFilters } from '../../types';
 import EquipmentMap from '../map/EquipmentMap';
 
 interface BrowsePageProps {
@@ -29,6 +31,7 @@ interface BrowsePageProps {
   onBack: () => void;
   isLoading?: boolean;
   onListEquipment?: () => void;
+  onSaveSearch?: (filters: SearchFilters) => Promise<void> | void;
 }
 
 export default function BrowsePage({
@@ -42,7 +45,9 @@ export default function BrowsePage({
   onBack,
   isLoading = false,
   onListEquipment,
+  onSaveSearch,
 }: BrowsePageProps) {
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [location, setLocation] = useState('');
@@ -162,6 +167,26 @@ export default function BrowsePage({
     setRentalDuration('');
     setSortBy('featured');
     setUserCoords(null);
+  };
+
+  const handleSaveSearch = async () => {
+    if (!onSaveSearch || saveState !== 'idle') return;
+    setSaveState('saving');
+    try {
+      await onSaveSearch({
+        query: searchQuery,
+        category: selectedCategory,
+        location,
+        minPrice: priceRange[0],
+        maxPrice: priceRange[1],
+        condition,
+        sortBy,
+      });
+      setSaveState('saved');
+      setTimeout(() => setSaveState('idle'), 2500);
+    } catch {
+      setSaveState('idle');
+    }
   };
 
   const handleNearMe = () => {
@@ -327,6 +352,26 @@ export default function BrowsePage({
                   </span>
                 )}
               </button>
+
+              {onSaveSearch && activeFiltersCount > 0 && (
+                <button
+                  onClick={handleSaveSearch}
+                  disabled={saveState !== 'idle'}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-colors ${
+                    saveState === 'saved'
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                      : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:border-teal-400 dark:hover:border-teal-600'
+                  }`}
+                  title="Save this search to get alerts on new matches"
+                >
+                  {saveState === 'saved'
+                    ? <Check className="w-4 h-4" />
+                    : <Bookmark className="w-4 h-4" />}
+                  <span className="hidden sm:inline">
+                    {saveState === 'saved' ? 'Saved' : saveState === 'saving' ? 'Saving…' : 'Save search'}
+                  </span>
+                </button>
+              )}
 
               <div className="hidden sm:flex items-center gap-1 border border-gray-200 dark:border-gray-700 rounded-xl p-1">
                 <button
