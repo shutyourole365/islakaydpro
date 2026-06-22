@@ -198,23 +198,22 @@ export default function Header({
     };
   }, []);
 
-  // The light hero needs a solid header; transparent-over-photo mode is retired
   const showTransparent: boolean = false;
 
-  const navItemClass = (page?: string) =>
-    `text-sm font-medium transition-colors hover:text-teal-500 ${
-      page && currentPage === page
-        ? 'text-teal-500'
-        : showTransparent
-          ? 'text-white/90'
-          : 'text-gray-700 dark:text-gray-200'
+  const navItemClass = (page?: string) => {
+    const isActive = page && currentPage === page;
+    return `text-sm font-medium px-3 py-1.5 rounded-full transition-all duration-200 ${
+      isActive
+        ? 'text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-900/30'
+        : 'text-gray-700 dark:text-gray-200 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gray-100 dark:hover:bg-gray-800/60'
     }`;
+  };
 
   const dropdownPanelClass =
-    'absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50';
+    'absolute top-full left-0 mt-2 w-56 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-soft-lg border border-gray-100/80 dark:border-gray-700/60 py-2 z-50 animate-dropdown';
 
   const dropdownItemClass =
-    'flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors';
+    'flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:text-teal-700 dark:hover:text-teal-300 transition-colors rounded-lg mx-1 w-[calc(100%-8px)]';
 
   const scrollToHowItWorks = () => {
     onNavigate('home');
@@ -263,16 +262,16 @@ export default function Header({
 
   return (
     <header
-      className={`fixed left-0 right-0 z-50 transition-all duration-300 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md ${
+      className={`fixed left-0 right-0 z-50 transition-all duration-500 ${
         offsetTop ? 'top-10' : 'top-0'
       } ${
         isScrolled
-          ? 'shadow-lg dark:shadow-gray-950/50'
-          : 'border-b border-gray-100 dark:border-gray-800'
+          ? 'bg-white/80 dark:bg-gray-950/85 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-800/60 shadow-[0_1px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_1px_40px_rgba(0,0,0,0.35)]'
+          : 'bg-white/70 dark:bg-gray-950/70 backdrop-blur-xl border-b border-white/30 dark:border-gray-800/30'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className={`flex items-center justify-between transition-all duration-300 ${isScrolled ? 'h-16' : 'h-20'}`}>
           <div className="flex items-center gap-10">
             <button onClick={() => onNavigate('home')} aria-label="Go to home page" className="flex items-center">
               <LogoPro variant={showTransparent ? 'light' : 'default'} size="md" showText={true} />
@@ -294,7 +293,7 @@ export default function Header({
                 {isExploreMenuOpen && (
                   <div
                     role="menu"
-                    className="absolute top-full left-0 mt-3 w-[640px] bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-700 p-5 z-50 animate-fade-in"
+                    className="absolute top-full left-0 mt-3 w-[640px] bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-3xl shadow-soft-xl border border-gray-100/80 dark:border-gray-700/60 p-5 z-50 animate-dropdown"
                   >
                     <div className="flex items-center justify-between px-2 pb-3 mb-2 border-b border-gray-100 dark:border-gray-700">
                       <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -469,7 +468,7 @@ export default function Header({
                   {isProfileMenuOpen && (
                     <div
                       role="menu"
-                      className="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 overflow-hidden"
+                      className="absolute right-0 mt-2 w-60 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-soft-lg border border-gray-100/80 dark:border-gray-700/60 py-2 overflow-hidden animate-dropdown"
                     >
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <p className="font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
@@ -553,7 +552,7 @@ export default function Header({
       </div>
 
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-xl max-h-[calc(100vh-5rem)] overflow-y-auto">
+        <div className="lg:hidden bg-white/90 dark:bg-gray-950/90 backdrop-blur-xl border-t border-gray-100/80 dark:border-gray-800/60 shadow-soft-lg max-h-[calc(100vh-5rem)] overflow-y-auto animate-mobile-menu">
           <div className="px-4 py-6 space-y-4">
             <button
               onClick={() => {

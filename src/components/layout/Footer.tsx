@@ -63,9 +63,14 @@ export default function Footer({ onNavigate }: FooterProps) {
   ];
 
   return (
-    <footer className="relative bg-gray-950 text-gray-300">
+    <footer className="relative bg-gray-950 text-gray-300 overflow-hidden">
+      {/* Ambient brand glow */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[80%] h-48 bg-gradient-to-r from-teal-500/10 via-emerald-500/10 to-cyan-500/10 blur-3xl"
+      />
       <div className="h-1 w-full bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500" />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Trust strip */}
         <div className="py-6 border-b border-gray-800/80 flex flex-wrap items-center justify-center md:justify-between gap-4">
           {trustBadges.map(({ Icon, label }) => (
@@ -95,7 +100,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-white transition-all duration-300"
+                    className="w-10 h-10 rounded-full bg-gray-800/80 border border-gray-700/60 flex items-center justify-center text-gray-400 hover:bg-teal-500 hover:text-white hover:border-teal-500 hover:-translate-y-0.5 transition-all duration-300"
                   >
                     <Icon className="w-5 h-5" />
                   </a>
@@ -112,7 +117,7 @@ export default function Footer({ onNavigate }: FooterProps) {
                   <li key={link.label}>
                     <button
                       onClick={() => onNavigate?.(link.page)}
-                      className="text-sm text-gray-400 hover:text-teal-400 transition-colors text-left"
+                      className="text-sm text-gray-400 hover:text-teal-400 hover:translate-x-1 transition-all duration-200 text-left inline-block"
                     >
                       {link.label}
                     </button>

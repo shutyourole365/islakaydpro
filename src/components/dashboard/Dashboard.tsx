@@ -37,6 +37,7 @@ import {
   Building,
   RefreshCw,
   Users,
+  Power,
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
 import AvailabilityManager from '../owner/AvailabilityManager';
@@ -61,6 +62,8 @@ import {
   updateBookingStatus,
   logAuditEvent,
   getReviews,
+  updateEquipment,
+  deleteEquipment,
 } from '../../services/database';
 import ReferralProgram from '../referral/ReferralProgram';
 
@@ -72,6 +75,7 @@ interface DashboardProps {
   onBack: () => void;
   onEquipmentClick: (equipment: Equipment) => void;
   onListEquipment: () => void;
+  onEditEquipment?: (equipment: Equipment) => void;
   onNavigate?: (page: string) => void;
   onLeaveReview?: (equipment: Equipment, bookingId: string) => void;
 }
@@ -83,6 +87,7 @@ export default function Dashboard({
   onBack,
   onEquipmentClick,
   onListEquipment,
+  onEditEquipment,
   onNavigate,
   onLeaveReview,
 }: DashboardProps) {
@@ -112,6 +117,9 @@ export default function Dashboard({
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [availabilityEquipment, setAvailabilityEquipment] = useState<Equipment | null>(null);
   const [conversationSearch, setConversationSearch] = useState('');
+  const [cancellingBookingId, setCancellingBookingId] = useState<string | null>(null);
+  const [togglingListingId, setTogglingListingId] = useState<string | null>(null);
+  const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
 
   // Use transition for non-urgent updates
   const [, startTransition] = useTransition();
@@ -282,6 +290,38 @@ export default function Dashboard({
     await updateBookingStatus(bookingId, status);
     setOwnerBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status } : b));
     if (user) logAuditEvent({ userId: user.id, action: `booking_${action}`, metadata: { bookingId } }).catch(() => {});
+  };
+
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      await updateBookingStatus(bookingId, 'cancelled');
+      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'cancelled' as const } : b));
+      setCancellingBookingId(null);
+    } catch {
+      // silently fail — UI stays open so user can retry
+    }
+  };
+
+  const handleToggleListing = async (item: Equipment) => {
+    setTogglingListingId(item.id);
+    try {
+      await updateEquipment(item.id, { is_active: !item.is_active });
+      setMyListings(prev => prev.map(l => l.id === item.id ? { ...l, is_active: !item.is_active } : l));
+    } catch {
+      // silently fail
+    } finally {
+      setTogglingListingId(null);
+    }
+  };
+
+  const handleDeleteListing = async (id: string) => {
+    try {
+      await deleteEquipment(id);
+      setMyListings(prev => prev.filter(l => l.id !== id));
+      setDeletingListingId(null);
+    } catch {
+      // silently fail
+    }
   };
 
   const filteredBookings = bookings.filter(b => bookingFilter === 'all' || b.status === bookingFilter);
@@ -679,6 +719,15 @@ export default function Dashboard({
                                       Leave a Review
                                     </button>
                                   )}
+                                {(booking.status === 'pending' || booking.status === 'confirmed') && (
+                                  <button
+                                    onClick={() => setCancellingBookingId(booking.id)}
+                                    className="flex items-center gap-2 px-4 py-2 text-red-600 dark:text-red-400 font-medium hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                                  >
+                                    <X className="w-4 h-4" aria-hidden="true" />
+                                    Cancel
+                                  </button>
+                                )}
                                 <button
                                   onClick={() => booking.equipment && onEquipmentClick(booking.equipment)}
                                   className="flex items-center gap-2 px-4 py-2 text-teal-600 dark:text-teal-400 font-medium hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-xl transition-colors"
@@ -780,11 +829,22 @@ export default function Dashboard({
                             className="w-full h-40 object-cover"
                           />
                           <div className="absolute top-3 right-3">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-lg ${
-                              item.is_active ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                            }`}>
+                            <button
+                              onClick={() => handleToggleListing(item)}
+                              disabled={togglingListingId === item.id}
+                              title={item.is_active ? 'Pause listing' : 'Activate listing'}
+                              className={`flex items-center gap-1.5 px-2 py-1 text-xs font-medium rounded-lg transition-colors disabled:opacity-60 ${
+                                item.is_active
+                                  ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/60'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                              }`}
+                            >
+                              {togglingListingId === item.id
+                                ? <Loader2 className="w-3 h-3 animate-spin" />
+                                : <Power className="w-3 h-3" />
+                              }
                               {item.is_active ? 'Active' : 'Inactive'}
-                            </span>
+                            </button>
                           </div>
                         </div>
                         <div className="p-4">
@@ -812,10 +872,18 @@ export default function Dashboard({
                             >
                               <Calendar className="w-5 h-5" />
                             </button>
-                            <button className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" aria-label="Edit listing">
+                            <button
+                              onClick={() => onEditEquipment?.(item)}
+                              className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                              aria-label="Edit listing"
+                            >
                               <Edit className="w-5 h-5" />
                             </button>
-                            <button aria-label="Delete item" className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                            <button
+                              onClick={() => setDeletingListingId(item.id)}
+                              aria-label="Delete listing"
+                              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            >
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -1407,6 +1475,66 @@ export default function Dashboard({
           onClose={() => setAvailabilityEquipment(null)}
         />
       )}
+
+      {/* Cancellation Confirmation Modal */}
+      {cancellingBookingId && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setCancellingBookingId(null)} />
+          <div className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/30 mx-auto mb-4">
+              <XCircle className="w-7 h-7 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">Cancel Booking?</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+              This action cannot be undone. Please check the cancellation policy before proceeding.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setCancellingBookingId(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+              >
+                Keep Booking
+              </button>
+              <button
+                onClick={() => handleCancelBooking(cancellingBookingId)}
+                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm font-medium"
+              >
+                Yes, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Listing Confirmation Modal */}
+      {deletingListingId && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setDeletingListingId(null)} />
+          <div className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-6">
+            <div className="flex items-center justify-center w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/30 mx-auto mb-4">
+              <Trash2 className="w-7 h-7 text-red-500" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white text-center mb-2">Remove Listing?</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">
+              This will deactivate the listing and remove it from search results. Active bookings will not be affected.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeletingListingId(null)}
+                className="flex-1 px-4 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-sm font-medium"
+              >
+                Keep Listing
+              </button>
+              <button
+                onClick={() => handleDeleteListing(deletingListingId)}
+                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-colors text-sm font-medium"
+              >
+                Yes, Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1419,18 +1547,20 @@ function StatCard({ label, value, icon: Icon, color, trend }: {
   trend?: number;
 }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-      <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white mb-4`}>
+    <div className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-soft-lg hover:-translate-y-0.5 transition-all duration-300">
+      {/* soft tinted glow that intensifies on hover */}
+      <div className={`absolute -top-8 -right-8 w-24 h-24 ${color} rounded-full opacity-[0.07] group-hover:opacity-[0.12] blur-xl transition-opacity duration-300`} />
+      <div className={`relative w-12 h-12 ${color} rounded-xl flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-105 transition-transform duration-300`}>
         <Icon className="w-6 h-6" />
       </div>
-      <div className="flex items-end justify-between">
+      <div className="relative flex items-end justify-between">
         <div>
           <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
         </div>
         {trend !== undefined && (
-          <div className={`flex items-center gap-1 text-sm ${trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-            {trend >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+          <div className={`flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full ${trend >= 0 ? 'text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900/30' : 'text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30'}`}>
+            {trend >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
             {Math.abs(trend)}%
           </div>
         )}

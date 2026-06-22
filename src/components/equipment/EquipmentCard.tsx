@@ -45,7 +45,7 @@ const EquipmentCard = memo(function EquipmentCard({
       >
         <div className="relative w-48 flex-shrink-0">
           {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="absolute inset-0 skeleton-shimmer" />
           )}
           <img
             src={equipment.images[0]}
@@ -112,7 +112,7 @@ const EquipmentCard = memo(function EquipmentCard({
       >
         <div className="relative aspect-square overflow-hidden">
           {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+            <div className="absolute inset-0 skeleton-shimmer" />
           )}
           <img
             src={equipment.images[0]}
@@ -156,7 +156,7 @@ const EquipmentCard = memo(function EquipmentCard({
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         {!imageLoaded && !imageError && (
-          <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+          <div className="absolute inset-0 skeleton-shimmer" />
         )}
         <img
           src={equipment.images[0]}

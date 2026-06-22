@@ -17,7 +17,7 @@ export default function BackToTop() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       aria-label="Back to top"
-      className="fixed bottom-6 right-24 z-40 w-11 h-11 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-teal-500 hover:border-teal-300 dark:hover:border-teal-600 transition-all"
+      className="fixed bottom-6 right-24 z-40 w-11 h-11 rounded-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-gray-200/70 dark:border-gray-700/60 shadow-soft-lg flex items-center justify-center text-gray-700 dark:text-gray-200 hover:bg-teal-500 hover:text-white hover:border-teal-500 hover:-translate-y-0.5 transition-all duration-200 animate-fade-in"
     >
       <ArrowUp className="w-5 h-5" />
     </button>

@@ -91,10 +91,10 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
   };
 
   const colors = {
-    success: 'bg-green-50 border-green-200 text-green-800',
-    error: 'bg-red-50 border-red-200 text-red-800',
-    warning: 'bg-amber-50 border-amber-200 text-amber-800',
-    info: 'bg-blue-50 border-blue-200 text-blue-800',
+    success: 'bg-green-50/90 dark:bg-green-950/80 border-green-200 dark:border-green-800/60 text-green-800 dark:text-green-200',
+    error: 'bg-red-50/90 dark:bg-red-950/80 border-red-200 dark:border-red-800/60 text-red-800 dark:text-red-200',
+    warning: 'bg-amber-50/90 dark:bg-amber-950/80 border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-200',
+    info: 'bg-blue-50/90 dark:bg-blue-950/80 border-blue-200 dark:border-blue-800/60 text-blue-800 dark:text-blue-200',
   };
 
   const iconColors = {
@@ -104,20 +104,33 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     info: 'text-blue-500',
   };
 
+  const barColors = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    warning: 'bg-amber-500',
+    info: 'bg-blue-500',
+  };
+
   const Icon = icons[toast.type];
+  const duration = toast.duration || 4000;
 
   return (
     <div
-      className={`flex items-start gap-3 min-w-[320px] max-w-md p-4 rounded-xl border shadow-lg animate-slide-in-right ${colors[toast.type]}`}
+      className={`relative flex items-start gap-3 min-w-[320px] max-w-md p-4 rounded-xl border shadow-soft-lg backdrop-blur-xl overflow-hidden animate-slide-in-right ${colors[toast.type]}`}
     >
       <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${iconColors[toast.type]}`} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm">{toast.title}</p>
         {toast.message && <p className="text-sm opacity-80 mt-0.5">{toast.message}</p>}
       </div>
-      <button onClick={onClose} aria-label="Close notification" className="flex-shrink-0 p-1 rounded hover:bg-black/5 transition-colors">
+      <button onClick={onClose} aria-label="Close notification" className="flex-shrink-0 p-1 rounded hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
         <X className="w-4 h-4" />
       </button>
+      {/* Countdown progress bar */}
+      <div
+        className={`absolute bottom-0 left-0 h-0.5 ${barColors[toast.type]} opacity-60`}
+        style={{ animation: `toast-countdown ${duration}ms linear forwards` }}
+      />
     </div>
   );
 }

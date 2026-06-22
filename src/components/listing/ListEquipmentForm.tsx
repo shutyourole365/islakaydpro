@@ -20,6 +20,7 @@ interface ListEquipmentFormProps {
   categories: Category[];
   onClose: () => void;
   onSubmit: (data: EquipmentFormData) => void;
+  initialData?: import('../../types').Equipment;
 }
 
 interface EquipmentFormData {
@@ -49,28 +50,30 @@ export default function ListEquipmentForm({
   categories,
   onClose,
   onSubmit,
+  initialData,
 }: ListEquipmentFormProps) {
+  const isEditMode = !!initialData;
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<EquipmentFormData>({
-    title: '',
-    category_id: '',
-    description: '',
-    brand: '',
-    model: '',
-    condition: 'excellent',
-    daily_rate: 0,
-    weekly_rate: 0,
-    monthly_rate: 0,
-    deposit_amount: 0,
-    location: '',
-    features: [],
-    images: [],
-    min_rental_days: 1,
-    max_rental_days: 30,
+    title: initialData?.title ?? '',
+    category_id: initialData?.category_id ?? '',
+    description: initialData?.description ?? '',
+    brand: initialData?.brand ?? '',
+    model: initialData?.model ?? '',
+    condition: initialData?.condition ?? 'excellent',
+    daily_rate: initialData?.daily_rate ?? 0,
+    weekly_rate: initialData?.weekly_rate ?? 0,
+    monthly_rate: initialData?.monthly_rate ?? 0,
+    deposit_amount: initialData?.deposit_amount ?? 0,
+    location: initialData?.location ?? '',
+    features: initialData?.features ?? [],
+    images: initialData?.images ?? [],
+    min_rental_days: initialData?.min_rental_days ?? 1,
+    max_rental_days: initialData?.max_rental_days ?? 30,
   });
   const [newFeature, setNewFeature] = useState('');
 
@@ -207,7 +210,7 @@ export default function ListEquipmentForm({
               <X className="w-5 h-5" />
               <span>Cancel</span>
             </button>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">List Your Equipment</h1>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">{isEditMode ? 'Edit Listing' : 'List Your Equipment'}</h1>
             <div className="w-20" />
           </div>
         </div>
@@ -787,7 +790,7 @@ export default function ListEquipmentForm({
               }`}
              
               >
-              {step === totalSteps ? 'Publish Listing' : 'Continue'}
+              {step === totalSteps ? (isEditMode ? 'Save Changes' : 'Publish Listing') : 'Continue'}
               {step < totalSteps && <ArrowRight className="w-5 h-5" />}
             </button>
           </div>

@@ -16,8 +16,8 @@ import {
   DollarSign,
   Grid3x3,
 } from 'lucide-react';
-import type { Equipment, Review } from '../../types';
-import { getReviews } from '../../services/database';
+import type { Equipment, Review, EquipmentAvailability } from '../../types';
+import { getReviews, getEquipmentAvailability } from '../../services/database';
 import ShareEquipment from './ShareEquipment';
 import PriceNegotiator from '../negotiation/PriceNegotiator';
 import MaintenancePredictor from '../predictive/MaintenancePredictor';
@@ -56,8 +56,11 @@ export default function EquipmentDetail({
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [blockedRanges, setBlockedRanges] = useState<EquipmentAvailability[]>([]);
+  const [calOffset, setCalOffset] = useState(0);
 
   const images = equipment.images?.length ? equipment.images : [];
+  const today = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
     let active = true;
@@ -70,6 +73,14 @@ export default function EquipmentDetail({
   }, [equipment.id]);
 
   useEffect(() => {
+    let active = true;
+    getEquipmentAvailability(equipment.id, today)
+      .then((ranges) => { if (active) setBlockedRanges(ranges); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [equipment.id, today]);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (lightboxIndex === null) return;
       if (e.key === 'Escape') setLightboxIndex(null);
@@ -79,8 +90,6 @@ export default function EquipmentDetail({
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [lightboxIndex, images.length]);
-
-  const today = new Date().toISOString().split('T')[0];
 
   const pricing = (() => {
     if (!startDate || !endDate) return null;
@@ -355,6 +364,70 @@ export default function EquipmentDetail({
                       </label>
                     </div>
                   </div>
+
+                  {/* Availability mini-calendar */}
+                  {(() => {
+                    const base = new Date();
+                    base.setDate(1);
+                    base.setMonth(base.getMonth() + calOffset);
+                    const year = base.getFullYear();
+                    const month = base.getMonth();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const firstDow = new Date(year, month, 1).getDay();
+                    const monthLabel = base.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+                    const isBlocked = (day: number) => {
+                      const d = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                      return blockedRanges.some(r => d >= r.start_date && d <= r.end_date);
+                    };
+                    const isPast = (day: number) => {
+                      const d = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                      return d < today;
+                    };
+                    const cells = Array.from({ length: firstDow }, (_, i) => <div key={`e${i}`} />);
+                    for (let d = 1; d <= daysInMonth; d++) {
+                      const past = isPast(d);
+                      const blocked = !past && isBlocked(d);
+                      cells.push(
+                        <div
+                          key={d}
+                          className={`flex items-center justify-center text-[11px] rounded-md h-6 w-full font-medium ${
+                            past ? 'text-gray-300 dark:text-gray-600' :
+                            blocked ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' :
+                            'text-gray-700 dark:text-gray-300'
+                          }`}
+                        >
+                          {d}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="mb-4 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <button onClick={() => setCalOffset(o => Math.max(0, o - 1))} disabled={calOffset === 0} className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30">
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">{monthLabel}</span>
+                          <button onClick={() => setCalOffset(o => Math.min(3, o + 1))} disabled={calOffset === 3} className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-30">
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-7 gap-0.5 mb-1">
+                          {['S','M','T','W','T','F','S'].map((d, i) => (
+                            <div key={i} className="text-center text-[10px] font-semibold text-gray-400 uppercase">{d}</div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-0.5">{cells}</div>
+                        {blockedRanges.length > 0 && (
+                          <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                            <div className="w-3 h-3 rounded-sm bg-red-100 dark:bg-red-900/40" />
+                            <span className="text-[10px] text-gray-400">Unavailable</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   <div className="flex items-center gap-2 px-3 py-2 mb-4 bg-gray-50 dark:bg-gray-700/40 rounded-lg text-xs text-gray-500 dark:text-gray-400">
                     <Info className="w-4 h-4 flex-shrink-0" />
