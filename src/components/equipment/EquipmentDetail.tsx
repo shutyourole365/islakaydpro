@@ -29,6 +29,7 @@ interface EquipmentDetailProps {
   onMessage: (equipment: Equipment) => void;
   isFavorite: boolean;
   onFavoriteToggle: () => void;
+  onViewOwner?: (ownerId: string) => void;
 }
 
 function timeAgo(dateString: string): string {
@@ -47,6 +48,7 @@ export default function EquipmentDetail({
   onMessage,
   isFavorite,
   onFavoriteToggle,
+  onViewOwner,
 }: EquipmentDetailProps) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -216,21 +218,29 @@ export default function EquipmentDetail({
               </div>
 
               {/* Owner */}
-              <div className="flex items-center gap-4 py-6 border-b border-gray-100 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={() => onViewOwner?.(equipment.owner_id)}
+                disabled={!onViewOwner}
+                className="flex items-center gap-4 py-6 border-b border-gray-100 dark:border-gray-700 w-full text-left group/owner disabled:cursor-default"
+              >
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center text-white font-bold overflow-hidden">
                   {equipment.owner?.avatar_url
                     ? <img src={equipment.owner.avatar_url} alt="" className="w-full h-full object-cover" />
                     : (equipment.owner?.full_name?.charAt(0) || 'O')}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900 dark:text-white">Hosted by {equipment.owner?.full_name || 'the owner'}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white group-hover/owner:text-teal-600 dark:group-hover/owner:text-teal-400 transition-colors">Hosted by {equipment.owner?.full_name || 'the owner'}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                     {(equipment.owner?.rating ?? 5).toFixed(1)} · {equipment.owner?.total_reviews ?? 0} reviews
                     {equipment.owner?.is_verified && <span className="ml-1 inline-flex items-center gap-1 text-teal-600"><Shield className="w-3.5 h-3.5" /> Verified</span>}
                   </p>
                 </div>
-              </div>
+                {onViewOwner && (
+                  <span className="ml-auto text-sm font-medium text-teal-600 dark:text-teal-400 opacity-0 group-hover/owner:opacity-100 transition-opacity">View profile →</span>
+                )}
+              </button>
 
               {/* Description */}
               {equipment.description && (

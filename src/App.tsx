@@ -46,6 +46,7 @@ const EquipmentRequestBoard = lazy(() => import('./components/requests/Equipment
 const DisputeCenter = lazy(() => import('./components/disputes/DisputeCenter'));
 const IDVerificationFlow = lazy(() => import('./components/verification/IDVerificationFlow'));
 const OwnerEarningsDashboard = lazy(() => import('./components/earnings/OwnerEarningsDashboard'));
+const OwnerProfilePage = lazy(() => import('./components/profile/OwnerProfilePage'));
 const RecurringRentals = lazy(() => import('./components/subscription/RecurringRentals'));
 
 // Lazy load heavy components for better performance
@@ -608,7 +609,7 @@ const sampleEquipment: Equipment[] = [
 ];
 
 function AppContent() {
-type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler' | 'equipment-health' | 'cost-estimator' | 'seasonal-deals' | 'rental-history' | 'multi-language' | 'availability-calendar' | 'revenue-dashboard' | 'certification-tracker' | 'agreement-generator' | 'support-tickets' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | '404';
+type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' | 'analytics' | 'admin' | 'notifications' | 'payments' | 'subscription' | 'sustainability' | 'tutorials' | 'loyalty' | 'fleet' | 'referrals' | 'pwa' | 'trust-score' | 'alerts' | 'bundles' | 'warranties' | 'bulk-booking' | 'insights' | 'terms' | 'privacy' | 'cookies' | 'refund' | 'accessibility' | 'cancellation' | 'about' | 'careers' | 'press' | 'blog' | 'partnerships' | 'investors' | 'help' | 'safety' | 'trust' | 'contact' | 'pricing-calculator' | 'insurance' | 'host-resources' | 'host-community' | 'ai-matching' | 'smart-contracts' | 'ar-preview' | 'carbon-tracker' | 'equipment-financing' | 'iot-telematics' | 'ar-visualization' | 'gps-tracking' | 'crypto-payments' | 'ai-insurance' | 'sustainability-dashboard' | 'social-communities' | 'voice-ai-assistant' | 'blockchain-contracts' | 'vr-training' | 'drone-delivery' | 'industry-integrations' | 'maintenance' | 'scheduler' | 'equipment-health' | 'cost-estimator' | 'seasonal-deals' | 'rental-history' | 'multi-language' | 'availability-calendar' | 'revenue-dashboard' | 'certification-tracker' | 'agreement-generator' | 'support-tickets' | 'requests' | 'disputes' | 'id-verification' | 'earnings' | 'recurring-rentals' | 'owner-profile' | '404';
   const { isAuthenticated, user, profile, signOut, unreadNotifications } = useAuth();
   const { addToast } = useToast();
   const {
@@ -635,6 +636,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
+  const [profileOwnerId, setProfileOwnerId] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCategory, setSearchCategory] = useState('');
@@ -1065,6 +1067,24 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       avatar: equipment.owner?.avatar_url || undefined,
     });
     setSelectedEquipment(null);
+    setIsLiveChatOpen(true);
+  };
+
+  const handleViewOwner = (ownerId: string) => {
+    setSelectedEquipment(null);
+    setProfileOwnerId(ownerId);
+    setCurrentPage('owner-profile');
+    window.scrollTo({ top: 0 });
+  };
+
+  const handleMessageOwner = (ownerId: string) => {
+    if (!isAuthenticated || !user) { setIsAuthOpen(true); return; }
+    const ownerEquipment = equipment.find(e => e.owner_id === ownerId);
+    setChatRecipient({
+      id: ownerId,
+      name: ownerEquipment?.owner?.full_name || 'Equipment Owner',
+      avatar: ownerEquipment?.owner?.avatar_url || undefined,
+    });
     setIsLiveChatOpen(true);
   };
 
@@ -1847,6 +1867,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onMessage={handleMessage}
             isFavorite={favorites.has(selectedEquipment.id)}
             onFavoriteToggle={() => handleFavoriteToggle(selectedEquipment.id)}
+            onViewOwner={handleViewOwner}
           />
         </Suspense>
       )}
@@ -3109,6 +3130,20 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
       {currentPage === 'earnings' && (
         <Suspense fallback={<PageLoader />}>
           <OwnerEarningsDashboard onBack={() => setCurrentPage('dashboard')} />
+          <Footer onNavigate={handleNavigate} />
+        </Suspense>
+      )}
+
+      {currentPage === 'owner-profile' && profileOwnerId && (
+        <Suspense fallback={<PageLoader />}>
+          <OwnerProfilePage
+            ownerId={profileOwnerId}
+            onBack={() => { setProfileOwnerId(null); setCurrentPage('browse'); }}
+            onEquipmentClick={handleEquipmentClick}
+            onMessage={handleMessageOwner}
+            onFavoriteClick={handleFavoriteToggle}
+            favorites={favorites}
+          />
           <Footer onNavigate={handleNavigate} />
         </Suspense>
       )}
