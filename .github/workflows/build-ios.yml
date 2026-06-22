@@ -16,13 +16,14 @@ env:
 jobs:
   build-ios:
     runs-on: macos-14
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -33,6 +34,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Patch @capacitor/status-bar for Xcode 15 compatibility
+        run: |
+          FILE="node_modules/@capacitor/status-bar/ios/Sources/StatusBarPlugin/StatusBar.swift"
+          if [ -f "$FILE" ]; then
+            # Fix: bridge.webView is not available on CAPBridgeProtocol in Capacitor 8
+            # Replace with optional cast to access webView safely
+            sed -i '' \
+              's/self\.bridge?\.webView/(self.bridge as? CAPWebViewBridge)?.webView/g' \
+              "$FILE" || \
+            sed -i \
+              's/self\.bridge?\.webView/(self.bridge as? CAPWebViewBridge)?.webView/g' \
+              "$FILE"
+            echo "✅ Patched StatusBar.swift"
+            grep -n "webView" "$FILE" | head -5
+          else
+            echo "⚠️ StatusBar.swift not found at expected path"
+          fi
+
       - name: Build web app
         run: npm run build
         env:
@@ -41,6 +60,19 @@ jobs:
 
       - name: Sync Capacitor
         run: npx cap sync ios
+
+      - name: Re-patch @capacitor/status-bar after cap sync
+        run: |
+          FILE="node_modules/@capacitor/status-bar/ios/Sources/StatusBarPlugin/StatusBar.swift"
+          if [ -f "$FILE" ]; then
+            sed -i '' \
+              's/self\.bridge?\.webView/(self.bridge as? CAPWebViewBridge)?.webView/g' \
+              "$FILE" 2>/dev/null || \
+            sed -i \
+              's/self\.bridge?\.webView/(self.bridge as? CAPWebViewBridge)?.webView/g' \
+              "$FILE"
+            echo "✅ Re-patched StatusBar.swift after sync"
+          fi
 
       - name: Resolve Swift Package Manager dependencies
         run: |
@@ -63,7 +95,7 @@ jobs:
             archive
 
       - name: Upload Archive
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: ios-archive
           path: ios/App/build/App.xcarchive
