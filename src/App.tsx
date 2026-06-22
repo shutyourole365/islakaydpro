@@ -1868,6 +1868,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             isFavorite={favorites.has(selectedEquipment.id)}
             onFavoriteToggle={() => handleFavoriteToggle(selectedEquipment.id)}
             onViewOwner={handleViewOwner}
+            onEquipmentClick={handleEquipmentClick}
           />
         </Suspense>
       )}

@@ -17,8 +17,9 @@ import {
   Grid3x3,
 } from 'lucide-react';
 import type { Equipment, Review, EquipmentAvailability } from '../../types';
-import { getReviews, getEquipmentAvailability } from '../../services/database';
+import { getReviews, getEquipmentAvailability, getEquipment } from '../../services/database';
 import ShareEquipment from './ShareEquipment';
+import EquipmentCard from './EquipmentCard';
 import PriceNegotiator from '../negotiation/PriceNegotiator';
 import MaintenancePredictor from '../predictive/MaintenancePredictor';
 
@@ -30,6 +31,7 @@ interface EquipmentDetailProps {
   isFavorite: boolean;
   onFavoriteToggle: () => void;
   onViewOwner?: (ownerId: string) => void;
+  onEquipmentClick?: (equipment: Equipment) => void;
 }
 
 function timeAgo(dateString: string): string {
@@ -49,7 +51,9 @@ export default function EquipmentDetail({
   isFavorite,
   onFavoriteToggle,
   onViewOwner,
+  onEquipmentClick,
 }: EquipmentDetailProps) {
+  const [similar, setSimilar] = useState<Equipment[]>([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
@@ -81,6 +85,19 @@ export default function EquipmentDetail({
       .catch(() => {});
     return () => { active = false; };
   }, [equipment.id, today]);
+
+  // "More like this" — other active listings in the same category
+  useEffect(() => {
+    if (!equipment.category_id) { setSimilar([]); return; }
+    let active = true;
+    getEquipment({ categoryId: equipment.category_id, limit: 9 })
+      .then(({ data }) => {
+        if (!active) return;
+        setSimilar(data.filter((e) => e.id !== equipment.id).slice(0, 4));
+      })
+      .catch(() => { if (active) setSimilar([]); });
+    return () => { active = false; };
+  }, [equipment.id, equipment.category_id]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -497,6 +514,25 @@ export default function EquipmentDetail({
               </div>
             </div>
           </div>
+
+          {/* More like this */}
+          {similar.length > 0 && (
+            <div className="px-5 sm:px-8 pb-8 pt-2 border-t border-gray-100 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 mt-6">More like this</h2>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {similar.map((item) => (
+                  <EquipmentCard
+                    key={item.id}
+                    equipment={item}
+                    variant="compact"
+                    onEquipmentClick={(eq) => onEquipmentClick?.(eq)}
+                    onFavoriteClick={() => {}}
+                    isFavorite={false}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
