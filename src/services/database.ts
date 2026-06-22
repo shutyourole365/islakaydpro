@@ -351,6 +351,22 @@ export async function createReview(review: Omit<Review, 'id' | 'created_at' | 'r
   return data;
 }
 
+/**
+ * Post (or update) an owner's public response to a review left about them.
+ * Only the reviewee should be allowed to call this; RLS enforces ownership.
+ */
+export async function respondToReview(reviewId: string, response: string): Promise<Review> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .update({ response, updated_at: new Date().toISOString() })
+    .eq('id', reviewId)
+    .select('*, reviewer:profiles!reviews_reviewer_id_fkey(*)')
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function getFavorites(userId: string): Promise<Favorite[]> {
   const { data, error } = await supabase
     .from('favorites')
