@@ -196,6 +196,23 @@ export default function BrowsePage({
     priceRange[0] > 0 || priceRange[1] < 1000,
   ].filter(Boolean).length;
 
+  // One-tap removable chips for each active filter
+  const categoryLabel = selectedCategory
+    ? categories.find((c) => c.slug === selectedCategory || c.name === selectedCategory)?.name || selectedCategory
+    : '';
+  const activeFilterChips: { key: string; label: string; onClear: () => void }[] = [
+    searchQuery && { key: 'search', label: `"${searchQuery}"`, onClear: () => setSearchQuery('') },
+    selectedCategory && { key: 'category', label: categoryLabel, onClear: () => setSelectedCategory('') },
+    location && { key: 'location', label: location, onClear: () => { setLocation(''); setUserCoords(null); } },
+    condition && { key: 'condition', label: condition.charAt(0).toUpperCase() + condition.slice(1), onClear: () => setCondition('') },
+    rentalDuration && { key: 'duration', label: rentalDuration, onClear: () => setRentalDuration('') },
+    (priceRange[0] > 0 || priceRange[1] < 1000) && {
+      key: 'price',
+      label: `$${priceRange[0]}–$${priceRange[1]}/day`,
+      onClear: () => setPriceRange([0, 1000]),
+    },
+  ].filter(Boolean) as { key: string; label: string; onClear: () => void }[];
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20">
       <div className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-20 z-40">
@@ -455,7 +472,7 @@ export default function BrowsePage({
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <p className="text-gray-600 dark:text-gray-400">
             <span className="font-semibold text-gray-900 dark:text-white">{filteredEquipment.length}</span>{' '}
             results found
@@ -467,6 +484,30 @@ export default function BrowsePage({
             )}
           </p>
         </div>
+
+        {/* Active filter chips */}
+        {activeFilterChips.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            {activeFilterChips.map((chip) => (
+              <button
+                key={chip.key}
+                onClick={chip.onClear}
+                className="group inline-flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 text-sm font-medium border border-teal-200/60 dark:border-teal-800/50 hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors"
+              >
+                {chip.label}
+                <span className="flex items-center justify-center w-4 h-4 rounded-full bg-teal-200/70 dark:bg-teal-800/70 group-hover:bg-teal-300 dark:group-hover:bg-teal-700 transition-colors">
+                  <X className="w-3 h-3" />
+                </span>
+              </button>
+            ))}
+            <button
+              onClick={clearFilters}
+              className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors px-2 py-1.5"
+            >
+              Clear all
+            </button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
