@@ -41,6 +41,7 @@ import {
 } from 'lucide-react';
 import AISettings from '../settings/AISettings';
 import AvailabilityManager from '../owner/AvailabilityManager';
+import PayoutSetupBanner from './PayoutSetupBanner';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -465,6 +466,9 @@ export default function Dashboard({
           <div className="flex-1 min-w-0">
             {activeTab === 'overview' && (
               <div className="space-y-6">
+                {/* Owner payout onboarding nudge */}
+                <PayoutSetupBanner hasListings={myListings.length > 0} />
+
                 {/* Quick Actions for new features */}
                 {onNavigate && (
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
