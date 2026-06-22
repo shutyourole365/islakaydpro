@@ -44,6 +44,7 @@ import {
 import AISettings from '../settings/AISettings';
 import AvailabilityManager from '../owner/AvailabilityManager';
 import PayoutSetupBanner from './PayoutSetupBanner';
+import ProfileCompletionCard from './ProfileCompletionCard';
 import { downloadBookingICS } from '../../utils/calendar';
 import { printBookingReceipt } from '../../utils/receipt';
 import type { Equipment, Booking, UserAnalytics, Notification, Conversation, Message } from '../../types';
@@ -472,6 +473,9 @@ export default function Dashboard({
               <div className="space-y-6">
                 {/* Owner payout onboarding nudge */}
                 <PayoutSetupBanner hasListings={myListings.length > 0} />
+
+                {/* Profile completion nudge */}
+                <ProfileCompletionCard profile={profile} onComplete={() => setActiveTab('settings')} />
 
                 {/* Quick Actions for new features */}
                 {onNavigate && (
