@@ -3143,6 +3143,7 @@ type PageType = 'home' | 'browse' | 'dashboard' | 'list-equipment' | 'security' 
             onMessage={handleMessageOwner}
             onFavoriteClick={handleFavoriteToggle}
             favorites={favorites}
+            currentUserId={user?.id}
           />
           <Footer onNavigate={handleNavigate} />
         </Suspense>

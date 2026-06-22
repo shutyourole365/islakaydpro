@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, MapPin, Star, ShieldCheck, Package, CalendarDays, MessageSquare, BadgeCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, Star, ShieldCheck, Package, CalendarDays, MessageSquare, BadgeCheck, CornerDownRight, Send, Loader2 } from 'lucide-react';
 import type { Profile, Equipment, Review } from '../../types';
-import { getProfile, getEquipment, getReviews } from '../../services/database';
+import { getProfile, getEquipment, getReviews, respondToReview } from '../../services/database';
 import EquipmentCard from '../equipment/EquipmentCard';
 
 interface OwnerProfilePageProps {
@@ -11,6 +11,8 @@ interface OwnerProfilePageProps {
   onMessage?: (ownerId: string) => void;
   onFavoriteClick?: (equipmentId: string) => void;
   favorites?: Set<string>;
+  /** Current viewer's id — when it matches ownerId, the owner can reply to reviews. */
+  currentUserId?: string;
 }
 
 function memberSince(dateString?: string): string {
@@ -35,11 +37,32 @@ export default function OwnerProfilePage({
   onMessage,
   onFavoriteClick,
   favorites,
+  currentUserId,
 }: OwnerProfilePageProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [listings, setListings] = useState<Equipment[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [replyingId, setReplyingId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [savingReply, setSavingReply] = useState(false);
+
+  const isOwnProfile = !!currentUserId && currentUserId === ownerId;
+
+  const handleSubmitReply = async (reviewId: string) => {
+    if (!replyText.trim()) return;
+    setSavingReply(true);
+    try {
+      const updated = await respondToReview(reviewId, replyText.trim());
+      setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, response: updated.response } : r));
+      setReplyingId(null);
+      setReplyText('');
+    } catch {
+      // keep the box open so the owner can retry
+    } finally {
+      setSavingReply(false);
+    }
+  };
 
   useEffect(() => {
     let active = true;
@@ -215,6 +238,57 @@ export default function OwnerProfilePage({
                         </div>
                       </div>
                       {review.comment && <p className="text-sm text-gray-600 dark:text-gray-300">{review.comment}</p>}
+
+                      {/* Owner's public response */}
+                      {review.response && (
+                        <div className="mt-3 flex gap-2 rounded-xl bg-gray-50 dark:bg-gray-800/60 p-3">
+                          <CornerDownRight className="w-4 h-4 text-teal-500 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                              {profile.full_name || 'Owner'} <span className="font-normal text-gray-400">responded</span>
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 mt-0.5">{review.response}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Owner reply affordance (only on own profile, when no response yet) */}
+                      {isOwnProfile && !review.response && (
+                        replyingId === review.id ? (
+                          <div className="mt-3">
+                            <textarea
+                              value={replyText}
+                              onChange={(e) => setReplyText(e.target.value)}
+                              rows={2}
+                              placeholder="Write a public response…"
+                              className="w-full text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500/30 focus:border-teal-500"
+                            />
+                            <div className="flex items-center gap-2 mt-2">
+                              <button
+                                onClick={() => handleSubmitReply(review.id)}
+                                disabled={savingReply || !replyText.trim()}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-500 text-white text-sm font-medium rounded-lg hover:bg-teal-600 disabled:opacity-60 transition-colors"
+                              >
+                                {savingReply ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                                Post response
+                              </button>
+                              <button
+                                onClick={() => { setReplyingId(null); setReplyText(''); }}
+                                className="px-3 py-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => { setReplyingId(review.id); setReplyText(''); }}
+                            className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-teal-600 dark:text-teal-400 hover:gap-2 transition-all"
+                          >
+                            <CornerDownRight className="w-4 h-4" /> Reply
+                          </button>
+                        )
+                      )}
                     </div>
                   ))}
                 </div>
